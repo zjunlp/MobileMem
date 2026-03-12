@@ -194,8 +194,8 @@ TRAJECTORY_DIR = str(_SCRIPT_DIR / "output" / "trajectories")
 
 EMBEDDING_MODEL_NAME = "text-embedding-3-small"
 EMBEDDING_DIMENSIONS = 1536
-EMBEDDING_API_KEY = "sk-RbEjV9qrdLGmwgnJdf6lPvqxJso9f95r6BGaGP2eANuVCnci"
-EMBEDDING_BASE_URL = "https://www.DMXapi.com/v1"
+EMBEDDING_API_KEY = "YOUR_API_KEY"
+EMBEDDING_BASE_URL = "YOUR_BASE_URL"
 EMBEDDING_BATCH_SIZE = 16
 EMBEDDING_CACHE_DIR = str(_SCRIPT_DIR / "output" / ".cache" / "embeddings")
 
