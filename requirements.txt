@@ -1,0 +1,5 @@
+agentscope==1.0.6
+pyngrok==7.4.1
+pymilvus[milvus_lite]==2.6.6
+nltk==3.9.2 
+scikit-learn==1.8.0

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trajectory Synthesis Visualization</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            min-height: 700px;
+        }
+
+        .chart-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .details-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: 700px;
+        }
+
+        #graph-container {
+            width: 100%;
+            height: 600px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn:disabled:hover {
+            transform: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .node-details {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .node-details h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .node-details pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border-left: 4px solid #667eea;
+        }
+
+        .node-details code {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .node-details ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .node-details li {
+            margin-bottom: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #667eea;
+        }
+
+        .loading i {
+            font-size: 48px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .status-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-item i {
+            color: #667eea;
+        }
+
+        .breadcrumb {
+            background: white;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        .breadcrumb-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #667eea;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .breadcrumb-item:hover {
+            background: #f0f0f0;
+        }
+
+        .breadcrumb-item.active {
+            font-weight: bold;
+            background: #667eea;
+            color: white;
+        }
+
+        .breadcrumb-separator {
+            color: #ccc;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-project-diagram"></i> Trajectory Synthesis Visualization</h1>
+            <p>Interactive exploration of hierarchical event trajectories</p>
+        </div>
+
+        <div class="breadcrumb" id="breadcrumb">
+            <!-- Breadcrumb will be populated by JavaScript -->
+        </div>
+
+        <div class="main-content">
+            <div class="chart-panel">
+                <div id="graph-container"></div>
+                <div class="controls">
+                    <button class="btn btn-secondary" id="btn-back" onclick="goBack()">
+                        <i class="fas fa-arrow-left"></i> Back to Parent
+                    </button>
+                    <button class="btn btn-primary" id="btn-expand" onclick="expandCurrent()">
+                        <i class="fas fa-level-down-alt"></i> Expand Current
+                    </button>
+                    <button class="btn btn-info" onclick="goToRoot()">
+                        <i class="fas fa-home"></i> Go to Root
+                    </button>
+                    <button class="btn btn-info" onclick="refreshGraph()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="details-panel">
+                <div class="node-details" id="node-details">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <i class="fas fa-info-circle"></i>
+                <span>Click on nodes to view details and navigate</span>
+            </div>
+            <div class="status-item">
+                <i class="fas fa-layer-group"></i>
+                <span id="current-level">Level: 0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentNodeId = null;
+        let graphData = null;
+        let chart = null;
+        let navigationHistory = [];
+        let isMessageView = false;  // Track if viewing session messages
+        let currentLevel = 0;  // Track current hierarchy level (0 = root)
+
+        // Initialize the chart
+        function initChart() {
+            chart = echarts.init(document.getElementById('graph-container'));
+            currentLevel = 0;  // Initialize at root level
+            updateLevelDisplay();
+            loadGraph(null);
+        }
+
+        // Load graph data from server
+        async function loadGraph(nodeId, expandMessages = false) {
+            try {
+                let url = nodeId ? `/api/graph?node_id=${nodeId}` : '/api/graph';
+                if (expandMessages) {
+                    url += '&expand_messages=true';
+                }
+                const response = await fetch(url);
+                graphData = await response.json();
+                
+                currentNodeId = graphData.current_node_id;
+                isMessageView = graphData.is_message_view || false;
+                navigationHistory.push(currentNodeId);
+                
+                renderGraph();
+                loadNodeDetails(currentNodeId);
+                updateControls();
+                updateBreadcrumb();
+                
+            } catch (error) {
+                console.error('Error loading graph:', error);
+                alert('Failed to load graph data');
+            }
+        }
+
+        // Render the graph using ECharts
+        function renderGraph() {
+            const option = {
+                title: {
+                    text: 'Trajectory Hierarchy',
+                    left: 'center',
+                    top: 10,
+                    textStyle: {
+                        fontSize: 18,
+                        fontWeight: 'bold',
+                        color: '#667eea'
+                    }
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: function(params) {
+                        if (params.dataType === 'node') {
+                            return `<b>${params.data.name}</b><br/>Click to view details`;
+                        }
+                        return params.data.name;
+                    }
+                },
+                legend: [{
+                    data: graphData.categories.map((cat, idx) => {
+                        const legendItem = { name: cat.name };
+                        if (cat.itemStyle && cat.itemStyle.color) {
+                            legendItem.itemStyle = { color: cat.itemStyle.color };
+                        }
+                        return legendItem;
+                    }),
+                    orient: 'vertical',
+                    left: 10,
+                    top: 50,
+                    selectedMode: true  
+                }],
+                animationDuration: 1500,
+                animationEasingUpdate: 'quinticInOut',
+                series: [{
+                    type: 'graph',
+                    layout: 'force',
+                    data: graphData.nodes,
+                    links: graphData.edges,
+                    categories: graphData.categories,
+                    roam: true,
+                    draggable: true,
+                    focusNodeAdjacency: true,
+                    label: {
+                        show: true,
+                        position: 'right',
+                        formatter: '{b}'
+                    },
+                    labelLayout: {
+                        hideOverlap: true
+                    },
+                    lineStyle: {
+                        color: 'source',
+                        curveness: 0.3,
+                        opacity: 0.6
+                    },
+                    edgeSymbol: ['none', 'arrow'],
+                    edgeSymbolSize: [0, 10],
+                    emphasis: {
+                        focus: 'adjacency',
+                        label: {
+                            fontSize: 14,
+                            fontWeight: 'bold'
+                        },
+                        lineStyle: {
+                            width: 3
+                        }
+                    },
+                    force: {
+                        repulsion: 1000,
+                        edgeLength: [100, 200],
+                        gravity: 0.1
+                    }
+                }]
+            };
+
+            chart.setOption(option);
+
+            // Add click event
+            chart.off('click');
+            chart.on('click', function(params) {
+                if (params.dataType === 'node') {
+                    onNodeClick(params.data.id);
+                }
+            });
+        }
+
+        // Handle node click
+        function onNodeClick(nodeId) {
+            console.log('Node clicked:', nodeId);
+            
+            // Update current node selection
+            currentNodeId = nodeId;
+            
+            // Load details for clicked node
+            loadNodeDetails(nodeId);
+            
+            // Reload graph data to update can_expand status
+            loadGraphData(nodeId);
+        }
+        
+        // Load graph data without changing view (for updating button states)
+        async function loadGraphData(nodeId) {
+            try {
+                const url = nodeId ? `/api/graph?node_id=${nodeId}` : '/api/graph';
+                const response = await fetch(url);
+                graphData = await response.json();
+                
+                currentNodeId = graphData.current_node_id;
+                isMessageView = graphData.is_message_view || false;
+                updateControls();
+                
+            } catch (error) {
+                console.error('Error loading graph data:', error);
+            }
+        }
+
+        // Load node details
+        async function loadNodeDetails(nodeId) {
+            try {
+                const url = nodeId ? `/api/node_details?node_id=${nodeId}` : '/api/node_details';
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                // Convert markdown to HTML (using marked.js)
+                const html = marked.parse(data.markdown);
+                document.getElementById('node-details').innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error loading node details:', error);
+                document.getElementById('node-details').innerHTML = 
+                    '<p style="color: red;">Error loading details</p>';
+            }
+        }
+
+        // Update control buttons
+        function updateControls() {
+            const btnBack = document.getElementById('btn-back');
+            const btnExpand = document.getElementById('btn-expand');
+            
+            btnBack.disabled = !graphData.can_go_back;
+            btnExpand.disabled = !graphData.can_expand;
+        }
+
+        // Update level display
+        function updateLevelDisplay() {
+            const levelElement = document.getElementById('current-level');
+            levelElement.textContent = `Level: ${currentLevel}`;
+        }
+
+        // Navigation functions
+        async function goBack() {
+            const currentType = currentNodeId ? currentNodeId.split('_')[0] : null;
+            
+            if (currentType === 'message') {
+                // Go back from single message to full message view (same level)
+                navigationHistory = [];
+                await loadGraph(graphData.parent_node_id, true);  // session with expand_messages=true
+            } else if (isMessageView) {
+                // Go back from messages view to session view (decrement level)
+                currentLevel = Math.max(0, currentLevel - 1);
+                navigationHistory = [];
+                await loadGraph(currentNodeId, false);  // Show session without messages
+                updateLevelDisplay();
+            } else if (graphData.parent_node_id) {
+                // Check if going back from event to graph (same level)
+                // If current is event and parent is graph, this is same level
+                const parentType = graphData.parent_node_id ? graphData.parent_node_id.split('_')[0] : null;
+                
+                if (currentType === 'event' && parentType === 'graph') {
+                    // Event -> Graph: same level, don't decrement
+                    navigationHistory = [];
+                    await loadGraph(graphData.parent_node_id);
+                } else {
+                    // Other cases: real level change, decrement level
+                    currentLevel = Math.max(0, currentLevel - 1);
+                    navigationHistory = [];
+                    await loadGraph(graphData.parent_node_id);
+                    updateLevelDisplay();
+                }
+            }
+        }
+
+        async function expandCurrent() {
+            if (graphData.can_expand) {
+                // Increment level when expanding
+                currentLevel++;
+                
+                // Check if current node is a session
+                const isSession = currentNodeId && currentNodeId.startsWith('session_');
+                
+                if (isSession) {
+                    // Expand session to show messages
+                    navigationHistory = [];
+                    await loadGraph(currentNodeId, true);  // expand_messages=true
+                } else {
+                    // Regular expand to child node
+                    const response = await fetch(`/api/navigate?action=expand&node_id=${currentNodeId}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        navigationHistory = [];
+                        await loadGraph(data.target_node_id);
+                    } else {
+                        // If expansion failed, revert level increment
+                        currentLevel--;
+                        alert(data.message);
+                        return;
+                    }
+                }
+                
+                updateLevelDisplay();
+            }
+        }
+
+        function goToRoot() {
+            currentLevel = 0;  // Reset to root level
+            navigationHistory = [];
+            updateLevelDisplay();
+            loadGraph(null);
+        }
+
+        function refreshGraph() {
+            loadGraph(currentNodeId);
+        }
+
+        // Update breadcrumb
+        function updateBreadcrumb() {
+            const breadcrumb = document.getElementById('breadcrumb');
+            // Simple breadcrumb - can be enhanced
+            const nodeType = currentNodeId ? currentNodeId.split('_')[0] : 'root';
+            breadcrumb.innerHTML = `
+                <div class="breadcrumb-item active">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Current: ${nodeType.charAt(0).toUpperCase() + nodeType.slice(1)}</span>
+                </div>
+            `;
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', initChart);
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (chart) {
+                chart.resize();
+            }
+        });
+    </script>
+</body>
+</html>
+
