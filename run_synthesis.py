@@ -3,11 +3,12 @@
 Run trajectory synthesis with pre-defined persona.
 
 This script runs the KEME trajectory synthesis pipeline using an existing persona
-(loaded from a pickle file) and provides visualization through both the trajectory 
+(loaded from a JSON file) and provides visualization through both the trajectory 
 visualization server and the AgentScope studio server.
 """
 import argparse
 import asyncio
+import json
 import os
 import pickle
 import signal
@@ -50,8 +51,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--persona_path",
         type=str,
-        default="person.pkl",
-        help="Path to the persona pickle file.",
+        default="person.json",
+        help="Path to the persona JSON file.",
     )
     
     # Model configuration
@@ -116,6 +117,16 @@ def parse_args() -> argparse.Namespace:
         default=8000,
         help="Maximum tokens for compatibility context before triggering summarization.",
     )
+    parser.add_argument(
+        "--grounded_session_subgraph_threshold",
+        type=int,
+        default=None,
+        help=(
+            "Threshold on the number of grounded sessions assigned to an event. When an "
+            "event's grounded session count exceeds this threshold, the event is not forced "
+            "to expand into a single session at the maximum depth."
+        ),
+    )
     
     # Server configuration
     parser.add_argument(
@@ -139,7 +150,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--studio_project",
         type=str,
-        default="haste_synthesis",
+        default="keme",
         help="Project name for the AgentScope studio.",
     )
     
@@ -250,7 +261,7 @@ class SynthesisRunner:
             pass
 
     def _load_persona(self) -> Person:
-        """Load persona from pickle file.
+        """Load persona from JSON file.
         
         Returns:
             `Person`:
@@ -263,11 +274,11 @@ class SynthesisRunner:
         if not os.path.exists(self.args.persona_path):
             raise FileNotFoundError(
                 f"Persona file '{self.args.persona_path}' is not found. "
-                "Please provide a valid persona pickle file."
+                "Please provide a valid persona JSON file."
             )
         
-        with open(self.args.persona_path, "rb") as f:
-            person = pickle.load(f)
+        with open(self.args.persona_path, "r", encoding="utf-8") as f:
+            person = Person.model_validate(json.load(f))
         
         print(f"✅ Loaded persona: {person.name}")
         print(f"   - Trajectory: {person.trajectory_start} to {person.trajectory_end}")
@@ -447,6 +458,7 @@ class SynthesisRunner:
             min_events=self.args.min_events,
             max_events=self.args.max_events,
             max_depth=self.args.max_depth,
+            grounded_session_subgraph_threshold=self.args.grounded_session_subgraph_threshold,
         )
         
         print(f"✅ Scheduler configured:")
