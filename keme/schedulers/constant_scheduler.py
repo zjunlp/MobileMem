@@ -14,6 +14,7 @@ class ConstantGraphNotebookStateScheduler(GraphNotebookStateSchedulerBase):
         max_events: int | None = None, 
         max_depth: int | None = None,
         is_agent_control: bool = False,
+        grounded_session_subgraph_threshold: int | None = None,
     ) -> None:
         """
         Initialize the constant scheduler. 
@@ -30,6 +31,10 @@ class ConstantGraphNotebookStateScheduler(GraphNotebookStateSchedulerBase):
                 The maximum depth of the trajectory. If `None`, no limit is used.
             is_agent_control (`bool`, defaults to `False`):
                 Whether the scheduler is agent-controlled.
+            grounded_session_subgraph_threshold (`int | None`, optional):
+                The threshold on the number of grounded sessions assigned to an event.
+                When an event's grounded session count exceeds this threshold, the event is
+                not forced to expand into a single session even at the maximum depth. 
         """
         super().__init__()
 
@@ -55,12 +60,23 @@ class ConstantGraphNotebookStateScheduler(GraphNotebookStateSchedulerBase):
         self.max_depth = max_depth or float("inf")
 
         self.is_agent_control = is_agent_control
+
+        if (
+            grounded_session_subgraph_threshold is not None
+            and grounded_session_subgraph_threshold < 0
+        ):
+            raise ValueError(
+                "The grounded session subgraph threshold must be non-negative. "
+                f"However, you provide '{grounded_session_subgraph_threshold}'."
+            )
+        self.grounded_session_subgraph_threshold = grounded_session_subgraph_threshold
         
         # Register state for serialization
         self.register_state("min_events")
         self.register_state("max_events")
         self.register_state("max_depth")
         self.register_state("is_agent_control")
+        self.register_state("grounded_session_subgraph_threshold")
     
     def get_min_events(self, level: int) -> int:
         return self.min_events
@@ -74,6 +90,16 @@ class ConstantGraphNotebookStateScheduler(GraphNotebookStateSchedulerBase):
         level: int | None = None,
     ) -> Literal["session_only", "subgraph_only", "both"]:
         level = level or 0 
+        # If the event already holds too many grounded sessions, do not force it to expand
+        # into a single session at the maximum depth. Expanding it into a sub-event graph
+        # instead allows the grounded sessions to be distributed across sub-events rather than
+        # being merged into one session.
+        if (
+            self.grounded_session_subgraph_threshold is not None
+            and isinstance(parent, Event)
+            and parent.num_grounded_sessions > self.grounded_session_subgraph_threshold
+        ):
+            return "both" if self.is_agent_control else "subgraph_only"
         if level + 1 <= self.max_depth - 1:
             return "both" if self.is_agent_control else "subgraph_only"
         return "session_only"
