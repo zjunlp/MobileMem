@@ -17,9 +17,9 @@ from agentscope.formatter import OpenAIChatFormatter
 from agentscope.message import Msg
 from agentscope.model import OpenAIChatModel
 
-from keme.models import TrajectorySynthesisState
-from keme.models.persona import PersonBase
-from keme.toolkits import (
+from MobileMem.keme.models import TrajectorySynthesisState
+from MobileMem.keme.models.persona import PersonBase
+from MobileMem.keme.toolkits import (
     SynthesisAgent,
     TemporalEventGraphNotebook,
     SessionNotebook,
@@ -30,8 +30,8 @@ from keme.toolkits import (
     DefaultSessionGroundingToHint,
     DefaultGraphRefinementToHint,
 )
-from keme.schedulers import ConstantGraphNotebookStateScheduler
-from keme.utils import SYSTEM_PROMPT
+from MobileMem.keme.schedulers import ConstantGraphNotebookStateScheduler
+from MobileMem.keme.utils import SYSTEM_PROMPT
 
 from custom_profile_schema import (
     PersonFull,

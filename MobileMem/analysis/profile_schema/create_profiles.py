@@ -13,7 +13,7 @@ from pathlib import Path
 from datetime import datetime, timedelta
 
 from custom_profile_schema import PersonFull, PersonMedium, PersonCompact
-from keme.data import create_profile
+from MobileMem.keme.data import create_profile
 from agentscope.model import OpenAIChatModel
 from agentscope.formatter import OpenAIChatFormatter
 

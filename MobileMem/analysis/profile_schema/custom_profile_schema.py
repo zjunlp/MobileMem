@@ -37,9 +37,9 @@ least affects overall trajectory diversity.
 """
 
 from pydantic import Field
-from keme.models.persona import PersonBase
-from keme.models import Person 
-from keme.models.persona import (
+from MobileMem.keme.models.persona import PersonBase
+from MobileMem.keme.models import Person
+from MobileMem.keme.models.persona import (
     BasicInfo,
     Personality,
     Career,

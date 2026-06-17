@@ -12,8 +12,8 @@ import json
 import asyncio
 from pathlib import Path
 from pydantic import BaseModel, Field
-from keme.models.persona import PersonBase
-from keme.models.persona import (
+from MobileMem.keme.models.persona import PersonBase
+from MobileMem.keme.models.persona import (
     BasicInfo,
     Personality,
     Career,
@@ -23,11 +23,11 @@ from keme.models.persona import (
     Finance,
     SocialCircle,
 )
-from keme.data import create_profile
+from MobileMem.keme.data import create_profile
 from agentscope.model import OpenAIChatModel
 from agentscope.formatter import OpenAIChatFormatter
 from agentscope.message import Msg
-from keme.toolkits.agent import SynthesisAgent
+from MobileMem.keme.toolkits.agent import SynthesisAgent
 
 
 _SCRIPT_DIR = Path(__file__).resolve().parent

@@ -12,7 +12,7 @@ from agentscope.embedding import (
     EmbeddingModelBase, 
     FileEmbeddingCache,
 )
-from keme.models.persona import PersonBase
+from MobileMem.keme.models.persona import PersonBase
 from custom_profile_schema import (
     PersonFull, 
     PersonMedium, 

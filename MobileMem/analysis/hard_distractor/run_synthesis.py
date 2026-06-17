@@ -16,10 +16,10 @@ import shortuuid
 from agentscope.formatter import OpenAIChatFormatter
 from agentscope.message import Msg
 from agentscope.model import OpenAIChatModel
-from keme.models import TrajectorySynthesisState
-from keme.models.session import Message, Session
-from keme.data import merge_parallel_sessions, unify_message_names
-from keme.toolkits import (
+from MobileMem.keme.models import TrajectorySynthesisState
+from MobileMem.keme.models.session import Message, Session
+from MobileMem.keme.data import merge_parallel_sessions, unify_message_names
+from MobileMem.keme.toolkits import (
     SynthesisAgent,
     TemporalEventGraphNotebook,
     SessionNotebook,
@@ -30,7 +30,7 @@ from keme.toolkits import (
     DefaultSessionGroundingToHint,
     DefaultGraphRefinementToHint,
 )
-from keme.schedulers import ConstantGraphNotebookStateScheduler
+from MobileMem.keme.schedulers import ConstantGraphNotebookStateScheduler
 from prepare_env import PersonMedium
 from typing import Any
 
