@@ -1,0 +1,29 @@
+重要指令：
+下面提供了真实用户画像数据（中文），你必须以此为主要数据来源生成 Init_State 各字段。具体要求：
+
+1. "education"：从CSV的education/basic_info字段提取。格式为"学校, 学历, 专业"。如CSV只提到学历等级（如"大学文凭"），请根据职业创建合理的学校名和专业。
+2. "location"：从CSV的basic_info提取。格式为"国家, 城市"（如"中国, 常州"）。
+3. "career"：从CSV的career字段提取。格式为"公司/雇主, 职位"。如为个体户，格式如"个体户, 百货店老板"。如未工作，写"未工作"。
+4. "preferences"：直接从CSV的diet/music/sport/shopping等偏好字段构建，每个类型包含"like"和"dislike"数组。所有偏好项目必须用中文。
+5. "health"、"emotion"、"finance"：根据CSV描述判断，赋值"Low"、"Medium"或"High"。
+6. "description"：根据年龄、性别、外貌特征生成一句中文的正面证件照描述。
+7. "social_relationships"：根据职业、地点和生活情况生成10-15个社交关系。每个人需要中文姓名、关系类型（中文，如"同事"、"朋友"、"邻居"、"母亲"）和中文外貌描述。
+   - 每个人的description必须是独立的、绝对的外貌描写，禁止出现任何与其他人的对比（如"与xxx相似"、"比xxx更胖"），因为这些描述将用于文生图，模型无法理解人物间的对比关系。
+   - 姓名必须像真实中国人名，姓+名共2-4字。
+   - 严禁使用以下高频易撞名人名：李建国、刘芳、张明、周涛、王秀英、李秀英、王秀兰、刘建军、刘洋、张磊、赵磊、郑浩、陈丽、孙悦、王海。
+   - 姓氏要多样化，适当使用 郝、甘、裴、蒋、乔、蔡、温、梅、聂、靳、童、穆、霍、敖 等低频姓氏，避免过度集中在王、李、张、刘、陈。
+
+【语言要求——极其重要】
+所有输出字段必须使用纯中文（health/emotion/finance的Low/Medium/High除外），严禁出现任何英文单词。
+- description 用中文
+- education 用中文（如"南京大学, 学士, 物流管理"）
+- location 用中文（如"中国, 常州"）
+- career 用中文（如"个体户, 快递员"）
+- preferences 的 like/dislike 内容用中文
+- social_relationships 的姓名、relationship_type、description 全部用中文
+
+真实用户画像数据（中文）：
+{csv_context}
+
+偏好摘要（中文）：
+{preferences_summary}

@@ -1,0 +1,19 @@
+You are a name generator. Based on the following information, generate a reasonable full name for each person.
+
+Main character info:
+- Name: {main_name}
+- Gender: {main_gender}
+- Nationality: {nationality}
+
+People who need real names:
+{problem_list}
+
+Requirements:
+1. Names must be realistic full names appropriate for the nationality
+2. If the original name contains a surname (e.g., "Coach He" contains "He"), keep that surname and add a given name
+3. Father shares surname with main character, mother uses a different surname
+4. Children share surname with main character
+5. Siblings share surname with main character
+6. Do NOT use any of these already-taken names: {forbidden_names}
+7. Return ONLY JSON format: {{"original_key": "new_name", ...}}
+8. Do not output anything else

@@ -1,0 +1,30 @@
+CRITICAL INSTRUCTIONS:
+You are provided with REAL user profile data (in Chinese) below. You MUST use this data as the
+primary source for generating the Init_State fields. Specifically:
+
+1. "education": Derive from the CSV education/basic_info field. Format as "School, Degree, Major"
+   in English. If the CSV only mentions a degree level (e.g., "college diploma"), create a plausible
+   school name and major that fits the persona's career.
+2. "location": Derive from CSV basic_info. Format as "Country, City" in English (e.g., "China, Changzhou").
+3. "career": Derive from CSV career field. Format as "Company/Employer, Position" in English.
+   If self-employed, format accordingly (e.g., "Self-employed, Shop Owner").
+4. "preferences": Build DIRECTLY from the CSV preference fields (diet, music, sport, shopping, etc.).
+   Convert each available preference to English with "like" and "dislike" arrays.
+   Only include preference categories that have data in the CSV.
+5. "health", "emotion", "finance": Interpret from CSV descriptions and assign "Low", "Medium", or "High".
+6. "description": Generate a one-sentence ID photo description in English based on the persona's
+   age, gender presentation, role identity, and full background context. You must commit to a
+   definite ethnicity or skin tone presentation \u2014 derive it from the persona's overall background
+   (name, culture, life history), not from nationality alone. If the background is ambiguous, make
+   the most coherent choice and hold it fixed.
+7. "social_relationships": Generate 10-15 realistic social connections. Use appropriate Western/English
+   names and write ALL descriptions in English.
+   - Each person's description must be entirely self-contained. Do NOT compare to or reference any other person (e.g., "similar to X", "older than Y"), as these descriptions will be used for text-to-image generation.
+
+ALL output fields must be in pure English. No Chinese characters anywhere.
+
+REAL USER PROFILE DATA (Chinese):
+{csv_context}
+
+PREFERENCES SUMMARY (Chinese):
+{preferences_summary}

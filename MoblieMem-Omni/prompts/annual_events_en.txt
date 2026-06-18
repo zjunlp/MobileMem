@@ -1,0 +1,271 @@
+<Role Description>
+You are a professional persona life event architect. Your expertise is in creating realistic, coherent annual event timelines for synthetic personas based on their established backgrounds, initial states, and important dates. These events will serve as foundational seeds for generating dialogues where the persona interacts with a chatbot seeking advice, help, and emotional resonance.
+</Role Description>
+
+<Task Description>
+You will be provided with:
+1. A complete persona profile as main role, including:
+- Background Information: name, gender, birth_date, nationality, personality_traits, life_experiences.
+- Initial State for 2025-01-01: description, education, location, career, preferences, social_relationships, health, emotion, finance.
+2. Important dates for 2025, including festivals and personal dates.
+
+Your primary task is to generate a chronological list of events (ordered by start time) for the persona's year 2025. Each event must represent a plausible situation where the persona might naturally seek guidance or support from a chatbot. The events should:
+- Begin from the persona's `Init_State` as of 2025-01-01.
+- Represent plausible occurrences given the persona's age, nationality, career, personality, and social circle.
+- Incorporate the provided important dates where relevant.
+- Involve interactions with 0-2 individuals from the provided `social_relationships`.
+- Vary in duration (short-term: hours; mid-term: days/weeks; long-term: months).
+- Vary in personal importance (High, Medium, Low).
+- Cover a realistic mix of daily routines, work challenges, social dilemmas, personal goals, health concerns, emotional struggles, financial decisions, travel experiences, and shopping activities where the persona would benefit from external advice or emotional support.
+- Multiple events may have overlapping times.
+
+Each generated event will serve as a seed for generating multi-turn dialogues where the persona engages with a chatbot to discuss the event, seek suggestions, or find emotional resonance.
+
+Each event must include the following fields:
+
+1. event_id: Unique identifier following sequential numbering starting from 0 (e.g., 0, 1, 2).
+
+2. event_name: Concise, descriptive title that captures the event's essence and the persona's potential need for support.
+
+3. event_start_time: Start time in "YYYY-MM-DD HH:MM:SS" format within 2025.
+
+4. event_end_time: End time in "YYYY-MM-DD HH:MM:SS" format within 2025, must be later than start time.
+
+5. duration_type: Event duration category, describing the time span of the event:
+- "short-term": Events lasting several hours (e.g., meetings, conversations, outings, short work sessions, doctor appointments).
+- "mid-term": Events lasting several days or several weeks(e.g., vacations, work projects, short courses, weekend trips, business trips). Note that important dates provided can be utilized.
+- "long-term": Events lasting several months (e.g., health treatments, long-term career development goals, fitness transformation journeys, extended education programs). Note that important dates provided can be utilized.
+
+6. participants: Array of people involved. Must include 0-2 people from social_relationships. The persona does not need to be recorded among the participants. Format: [] or ["relationship_name1", ...].
+
+7. description: The event description needs to be expressed as discussing the event with the chatbot. Detailed narrative written from the first-person perspective ("I", "my", "me"), including:
+- Setting and context of the event.
+- Key actions, interactions, or realizations.
+- The persona's emotional state and internal thoughts.
+- A clear indication of why the persona might seek help or advice about this situation.
+- How this event connects to the persona's broader life context or challenges.
+- For events involving characters in social relationships and main role, include a brief introduction to their relationship when first mentioned. Afterwards, use their names.
+
+8. importance: Significance level in terms of how much the persona would need support:
+- "high": Life-altering events with major consequences requiring significant guidance.
+- "medium": Noticeable challenges or deci1sions where advice would be valuable.
+- "low": Routine situations where the persona might seek daily input or emotional validation.
+
+9. additional_info: Array indicating how this event should be displayed. Must contain exactly one element from: ["food", "friend", "money", "ticket", "wechat"]
+- "food": Event involves food delivery orders
+- "friend": Event can be displayed as social media post (WeChat Moments)
+- "money": Event involves money transfers
+- "ticket": Event involves train/transportation tickets
+- "wechat": Event can be displayed as WeChat chat conversation
+
+10. food_info (REQUIRED only when additional_info contains "food"): Food delivery order information object with the following fields:
+- delivery_time: Expected delivery time (e.g., "Immediate delivery", "12:00-12:30")
+- delivery_address: Delivery address (e.g., "2108 Tower A, Downtown Business District")
+- rider_name: Delivery rider name (e.g., "Driver Mike", "En route")
+- order_number: Order number (18 digits, e.g., "202511201830456789")
+- order_time: Order time in "YYYY-MM-DD HH:MM:SS" format
+- payment_method: Payment method (e.g., "Online payment", "Cash on delivery")
+
+11. money_info (REQUIRED only when additional_info contains "money"): Money transfer information object with the following fields:
+- recipient_name: Recipient name (e.g., "Data Science Bootcamp", "Emily Wilson")
+- amount: Transfer amount as string (e.g., "12800.00", "500.00")
+- transfer_time: Transfer time in "YYYY-MM-DD HH:MM:SS" format
+- receive_time: Receive time in "YYYY-MM-DD HH:MM:SS" format
+- status: Transfer status (e.g., "Received", "Pending")
+- description: Transfer description (e.g., "Course fee", "Living expenses", "Bank transfer")
+- payment_method: Payment method (e.g., "Debit card", "Balance", "Credit card")
+- transaction_id: Transaction ID (14-18 digits, e.g., "100520250901091500")
+
+12. friend_info (REQUIRED only when additional_info contains "friend"): Social media post information object with the following fields:
+- post_text: Post content text (e.g., "Weekend hiking plan is finally happening! Can't wait for the sunrise at the summit 🌄")
+- post_time: Post time relative description (e.g., "Just now", "5 min ago", "1 hour ago")
+- likes: Array of names who liked the post (e.g., ["Mike", "Jenny", "Sarah"])
+- comments: Array of comment objects, each with:
+  - name: Commenter name
+  - text: Comment text
+
+13. wechat_info (REQUIRED only when additional_info contains "wechat"): WeChat conversation information object with the following fields:
+- chat_partner: Name of the chat partner (e.g., "Mom", "Emily Wilson")
+- messages: Array of message objects, each with:
+  - side: Message side, either "left" (from partner) or "right" (from self)
+  - text: Message text
+
+14. ticket_info (REQUIRED only when additional_info contains "ticket"): Train ticket information object with the following fields:
+- departure_station: Departure station name (e.g., "New York", "Chicago")
+- departure_station_en: Departure station name in English (e.g., "New York", "Chicago")
+- arrival_station: Arrival station name (e.g., "Los Angeles", "Boston")
+- arrival_station_en: Arrival station name in English (e.g., "Los Angeles", "Boston")
+- train_number: Train number (e.g., "G123", "D456", "K789")
+- seat_type: Seat class (e.g., "Economy", "First Class", "Business")
+- seat_number: Seat number (e.g., "Car 05 Seat 06D", "Car 03 Seat 12A")
+- price: Ticket price as string (e.g., "553.50", "247.00")
+- passenger_name: Passenger full name as printed on the ticket (e.g., "James Wilson", "Emily Carter")
+</Task Description>
+
+<Generation Guidelines>
+Follow these steps to ensure quality, coherence, and dialogue potential:
+
+1. Analyze the persona foundation and important dates:
+   - Calculate current age from birth_date relative to 2025-01-01.
+   - Deeply understand personality_traits and life_experiences as primary drivers for behavior.
+   - Map the social_relationships network to identify key connections.
+   - Note the location and nationality for cultural and seasonal context.
+   - Integrate the provided important dates into the event timeline.
+
+2. Design the annual narrative arc with dialogue opportunities:
+   - Opening phase: Establish routine, current challenges, and initial situations where advice might be sought. The description of the first few events must express the basic information (name, gender, birth_date, nationality, life_experiences, education, location, career) of the main role.
+   - Development phase: Introduce projects, relationship developments, conflicts, and opportunities that naturally lead to seeking guidance.
+   - Climax/Transition phase: Include major turning points or decisions where external perspective would be valuable.
+   - Closing phase: Resolve narrative threads and include reflection events perfect for year-end conversations with a chatbot.
+
+3. Craft individual events with dialogue potential:
+   - For temporal placement: Distribute events evenly throughout 2025, ensuring multiple events can occur on the same day at different times.
+   - For duration categorization: Aim for 50% short-term events, 30% mid-term events and 20% long-term events. Please note that there is at least one long-term event. Note that the time span determined by event_start_time and event_ded_time of the event should conform to the duration setting (short-term: hours; mid-term: days/weeks; long-term: months).
+   - For mid-term and long-term events: Generate a detailed and complete process with reasonable event spans. The entire process usually involves advance planning, event execution, and post event summary.
+   - For participant selection: Most events should involve 0-2 people from social_relationships.
+   - Please note that multiple events may have overlapping times. For example, there can be multiple events at the same time, such as multiple short-term and medium-term events within the scope of a long-term event.
+   - For narrative description: Write 4-6 sentence paragraphs that:
+       1. Set the scene and context.
+       2. Describe specific actions or interactions.
+       3. Express the persona's emotional response.
+       4. Clearly indicate why they might seek chatbot assistance (confusion, need for advice, emotional support, decision-making help).
+
+4. IMPORTANT EVENT TYPE DISTRIBUTION REQUIREMENTS:
+   - Ensure at least 25% of events involve travel or shopping scenarios
+   - Travel scenarios include: train tickets, flight tickets, hotel bookings, attraction tickets, car rentals, travel insurance, etc.
+   - Shopping scenarios include: online shopping (Taobao, JD, Amazon, etc.), offline shopping, large purchases, refund disputes, etc.
+   - ticket-type events should account for 15-20% of total events, covering various transportation tickets
+   - money-type events should account for 10-15% of total events, covering various payment and transfer scenarios
+
+5. Ensure coherence and plausibility:
+   - Events must align with the persona's personality and circumstances.
+   - Career events must fit the industry and job role.
+   - Health, emotion, and finance levels should fluctuate realistically based on events.
+   - Maintain chronological consistency.
+
+6. Incorporate realistic variety in dialogue triggers:
+   - Include situations requiring practical advice (work problems, financial decisions).
+   - Include emotional situations needing validation or comfort.
+   - Include dilemmas requiring objective perspective.
+   - Include growth opportunities where guidance would be helpful.
+
+7. Generate sufficient quantity (strict range):
+   - Total events MUST be between **100 and 130** (inclusive). Do NOT exceed 130.
+   - Distribute events evenly across 2025; adjust density rather than piling events at year-end.
+
+</Generation Guidelines>
+
+<Response Format>
+Your output must be a valid JSON object with the following structure:
+
+```json
+{
+  "Events": [
+    {
+      "event_id": 0,
+      "event_name": "...",
+      "event_start_time": "YYYY-MM-DD HH:MM:SS",
+      "event_end_time": "YYYY-MM-DD HH:mm:ss",
+      "duration_type": "short-term/mid-term/long-term",
+      "participants": [...],
+      "description": "...",
+      "importance": "low/medium/high",
+      "additional_info": ["ticket"],
+      "ticket_info": {
+        "departure_station": "New York Penn Station",
+        "arrival_station": "Boston South Station",
+        "departure_time": "08:30",
+        "travel_date": "2025-04-15",
+        "train_number": "NE2150",
+        "seat_type": "Standard",
+        "seat_number": "Car 05 Seat 06D",
+        "price": "89.50",
+        "passenger_name": "John Smith"
+      }
+    },
+    {
+      "event_id": 1,
+      "event_name": "...",
+      "event_start_time": "YYYY-MM-DD HH:MM:SS",
+      "event_end_time": "YYYY-MM-DD HH:mm:ss",
+      "duration_type": "short-term/mid-term/long-term",
+      "participants": [...],
+      "description": "...",
+      "importance": "low/medium/high",
+      "additional_info": ["food"],
+      "food_info": {
+        "delivery_time": "Immediate delivery",
+        "delivery_address": "...",
+        "rider_name": "Driver Mike",
+        "order_number": "202511201830456789",
+        "order_time": "YYYY-MM-DD HH:MM:SS",
+        "payment_method": "Online payment"
+      }
+    },
+    {
+      "event_id": 2,
+      "event_name": "...",
+      "event_start_time": "YYYY-MM-DD HH:MM:SS",
+      "event_end_time": "YYYY-MM-DD HH:mm:ss",
+      "duration_type": "short-term/mid-term/long-term",
+      "participants": [...],
+      "description": "...",
+      "importance": "low/medium/high",
+      "additional_info": ["money"],
+      "money_info": {
+        "recipient_name": "...",
+        "amount": "1000.00",
+        "transfer_time": "YYYY-MM-DD HH:MM:SS",
+        "receive_time": "YYYY-MM-DD HH:MM:SS",
+        "status": "Received",
+        "description": "...",
+        "payment_method": "Debit card",
+        "transaction_id": "100520250901091500"
+      }
+    },
+    {
+      "event_id": 3,
+      "event_name": "...",
+      "event_start_time": "YYYY-MM-DD HH:MM:SS",
+      "event_end_time": "YYYY-MM-DD HH:mm:ss",
+      "duration_type": "short-term/mid-term/long-term",
+      "participants": [...],
+      "description": "...",
+      "importance": "low/medium/high",
+      "additional_info": ["friend"],
+      "friend_info": {
+        "post_text": "...",
+        "post_time": "Just now",
+        "likes": ["Name1", "Name2"],
+        "comments": [
+          {"name": "Name1", "text": "..."},
+          {"name": "Name2", "text": "..."}
+        ]
+      }
+    },
+    {
+      "event_id": 4,
+      "event_name": "...",
+      "event_start_time": "YYYY-MM-DD HH:MM:SS",
+      "event_end_time": "YYYY-MM-DD HH:mm:ss",
+      "duration_type": "short-term/mid-term/long-term",
+      "participants": [...],
+      "description": "...",
+      "importance": "low/medium/high",
+      "additional_info": ["wechat"],
+      "wechat_info": {
+        "chat_partner": "...",
+        "messages": [
+          {"side": "left", "text": "..."},
+          {"side": "right", "text": "..."},
+          {"side": "left", "text": "..."}
+        ]
+      }
+    }
+    // ... more events (total between 100 and 130)
+    // Note: Include the corresponding *_info field based on additional_info value
+  ]
+}
+```
+Please ensure the final JSON format is correct and can be directly parsed by a program.
+</Response Format>

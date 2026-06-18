@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>朋友圈</title>
+<style>
+:root{
+  --bg:#ededed;--card:#fff;
+  --fg-0:rgba(0,0,0,.9);--fg-1:rgba(0,0,0,.55);--fg-2:rgba(0,0,0,.3);--fg-3:rgba(0,0,0,.1);
+  --link:#576b95;--brand:#07c160;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:-apple-system,"SF Pro SC","PingFang SC","Helvetica Neue",sans-serif;
+  background:var(--bg);color:var(--fg-0);width:450px;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;line-height:1.5;
+}
+
+/* ── iOS 状态栏 ── */
+.sb{height:44px;background:var(--bg);color:#000;display:flex;align-items:center;padding:0 16px;font-size:15px;font-weight:600}
+.sb .time{flex:1}
+.sb .ri{display:flex;gap:6px;align-items:center}
+.sb .ri svg{height:12px}
+
+/* ── 导航栏 ── */
+.nav{
+  background:var(--bg);height:44px;display:flex;align-items:center;padding:0 16px;
+  border-bottom:.5px solid var(--fg-3);position:relative;
+}
+.nav .back svg{width:10px;height:18px;fill:none;stroke:#000;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.nav .t{flex:1;text-align:center;font-size:17px;font-weight:600}
+.nav .cam{width:24px;text-align:right;opacity:.6;font-size:18px}
+
+/* ── 帖子区域 ── */
+.post{background:var(--card);border-top:.5px solid var(--fg-3)}
+.post-inner{padding:14px 16px 0}
+
+/* 帖子头部 */
+.ph{display:flex;gap:10px;align-items:flex-start}
+.p-av{
+  width:44px;height:44px;border-radius:6px;flex-shrink:0;
+  object-fit:cover;
+}
+.p-av-text{
+  width:44px;height:44px;border-radius:6px;flex-shrink:0;
+  background:var(--brand);display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:20px;font-weight:600;
+}
+.p-info{flex:1;padding-top:2px}
+.p-name{font-size:15px;font-weight:600;color:var(--link);line-height:1.35}
+
+/* 帖子正文 */
+.p-text{
+  font-size:15px;line-height:1.7;color:#111;
+  margin:8px 0 0 54px;word-break:break-word;
+}
+
+/* 九宫格图片 */
+.p-imgs{display:grid;gap:4px;margin:10px 0 0 54px}
+.p-imgs.c1{grid-template-columns:200px}
+.p-imgs.c2,.p-imgs.c4{grid-template-columns:repeat(2,1fr)}
+.p-imgs.c3,.p-imgs.c5,.p-imgs.c6,.p-imgs.c7,.p-imgs.c8,.p-imgs.c9{grid-template-columns:repeat(3,1fr)}
+.p-img{
+  aspect-ratio:1;border-radius:3px;
+  background:linear-gradient(135deg,#e8e8e8 0%,#d5d5d5 100%);
+}
+
+/* 底部操作行 */
+.p-foot{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0 12px;margin-left:54px;
+}
+.p-time{font-size:12px;color:var(--fg-2)}
+.p-loc{font-size:12px;color:var(--link);margin-left:8px}
+.p-foot-r{display:flex;align-items:center;gap:8px}
+.p-act{
+  width:30px;height:20px;background:var(--fg-3);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.p-act svg{width:16px;height:16px;fill:var(--fg-1)}
+
+/* ── 互动区 (赞/评论) ── */
+.interact{
+  margin:0 16px 14px 70px;background:#f7f7f7;border-radius:4px;
+  overflow:hidden;
+}
+
+/* 点赞行 */
+.likes{
+  display:flex;align-items:flex-start;padding:7px 10px;gap:5px;flex-wrap:wrap;
+}
+.likes svg{width:14px;height:14px;fill:var(--link);flex-shrink:0;margin-top:3px}
+.likes .names{font-size:14px;color:var(--link);line-height:1.6;font-weight:500}
+
+/* 评论区 */
+.cmt-list{border-top:.5px solid var(--fg-3);padding:6px 10px}
+.cmt{font-size:14px;line-height:1.7;margin:2px 0;display:flex;align-items:flex-start;gap:6px}
+.cmt-av{width:22px;height:22px;border-radius:4px;flex-shrink:0;object-fit:cover;margin-top:2px}
+.cmt .cn{color:var(--link);font-weight:600}
+.cmt .ct{color:#333}
+
+/* ── 分割 ── */
+.sep{height:8px;background:var(--bg)}
+</style></head>
+<body>
+
+<!-- iOS 状态栏 -->
+<div class="sb">
+  <span class="time">9:41</span>
+  <span class="ri">
+    <svg viewBox="0 0 17 12" width="17"><path d="M8.5.5l8 11H.5z" fill="currentColor" opacity=".9"/></svg>
+    <svg viewBox="0 0 16 12" width="16"><path d="M1 4h2v8H1zM5 2h2v10H5zM9 0h2v12H9zM13 3h2v9h-2z" fill="currentColor"/></svg>
+    <svg viewBox="0 0 25 12" width="25"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="1.5" y="2.5" width="17" height="7" rx="1" fill="currentColor"/><path d="M23 4.5v3a1.5 1.5 0 000-3z" fill="currentColor"/></svg>
+  </span>
+</div>
+
+<!-- 导航栏 -->
+<div class="nav">
+  <div class="back"><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg></div>
+  <div class="t">朋友圈</div>
+  <div class="cam">📷</div>
+</div>
+
+<!-- 帖子 -->
+<div class="post">
+  <div class="post-inner">
+    <div class="ph">
+      <img class="p-av" src="{{POSTER_AVATAR_SRC}}" alt="{{POSTER_NAME}}"/>
+      <div class="p-info"><div class="p-name">{{POSTER_NAME}}</div></div>
+    </div>
+    <div class="p-text">{{POST_TEXT}}</div>
+    <div class="p-imgs" id="imgs"></div>
+  </div>
+  <div class="p-foot">
+    <div style="display:flex;align-items:center">
+      <span class="p-time">{{POST_TIME}}</span>
+    </div>
+    <div class="p-foot-r">
+      <div class="p-act">
+        <svg viewBox="0 0 24 24"><circle cx="7" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="17" cy="12" r="1.5"/></svg>
+      </div>
+    </div>
+  </div>
+  <div class="interact" id="interact"></div>
+</div>
+
+<div class="sep"></div>
+
+<script>
+(function(){
+  /* 图片九宫格 */
+  var ic = {{IMAGE_COUNT}};
+  var imageData = {{IMAGE_DATA}};
+  var ig = document.getElementById('imgs');
+  if(ic > 0){
+    ig.classList.add('c' + Math.min(ic, 9));
+    for(var i = 0; i < Math.min(ic, 9); i++){
+      if(imageData.length > i){
+        /* 有实际图片 */
+        var img = document.createElement('img');
+        img.src = imageData[i];
+        img.className = 'p-img';
+        img.style.objectFit = 'cover';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        ig.appendChild(img);
+      } else {
+        /* 占位色块 */
+        var d = document.createElement('div');
+        d.className = 'p-img';
+        ig.appendChild(d);
+      }
+    }
+  }
+
+  /* 互动区 */
+  var likeStr = '{{LIKE_NAMES}}';
+  var cmts = {{COMMENTS_JSON}};
+  var avatarMap = {{AVATAR_MAP_JSON}};
+  var box = document.getElementById('interact');
+  var html = '';
+  if(likeStr){
+    html += '<div class="likes">';
+    html += '<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
+    html += '<span class="names">' + likeStr + '</span></div>';
+  }
+  if(cmts.length){
+    html += '<div class="cmt-list">';
+    cmts.forEach(function(c){
+      var avHtml = '';
+      if(avatarMap[c.name]){
+        avHtml = '<img class="cmt-av" src="' + avatarMap[c.name] + '"/>';
+      }
+      html += '<div class="cmt">' + avHtml + '<div><span class="cn">' + c.name + '</span>：<span class="ct">' + c.text + '</span></div></div>';
+    });
+    html += '</div>';
+  }
+  if(html) box.innerHTML = html; else box.style.display = 'none';
+})();
+</script>
+</body></html>

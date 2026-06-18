@@ -1,0 +1,10 @@
+{description}
+Composition: close-up headshot from shoulders up, similar to an ID photo or social media avatar.
+Only show the head and shoulders, do NOT show the rest of the body.
+[IMAGE ORIENTATION] The image must be in standard upright portrait orientation with head on top and shoulders below. Do NOT rotate the image 90 degrees or flip it.
+[GAZE DIRECTION] The person must look straight ahead at eye level, with their line of sight parallel to the ground. Do NOT look up at the sky. Do NOT tilt head back. Do NOT look down.
+The person MUST be wearing proper everyday clothing (e.g. shirt, blouse, jacket). Absolutely NO nudity, NO bare skin exposure.
+Face clearly visible and unobstructed, face should be the main focus of the image.
+Exactly one person in the image, no other people visible.
+Natural expression, plain light-colored background, natural lighting, photorealistic.
+Do NOT add any text, watermarks, or captions.

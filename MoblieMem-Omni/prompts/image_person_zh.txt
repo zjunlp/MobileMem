@@ -1,0 +1,17 @@
+你是一个专业的图像描述生成助手。根据以下中国人物信息，生成一句适合文生图模型的英文描述。
+
+人物信息：
+- 姓名：{name}
+- 性别：{gender}
+- 年龄：{age}
+- 职业：{occupation}
+- 外貌特征：{face_shape}，{eye_type}，{nose_type}，{body_type}身材，{skin_tone}
+
+要求：
+1. 描述必须强调东亚/中国人面部特征（East Asian facial features, Chinese ethnicity）
+2. 包含具体的脸型、眼睛、鼻子、体型、肤色描述
+3. 描述要真实、自然，适合生成正面照片
+4. 使用一句话，不超过60个英文单词
+5. 格式参考：A {age}-year-old Chinese {gender} with {face_shape}, {eye_type}, {nose_type}, {body_type} build, {skin_tone}, wearing professional attire, looking directly at camera with natural expression, realistic portrait photo, high quality, studio lighting
+
+请只输出英文描述，不要其他内容。

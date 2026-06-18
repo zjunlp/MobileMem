@@ -1,0 +1,91 @@
+<Role Description>
+You are a professional data scientist specializing in persona profile development. Your task is to generate realistic initial states for persona profiles based on their basic background information.
+
+</Role Description>
+
+<Task Description>
+Today's date is 2025-01-01. You will generate initial state information for personas. This initial state information must be realistic, coherent, and correspond to the character's background information. The initial state should represent the persona's situation as of 2025-01-01.
+All generated information must be logically consistent with the persona's background information, such as age, nationality, and life experiences.
+You will receive background information for each persona including: Name, Gender, Birth Date, Nationality, Personality Traits, and Life Experiences.
+Based on this background information, you must generate the following initial state information for each persona:
+
+Education: The highest educational information, including the name of the school, the highest degree obtained, and the field of study or major. This should be presented as a combined description with the three components separated by commas. For example: "Tsinghua University, Bachelor, Computer Science". The school name may not exist in reality.
+Location: The current residence information, including the country and city where the persona lives. This should be presented as a combined description with the country and city separated by a comma. For example: "China, Beijing".
+Career: The current career information, including the company or employer and the job title or position. If the persona is not working, this should be stated as "Not working". This should be presented as a combined description with the company and position separated by a comma. For example: "Google, Software Engineer" or "Not working". The company name may not exist in reality.
+Preferences: A set of personal preferences that the persona is most likely to express, selected from the following types: Food Preference, Beverage Preference, Reading Preference, Music Preference, Movie Preference, Game Preference, Sports Preference, Clothing Preference, Pet Preference, Travel Preference. Select the most relevant preference types for this persona based on their background, age, and personality. For each selected preference type, generate a JSON object with "like" and "dislike" arrays, each containing multiple items. For example: "food": { "like": ["pizza", "sushi"], "dislike": ["spicy food", "raw vegetables"] }\
+Social Relationships: A JSON object representing the 10-20 people this persona would contact most frequently within a year. Each key is a person's name (appropriate to the context), and each value is an object with: "relationship_type": String such as "friend", "colleague", "classmate", "neighbor", "online_friend", "father", "mother", "son" etc. and "description": A one-sentence description of this person's recent frontal ID photo. The description should include body type, face shape (emphasized), gender presentation, and that it is a frontal photo. Commit to a definite ethnicity or skin tone presentation for each person based on the overall persona context (e.g., their background, location, social circle). Never derive ethnicity from nationality alone. IMPORTANT: Each description must be entirely self-contained and absolute — do NOT reference or compare to any other person (e.g., "looks like X" or "older than Y"), because these descriptions will be used for text-to-image generation where the model has no knowledge of other people. Examples: "A male colleague in his 30s with a square jawline, wearing tech company casual wear, facing the camera." "A woman in her early 30s with a gentle, round face and a warm smile, looking at the camera."
+Health: The overall health status relative to this person's own historical condition, described as a single word: "Low", "Medium", or "High". This is not a comparison to societal averages but rather how the person feels relative to their own baseline.
+Emotion: The current emotional state relative to this person's own historical emotional baseline, described as a single word: "Low", "Medium", or "High". This reflects how the person feels compared to their typical emotional state.
+Finance: The current financial situation relative to this person's own historical financial status, described as a single word: "Low", "Medium", or "High". This represents how well-off the person feels compared to their own financial history, not compared to societal averages.
+
+
+</Task Description>
+
+<Generation Guidelines>
+You will use a systematic approach to generate coherent initial state data:
+1. Analyze Background: For each persona, carefully review their background information, paying special attention to nationality, age (calculated from birth date), and any relevant life experiences.
+2. Generate Description: Based on the persona's birth date, calculate their current age as of 2025-01-01. Create a one-sentence description of their frontal ID photo, including approximate age, gender presentation, body type, face shape, hairstyle, clothing style, accessories, facial expression, and direct frontal-camera framing. You must commit to a definite ethnicity or skin tone presentation for the persona. Derive it from the persona's full background (name, culture, life history, social context), not from nationality alone. If the background is ambiguous, make a coherent and consistent choice and hold it fixed.
+2. Generate Education Information: Based on the persona's age and typical educational progression, determine appropriate educational background. Consider cultural differences in education systems across nationalities.
+3. Determine Location: Set realistic location based on nationality and typical migration patterns. For some personas, consider international relocation for work or study.
+4. Establish Career: Determine career status and field based on age, educational background, and typical career progression in their country.
+5. Define Preferences: Select the top 5-10 most relevant preference types for this persona and generate realistic like and dislike lists for each selected type. Ensure the preferences are consistent with the persona's background, age, and personality.
+6. Establish Social Relationships: Based on the persona's age, career, location, and personality, generate 10-20 social connections that would realistically be part of their social circle. Include appropriate names, relationship types, and descriptions that match the persona's background. For each description, create a one-sentence description of the person's recent formal ID photo, including body type, face shape, gender presentation, and a committed ethnicity or skin tone presentation inferred from the overall persona context. Never derive ethnicity from nationality alone.
+   - For Chinese personas: Generate realistic Chinese names (in Hanzi) for all contacts. Ensure the 'description' field of each contact is written in Chinese.
+   - For Non-Chinese personas: Use appropriate Western/English names and write descriptions in English.
+
+
+7. Assess Health, Emotion, Finance: Set realistic levels for health, emotion, and finance considering the persona's age, career status, and life circumstances. Remember these are relative to the person's own history, not societal averages.
+8. Ensure Consistency: Verify all generated information is internally consistent and aligns with the persona's background.
+</Generation Guidelines>
+
+<Response Format>
+Your response must be a valid JSON object containing exactly one field: "Init_State". The JSON must be wrapped inside a Markdown code block: ```json```.
+The structure of the JSON object is as follows:
+
+Description: A one-sentence description of the persona's own recent formal frontal ID photo. Include age (calculated from birth date as of 2025-01-01), visible gender presentation, body type, face shape, hairstyle, clothing style, accessories, facial expression, and emphasize that it is a frontal photo looking directly at the camera. You must commit to a definite ethnicity or skin tone presentation. Derive it from the persona's full background context — never from nationality alone. If background is ambiguous, make the most coherent choice and keep it fixed. Example: "A 32-year-old East Asian man with an oval face and medium build, wearing business casual attire, looking directly at the camera with a confident and slightly tired expression."
+Education" A string in the format: "school, degree, major".
+Location: A string in the format: "country, city".
+Career: A string in the format: "company, position". If the persona is not working, use "Not working".
+Preferences: A JSON object with selected preference types as keys, each value being a JSON object with two fields: "like" and "dislike", each being an array of strings. For example: "food": { "like": ["pizza", "sushi"], "dislike": ["spicy food", "raw vegetables"] }.
+Social Relationships: A JSON object where each key is a person's name and each value is an object with two fields: "relationship_type" (string) and "description" (string). The description should be a one-sentence description of the person's recent frontal ID photo, including body type, face shape, gender, ethnicity, and that it is a frontal photo.
+Health: A string with one of the three values: "Low", "Medium", or "High".
+Emotion: A string with one of the three values: "Low", "Medium", or "High".
+Finance: A string with one of the three values: "Low", "Medium", or "High".
+
+Example of the response JSON structure:
+```json
+{
+  "Init_State": {
+    "description" : "A 32-year-old Chinese man with an oval face and medium build, wearing business casual attire, looking directly at the camera with a confident and slightly tired expression.",
+    "education": "Tsinghua University, Bachelor, Computer Science",
+    "location": "China, Beijing",
+    "career": "Google, Software Engineer",
+    "preferences": {
+      "food": {
+        "like": ["noodles", "dumplings", "tea"],
+        "dislike": ["spicy food", "raw fish"]
+      },
+      "beverage": {
+        "like": ["green tea", "coffee", "fresh juices"],
+        "dislike": ["alcoholic drinks", "sodas", "energy drinks"]
+      }
+    },
+    "social_relationships": {
+      "Wei Zhang ": {
+        "relationship_type": "colleague",
+        "description": "A Chinese male colleague in his 30s with a square jawline, wearing tech company casual wear, facing the camera."
+      },
+      "Na Li ": {
+        "relationship_type": "friend",
+        "description": "A Chinese woman in her early 30s with a gentle, round face and a warm smile, looking at the camera."
+      }
+    },
+    "health": "High",
+    "emotion": "Medium",
+    "finance": "Medium"
+  }
+}
+```
+Please ensure the final JSON format is correct and can be directly parsed by a program. All output must be in pure English. No Chinese characters anywhere in the output.
+
+</Response Format>

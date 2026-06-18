@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WeChat Group</title>
+<style>
+/* ── 全局重置 ── */
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:#ebebeb;
+  font-family:-apple-system,"PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  display:flex;justify-content:center;
+}
+.phone{width:100%;max-width:450px;display:flex;flex-direction:column;min-height:100vh}
+
+/* ── iOS 状态栏 ── */
+.status-bar{
+  background:#ededed;height:44px;display:flex;align-items:center;
+  padding:0 16px;font-size:14px;font-weight:600;color:#000;
+}
+.status-bar .time{flex:1}
+.status-bar .icons{display:flex;gap:5px;align-items:center}
+.status-bar .icons svg{width:16px;height:16px;fill:#000}
+
+/* ── 导航栏 ── */
+.nav-bar{
+  background:#ededed;height:44px;display:flex;align-items:center;
+  padding:0 10px;border-bottom:.5px solid #c8c8c8;
+}
+.nav-back{width:32px;display:flex;align-items:center;cursor:pointer}
+.nav-back svg{width:12px;height:22px;fill:none;stroke:#000;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.nav-title{
+  flex:1;text-align:center;font-size:17px;font-weight:600;color:#000;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  padding:0 4px;
+}
+.nav-title #memberCount{font-weight:600}
+.nav-right{width:32px;display:flex;justify-content:flex-end;align-items:center}
+.nav-right svg{width:22px;height:22px;fill:#181818}
+
+/* ── 聊天区域 ── */
+.chat{flex:1;padding:10px 12px 8px;display:flex;flex-direction:column;gap:16px;overflow-y:auto}
+
+/* ── 时间戳（可选） ── */
+.time-divider{
+  text-align:center;font-size:12px;color:#b2b2b2;
+  padding:4px 0;
+}
+
+/* ── 消息行 ── */
+.message-row{display:flex;align-items:flex-start;gap:8px}
+.avatar{width:40px;height:40px;border-radius:6px;object-fit:cover;flex-shrink:0}
+.message-content{display:flex;flex-direction:column;max-width:65%}
+
+/* 发送者名 */
+.sender-name{font-size:12px;color:#888;margin-bottom:2px;line-height:1.2}
+
+/* 气泡 */
+.bubble{
+  position:relative;padding:9px 12px;border-radius:4px;
+  font-size:16px;line-height:1.5;word-break:break-word;color:#111;
+}
+
+/* ── 左侧（他人） ── */
+.left{flex-direction:row}
+.left .bubble{background:#fff}
+.left .bubble::before{
+  content:"";position:absolute;top:12px;left:-6px;
+  border-top:5px solid transparent;border-bottom:5px solid transparent;
+  border-right:6px solid #fff;
+}
+
+/* ── 右侧（自己） ── */
+.right{flex-direction:row-reverse}
+.right .message-content{align-items:flex-end}
+.right .sender-name{display:none}
+.right .bubble{background:#95ec69}
+.right .bubble::before{
+  content:"";position:absolute;top:12px;right:-6px;
+  border-top:5px solid transparent;border-bottom:5px solid transparent;
+  border-left:6px solid #95ec69;
+}
+
+/* ── 底部输入栏 ── */
+.input-bar{
+  background:#f7f7f7;border-top:.5px solid #d0d0d0;
+  padding:7px 10px;display:flex;align-items:center;gap:8px;
+  flex-shrink:0;
+}
+.input-bar .icon{width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.input-bar .icon svg{width:24px;height:24px;fill:#444}
+.text-field{
+  flex:1;height:36px;background:#fff;border:.5px solid #e0e0e0;
+  border-radius:4px;padding:0 10px;font-size:15px;
+}
+
+/* ── 微信 emoji ── */
+img.emoji{width:24px;height:24px;vertical-align:-5px;display:inline}
+</style>
+</head>
+<body>
+<div class="phone">
+  <!-- iOS 状态栏 -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <span class="icons">
+      <svg viewBox="0 0 18 12"><path d="M1 8h2v4H1zM5 5h2v7H5zM9 3h2v9H9zM13 0h2v12h-2z"/></svg>
+      <svg viewBox="0 0 16 12"><path d="M8 1.6A8.7 8.7 0 0114.3 4l-1.1 1.1A7 7 0 008 3.2 7 7 0 002.8 5.1L1.7 4A8.7 8.7 0 018 1.6zm0 3.2a5.4 5.4 0 013.9 1.6L10.8 7.5A3.8 3.8 0 008 6.4c-1 0-2 .4-2.8 1.1L4.1 6.4A5.4 5.4 0 018 4.8zM9.4 9.6A2 2 0 008 9a2 2 0 00-1.4.6l1.4 1.4 1.4-1.4z"/></svg>
+      <svg viewBox="0 0 27 12"><rect x="0" y="1" width="22" height="10" rx="2" ry="2" fill="none" stroke="#000" stroke-width="1.2"/><rect x="23.5" y="3.5" width="1.5" height="5" rx=".75" fill="#000"/><rect x="2" y="3" width="16" height="6" rx="1" fill="#000"/></svg>
+    </span>
+  </div>
+
+  <!-- 导航栏 -->
+  <div class="nav-bar">
+    <div class="nav-back"><svg viewBox="0 0 12 22"><polyline points="10,2 2,11 10,20"/></svg></div>
+    <div class="nav-title"><span id="groupName">群聊</span><span id="memberCount">(3)</span></div>
+    <div class="nav-right">
+      <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2" fill="#181818"/><circle cx="12" cy="12" r="2" fill="#181818"/><circle cx="19" cy="12" r="2" fill="#181818"/></svg>
+    </div>
+  </div>
+
+  <!-- 聊天区域 -->
+  <div class="chat" id="chatContainer">
+    <!-- 消息将由脚本动态填充 -->
+  </div>
+
+  <!-- 底部输入栏 -->
+  <div class="input-bar">
+    <div class="icon">
+      <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM5 10v2a7 7 0 0014 0v-2h-2v2a5 5 0 01-10 0v-2H5zm6 11v-2.07A8 8 0 014 11h2a6 6 0 0012 0h2a8 8 0 01-7 7.93V21h3v2H8v-2h3z"/></svg>
+    </div>
+    <div class="text-field"></div>
+    <div class="icon">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#444" stroke-width="1.5"/><circle cx="8.5" cy="10" r="1.2" fill="#444"/><circle cx="15.5" cy="10" r="1.2" fill="#444"/><path d="M8 14.5c1 1.5 2.5 2.5 4 2.5s3-1 4-2.5" fill="none" stroke="#444" stroke-width="1.3" stroke-linecap="round"/></svg>
+    </div>
+    <div class="icon">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="4" x2="12" y2="20" stroke="#444" stroke-width="2" stroke-linecap="round"/><line x1="4" y1="12" x2="20" y2="12" stroke="#444" stroke-width="2" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+</div>
+</body>
+</html>
