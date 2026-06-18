@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>微信转账详情</title>
+<style>
+:root{
+  --bg-page:#ededed;--bg-card:#fff;
+  --fg-0:rgba(0,0,0,.9);--fg-1:rgba(0,0,0,.55);--fg-2:rgba(0,0,0,.3);--fg-3:rgba(0,0,0,.1);
+  --green:#07c160;--orange:#ff9500;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:-apple-system,"SF Pro SC","PingFang SC","Helvetica Neue",sans-serif;
+  background:var(--bg-page);color:var(--fg-0);width:450px;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;line-height:1.5;
+}
+
+/* ── iOS 状态栏 ── */
+.sb{height:44px;background:var(--bg-page);color:#000;display:flex;align-items:center;padding:0 16px;font-size:15px;font-weight:600}
+.sb .time{flex:1}
+.sb .ri{display:flex;gap:6px;align-items:center}
+.sb .ri svg{height:12px}
+
+/* ── WeUI 导航栏 ── */
+.nav{
+  background:var(--bg-page);height:44px;display:flex;align-items:center;
+  padding:0 16px;position:relative;border-bottom:.5px solid var(--fg-3);
+}
+.nav .back{width:24px;display:flex;align-items:center}
+.nav .back svg{width:10px;height:18px;fill:none;stroke:#000;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.nav .t{flex:1;text-align:center;font-size:17px;font-weight:600;margin-right:24px}
+
+/* ── 转账卡片 ── */
+.card{background:var(--bg-card);margin:12px 16px;border-radius:12px;overflow:hidden}
+
+/* 头部 - 状态图标 + 金额 */
+.card-hd{text-align:center;padding:32px 20px 24px}
+
+.status-icon{
+  width:56px;height:56px;border-radius:50%;margin:0 auto 16px;
+  display:flex;align-items:center;justify-content:center;
+}
+.status-icon.ok{background:#e8f5e9}
+.status-icon.wait{background:#fff3e0}
+.status-icon svg{width:30px;height:30px}
+.status-icon.ok svg{fill:var(--green)}
+.status-icon.wait svg{fill:var(--orange)}
+
+.amount{font-size:44px;font-weight:700;color:var(--fg-0);letter-spacing:-1.5px;font-variant-numeric:tabular-nums}
+.amount .cny{font-size:24px;font-weight:600;margin-right:2px;letter-spacing:0}
+
+.status-text{
+  display:inline-block;margin-top:10px;padding:3px 14px;border-radius:14px;
+  font-size:13px;font-weight:500;
+}
+.status-text.ok{background:#e8f5e9;color:var(--green)}
+.status-text.wait{background:#fff3e0;color:var(--orange)}
+
+/* 转账说明 */
+.desc-area{text-align:center;padding:0 20px 16px;font-size:14px;color:var(--fg-1)}
+
+/* ── WeUI Cells 明细行 ── */
+.cells{border-top:.5px solid var(--fg-3)}
+.cell{
+  display:flex;padding:15px 20px;align-items:center;
+  border-bottom:.5px solid var(--fg-3);
+}
+.cell:last-child{border-bottom:none}
+.cell .lab{width:80px;color:var(--fg-1);font-size:14px;flex-shrink:0}
+.cell .val{flex:1;text-align:right;font-size:14px;color:var(--fg-0);word-break:break-all}
+.cell .val.small{font-size:12px;color:var(--fg-2)}
+
+/* ── 底部操作区 ── */
+.actions{padding:24px 16px;text-align:center}
+.btn-complaint{
+  display:inline-block;font-size:13px;color:var(--fg-2);
+  border:1px solid var(--fg-3);padding:6px 20px;border-radius:20px;
+}
+</style></head>
+<body>
+
+<!-- iOS 状态栏 -->
+<div class="sb">
+  <span class="time">9:41</span>
+  <span class="ri">
+    <svg viewBox="0 0 17 12" width="17"><path d="M8.5.5l8 11H.5z" fill="currentColor" opacity=".9"/></svg>
+    <svg viewBox="0 0 16 12" width="16"><path d="M1 4h2v8H1zM5 2h2v10H5zM9 0h2v12H9zM13 3h2v9h-2z" fill="currentColor"/></svg>
+    <svg viewBox="0 0 25 12" width="25"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="1.5" y="2.5" width="17" height="7" rx="1" fill="currentColor"/><path d="M23 4.5v3a1.5 1.5 0 000-3z" fill="currentColor"/></svg>
+  </span>
+</div>
+
+<!-- 导航栏 -->
+<div class="nav">
+  <div class="back"><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg></div>
+  <div class="t">转账详情</div>
+</div>
+
+<!-- 转账卡片 -->
+<div class="card">
+  <div class="card-hd">
+    <div class="status-icon" id="sicon">
+      <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+    </div>
+    <div class="amount"><span class="cny">¥</span>{{amount}}</div>
+    <div class="status-text" id="stxt">{{status}}</div>
+  </div>
+  <div class="desc-area" id="desc"></div>
+  <div class="cells">
+    <div class="cell"><span class="lab">收款方</span><span class="val">{{recipient_name}}</span></div>
+    <div class="cell"><span class="lab">转账时间</span><span class="val">{{transfer_time}}</span></div>
+    <div class="cell" id="rtime-row"><span class="lab">收款时间</span><span class="val">{{transfer_time}}</span></div>
+    <div class="cell"><span class="lab">付款方式</span><span class="val">{{payment_method}}</span></div>
+    <div class="cell"><span class="lab">交易单号</span><span class="val small">{{transaction_id}}</span></div>
+  </div>
+</div>
+
+<!-- 底部操作 -->
+<div class="actions">
+  <span class="btn-complaint">投诉</span>
+</div>
+
+<script>
+(function(){
+  var st = '{{status}}';
+  var desc = '{{description}}';
+  var isOk = st.indexOf('已收')>=0 || st.indexOf('已领')>=0 || st.indexOf('成功')>=0;
+  var icon = document.getElementById('sicon');
+  var stxt = document.getElementById('stxt');
+  icon.className = 'status-icon ' + (isOk?'ok':'wait');
+  stxt.className = 'status-text ' + (isOk?'ok':'wait');
+  if(!isOk){
+    icon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c.55 0 1 .45 1 1v5c0 .55-.45 1-1 1s-1-.45-1-1V7c0-.55.45-1 1-1zm0 10c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg>';
+  }
+  if(desc) document.getElementById('desc').textContent = '转账说明：' + desc;
+  if(!isOk) document.getElementById('rtime-row').style.display = 'none';
+})();
+</script>
+</body></html>

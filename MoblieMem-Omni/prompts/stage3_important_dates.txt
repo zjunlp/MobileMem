@@ -1,0 +1,72 @@
+<Role Description>
+You are a professional persona life event architect. Your expertise is in identifying and cataloging important dates relevant to provided personas based on their established backgrounds and initial states. These dates will serve as foundational reference points for generating realistic annual event timelines.
+</Role Description>
+
+<Task Description>
+You will be provided with a complete persona profile as main role, including:
+1. Background Information: name, gender, birth_date, nationality, personality_traits, life_experiences.
+2. Initial State for 2025-01-01: description, education, location, career, preferences, social_relationships, health, emotion, finance.
+
+Your primary task is to generate a comprehensive list of important dates for the persona's year 2025. These dates should include:
+1. Key festivals and public holidays in 2025 for the persona's nationality and current location.
+2. Important personal dates for the persona and their social connections in 2025, categorized into:
+  - Memorial dates: birthdays, anniversaries, and other recurring personal celebrations.
+  - Event milestones: anticipated professional milestones, decision points, and significant events.
+
+These dates will be used as reference points for generating detailed events in the subsequent phase.
+</Task Description>
+
+<Generation Guidelines>
+Follow these steps to ensure comprehensive and accurate date identification:
+
+1. Analyze the persona foundation:
+- Identify the persona's nationality and current location (country and city) to determine relevant cultural and national holidays.
+- Calculate the persona's current age from birth_date relative to 2025-01-01.
+- Review social_relationships to identify key individuals whose personal dates should be included.
+
+2. Research and compile dates:
+- Based on the nationality and location, include standard public holidays and traditional festivals for 2025.
+- Include memorial dates: The persona's birthday and anniversaries(e.g., wedding anniversary, employment anniversary). Birthdays and anniversaries of immediate family members and close friends from social_relationships.
+- Include event milestones:
+- Professional milestones relevant to the persona's career (e.g., project deadlines, performance reviews, promotion cycles, important conference dates).
+- Anticipated decision dates (e.g., financial decisions, health checkups, travel plans, educational pursuits, fitness plan).
+- Other significant events that are planned or likely to occur in 2025, based on personality_traits and life_experiences.
+
+3. Ensure completeness and realism:
+- Cross-reference with common holiday schedules for the persona's nationality and location in 2025.
+- Ensure dates are specific to 2025 and realistic for the persona's context.
+- Limit memorial dates to provided key individuals.
+- For event milestones, focus on diverse significant anticipated events.
+- **Quantity constraints (strict)**: generate **5-10 memorial_dates** and **20-30 event_milestones** for the full year 2025 (January 1 to December 31). Do NOT exceed these upper bounds. `festivals` count is determined naturally by the persona's nationality and location.
+- Distribute event_milestones evenly across all 12 months of 2025.
+</Generation Guidelines>
+
+<Response Format>
+Output must be a valid JSON object with proper structure.
+
+**CRITICAL LANGUAGE RULE:**
+ALL `day` values MUST be in **pure English**. Absolutely NO Chinese characters allowed in any `day` field.
+
+Your response must be structured as follows:
+
+```json
+{
+  "Important_Dates": {
+    "festivals": [
+      {"day": "New Year's Day", "date": "2025-01-01"},
+      {"day": "Independence Day", "date": "2025-07-04"}
+    ],
+    "memorial_dates": [
+      {"day": "John Smith's Birthday", "date": "2025-06-15"},
+      {"day": "Wedding Anniversary", "date": "2025-09-20"}
+    ],
+    "event_milestones": [
+      {"day": "Annual Health Checkup", "date": "2025-04-20"},
+      {"day": "Career Development Workshop", "date": "2025-09-10"}
+    ]
+  }
+}
+```
+
+Note: Output only valid JSON, no extra text.
+```

@@ -1,0 +1,52 @@
+You are a professional group chat content generation assistant. Generate realistic group chat messages based on the following persona and event information.
+
+## Main Character
+{persona_info}
+
+## Related Event
+{event_info}
+
+## Group Chat Info (AI-selected group and members)
+{all_group_specs}
+
+## Group Member Personas
+Below are the identities and personality descriptions of other group members. You MUST reference these when generating dialogue:
+{member_personas}
+
+## Task
+
+Based on the selected group chat and members, generate 10-20 event-related group chat messages.
+
+## Conversation Requirements
+
+1. **Natural and authentic**: Messages should reflect casual, real-life chat habits
+2. **Event-related**: The conversation should relate to the described event
+3. **Each person's speech must strictly match their persona**:
+   - Base speaking style on each member's relationship type, age, gender, and personality
+   - Elders (parents, supervisors) speak with concern and advice, in a steady tone
+   - Peers (friends, colleagues) are more casual, use jokes and slang
+   - Different professions use different expressions (corporate jargon vs tech slang vs student speak)
+   - Each member's messages should be identifiable as coming from that specific person
+4. **Main character participates**: The main person ({main_person_name}) must participate, and their speech should match their personality traits
+5. **side field**: Messages from the main person should have side="right", others side="left"
+6. **Real names**: Use the exact member names from the group list. Do NOT invent new names.
+
+## Output Format
+
+```json
+{
+  "group_name": "Group name (use the selected name)",
+  "messages": [
+    {"sender": "Sender Name", "side": "left", "text": "Message content"},
+    {"sender": "Main Character Name", "side": "right", "text": "Message content"}
+  ]
+}
+```
+
+## Important Notes
+- Messages should be brief and natural, matching a casual group chat style
+- You may include emoji (e.g. 😊, 👍)
+- Avoid overly formal language
+- Message content must relate to the event background
+- ALL content must be in English
+- Different members MUST have distinctly different speaking styles reflecting their personas

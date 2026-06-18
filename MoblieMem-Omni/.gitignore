@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ruff_cache/
+.pytest_cache/
+
+# Secrets & local config (keep .env.example tracked)
+.env
+.env.*
+!.env.example
+*.bak
+
+# Logs
+*.log
+
+# Local-only data & outputs (not part of the open-source release)
+output/
+infotest/
+web/
+
+# OS cruft
+.DS_Store
+Thumbs.db

@@ -1,0 +1,39 @@
+<Role Description>
+You are a professional data scientist tasked with generating synthetic persona profile data. Your task is to create realistic and coherent basic information for a specified number of personas.
+</Role Description>
+ 
+<Task Description>
+Today's date is 2025-01-01. You will generate basic information for personas. The information for each persona must be realistic, coherent, and correspond to a character that could plausibly exist in reality.
+For each persona, you must generate the following information:
+ 
+uuid: A unique identifier, starting from 0 and incrementing sequentially.
+ 
+Name: A full name in the persona's native language. For Chinese personas, use authentic Chinese characters (e.g., "Chen Wei", "Wang Lihua"). Ensure names are culturally appropriate and diverse. DO NOT use pinyin or English transliteration. For non-Chinese personas, use their native language naming conventions.
+
+Gender: Either "Male" or "Female".
+ 
+Birth Date: In YYYY-MM-DD format. The age implied by this date relative to 2025-01-01 should be realistic for an adult (e.g., generally between 18 and 65 years old).
+ 
+Nationality: The country of citizenship. Approximately one-third of the generated personas must have Chinese nationality. The remaining two-thirds should have a diverse mix of other nationalities.
+ 
+Language: Either "Chinese" or "English". It is set to "Chinese" for Chinese or people living in China, and "English" for others.
+ 
+Personality Traits: Summarize the key aspects of a character's personality in a several sentences. These personality traits should be long-term and stable.
+
+Life Experiences: Summarize the key aspects of a character's life experience in a several sentences. These life experiences must come from the past, not the present or recent, and will not change in the near future. For example, important past life, work, educational experiences, etc.
+</Task Description>
+ 
+<Generation Guidelines>
+You will use a systematic approach to generate coherent and diverse persona data:
+1. Determine Core Demographics: For each persona, first decide on nationality (respecting the 1/3 Chinese ratio), gender (aim for a roughly balanced distribution overall), and a target age range.
+2. Generate Plausible Name and Birth Date: Create a name fitting the nationality and gender. Calculate a birth date that results in an age within the target range, relative to 2025-01-01.  Attention should be paid to ensuring diversity in age.
+3. Define Personality Traits and Life Experiences: Ensure these personality traits and life experiences don't blatantly contradict other attributes. Ensure diversity in personality traits and life experiences.
+4. Ensure Overall Coherence: Review the complete profile for each persona to ensure all fields are realistic, non-contradictory, and together depict a plausible individual.
+4. CRITICAL: Ensure all descriptions use first person perspective ("I", "my", "me") instead of third person ("she", "her", "he", "him")
+</Generation Guidelines>
+ 
+<Response Format>
+Your response must be a valid JSON object containing exactly two fields: "Analysis" and "Answer". The JSON must be wrapped inside a Markdown code block: ```json```.
+1. Analysis: A brief explanation of your generation strategy. Describe how you ensured diversity (in personality traits, age, life experience, etc.), realism, and adherence to the requirements (e.g., the 1/3 Chinese nationality rule).
+2. Answer: Provide the generated data in JSON Lines (jsonl) format. This must be a single string where each line is a separate JSON object representing one complete persona profile, containing all the required fields ("uuid", "name", "gender", "birth_date", "nationality", "language", "personality_traits", "life_experiences"). Do not include any additional text outside the JSON object for this field. Please ensure the final JSON format of your response is correct and can be directly parsed by a program.
+</Response Format>

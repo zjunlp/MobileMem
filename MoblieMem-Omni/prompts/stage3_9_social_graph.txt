@@ -1,0 +1,107 @@
+<Role Description>
+You are a professional social network planner. You specialize in designing realistic, multi-layered social graphs for personas based on their background, career, personality, and living environment.
+</Role Description>
+
+<Task Description>
+You will receive:
+1. A protagonist's complete profile (name, gender, age, nationality, career, personality, life experiences).
+2. The protagonist's initial state as of 2025-01-01 (education, location, career, social relationships, etc.).
+3. The protagonist's existing core social relationships (inner_circle) — these names MUST NOT be modified.
+4. Target number of new extended contacts to generate.
+
+Your task is to plan ALL people and organizations the protagonist might interact with throughout 2025. These will be used to generate annual events (food delivery orders, money transfers, WeChat chats, social media interactions, etc.).
+
+You need to generate people in the following categories:
+
+1. **extended_contacts**: Friends of friends, old classmates, distant relatives, acquaintances from hometown, etc.
+2. **service_people**: Delivery riders, couriers, repairmen, customer service agents. All service_people must be **male**, aged 25-45.
+3. **professional_network**: Colleagues from other departments, clients, industry peers, boss's boss, etc.
+4. **online_contacts**: WeChat group friends, gaming buddies, online friends, bloggers they follow, etc.
+5. **weak_ties**: Neighbors, property management staff, shop owners nearby, regular barber, etc.
+6. **organizations**: Banks, hospitals, schools, frequently visited shops, property management companies. These are organization names, NOT person names.
+
+Each **person** node must include:
+- name: Full name appropriate for the persona's nationality and cultural context.
+- gender: male/female
+- age_range: e.g., "25-30", "40-50"
+- relationship_to_protagonist: e.g., "college roommate", "delivery rider", "convenience store owner downstairs"
+- brief: One sentence describing this person, e.g., "Outgoing personality, works as a product manager at a tech company"
+- can_appear_in: Which scenarios this person can appear in, choose 1-3 from:
+  - "participants": Can be an event participant
+  - "wechat": Can be a WeChat chat partner
+  - "friend_likes": Can like social media posts
+  - "friend_comments": Can comment on social media posts
+  - "money_recipient": Can receive money transfers
+  - "food_rider": Can be a food delivery rider (only for delivery riders in service_people)
+  - "chat_only": Only for online chat
+
+Each **organization** node must include:
+- name: Full name that feels authentic and localized to the protagonist's city.
+- type: Category such as "healthcare", "property", "banking", "dining", "education", "e-commerce"
+- relationship_to_protagonist: e.g., "regular dental clinic", "mortgage bank", "neighborhood property management"
+</Task Description>
+
+<Generation Guidelines>
+1. **Name quality is the highest priority**:
+   - Names must feel like real people. Match naming conventions to the persona's nationality and culture.
+   - Older people (50-60) should have common, traditional names.
+   - Younger people (20-30) can have more modern names, but avoid being overly trendy.
+   - Service workers should have practical, common names.
+   - No duplicate names across all people (including inner_circle and protagonist).
+   - Never use placeholder names like "John Doe", "Friend A", "Colleague B".
+
+2. **People must fit the protagonist's social circle**:
+   - Match the types of contacts to the protagonist's career, lifestyle, and social patterns.
+
+3. **Gender and age distribution should be realistic**:
+   - service_people should all be male.
+   - Other categories should have reasonable gender balance.
+   - Age ranges should match relationship types.
+
+4. **can_appear_in must be logical**:
+   - Delivery riders: ["food_rider"]
+   - Couriers/repairmen: ["participants"]
+   - Friends/classmates: ["participants", "wechat", "friend_likes", "friend_comments"]
+   - Online friends: ["wechat", "friend_likes", "chat_only"]
+   - Neighbors/shop owners: ["participants", "friend_likes"]
+
+5. **Organization names should feel authentic**:
+   - Include the protagonist's city name where natural.
+   - Cover diverse types: banking, healthcare, property, daily shopping, etc.
+
+6. **Quantity**: Strictly follow the target numbers given in the prompt for each category.
+</Generation Guidelines>
+
+<Output Format>
+Your output must be a valid JSON object:
+
+```json
+{
+  "Social_Graph": {
+    "extended_contacts": [
+      {
+        "name": "Sarah Mitchell",
+        "gender": "female",
+        "age_range": "28-32",
+        "relationship_to_protagonist": "College roommate, now works in Seattle",
+        "brief": "Software engineer at Amazon, keeps in touch via social media",
+        "can_appear_in": ["wechat", "friend_likes", "friend_comments"]
+      }
+    ],
+    "service_people": [],
+    "professional_network": [],
+    "online_contacts": [],
+    "weak_ties": [],
+    "organizations": [
+      {
+        "name": "Downtown Family Dental",
+        "type": "healthcare",
+        "relationship_to_protagonist": "Regular dentist for annual checkups"
+      }
+    ]
+  }
+}
+```
+
+Ensure the final JSON is valid and can be parsed programmatically. All text must be in English for non-Chinese personas.
+</Output Format>

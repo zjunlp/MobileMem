@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telegram Group</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:#c8d9e6;
+  font-family:-apple-system,"Helvetica Neue","PingFang SC","Microsoft YaHei",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  display:flex;justify-content:center;
+}
+.phone{width:100%;max-width:450px;display:flex;flex-direction:column;min-height:100vh}
+
+/* ── Header bar ── */
+.header{
+  background:#517da2;height:56px;display:flex;align-items:center;
+  padding:0 8px;gap:10px;flex-shrink:0;
+}
+.header .back{width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.header .back svg{width:20px;height:20px;fill:#fff}
+.header .group-avatar{
+  width:40px;height:40px;border-radius:50%;background:#7ea8c6;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:18px;font-weight:600;flex-shrink:0;
+}
+.header .info{flex:1;overflow:hidden}
+.header .info .name{font-size:16px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header .info .meta{font-size:13px;color:rgba(255,255,255,.75)}
+.header .actions{display:flex;gap:6px}
+.header .actions svg{width:22px;height:22px;fill:#fff}
+#groupName{/* placeholder */}
+#memberCount{/* placeholder */}
+
+/* ── Chat area: Telegram-style wallpaper ── */
+.chat-bg{
+  flex:1;padding:6px 8px 8px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,.12) 0%, transparent 60%),
+    radial-gradient(circle at 80% 70%, rgba(255,255,255,.08) 0%, transparent 50%),
+    #c8d9e6;
+}
+
+/* ── Message row ── */
+.message-row{display:flex;align-items:flex-end;gap:6px;margin-bottom:2px}
+.avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.message-content{display:flex;flex-direction:column;max-width:70%}
+
+/* Sender name (colored) */
+.sender-name{font-size:13px;font-weight:600;margin-bottom:1px;padding-left:12px}
+.message-row:nth-child(6n+1) .sender-name{color:#c0392b}
+.message-row:nth-child(6n+2) .sender-name{color:#2980b9}
+.message-row:nth-child(6n+3) .sender-name{color:#27ae60}
+.message-row:nth-child(6n+4) .sender-name{color:#8e44ad}
+.message-row:nth-child(6n+5) .sender-name{color:#d35400}
+.message-row:nth-child(6n+6) .sender-name{color:#16a085}
+
+/* Bubble */
+.bubble{
+  position:relative;padding:7px 12px 7px;border-radius:12px;
+  font-size:15px;line-height:1.45;word-break:break-word;color:#000;
+  box-shadow:0 1px 1px rgba(0,0,0,.06);
+}
+
+/* ── Left side (others) ── */
+.left{flex-direction:row;align-items:flex-end}
+.left .bubble{
+  background:#fff;
+  border-bottom-left-radius:4px;
+}
+/* Tail (simulated with clip-path) */
+.left .bubble::before{
+  content:"";position:absolute;bottom:0;left:-8px;
+  width:12px;height:16px;
+  background:#fff;
+  clip-path:path("M12 0 C12 0, 0 4, 0 16 L12 16 Z");
+}
+
+/* ── Right side (self) ── */
+.right{flex-direction:row-reverse;align-items:flex-end}
+.right .message-content{align-items:flex-end}
+.right .sender-name{display:none}
+.right .avatar{display:none}
+.right .bubble{
+  background:#eeffde;
+  border-bottom-right-radius:4px;
+}
+.right .bubble::before{
+  content:"";position:absolute;bottom:0;right:-8px;
+  width:12px;height:16px;
+  background:#eeffde;
+  clip-path:path("M0 0 C0 0, 12 4, 12 16 L0 16 Z");
+}
+
+/* ── Bottom input bar ── */
+.input-bar{
+  background:#fff;border-top:.5px solid #d8dce0;
+  padding:6px 8px;display:flex;align-items:center;gap:6px;
+  flex-shrink:0;
+}
+.input-bar .icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer}
+.input-bar .icon svg{width:24px;height:24px;fill:#8e99a4}
+.text-field{
+  flex:1;height:36px;background:#fff;border:1.5px solid #d8dce0;
+  border-radius:18px;padding:0 14px;font-size:15px;color:#333;
+}
+.send-btn{
+  width:36px;height:36px;border-radius:50%;background:#5ca5d4;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.send-btn svg{width:20px;height:20px;fill:#fff;transform:rotate(-30deg)}
+
+/* ── emoji ── */
+img.emoji{width:22px;height:22px;vertical-align:-4px;display:inline}
+</style>
+</head>
+<body>
+<div class="phone">
+  <!-- Header -->
+  <div class="header">
+    <div class="back">
+      <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </div>
+    <div class="group-avatar">G</div>
+    <div class="info">
+      <div class="name" id="groupName">Group Chat</div>
+      <div class="meta" id="memberCount">3 members</div>
+    </div>
+    <div class="actions">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5L20.49 19l-5-5zm-6 0A4.5 4.5 0 1114 9.5 4.49 4.49 0 019.5 14z"/></svg>
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+    </div>
+  </div>
+
+  <!-- Chat area -->
+  <div class="chat-bg" id="chatContainer">
+    <!-- Messages are injected dynamically by script -->
+  </div>
+
+  <!-- Bottom input bar -->
+  <div class="input-bar">
+    <div class="icon">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#8e99a4" stroke-width="1.5"/><circle cx="8.5" cy="10" r="1.2"/><circle cx="15.5" cy="10" r="1.2"/><path d="M8 14.5c1 1.5 2.5 2.5 4 2.5s3-1 4-2.5" fill="none" stroke="#8e99a4" stroke-width="1.3" stroke-linecap="round"/></svg>
+    </div>
+    <div class="icon">
+      <svg viewBox="0 0 24 24"><path d="M16.5 6v11.5a4 4 0 01-8 0V5a2.5 2.5 0 015 0v10.5a1 1 0 01-2 0V6h-1.5v9.5a2.5 2.5 0 005 0V5a4 4 0 00-8 0v12.5a5.5 5.5 0 0011 0V6H16.5z"/></svg>
+    </div>
+    <div class="text-field" contenteditable="false"></div>
+    <div class="send-btn">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </div>
+  </div>
+</div>
+</body>
+</html>

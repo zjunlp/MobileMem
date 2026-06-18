@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X Direct Messages</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:#000;color:#e7e9ea;
+  font-family:-apple-system,"SF Pro Text","Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  display:flex;justify-content:center;
+}
+.phone{width:100%;max-width:450px;display:flex;flex-direction:column;min-height:100vh}
+
+/* ── Header ── */
+.header{
+  background:#000;height:54px;display:flex;align-items:center;
+  padding:0 12px;gap:10px;border-bottom:1px solid #2f3336;
+  flex-shrink:0;
+}
+.header .back{width:28px;height:28px;display:flex;align-items:center;justify-content:center}
+.header .back svg{width:20px;height:20px;fill:#e7e9ea}
+.header .user-info{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.header .user-avatar{
+  position:relative;width:32px;height:32px;flex-shrink:0;
+}
+.header .user-avatar img{width:32px;height:32px;border-radius:50%;object-fit:cover}
+.header .user-avatar .online{
+  position:absolute;bottom:0;right:0;width:10px;height:10px;
+  background:#00ba7c;border:2px solid #000;border-radius:50%;
+}
+.header .user-name{font-size:16px;font-weight:700;color:#e7e9ea;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header .info-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center}
+.header .info-btn svg{width:20px;height:20px;fill:#e7e9ea}
+#groupName{/* inline */}
+#memberCount{display:none}
+
+/* ── Chat area ── */
+.chat{flex:1;padding:12px 12px 8px;display:flex;flex-direction:column;gap:6px;overflow-y:auto}
+
+/* ── 消息行 ── */
+.message-row{display:flex;align-items:flex-end;gap:8px;margin-bottom:2px}
+.avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.message-content{display:flex;flex-direction:column;max-width:72%}
+.sender-name{display:none}/* X DM 不显示发送者名 */
+
+/* 气泡 */
+.bubble{
+  padding:10px 16px;border-radius:24px;
+  font-size:15px;line-height:1.4;word-break:break-word;
+}
+
+/* ── 左侧（他人）── */
+.left{flex-direction:row;align-items:flex-end}
+.left .bubble{
+  background:#2a2f35;color:#e7e9ea;
+  border-bottom-left-radius:6px;
+}
+
+/* ── 右侧（自己）── */
+.right{flex-direction:row-reverse;align-items:flex-end}
+.right .message-content{align-items:flex-end}
+.right .avatar{display:none}
+.right .bubble{
+  background:#1d9bf0;color:#fff;
+  border-bottom-right-radius:6px;
+}
+
+/* ── 底部输入栏 ── */
+.input-bar{
+  background:#000;border-top:1px solid #2f3336;
+  padding:8px 12px;display:flex;align-items:center;gap:8px;
+  flex-shrink:0;
+}
+.input-bar .icon{width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.input-bar .icon svg{width:22px;height:22px;fill:#1d9bf0}
+.text-field{
+  flex:1;height:38px;background:#202327;border:1px solid #333639;
+  border-radius:20px;padding:0 14px;font-size:15px;color:#71767b;
+  display:flex;align-items:center;
+}
+.text-field::after{content:"Start a new message";color:#71767b;font-size:15px}
+.send-arrow{
+  width:34px;height:34px;border-radius:50%;background:#1d9bf0;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  opacity:.5;
+}
+.send-arrow svg{width:18px;height:18px;fill:#fff}
+
+/* ── emoji ── */
+img.emoji{width:22px;height:22px;vertical-align:-4px;display:inline}
+</style>
+</head>
+<body>
+<div class="phone">
+  <!-- Header -->
+  <div class="header">
+    <div class="back">
+      <svg viewBox="0 0 24 24"><path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"/></svg>
+    </div>
+    <div class="user-info">
+      <div class="user-avatar">
+        <div class="online"></div>
+      </div>
+      <span class="user-name" id="groupName">Group Chat</span>
+    </div>
+    <span id="memberCount" style="display:none"></span>
+    <div class="info-btn">
+      <svg viewBox="0 0 24 24"><path d="M12 8.21c-2.09 0-3.79 1.7-3.79 3.79s1.7 3.79 3.79 3.79 3.79-1.7 3.79-3.79-1.7-3.79-3.79-3.79zm0 6.08c-1.262 0-2.29-1.026-2.29-2.29S10.74 9.71 12 9.71s2.29 1.026 2.29 2.29-1.028 2.29-2.29 2.29z"/><circle cx="12" cy="12" r="10" fill="none" stroke="#e7e9ea" stroke-width="1.5"/></svg>
+    </div>
+  </div>
+
+  <!-- 聊天区域 -->
+  <div class="chat" id="chatContainer">
+    <!-- 消息将由脚本动态填充 -->
+  </div>
+
+  <!-- 底部输入栏 -->
+  <div class="input-bar">
+    <div class="icon">
+      <svg viewBox="0 0 24 24"><path d="M3 5.5C3 4.119 4.119 3 5.5 3h13C19.881 3 21 4.119 21 5.5v13c0 1.381-1.119 2.5-2.5 2.5h-13C4.119 21 3 19.881 3 18.5v-13zM5.5 5c-.276 0-.5.224-.5.5v9.086l3-3 3 3 5-5 3 3V5.5c0-.276-.224-.5-.5-.5h-13zM19 15.414l-3-3-5 5-3-3-3 3V18.5c0 .276.224.5.5.5h13c.276 0 .5-.224.5-.5v-3.086zM9.75 7a1.75 1.75 0 100 3.5 1.75 1.75 0 000-3.5z"/></svg>
+    </div>
+    <div class="icon">
+      <svg viewBox="0 0 24 24"><path d="M8 9.5a1.25 1.25 0 100 2.5 1.25 1.25 0 000-2.5zm4 0a1.25 1.25 0 100 2.5 1.25 1.25 0 000-2.5zm4 0a1.25 1.25 0 100 2.5 1.25 1.25 0 000-2.5z"/><circle cx="12" cy="12" r="10" fill="none" stroke="#1d9bf0" stroke-width="1.5"/></svg>
+    </div>
+    <div class="text-field"></div>
+    <div class="send-arrow">
+      <svg viewBox="0 0 24 24"><path d="M2.504 21.866l.526-2.108L3.04 19.75l2-8 .006-.025 1.97.49-1.975 7.93 12.42-7.62-16.912-4.98L12.87 2.2l18.9 9.9-18.9 9.766z"/></svg>
+    </div>
+  </div>
+</div>
+</body>
+</html>

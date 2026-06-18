@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>12306 电子客票</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:-apple-system,"SF Pro SC","PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;
+  background:#f5f5f9;color:#333;width:450px;overflow-x:hidden;-webkit-font-smoothing:antialiased;line-height:1.4;
+}
+
+/* ── iOS 状态栏 ── */
+.sb{height:44px;background:#3168e8;color:#fff;display:flex;align-items:center;padding:0 16px;font-size:15px;font-weight:600}
+.sb .time{flex:1}
+.sb .ri{display:flex;gap:6px;align-items:center}
+.sb .ri svg{height:12px}
+
+/* ── 导航栏 ── */
+.nav{
+  background:linear-gradient(180deg,#3168e8 0%,#4a7cf7 100%);
+  height:44px;display:flex;align-items:center;padding:0 16px;position:relative;
+}
+.nav .back{width:24px;height:24px;display:flex;align-items:center}
+.nav .back svg{width:10px;height:18px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.nav .t{flex:1;text-align:center;font-size:17px;font-weight:600;color:#fff;margin-right:24px}
+
+/* ── 状态提示 ── */
+.status-tip{
+  background:linear-gradient(180deg,#4a7cf7 0%,#f5f5f9 40px);
+  padding:16px 16px 0;text-align:center;
+}
+.status-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(255,255,255,.15);backdrop-filter:blur(8px);
+  padding:6px 16px;border-radius:20px;font-size:13px;color:#fff;
+}
+.status-badge svg{width:14px;height:14px;fill:#fff}
+
+/* ── 车票卡片 ── */
+.ticket{
+  background:#fff;margin:12px 16px;border-radius:14px;overflow:visible;position:relative;
+  box-shadow:0 4px 20px rgba(49,104,232,.10),0 1px 3px rgba(0,0,0,.06);
+}
+
+/* 蓝色顶部条 */
+.tk-top{
+  background:linear-gradient(135deg,#3168e8,#5b8df7);
+  padding:12px 18px;border-radius:14px 14px 0 0;
+  display:flex;align-items:center;justify-content:space-between;color:#fff;
+}
+.tk-top .train-no{font-size:17px;font-weight:700;letter-spacing:.5px}
+.tk-top .train-type{font-size:12px;opacity:.8;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:10px}
+
+/* 路线区域 */
+.route{padding:20px 18px 16px;display:flex;align-items:flex-start}
+.stn{flex:1;text-align:center}
+.stn .name{font-size:24px;font-weight:700;color:#1a1a1a;letter-spacing:1px}
+.stn .time{font-size:30px;font-weight:700;color:#3168e8;margin-top:6px;font-variant-numeric:tabular-nums}
+.stn .date{font-size:12px;color:#999;margin-top:2px}
+.arrow-wrap{flex:0 0 90px;display:flex;flex-direction:column;align-items:center;padding-top:6px}
+.arrow-line{width:60px;height:0;border-top:1.5px solid #d0d0d0;position:relative;margin-top:10px}
+.arrow-line::after{content:'';position:absolute;right:-2px;top:-5px;border:5px solid transparent;border-left:6px solid #3168e8}
+.arrow-dur{font-size:11px;color:#999;margin-top:6px;white-space:nowrap}
+
+/* 穿孔分割线 */
+.perf{position:relative;height:24px;overflow:visible}
+.perf::before,.perf::after{
+  content:'';position:absolute;top:50%;width:18px;height:18px;border-radius:50%;
+  background:#f5f5f9;transform:translateY(-50%);z-index:2;
+}
+.perf::before{left:-9px}
+.perf::after{right:-9px}
+.perf .dash{border-top:1.5px dashed #e5e5e5;margin:0 14px;position:relative;top:50%}
+
+/* 票面下半部 */
+.tk-detail{padding:12px 18px 18px}
+.tk-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
+.tk-row .k{font-size:13px;color:#999}
+.tk-row .v{font-size:14px;color:#333;font-weight:500}
+.tk-row .v.price{color:#3168e8;font-size:20px;font-weight:700}
+
+/* ── 乘客信息卡 ── */
+.pax-card{
+  background:#fff;margin:0 16px 12px;border-radius:12px;padding:16px 18px;
+  box-shadow:0 1px 4px rgba(0,0,0,.04);
+}
+.pax-title{font-size:14px;font-weight:600;color:#333;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.pax-title svg{width:16px;height:16px;fill:#3168e8}
+.pax-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px}
+.pax-row .k{color:#999}
+.pax-row .v{color:#333;font-weight:500}
+
+/* ── 二维码区域 ── */
+.qr-area{text-align:center;padding:16px;margin:0 16px 16px;background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.qr-area img{width:90px;height:90px;border:1px solid #eee;border-radius:6px;padding:4px;background:#fff}
+.qr-area .tip{font-size:11px;color:#bbb;margin-top:8px}
+.qr-area .order{font-size:11px;color:#ccc;margin-top:4px}
+
+/* ── 底部 ── */
+.footer-brand{text-align:center;padding:16px 0 24px;font-size:12px;color:#ccc}
+.footer-brand .logo{font-weight:600;color:#3168e8;font-size:13px}
+</style></head>
+<body>
+
+<!-- iOS 状态栏 -->
+<div class="sb">
+  <span class="time">9:41</span>
+  <span class="ri">
+    <svg viewBox="0 0 17 12" width="17"><path d="M8.5.5l8 11H.5z" fill="currentColor" opacity=".9"/></svg>
+    <svg viewBox="0 0 16 12" width="16"><path d="M1 4h2v8H1zM5 2h2v10H5zM9 0h2v12H9zM13 3h2v9h-2z" fill="currentColor"/></svg>
+    <svg viewBox="0 0 25 12" width="25"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="1.5" y="2.5" width="17" height="7" rx="1" fill="currentColor"/><path d="M23 4.5v3a1.5 1.5 0 000-3z" fill="currentColor"/></svg>
+  </span>
+</div>
+
+<!-- 导航栏 -->
+<div class="nav">
+  <div class="back"><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg></div>
+  <div class="t">电子客票</div>
+</div>
+
+<!-- 状态提示 -->
+<div class="status-tip">
+  <div class="status-badge">
+    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+    已出票 · 待出行
+  </div>
+</div>
+
+<!-- 车票卡片 -->
+<div class="ticket">
+  <div class="tk-top">
+    <span class="train-no">{{train_number}}</span>
+    <span class="train-type">{{seat_type}}</span>
+  </div>
+  <div class="route">
+    <div class="stn">
+      <div class="name">{{departure_station}}</div>
+      <div class="time">{{departure_time}}</div>
+      <div class="date">{{travel_date}}</div>
+    </div>
+    <div class="arrow-wrap">
+      <div class="arrow-line"></div>
+      <div class="arrow-dur" id="dur"></div>
+    </div>
+    <div class="stn">
+      <div class="name">{{arrival_station}}</div>
+      <div class="time" id="arr-time">--:--</div>
+      <div class="date">{{travel_date}}</div>
+    </div>
+  </div>
+  <div class="perf"><div class="dash"></div></div>
+  <div class="tk-detail">
+    <div class="tk-row"><span class="k">席别 / 座位</span><span class="v">{{seat_type}}  {{seat_number}}</span></div>
+    <div class="tk-row"><span class="k">票价</span><span class="v price">¥{{price}}</span></div>
+  </div>
+</div>
+
+<!-- 乘客信息 -->
+<div class="pax-card">
+  <div class="pax-title">
+    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+    乘车人信息
+  </div>
+  <div class="pax-row"><span class="k">姓名</span><span class="v">{{passenger_name}}</span></div>
+  <div class="pax-row"><span class="k">证件尾号</span><span class="v">{{passenger_id_last4}}</span></div>
+</div>
+
+<!-- 二维码 -->
+<div class="qr-area">
+  <img src="data:image/png;base64,{{qr_code_base64}}" alt="二维码">
+  <div class="tip">请凭身份证原件进站乘车</div>
+  <div class="order">订单号：{{order_number}}</div>
+</div>
+
+<!-- 底部品牌 -->
+<div class="footer-brand">
+  <span class="logo">中国铁路</span> 12306
+</div>
+
+<script>
+(function(){
+  var dep = '{{departure_time}}';
+  var p = dep.split(':');
+  var dh = parseInt(p[0])||8, dm = parseInt(p[1])||0;
+  var dur = 120 + Math.floor(Math.random()*240);
+  var ah = Math.floor((dh*60+dm+dur)/60)%24;
+  var am = (dm+dur)%60;
+  var arrEl = document.getElementById('arr-time');
+  if(arrEl) arrEl.textContent = String(ah).padStart(2,'0')+':'+String(am).padStart(2,'0');
+  var durEl = document.getElementById('dur');
+  if(durEl) durEl.textContent = Math.floor(dur/60)+'h'+String(dur%60).padStart(2,'0')+'m';
+})();
+</script>
+</body></html>

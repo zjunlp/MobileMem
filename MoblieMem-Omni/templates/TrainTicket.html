@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Train Ticket</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:-apple-system,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;
+  background:#f2f4f7;color:#1a1a2e;width:450px;overflow-x:hidden;-webkit-font-smoothing:antialiased;line-height:1.4;
+}
+
+/* ── iOS Status Bar ── */
+.sb{height:44px;background:#0a2540;color:#fff;display:flex;align-items:center;padding:0 16px;font-size:15px;font-weight:600}
+.sb .time{flex:1}
+.sb .ri{display:flex;gap:6px;align-items:center}
+.sb .ri svg{height:12px}
+
+/* ── Navigation Bar (Trainline teal) ── */
+.nav{
+  background:#0a2540;
+  height:48px;display:flex;align-items:center;padding:0 16px;position:relative;
+}
+.nav .back{width:28px;height:28px;display:flex;align-items:center}
+.nav .back svg{width:10px;height:18px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.nav .t{flex:1;text-align:center;font-size:17px;font-weight:600;color:#fff;margin-right:28px}
+
+/* ── Confirmed banner ── */
+.confirm-bar{
+  background:linear-gradient(135deg,#00b67a,#00d68f);
+  padding:10px 16px;display:flex;align-items:center;gap:8px;
+}
+.confirm-bar svg{width:18px;height:18px;fill:#fff}
+.confirm-bar .text{color:#fff;font-size:14px;font-weight:600}
+
+/* ── Ticket Card ── */
+.ticket{
+  background:#fff;margin:16px;border-radius:16px;overflow:visible;position:relative;
+  box-shadow:0 4px 24px rgba(10,37,64,.08),0 1px 3px rgba(0,0,0,.04);
+}
+
+/* Route section */
+.tk-route{padding:24px 20px 16px}
+.tk-date{font-size:13px;color:#6b7280;font-weight:500;margin-bottom:12px}
+
+.journey{display:flex;align-items:stretch;gap:12px}
+.timeline{display:flex;flex-direction:column;align-items:center;padding:4px 0}
+.timeline .dot{width:10px;height:10px;border-radius:50%;border:2px solid #0a2540;background:#fff;flex-shrink:0}
+.timeline .line{flex:1;width:2px;background:#d1d5db;margin:4px 0}
+.timeline .dot.arr{background:#0a2540}
+.stops{flex:1;display:flex;flex-direction:column;gap:20px}
+.stop{display:flex;align-items:baseline;gap:10px}
+.stop .time{font-size:20px;font-weight:700;color:#0a2540;width:56px;flex-shrink:0;font-variant-numeric:tabular-nums}
+.stop .station{font-size:16px;font-weight:600;color:#1a1a2e}
+
+/* Duration badge */
+.dur-badge{
+  align-self:center;background:#f0fdf4;color:#00b67a;
+  font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;margin:4px 0 4px 68px;
+}
+
+/* Perforated divider */
+.perf{position:relative;height:24px;overflow:visible}
+.perf::before,.perf::after{
+  content:'';position:absolute;top:50%;width:18px;height:18px;border-radius:50%;
+  background:#f2f4f7;transform:translateY(-50%);z-index:2;
+}
+.perf::before{left:-9px}
+.perf::after{right:-9px}
+.perf .dash{border-top:1.5px dashed #e5e7eb;margin:0 14px;position:relative;top:50%}
+
+/* Details section */
+.tk-details{padding:14px 20px 20px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.detail-item .label{font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.detail-item .value{font-size:14px;color:#1a1a2e;font-weight:600;margin-top:3px}
+.detail-item .value.price{color:#0a2540;font-size:22px;font-weight:700}
+
+/* ── Passenger Card ── */
+.pax-card{
+  background:#fff;margin:0 16px 12px;border-radius:12px;padding:16px 20px;
+  box-shadow:0 1px 4px rgba(0,0,0,.04);
+}
+.pax-title{font-size:13px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.pax-row{display:flex;justify-content:space-between;padding:5px 0;font-size:14px}
+.pax-row .k{color:#9ca3af;font-weight:500}
+.pax-row .v{color:#1a1a2e;font-weight:600}
+
+/* ── QR Code ── */
+.qr-area{text-align:center;padding:20px;margin:0 16px 16px;background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.qr-area img{width:90px;height:90px;border:1px solid #e5e7eb;border-radius:8px;padding:4px;background:#fff}
+.qr-area .tip{font-size:11px;color:#9ca3af;margin-top:8px}
+.qr-area .order{font-size:11px;color:#d1d5db;margin-top:4px}
+
+/* ── Footer ── */
+.footer{text-align:center;padding:16px 0 28px;font-size:12px;color:#d1d5db}
+</style></head>
+<body>
+
+<!-- iOS Status Bar -->
+<div class="sb">
+  <span class="time">10:30 AM</span>
+  <span class="ri">
+    <svg viewBox="0 0 17 12" width="17"><path d="M8.5.5l8 11H.5z" fill="currentColor" opacity=".9"/></svg>
+    <svg viewBox="0 0 16 12" width="16"><path d="M1 4h2v8H1zM5 2h2v10H5zM9 0h2v12H9zM13 3h2v9h-2z" fill="currentColor"/></svg>
+    <svg viewBox="0 0 25 12" width="25"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="1.5" y="2.5" width="17" height="7" rx="1" fill="currentColor"/><path d="M23 4.5v3a1.5 1.5 0 000-3z" fill="currentColor"/></svg>
+  </span>
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <div class="back"><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg></div>
+  <div class="t">My Ticket</div>
+</div>
+
+<!-- Confirmed Banner -->
+<div class="confirm-bar">
+  <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+  <span class="text">Confirmed · Ready to Travel</span>
+</div>
+
+<!-- Ticket Card -->
+<div class="ticket">
+  <div class="tk-route">
+    <div class="tk-date">{{travel_date}}</div>
+    <div class="journey">
+      <div class="timeline">
+        <div class="dot"></div>
+        <div class="line"></div>
+        <div class="dot arr"></div>
+      </div>
+      <div class="stops">
+        <div class="stop">
+          <span class="time">{{departure_time}}</span>
+          <span class="station">{{departure_station_en}}</span>
+        </div>
+        <div class="dur-badge" id="dur"></div>
+        <div class="stop">
+          <span class="time" id="arr-time">--:--</span>
+          <span class="station">{{arrival_station_en}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="perf"><div class="dash"></div></div>
+  <div class="tk-details">
+    <div class="detail-grid">
+      <div class="detail-item"><div class="label">Train</div><div class="value">{{train_number}}</div></div>
+      <div class="detail-item"><div class="label">Class</div><div class="value">{{seat_type}}</div></div>
+      <div class="detail-item"><div class="label">Seat</div><div class="value">{{seat_number}}</div></div>
+      <div class="detail-item"><div class="label">Price</div><div class="value price">${{price_usd}}</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Passenger Info -->
+<div class="pax-card">
+  <div class="pax-title">Passenger Details</div>
+  <div class="pax-row"><span class="k">Name</span><span class="v">{{passenger_name}}</span></div>
+  <div class="pax-row"><span class="k">ID Number</span><span class="v">{{passenger_id_last4}}</span></div>
+</div>
+
+<!-- QR Code -->
+<div class="qr-area">
+  <img src="data:image/png;base64,{{qr_code_base64}}" alt="QR Code">
+  <div class="tip">Show this QR code at the gate</div>
+  <div class="order">Booking ref: {{order_number}}</div>
+</div>
+
+<!-- Footer -->
+<div class="footer">Train Booking Service</div>
+
+<script>
+(function(){
+  var dep = '{{departure_time}}';
+  var p = dep.split(':');
+  var dh = parseInt(p[0])||9, dm = parseInt(p[1])||0;
+  var dur = 90 + Math.floor(Math.random()*180);
+  var ah = Math.floor((dh*60+dm+dur)/60)%24;
+  var am = (dm+dur)%60;
+  var arrEl = document.getElementById('arr-time');
+  if(arrEl){
+    var ampm = ah >= 12 ? 'PM' : 'AM';
+    var h12 = ah % 12 || 12;
+    arrEl.textContent = h12+':'+String(am).padStart(2,'0');
+  }
+  var durEl = document.getElementById('dur');
+  if(durEl){
+    var h = Math.floor(dur/60), m = dur%60;
+    durEl.textContent = h+'h '+m+'min';
+  }
+})();
+</script>
+</body></html>

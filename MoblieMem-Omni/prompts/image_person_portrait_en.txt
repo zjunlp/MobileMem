@@ -1,0 +1,7 @@
+A realistic portrait photo of a single {age}-year-old {ethnicity} {gender}. {skin_emphasis}
+{description} {face_detail} {hair_detail}
+Wearing {clothing}.
+The portrait must be upright with the head at the top of the frame. Head-and-shoulders framing, face centered and unobstructed.
+Exactly one person in the image, no other people visible.
+Looking directly at camera, neutral expression, plain light-colored background, natural studio lighting, photorealistic, high detail.
+Do NOT add any text, watermarks, or captions.

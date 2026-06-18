@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>YouTube</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Segoe UI",sans-serif;
+  background:#f9f9f9;color:#0f0f0f;width:450px;overflow-x:hidden;-webkit-font-smoothing:antialiased;line-height:1.5}
+
+.status-bar{height:44px;display:flex;align-items:center;padding:0 20px;background:#fff}
+.status-bar .time{font-size:15px;font-weight:600;flex:1;color:#333}
+.status-bar .icons{display:flex;gap:5px;align-items:center}
+.status-bar .icons svg{width:17px;height:12px;fill:#333}
+
+.player{background:#000;aspect-ratio:16/9;position:relative;overflow:hidden}
+.player .cover-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.player .cover-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:16px;color:rgba(255,255,255,.15);font-weight:700;letter-spacing:2px}
+.play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:56px;height:56px;border-radius:50%;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;z-index:5}
+.play-btn svg{fill:#fff;width:26px;height:26px;margin-left:3px}
+.duration{position:absolute;bottom:10px;right:12px;background:rgba(0,0,0,.65);color:#fff;
+  font-size:11px;padding:2px 6px;border-radius:3px;font-family:'SF Mono','Menlo',monospace}
+.player-progress{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.15)}
+.player-progress .fill{height:100%;background:#ff0000;width:35%}
+
+.content{background:#fff;padding:14px 16px 0}
+.video-title{font-size:17px;font-weight:600;line-height:1.45;color:#0f0f0f;margin-bottom:6px}
+.meta{display:flex;align-items:center;gap:14px;font-size:12px;color:#606060;margin-bottom:14px;flex-wrap:wrap}
+.meta-item{display:flex;align-items:center;gap:3px}
+.meta-item svg{width:14px;height:14px;fill:#909090;flex-shrink:0}
+
+.up-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:0.5px solid #f0f0f0;border-bottom:0.5px solid #f0f0f0}
+.up-avatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;position:relative;
+  display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;color:#fff}
+.up-info{flex:1}
+.up-info .name{font-size:14px;font-weight:500;color:#0f0f0f}
+.up-info .fans{font-size:11px;color:#606060;margin-top:1px}
+.follow-btn{font-size:12px;color:#fff;background:#0f0f0f;border:none;border-radius:18px;
+  padding:8px 16px;font-weight:500}
+
+.action-bar{display:flex;justify-content:space-around;padding:14px 0;border-bottom:0.5px solid #f0f0f0}
+.action-item{text-align:center;cursor:pointer}
+.action-item svg{width:24px;height:24px;fill:#0f0f0f;display:block;margin:0 auto 3px}
+.action-item .label{font-size:11px;color:#0f0f0f}
+.action-item.liked svg{fill:#065fd4}
+.action-item.liked .label{color:#065fd4}
+
+.desc-section{padding:12px 0;border-bottom:0.5px solid #f0f0f0}
+.desc-text{font-size:13px;color:#606060;line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden}
+.desc-expand{font-size:12px;color:#606060;margin-top:4px}
+
+.tags{display:flex;gap:8px;flex-wrap:wrap;padding:12px 0}
+.tag{font-size:12px;color:#065fd4;background:rgba(6,95,212,.06);padding:4px 12px;border-radius:14px;
+  border:0.5px solid rgba(6,95,212,.15)}
+
+.comment-entry{display:flex;align-items:center;gap:10px;padding:14px 0;border-top:0.5px solid #f0f0f0}
+.comment-entry .hot-label{font-size:14px;font-weight:600;color:#0f0f0f}
+.comment-entry .count{font-size:12px;color:#606060;margin-left:4px}
+.comment-entry .arrow{margin-left:auto;color:#ccc;font-size:16px}
+
+.hot-comments{padding:0 0 16px}
+.cmt-item{display:flex;gap:10px;padding:10px 0}
+.cmt-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:600}
+.cmt-body{flex:1}
+.cmt-body .cmt-name{font-size:12px;color:#606060}
+.cmt-body .cmt-text{font-size:13px;color:#0f0f0f;line-height:1.55;margin-top:2px}
+.cmt-body .cmt-meta{display:flex;gap:12px;font-size:11px;color:#909090;margin-top:4px}
+</style></head><body>
+
+<div class="status-bar">
+  <span class="time">{{STATUS_TIME}}</span>
+  <span class="icons">
+    <svg viewBox="0 0 17 12"><path d="M1 8.5a7.5 7.5 0 0115 0" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 8.5a4.5 4.5 0 019 0" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8.5" cy="9" r="1.5" fill="currentColor"/></svg>
+    <svg viewBox="0 0 16 12"><path d="M1 4h2v8H1zM5 2h2v10H5zM9 0h2v12H9zM13 3h2v9h-2z" fill="currentColor"/></svg>
+    <svg viewBox="0 0 25 12"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="1.5" y="2.5" width="18" height="7" rx="1" fill="currentColor"/><path d="M23 4.5v3a1.5 1.5 0 000-3z" fill="currentColor"/></svg>
+  </span>
+</div>
+
+<div class="player">
+  <img class="cover-img" src="{{COVER_BASE64}}" alt="cover">
+  <div class="cover-text">{{TITLE}}</div>
+  <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+  <div class="duration">{{DURATION}}</div>
+  <div class="player-progress"><div class="fill" id="progressFill"></div></div>
+</div>
+
+<div class="content">
+  <div class="video-title">{{TITLE}}</div>
+  <div class="meta">
+    <div class="meta-item"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>{{VIEW_COUNT}} views</div>
+    <div class="meta-item">{{PUBLISH_DATE}}</div>
+  </div>
+
+  <div class="up-row">
+    <div class="up-avatar" id="upAvatar"></div>
+    <div class="up-info">
+      <div class="name">{{UPLOADER}}</div>
+      <div class="fans">{{FANS_COUNT}} subscribers</div>
+    </div>
+    <button class="follow-btn">Subscribe</button>
+  </div>
+
+  <div class="action-bar" id="actionBar">
+    <div class="action-item" id="actLike">
+      <svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>
+      <div class="label">{{LIKE_COUNT}}</div>
+    </div>
+    <div class="action-item">
+      <svg viewBox="0 0 24 24"><path d="M10 15V19a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10zM17 2h2.67A2.31 2.31 0 0122 4v7a2.31 2.31 0 01-2.33 2H17"/></svg>
+      <div class="label">Dislike</div>
+    </div>
+    <div class="action-item" id="actFav">
+      <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" fill="none" stroke="#0f0f0f" stroke-width="1.5"/></svg>
+      <div class="label">Save</div>
+    </div>
+    <div class="action-item">
+      <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3" fill="none" stroke="#0f0f0f" stroke-width="1.5"/><circle cx="6" cy="12" r="3" fill="none" stroke="#0f0f0f" stroke-width="1.5"/><circle cx="18" cy="19" r="3" fill="none" stroke="#0f0f0f" stroke-width="1.5"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49" stroke="#0f0f0f" stroke-width="1.5"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" stroke="#0f0f0f" stroke-width="1.5"/></svg>
+      <div class="label">Share</div>
+    </div>
+  </div>
+
+  <div class="desc-section" id="descSection">
+    <div class="desc-text">{{DESCRIPTION}}</div>
+    <div class="desc-expand">Show more ▾</div>
+  </div>
+
+  <div class="tags" id="tagsBox"></div>
+
+  <div class="comment-entry">
+    <span class="hot-label">Comments</span>
+    <span class="count" id="cmtCount"></span>
+    <span class="arrow">›</span>
+  </div>
+
+  <div class="hot-comments" id="hotComments"></div>
+</div>
+
+<script>
+(function(){
+  var upName = '{{UPLOADER}}';
+  var upEl = document.getElementById('upAvatar');
+  var avatarColors = ['#ff0000','#065fd4','#2ba640','#ff6090','#7c4dff','#ff8f00'];
+  var ci = Math.abs((upName.charCodeAt(0)||0) % avatarColors.length);
+  upEl.style.background = avatarColors[ci];
+  upEl.insertBefore(document.createTextNode(upName.charAt(0)), upEl.firstChild);
+
+  var action = '{{ACTION}}';
+  if(action && (action.indexOf('like')>=0 || action.indexOf('Like')>=0)){
+    document.getElementById('actLike').classList.add('liked');
+  }
+
+  var tags;
+  try { tags = {{TAGS_JSON}}; } catch(e){ tags = []; }
+  var tbox = document.getElementById('tagsBox');
+  tags.forEach(function(t){
+    var s = document.createElement('span');
+    s.className = 'tag';
+    s.textContent = '#' + t;
+    tbox.appendChild(s);
+  });
+
+  var hotCmts;
+  try { hotCmts = {{HOT_COMMENTS_JSON}}; } catch(e){ hotCmts = []; }
+  var cmtBox = document.getElementById('hotComments');
+  var cmtColors = ['#ff0000','#065fd4','#2ba640','#ff6090','#7c4dff'];
+  hotCmts.slice(0,3).forEach(function(c,i){
+    var d = document.createElement('div');
+    d.className = 'cmt-item';
+    d.innerHTML = '<div class="cmt-avatar" style="background:'+cmtColors[i%cmtColors.length]+'">'+
+      (c.name||'A').charAt(0)+'</div>'+
+      '<div class="cmt-body"><div class="cmt-name">@'+(c.name||'Anonymous')+'</div>'+
+      '<div class="cmt-text">'+(c.text||'')+'</div>'+
+      '<div class="cmt-meta"><span>'+(c.time||'just now')+'</span><span>👍 '+(c.likes||Math.floor(Math.random()*200))+'</span></div></div>';
+    cmtBox.appendChild(d);
+  });
+
+  var desc = '{{DESCRIPTION}}';
+  if(!desc) document.getElementById('descSection').style.display='none';
+})();
+</script>
+</body></html>

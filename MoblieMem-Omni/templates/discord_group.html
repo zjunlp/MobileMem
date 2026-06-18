@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discord Channel</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:#313338;color:#dbdee1;
+  font-family:"gg sans","Noto Sans","PingFang SC","Microsoft YaHei",Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  display:flex;justify-content:center;
+}
+.phone{width:100%;max-width:450px;display:flex;flex-direction:column;min-height:100vh}
+
+/* ── Header ── */
+.header{
+  background:#313338;height:48px;display:flex;align-items:center;
+  padding:0 12px;gap:8px;border-bottom:1px solid #1e1f22;
+  flex-shrink:0;
+}
+.header .hash{width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header .hash svg{width:22px;height:22px;fill:#80848e}
+.header .channel-name{font-size:16px;font-weight:600;color:#f2f3f5;flex:1}
+.header .toolbar{display:flex;gap:10px}
+.header .toolbar svg{width:22px;height:22px;fill:#b5bac1;cursor:pointer}
+#groupName{/* inline */}
+#memberCount{display:none}
+
+/* ── 消息区域 ── */
+.messages{flex:1;padding:16px 16px 8px;display:flex;flex-direction:column;overflow-y:auto}
+
+/* ── 消息行 ── */
+.message-row{
+  display:flex;gap:16px;padding:2px 0;
+  position:relative;border-radius:4px;
+}
+.message-row:hover{background:#2e3035}
+/* Discord 忽略 left/right，统一布局 */
+.message-row.right{flex-direction:row}
+.right .message-content{align-items:stretch}
+
+/* 有 header 的行（新消息组首条） */
+.message-row.has-header{margin-top:16px;padding-top:2px}
+.message-row.has-header .avatar{display:block}
+.message-row:not(.has-header) .avatar{
+  width:40px;visibility:hidden;flex-shrink:0;
+}
+
+.avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.message-content{display:flex;flex-direction:column;flex:1;min-width:0}
+
+/* 消息头（用户名 + 时间戳） */
+.msg-header{display:flex;align-items:baseline;gap:8px;margin-bottom:1px}
+.message-row:not(.has-header) .msg-header{display:none}
+
+.sender-name{font-size:16px;font-weight:500;line-height:1.375}
+/* 角色颜色 */
+.message-row:nth-child(7n+1) .sender-name{color:#f47b67}
+.message-row:nth-child(7n+2) .sender-name{color:#3ba55d}
+.message-row:nth-child(7n+3) .sender-name{color:#5865f2}
+.message-row:nth-child(7n+4) .sender-name{color:#faa61a}
+.message-row:nth-child(7n+5) .sender-name{color:#eb459e}
+.message-row:nth-child(7n+6) .sender-name{color:#57f287}
+.message-row:nth-child(7n+7) .sender-name{color:#ed4245}
+
+.msg-time{font-size:12px;color:#949ba4;font-weight:400}
+
+/* 消息正文（无气泡） */
+.bubble{
+  font-size:16px;line-height:1.375;color:#dbdee1;
+  word-break:break-word;padding:0;
+  background:none !important;border-radius:0 !important;
+}
+
+/* ── 底部输入栏 ── */
+.input-bar{
+  padding:0 16px 24px;flex-shrink:0;
+}
+.input-wrap{
+  background:#383a40;border-radius:8px;padding:10px 16px;
+  display:flex;align-items:center;gap:8px;
+}
+.input-wrap .icon{width:24px;height:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.input-wrap .icon svg{width:22px;height:22px;fill:#b5bac1}
+.input-field{
+  flex:1;font-size:16px;color:#686b73;
+}
+.input-field::after{content:"Message #general";color:#6d6f78;font-size:16px}
+.input-wrap .right-icons{display:flex;gap:8px}
+.input-wrap .right-icons svg{width:24px;height:24px;fill:#b5bac1}
+
+/* ── emoji ── */
+img.emoji{width:22px;height:22px;vertical-align:-4px;display:inline}
+</style>
+</head>
+<body>
+<div class="phone">
+  <!-- Header -->
+  <div class="header">
+    <div class="hash">
+      <svg viewBox="0 0 24 24"><path d="M5.88657 21L7.88657 13H2.88657L3.40657 11H8.40657L9.73991 5H4.73991L5.25991 3H10.2599L11.5932 0H13.5932L12.2599 3H17.2599L18.5932 0H20.5932L19.2599 3H23.2599L22.7399 5H18.7399L17.4066 11H22.4066L21.8866 13H16.8866L14.8866 21H12.8866L14.8866 13H9.88657L7.88657 21H5.88657ZM10.4066 11H15.4066L16.7399 5H11.7399L10.4066 11Z" fill="#80848e"/></svg>
+    </div>
+    <span class="channel-name" id="groupName">general</span>
+    <span id="memberCount" style="display:none"></span>
+    <div class="toolbar">
+      <svg viewBox="0 0 24 24"><path d="M14 8a6 6 0 00-3.31 1L4 2.33a1 1 0 00-.7-.29.91.91 0 00-.7.33l-.34.34a1 1 0 000 1.41L9 10.69A6 6 0 1014 8zm0 10a4 4 0 110-8 4 4 0 010 8z" fill="#b5bac1"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M22 12L12.101 2.1a1.955 1.955 0 00-2.77 0L2 9.332V22h7.778v-5.333h4.444V22H22V12z" fill="none" stroke="#b5bac1" stroke-width="2" stroke-linejoin="round"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 14h-2v-2h2v2zm0-4h-2V8h2v4z" fill="#b5bac1"/></svg>
+    </div>
+  </div>
+
+  <!-- 消息区域 -->
+  <div class="messages" id="chatContainer">
+    <!-- 消息将由脚本动态填充 -->
+  </div>
+
+  <!-- 底部输入栏 -->
+  <div class="input-bar">
+    <div class="input-wrap">
+      <div class="icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2.00098C6.486 2.00098 2 6.48698 2 12.001C2 17.515 6.486 22.001 12 22.001C17.514 22.001 22 17.515 22 12.001C22 6.48698 17.514 2.00098 12 2.00098ZM12 4.00098C16.411 4.00098 20 7.59098 20 12.001C20 16.412 16.411 20.001 12 20.001C7.589 20.001 4 16.412 4 12.001C4 7.59098 7.589 4.00098 12 4.00098ZM11 7.00098V11.001H7V13.001H11V17.001H13V13.001H17V11.001H13V7.00098H11Z" fill="#b5bac1"/></svg>
+      </div>
+      <div class="input-field"></div>
+      <div class="right-icons">
+        <svg viewBox="0 0 24 24"><path d="M2 12a10 10 0 1020 0 10 10 0 00-20 0zm4.2-1.5a1.3 1.3 0 112.6 0 1.3 1.3 0 01-2.6 0zm8.6 0a1.3 1.3 0 112.6 0 1.3 1.3 0 01-2.6 0zM8.9 15.1a.75.75 0 011.06 0c.58.58 1.28.9 2.04.9s1.46-.32 2.04-.9a.75.75 0 011.06 1.06A4.25 4.25 0 0112 17.5a4.25 4.25 0 01-3.1-1.34.75.75 0 010-1.06z" fill="#b5bac1"/></svg>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
