@@ -179,47 +179,55 @@ dst = load_dataset("zjunlp/xxx")
 
 ## 🖼️ Data Construction
 
+The dataset is produced by a declarative pipeline — a DAG of stages that turns a
+persona spec (or a CSV profile) into a full year of multimodal mobile memories.
+
 ### Navigate to the directory
 
-```
-cd MobileMem/src
-```
-
-### stage 1
-
-```python
-
+```bash
+cd MoblieMem-Omni/src
+cp .env.example .env          # then fill in your API keys
 ```
 
-### stage 2
+### Run the pipeline
 
-```python
+```bash
+# List all stages in topological order
+python -m pipeline.cli list
 
+# Run the whole pipeline for every persona
+python -m pipeline.cli run
+
+# Run a single stage, or a stage plus everything downstream
+python -m pipeline.cli run --only event_photo
+python -m pipeline.cli run --from social_world
+
+# Restrict to specific persona uuid(s) and cap the events per persona
+python -m pipeline.cli run --uuid 0 --max-events 15
 ```
 
-### stage 3
+### Stages
 
-```python
+Records are written to `output/data/` (JSONL); rendered media to `output/image/`.
 
-```
+| # | Stage (node) | Output |
+|--:|--------------|--------|
+| 1 | `profile` | `basic_profiles.jsonl` |
+| 2 | `persona_seeds` | `basic_profiles.jsonl` (appends LLM-seeded personas) |
+| 3 | `life_state` | `init_states.jsonl` |
+| 4 | `social_name_fix` | rewrites `init_states.jsonl` |
+| 5 | `timeline_dates` | `important_dates.jsonl` |
+| 6 | `social_world` | `social_graph.jsonl` |
+| 7 | `annual_events` | `annual_events.jsonl` |
+| 8 | `sub_events` | `sub_events.jsonl` |
+| 9 | `conversation` | `group_chats.jsonl` + chat images |
+| 10 | `app_trace` | `app_screenshots.jsonl` + app images |
+| 11 | `event_photo` | `event_images.jsonl` + event photos |
+| 12 | `document` | `tickets.jsonl` + document images |
+| 13 | `scenery` | scenery images |
+| 14 | `memory_summary` | `image_summaries.jsonl` + `total_images.jsonl` |
 
-### stage 4
-
-```python
-
-```
-
-### stage 5
-
-```python
-
-```
-
-### stage 6
-
-```python
-
-```
+See `src/pipeline/README.md` for the full stage reference.
 
 # 🌻Acknowledgement
 
