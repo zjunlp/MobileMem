@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1 align="center" style="font-size: 48px;">
+<h1 align="center" style="font-size: 55px;">
   <img src="https://img.icons8.com/fluency/48/iphone.png" alt="iPhone" width="40" height="40" style="vertical-align: middle; pointer-events: none;"/>
   MobileMem-Omni
   <img src="https://img.icons8.com/fluency/48/gallery.png" alt="Gallery" width="36" height="36" style="vertical-align: middle; pointer-events: none;"/>
