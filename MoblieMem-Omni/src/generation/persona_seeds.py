@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 """Persona seed generator (Stage 0): synthesize brand-new personas via LLM.
 
 The CSV pipeline (the ``profile`` node) only covers the personas that have a
 folder in ``infotest`` (uuid 0-9, all Chinese). This module seeds additional
 personas that have **no CSV source** — by default foreign ones (uuid 10-19) — by
 asking the LLM to expand a short spec (nationality, ethnicity, occupation hint)
-into a record compatible with ``stage1_basic_profiles.jsonl``.
+into a record compatible with ``basic_profiles.jsonl``.
 
 For non-Chinese specs the generated record carries a structured ``appearance``
 block (ethnicity / skin / hair / eyes / face / build) that downstream image
@@ -23,9 +22,7 @@ from typing import Dict, List, Optional, Set
 
 from backends.llm import get_text_llm_model, llm_request, set_log_context
 
-# ============================================================================
 # Persona specs — personas without a CSV source, seeded straight from the LLM.
-# ============================================================================
 PERSONA_SPECS: List[Dict] = [
     # Foreign personas (uuid 10-19): 6 American + 4 British.
     {"uuid": 10, "nationality": "American", "language": "en",
@@ -225,13 +222,13 @@ def main() -> None:
     project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     parser = argparse.ArgumentParser(description="Stage 0: generate persona seeds via LLM")
     parser.add_argument("--output-dir", default=os.path.join(project_root, "output", "data"),
-                        help="Directory holding stage1_basic_profiles.jsonl")
+                        help="Directory holding basic_profiles.jsonl")
     parser.add_argument("--start-uuid", type=int, default=10)
     parser.add_argument("--end-uuid", type=int, default=24)
     parser.add_argument("--force", action="store_true", help="Regenerate even if the uuid exists")
     args = parser.parse_args()
 
-    out_path = os.path.join(args.output_dir, "stage1_basic_profiles.jsonl")
+    out_path = os.path.join(args.output_dir, "basic_profiles.jsonl")
     os.makedirs(args.output_dir, exist_ok=True)
 
     existing = read_jsonl(out_path) if os.path.exists(out_path) else []

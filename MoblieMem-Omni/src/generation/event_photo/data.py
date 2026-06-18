@@ -32,7 +32,7 @@ def load_init_state_map(init_states_file: str) -> Dict[int, Dict]:
 
 def load_nationality_map(profiles_file: str) -> Dict[int, str]:
     """
-    Load stage1_basic_profiles.jsonl and return a uuid -> nationality mapping.
+    Load basic_profiles.jsonl and return a uuid -> nationality mapping.
     """
     if not os.path.exists(profiles_file):
         logger.warning(f"Profiles file not found: {profiles_file}")

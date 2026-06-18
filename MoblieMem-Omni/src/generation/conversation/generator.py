@@ -255,7 +255,7 @@ def process_persona(
                 active_model = get_text_llm_model(is_chinese)
             if prompt_template is None:
                 # Chinese personas use the Chinese prompt; others use the _en one.
-                prompt_file = 'stage7_group_chat.txt' if nationality == 'Chinese' else 'stage7_group_chat_en.txt'
+                prompt_file = 'group_chat_zh.txt' if nationality == 'Chinese' else 'group_chat_en.txt'
                 prompt_template = load_prompt(os.path.join(prompts_dir, prompt_file))
 
             # Generate content via LLM — LLM chooses the best group
@@ -346,19 +346,16 @@ def process_persona(
     logger.info(f"[uuid={uuid}] Done: {len(group_chats_by_id)} group chats, {len(errors)} errors")
     return result
 
-# ============================================================================
 # Main
-# ============================================================================
 
 
 def main():
     parser = argparse.ArgumentParser(description='Stage 7: Generate group chats + screenshots')
-    # ---- Key hyperparameters ----
     parser.add_argument('--input-file', type=str,
-                        default=os.path.join(config.OUTPUT_DIR, 'data', 'stage4_annual_events.jsonl'),
+                        default=os.path.join(config.OUTPUT_DIR, 'data', 'annual_events.jsonl'),
                         help='Input stage4 JSONL file')
     parser.add_argument('--output-file', type=str,
-                        default=os.path.join(config.OUTPUT_DIR, 'data', 'stage7_group_chats.jsonl'),
+                        default=os.path.join(config.OUTPUT_DIR, 'data', 'group_chats.jsonl'),
                         help='Output stage7 JSONL file')
     parser.add_argument('--prompts-dir', type=str,
                         default=config.PROMPTS_DIR,
@@ -381,7 +378,7 @@ def main():
     parser.add_argument('--force-regenerate', '--force', dest='force_regenerate', action='store_true',
                         help='Delete cache for each uid and regenerate all group chats from scratch')
     parser.add_argument('--sub-events-file', type=str,
-                        default=os.path.join(config.OUTPUT_DIR, 'data', 'stage4_5_sub_events.jsonl'),
+                        default=os.path.join(config.OUTPUT_DIR, 'data', 'sub_events.jsonl'),
                         help='stage4.5 sub-events JSONL for expanding mid/long-term events')
     args = parser.parse_args()
 
@@ -402,7 +399,7 @@ def main():
         logger.error(f"No data in {args.input_file}")
         return
 
-    init_states_file = os.path.join(config.OUTPUT_DIR, 'data', 'stage2_init_states.jsonl')
+    init_states_file = os.path.join(config.OUTPUT_DIR, 'data', 'init_states.jsonl')
     init_state_map = load_init_state_map(init_states_file)
     for persona in personas:
         uid = persona.get('uuid')
@@ -599,9 +596,7 @@ def main():
     logger.info(f"{'=' * 70}")
 
 
-# ===================================================================== #
 # Domain generator -- thin uniform entry point for the future pipeline DAG.
-# ===================================================================== #
 
 class ConversationGenerator(Generator):
     """Generate per-persona group-chat conversations + screenshots.

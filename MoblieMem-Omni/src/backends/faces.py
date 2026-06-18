@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Unified face capability (L1 backend) — FaceEngine.
 
 Two groups of helpers:
@@ -26,9 +25,7 @@ logger = logging.getLogger('stage7')
 _REC_LOGGER = logging.getLogger('fix_event_images')
 
 
-# ====================================================================== #
 # Recognition / consistency verification  (origin: stage7_1_faces)       #
-# ====================================================================== #
 
 FACE_SIMILARITY_THRESHOLD = 0.35
 FACE_SIMILARITY_THRESHOLD_INTL = 0.22  # non-Chinese nationalities: generated faces vary more, so the threshold is relaxed
@@ -187,9 +184,7 @@ def verify_named_identities(image_path: str, named_embeddings: Dict[str, List],
     return results
 
 
-# ====================================================================== #
 # Avatar image processing  (origin: stage7_gc_faces)                     #
-# ====================================================================== #
 
 # Lazily-initialized InsightFace detector shared across avatar crops. Was a
 # module-level global in the original stage7_group_chats.
@@ -434,9 +429,7 @@ def maybe_auto_orient_avatar(target_path: str, uuid: int, member_name: str) -> b
         return False
 
 
-# ====================================================================== #
 # FaceEngine — thin facade over the two groups for generators to adopt.  #
-# ====================================================================== #
 
 class FaceEngine:
     """Unified face capability: recognition + avatar processing.

@@ -61,9 +61,7 @@ ENGLISH_ORG_PREFIXES = ["North", "Blue", "Cedar", "Harbor", "Maple", "Bright", "
 ENGLISH_ORG_SUFFIXES = ["Learning Center", "Care Studio", "Community Hub", "Repair Shop", "Health Clinic", "Service Desk"]
 
 
-# ============================================================================
 # Per-record LLM parse / validate (folded from the old stage4_lib)
-# ============================================================================
 
 
 def _stable_seed(*parts: object) -> int:
@@ -495,9 +493,7 @@ def _apply_event_name_strategy(events: List[Dict], name_strategy: Dict, is_chine
 
     return events
 
-# ============================================================================
 # Prompt & LLM helpers (stateless, thread-safe)
-# ============================================================================
 
 def _build_incremental_prompt(
     persona_record: Dict,
@@ -656,6 +652,4 @@ def _merge_and_sort_events(existing_events: List[Dict], new_events: List[Dict],
 
     return merged
 
-# ============================================================================
 # Parallel Runner
-# ============================================================================

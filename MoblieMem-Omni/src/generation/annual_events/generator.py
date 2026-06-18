@@ -255,9 +255,7 @@ class _Stage4Runner:
 
         return self._get_ordered_records()
 
-# ============================================================================
 # Public API
-# ============================================================================
 
 class AnnualEventsGenerator(Generator):
     """Generate each persona's 2025 annual events (iterative top-up to a target).
@@ -302,11 +300,11 @@ def generate_annual_events(stage3_records: List[Dict], prompts_dir: str,
         The complete records list (in the original persona order)
     """
     existing = existing or {}
-    prompt_path = os.path.join(prompts_dir, 'stage4_annual_events.txt')
+    prompt_path = os.path.join(prompts_dir, 'annual_events_en.txt')
     system_prompt = load_prompt(prompt_path)
     
     # Load the Chinese prompt file
-    prompt_path_cn = os.path.join(prompts_dir, 'stage4_annual_events_cn.txt')
+    prompt_path_cn = os.path.join(prompts_dir, 'annual_events_zh.txt')
     system_prompt_cn = load_prompt(prompt_path_cn)
 
     print(f"[Stage4] Target: {max_events} events/person, "

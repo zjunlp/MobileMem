@@ -25,9 +25,7 @@ from typing import Any, Callable, Dict, Iterable, List, Sequence
 Record = Dict[str, Any]
 
 
-# ---------------------------------------------------------------------------
 # Low-level JSONL I/O
-# ---------------------------------------------------------------------------
 
 def read_jsonl(path: str) -> List[Record]:
     """Read a JSONL file and return its records.
@@ -92,9 +90,7 @@ def append_jsonl(path: str, record: Record) -> None:
             f.write(line + '\n')
 
 
-# ---------------------------------------------------------------------------
 # Indexing (checkpoint / resume helpers)
-# ---------------------------------------------------------------------------
 
 def index_by(records: Sequence[Record], key: str) -> Dict[Any, Record]:
     """Index records by ``key``; later records win on duplicate keys.
@@ -150,9 +146,7 @@ def load_existing_by_uuid(jsonl_path: str) -> Dict[Any, Record]:
     return existing
 
 
-# ---------------------------------------------------------------------------
 # Incremental save callbacks (used by stage generators)
-# ---------------------------------------------------------------------------
 
 def make_save_callback(output_path: str, stage_num: Any) -> Callable[[Sequence[Record]], None]:
     """Build a callback that rewrites ``output_path`` after each batch.
@@ -197,9 +191,7 @@ def make_preserving_save_callback(
     return _save
 
 
-# ---------------------------------------------------------------------------
 # Object-oriented facade
-# ---------------------------------------------------------------------------
 
 class JsonlStore:
     """A keyed view over one JSONL file: read, index, append, upsert, save.

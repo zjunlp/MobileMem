@@ -89,7 +89,7 @@ class PipelineDagSmokeTest(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "required output"):
                 dag.verify_node_outputs(ctx, node)
 
-            Path(ctx.data_path("stage7_1_event_images.jsonl")).write_text("", encoding="utf-8")
+            Path(ctx.data_path("event_images.jsonl")).write_text("", encoding="utf-8")
             with self.assertRaisesRegex(RuntimeError, "wrote no records"):
                 dag.verify_node_outputs(ctx, node)
 
@@ -102,7 +102,7 @@ class PipelineDagSmokeTest(unittest.TestCase):
                 prompts_dir=str(Path(tmp) / "prompts"),
             )
             Path(ctx.output_dir).mkdir(parents=True)
-            Path(ctx.data_path("stage7_2_app_screenshots.jsonl")).write_text("", encoding="utf-8")
+            Path(ctx.data_path("app_screenshots.jsonl")).write_text("", encoding="utf-8")
 
             dag.verify_node_outputs(ctx, dag.NODES["app_trace"])
 

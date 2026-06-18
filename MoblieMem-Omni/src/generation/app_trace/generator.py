@@ -42,7 +42,6 @@ if hasattr(sys.stderr, 'reconfigure'):
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
-# --- Logging (the 'fix_app_screenshots' logger; the split modules log here too) ---
 logger = logging.getLogger('fix_app_screenshots')
 logger.setLevel(logging.DEBUG)
 fh = logging.FileHandler(os.path.join(LOG_DIR, 'fix_app_screenshots.log'), encoding='utf-8')
@@ -213,9 +212,7 @@ def render_single_sync(page, task, output_dir, templates, resume=True, keep_html
         logger.error(f"FAIL: {png_name}: {e}")
         return "failed"
 
-# ═══════════════════════════════════════════════════════════════════
 # Main flow.
-# ═══════════════════════════════════════════════════════════════════
 
 def process_persona(persona_record, events_per_type, skip_llm, generate_covers,
                     all_events=False, checkpoint_done=None,
@@ -323,7 +320,7 @@ def main():
         description='App-trace screenshots: render the 4 app types from stage4 events')
     parser.add_argument('--events-file', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'data',
-                                             'stage4_annual_events.jsonl'),
+                                             'annual_events.jsonl'),
                         help='Path to the stage4 events JSONL file')
     parser.add_argument('--output-dir', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'image'),
@@ -357,7 +354,7 @@ def main():
     parser.add_argument('--force-regen', '--force', dest='force_regen', action='store_true',
                         help='Ignore caches and force-regenerate the *_info, checkpoint and screenshots for the given types')
     parser.add_argument('--sub-events-file', type=str,
-                        default=os.path.join(config.OUTPUT_DIR, 'data', 'stage4_5_sub_events.jsonl'),
+                        default=os.path.join(config.OUTPUT_DIR, 'data', 'sub_events.jsonl'),
                         help='stage4.5 sub-events JSONL for expanding mid/long-term events')
     args = parser.parse_args()
 
@@ -566,7 +563,7 @@ def main():
     # -- Save standalone JSONL, even when empty, so downstream can distinguish
     # "ran and selected no app screenshots" from "node never produced a manifest".
     jsonl_output_path = os.path.join(os.path.dirname(args.events_file),
-                                     'stage7_2_app_screenshots.jsonl')
+                                     'app_screenshots.jsonl')
     write_jsonl(jsonl_records, jsonl_output_path)
     logger.info(f"Saved {len(jsonl_records)} records to {jsonl_output_path}")
 
@@ -575,9 +572,7 @@ def main():
     logger.info("=" * 70)
 
 
-# ===================================================================== #
 # Domain generator -- thin uniform entry point for the future pipeline DAG.
-# ===================================================================== #
 
 class AppTraceGenerator(Generator):
     """Generate per-persona app-trace payloads (book / music / video / shopping).

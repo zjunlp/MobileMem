@@ -26,9 +26,7 @@ from infra.base_generator import Generator
 
 DEFAULT_WORKERS = 3
 
-# ============================================================================
 # Prompts
-# ============================================================================
 
 SYSTEM_PROMPT_CN = """你是一个创意写作助手。你需要将一个长期/中期事件拆分为一系列按时间顺序排列的子事件。
 
@@ -199,9 +197,7 @@ def split_one_event(protagonist_name: str,
         return None, {"total_cost_usd": 0}
 
 
-# ============================================================================
 # Person-introduction sub-event generation
-# ============================================================================
 
 INTRO_SYSTEM_PROMPT_CN = """你是一个创意写作助手。你需要以主人公的口吻写一段内心独白/回忆，描述他/她对某个人的印象和关系。
 
@@ -560,17 +556,15 @@ class SubEventsGenerator(Generator):
         return process_one_uuid(record, ctx, self.model)
 
 
-# ============================================================================
 # Main
-# ============================================================================
 
 def main():
     parser = argparse.ArgumentParser(description="Stage 4.5: Split long/mid-term events into sub-events")
     parser.add_argument('--input', type=str,
-                        default=os.path.join(OUTPUT_DIR, 'data', 'stage4_annual_events.jsonl'),
+                        default=os.path.join(OUTPUT_DIR, 'data', 'annual_events.jsonl'),
                         help='Input file (stage4 output)')
     parser.add_argument('--output', type=str,
-                        default=os.path.join(OUTPUT_DIR, 'data', 'stage4_5_sub_events.jsonl'),
+                        default=os.path.join(OUTPUT_DIR, 'data', 'sub_events.jsonl'),
                         help='Output file')
     parser.add_argument('--max-workers', type=int, default=DEFAULT_WORKERS)
     parser.add_argument('--uuid-filter', type=int, default=None)

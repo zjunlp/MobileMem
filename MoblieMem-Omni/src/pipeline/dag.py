@@ -18,19 +18,15 @@ from typing import Dict, Iterable, List, Optional
 
 from pipeline.spec import Node, RunContext
 
-# ---------------------------------------------------------------------------
 # Stage output filenames (mirror main.py)
-# ---------------------------------------------------------------------------
-STAGE1_FILE = "stage1_basic_profiles.jsonl"
-STAGE2_FILE = "stage2_init_states.jsonl"
-STAGE3_FILE = "stage3_important_dates.jsonl"
-STAGE3_9_FILE = "stage3_9_social_graph.jsonl"
-STAGE4_FILE = "stage4_annual_events.jsonl"
+STAGE1_FILE = "basic_profiles.jsonl"
+STAGE2_FILE = "init_states.jsonl"
+STAGE3_FILE = "important_dates.jsonl"
+STAGE3_9_FILE = "social_graph.jsonl"
+STAGE4_FILE = "annual_events.jsonl"
 
 
-# ---------------------------------------------------------------------------
 # Gender fix (applied after the annual_events record stage)
-# ---------------------------------------------------------------------------
 def fix_gender(value: str) -> str:
     v = value.strip()
     if v in ("Female", "\u5973"):
@@ -70,9 +66,7 @@ def fix_gender_in_stage4(stage4_path: str) -> None:
     print(f"Done: {total} records total, {changed} gender fields modified.")
 
 
-# ---------------------------------------------------------------------------
 # Record adapters — mirror main.py's per-stage logic exactly (byte-faithful I/O)
-# ---------------------------------------------------------------------------
 def _uuid_keep_set(ctx: RunContext):
     """Record-stage uuid filter as a set (None = all personas).
 
@@ -294,16 +288,15 @@ def _delegate(module_name: str, argv_builder=None):
 
 # Data-file names under output_dir (mirror each generator's argparse defaults,
 # which are OUTPUT_DIR/data/<name>; these map cleanly to RunContext.output_dir).
-SUB_EVENTS_FILE = "stage4_5_sub_events.jsonl"
-GROUP_CHATS_FILE = "stage7_group_chats.jsonl"
-S10_SUMMARY_FILE = "stage10_image_summaries.jsonl"
-S10_MERGED_FILE = "stage10_merged.jsonl"
-APP_TRACE_FILE = "stage7_2_app_screenshots.jsonl"
-EVENT_PHOTO_FILE = "stage7_1_event_images.jsonl"
-DOCUMENT_FILE = "stage7_3_tickets.jsonl"
+SUB_EVENTS_FILE = "sub_events.jsonl"
+GROUP_CHATS_FILE = "group_chats.jsonl"
+S10_SUMMARY_FILE = "image_summaries.jsonl"
+S10_MERGED_FILE = "merged_memories.jsonl"
+APP_TRACE_FILE = "app_screenshots.jsonl"
+EVENT_PHOTO_FILE = "event_images.jsonl"
+DOCUMENT_FILE = "tickets.jsonl"
 
 
-# --- Per-generator argv builders -------------------------------------------
 # Emit only flags the generator declares. Data-file paths are threaded from
 # ctx.output_dir, and rendered media paths from ctx.image_dir, so a custom DAG
 # run stays self-contained.
@@ -461,9 +454,7 @@ def _argv_memory_summary(ctx: RunContext):
             *_force(ctx)]
 
 
-# ---------------------------------------------------------------------------
 # Node registry (see the Quickstart node table in README.md)
-# ---------------------------------------------------------------------------
 NODES: Dict[str, Node] = {
     "profile": Node(
         "profile", (), (STAGE1_FILE,), _run_profile,
@@ -487,12 +478,12 @@ NODES: Dict[str, Node] = {
         "annual_events", ("social_world",), (STAGE4_FILE,), _run_annual_events,
         "record", "Annual events (LLM) + gender fix [stage4]"),
     "sub_events": Node(
-        "sub_events", ("annual_events",), ("stage4_5_sub_events.jsonl",),
+        "sub_events", ("annual_events",), ("sub_events.jsonl",),
         _delegate("generation.sub_events", _argv_sub_events),
         "record", "Sub-events (LLM) [stage4.5]"),
     "conversation": Node(
         "conversation", ("annual_events", "social_world", "sub_events"),
-        ("stage7_group_chats.jsonl",),
+        ("group_chats.jsonl",),
         _delegate("generation.conversation", _argv_conversation),
         "media", "Group chats + images [stage7]"),
     "app_trace": Node(
@@ -517,15 +508,13 @@ NODES: Dict[str, Node] = {
     "memory_summary": Node(
         "memory_summary",
         ("conversation", "app_trace", "document", "event_photo", "scenery", "sub_events"),
-        ("stage10_total_images.jsonl",),
+        ("total_images.jsonl",),
         _delegate("generation.memory_summary", _argv_memory_summary),
         "index", "Image summaries + merge [stage10]"),
 }
 
 
-# ---------------------------------------------------------------------------
 # Graph algorithms
-# ---------------------------------------------------------------------------
 def _declaration_index() -> Dict[str, int]:
     return {name: i for i, name in enumerate(NODES)}
 

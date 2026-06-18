@@ -15,7 +15,6 @@ from datetime import datetime
 from common import TEMPLATE_DIR
 from core import DIR_NAME
 
-# --- Template paths ---
 TEMPLATES_CN = {
     "ticket": os.path.join(TEMPLATE_DIR, '\u706b\u8f66\u7968.html'),
     "money": os.path.join(TEMPLATE_DIR, '\u5fae\u4fe1\u8f6c\u8d26.html'),

@@ -139,9 +139,7 @@ def build_group_specs(persona: Dict, event: Dict = None) -> List[Dict]:
         "all_social_members": all_members,
     }]
 
-# ============================================================================
 # LLM group chat generation
-# ============================================================================
 
 def _format_social_members_for_prompt(members: List[Dict], is_cn: bool) -> str:
     """Format social members as readable text for LLM selection."""

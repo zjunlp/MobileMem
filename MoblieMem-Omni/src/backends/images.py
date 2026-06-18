@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Image-generation capability (L1 backend) — DMX/doubao person & event images.
 
 Generators import from here:
@@ -15,7 +14,6 @@ import json
 import config
 from llm_request import get_text_llm_model, log_image_api_call, get_image_client
 
-# ============ API configuration (centralized in config) ============
 API_KEY = config.DMX_API_KEY  # DMXAPI API key
 Generation_API_URL = config.DMX_GENERATION_URL  # DMXAPI image generation endpoint
 Edit_API_URL = config.DMX_EDIT_URL  # DMXAPI image edit endpoint
@@ -32,15 +30,12 @@ CHINESE_EDIT_FALLBACK_MODELS = [
 ]
 
 
-# ============================================================================
 # OpenRouter image backend (Gemini "nano-banana"), routed through local proxy
-# ----------------------------------------------------------------------------
 # Active when config.IMAGE_PROVIDER == "openrouter" (the default). OpenRouter is
 # reachable only through the local proxy, which drops oversized TLS upload
 # bodies, so input images are downscaled before sending and transient SSL
 # errors are retried. The legacy DMX code paths below are used when
 # IMAGE_PROVIDER == "dmx".
-# ============================================================================
 import io  # noqa: E402
 from PIL import Image  # noqa: E402
 
@@ -238,7 +233,6 @@ def generate_person_images(prompt, output_dir="output", nationality="Chinese"):
         prompt = prompt[:max_len]
         print(f"[WARN] prompt truncated: {original_len} -> {len(prompt)} chars")
 
-    # ============ Build request parameters ============
     # Always use the doubao-seedream-4-5-251128 model
     payload = {
         "prompt": prompt,
@@ -247,10 +241,8 @@ def generate_person_images(prompt, output_dir="output", nationality="Chinese"):
         "size": "2K",
     }
 
-    # ============ Set HTTP request headers ============
     headers = build_generation_headers(model_name)
 
-    # ============ Main execution ============
     try:
         print("=" * 50)
         print("[*] Generating image...")
@@ -258,14 +250,12 @@ def generate_person_images(prompt, output_dir="output", nationality="Chinese"):
         print(f"   Model: {payload['model']}")
         print("=" * 50)
 
-        # ---------- Step 1: create the output folder ----------
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
             print(f"[OK] Created output dir: {output_dir}")
         else:
             print(f"[OK] Output dir exists: {output_dir}")
 
-        # ---------- Step 2: send the API request ----------
         print("[..] Sending API request...")
         print(f"   Model: {payload['model']}")
         print(f"   Size: {payload['size']}")
@@ -275,10 +265,8 @@ def generate_person_images(prompt, output_dir="output", nationality="Chinese"):
         response = requests.post(Generation_API_URL, json=payload, headers=headers, timeout=180)
         response.raise_for_status()  # Check the HTTP status code and raise on error
 
-        # ---------- Step 3: parse the API response ----------
         result = response.json()
         print("[OK] API response received")
-        # ---------- Step 4: process and save the images ----------
         if 'data' in result and len(result['data']) > 0:
             print("[..] Saving images...")
 
@@ -378,9 +366,6 @@ def generate_event_images(prompt, image_paths, output_dir="output", nationality=
     # Truncate the prompt to avoid API length errors (qwen-image-edit has a stricter limit)
     model_candidates = get_edit_model_candidates(nationality)
 
-    # ╔══════════════════════════════════════════════════════════════════════════════╗
-    # ║                            Prepare image files                                ║
-    # ╚══════════════════════════════════════════════════════════════════════════════╝
 
     files = []
 
@@ -409,9 +394,6 @@ def generate_event_images(prompt, image_paths, output_dir="output", nationality=
         except Exception as e:
             print(f"[WARN] Error processing file - {img_path}: {str(e)}")
 
-    # ╔══════════════════════════════════════════════════════════════════════════════╗
-    # ║                       Send request and handle response                        ║
-    # ╚══════════════════════════════════════════════════════════════════════════════╝
 
     if not files:
         # If no image file was successfully loaded

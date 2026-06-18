@@ -73,10 +73,10 @@ def _deduplicate_social_relationships(
 
 
 # Prompt files (relative to prompts/ directory):
-#   stage2_init_state_nation.txt    – EN system prompt
-#   stage2_init_state_nation_cn.txt – CN system prompt
-#   stage2_extra_instruction_en.txt – EN extra instruction (with {csv_context}/{preferences_summary})
-#   stage2_extra_instruction_cn.txt – CN extra instruction (with {csv_context}/{preferences_summary})
+#   init_state_nation_en.txt    – EN system prompt
+#   init_state_nation_zh.txt – CN system prompt
+#   extra_instruction_en.txt – EN extra instruction (with {csv_context}/{preferences_summary})
+#   extra_instruction_zh.txt – CN extra instruction (with {csv_context}/{preferences_summary})
 
 
 def _build_life_state_user_content(basic_profile: Dict, role_identity: str,
@@ -176,7 +176,6 @@ def generate_life_state_for_person(
     if persona.get("appearance"):
         basic_profile["appearance"] = persona["appearance"]
 
-    # ── Switch between Chinese and English prompts based on nationality ──
     nationality = basic_profile.get('nationality', '')
     is_chinese = '中国' in nationality or 'China' in nationality or 'Chinese' in nationality
 
@@ -315,10 +314,10 @@ def generate_life_states(stage1_records: List[Dict], info_dir: str, prompts_dir:
     existing = existing or {}
     # Prompt variants: the base/_en files drive non-Chinese personas; the _cn
     # files keep the original Chinese instructions for Chinese personas.
-    base_prompt = load_prompt(os.path.join(prompts_dir, 'stage2_init_state_nation.txt'))
-    cn_system_prompt = load_prompt(os.path.join(prompts_dir, 'stage2_init_state_nation_cn.txt'))
-    extra_instruction_en = load_prompt(os.path.join(prompts_dir, 'stage2_extra_instruction_en.txt'))
-    extra_instruction_cn = load_prompt(os.path.join(prompts_dir, 'stage2_extra_instruction_cn.txt'))
+    base_prompt = load_prompt(os.path.join(prompts_dir, 'init_state_nation_en.txt'))
+    cn_system_prompt = load_prompt(os.path.join(prompts_dir, 'init_state_nation_zh.txt'))
+    extra_instruction_en = load_prompt(os.path.join(prompts_dir, 'extra_instruction_en.txt'))
+    extra_instruction_cn = load_prompt(os.path.join(prompts_dir, 'extra_instruction_zh.txt'))
 
     generator = LifeStateGenerator(info_dir, base_prompt, cn_system_prompt,
                                    extra_instruction_en, extra_instruction_cn)

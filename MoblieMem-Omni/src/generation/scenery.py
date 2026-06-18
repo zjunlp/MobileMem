@@ -29,9 +29,7 @@ from infra.base_generator import Generator
 LOG_DIR = config.LOG_DIR
 os.makedirs(LOG_DIR, exist_ok=True)
 
-# ============================================================================
 # Logging
-# ============================================================================
 
 def setup_logging():
     summary_handler = logging.FileHandler(os.path.join(LOG_DIR, 'stage8_summary.log'), encoding='utf-8')
@@ -49,16 +47,12 @@ def setup_logging():
 
 logger = setup_logging()
 
-# ============================================================================
 # Constants
-# ============================================================================
 
 CATEGORIES = ['food', 'landscape', 'indoor', 'weather_calendar', 'map_location', 'news_notification']
 IMAGES_PER_CATEGORY = 3  # Default: 3 per category per persona
 
-# ============================================================================
 # Prompt builders
-# ============================================================================
 
 def build_image_prompt(category: str, persona: Dict, event: Optional[Dict] = None) -> str:
     """Build an image generation prompt for a given category and persona."""
@@ -237,15 +231,12 @@ class SceneryGenerator(Generator):
         return generated
 
 
-# ============================================================================
 # Main
-# ============================================================================
 
 def main():
     parser = argparse.ArgumentParser(description='Stage 8: Generate scenery images')
-    # ---- Key hyperparameters ----
     parser.add_argument('--input-file', type=str,
-                        default=os.path.join(config.OUTPUT_DIR, 'data', 'stage4_annual_events.jsonl'),
+                        default=os.path.join(config.OUTPUT_DIR, 'data', 'annual_events.jsonl'),
                         help='Input stage4 JSONL file')
     parser.add_argument('--output-dir', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'image'),

@@ -461,6 +461,4 @@ def process_single_persona(persona_record: Dict, prompt: str, max_events: int = 
         raise
 
 
-# ============================================================================
 # Name strategy (Social-Graph driven, with legacy word-pool fallback)
-# ============================================================================

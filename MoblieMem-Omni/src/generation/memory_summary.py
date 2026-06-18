@@ -63,12 +63,12 @@ def encode_image(image_path: str) -> str:
 def build_prompt(image_type: str, nationality: str = "Chinese") -> str:
     """Build prompt for image summarization based on nationality.
     
-    Reads from prompts/stage10_image_summary_zh.txt or _en.txt.
+    Reads from prompts/image_summary_zh.txt or image_summary_en.txt.
     Same prompt for all image types.
     """
     is_cn = (nationality == "Chinese")
     lang = "zh" if is_cn else "en"
-    prompt_file = os.path.join(PROJECT_ROOT, "prompts", f"stage10_image_summary_{lang}.txt")
+    prompt_file = os.path.join(PROJECT_ROOT, "prompts", f"image_summary_{lang}.txt")
     try:
         with open(prompt_file, "r", encoding="utf-8") as f:
             return f.read().strip()
@@ -315,9 +315,7 @@ def generate_image_summary(image_path: str, image_type: str, nationality: str) -
             "error": error_msg
         }
 
-# ═══════════════════════════════════════════════════════════════════
 # Phase 2: Merge all stage JSONL files into one unified file
-# ═══════════════════════════════════════════════════════════════════
 
 def _read_jsonl(path, *, required: bool = False):
     """Read a JSONL file.
@@ -411,8 +409,8 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
     """Merge all stage image JSONL files into a unified per-sub-event format.
 
     Output files:
-    1. stage10_merged.jsonl: one sub-event per line, with images containing only image paths.
-    2. stage10_total_images.jsonl: one image per line, keyed by path and carrying
+    1. merged_memories.jsonl: one sub-event per line, with images containing only image paths.
+    2. total_images.jsonl: one image per line, keyed by path and carrying
        type-specific structured information.
     """
     logger.info("=" * 70)
@@ -428,7 +426,7 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
     # sub_events: (uuid, sub_event_id) -> {event_name, event_time, participants, importance, parent_event_id}
     event_metadata = {}
 
-    # 2a. Load sub-event metadata from stage4_5_sub_events.jsonl.
+    # 2a. Load sub-event metadata from sub_events.jsonl.
     sub_events_records = _read_jsonl(sub_events_file, required=True)
     for rec in sub_events_records:
         uid = rec['uuid']
@@ -450,7 +448,7 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
                 }
     logger.info(f"Loaded metadata for {len(event_metadata)} sub-events")
 
-    # 2b. Load short-term event metadata from stage4_annual_events.jsonl.
+    # 2b. Load short-term event metadata from annual_events.jsonl.
     events_records = _read_jsonl(events_file, required=True)
     for rec in events_records:
         uid = rec['uuid']
@@ -475,7 +473,7 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
     grouped = defaultdict(list)
 
     # 3a. stage7_1 event scene images.
-    s71_path = os.path.join(data_dir, 'stage7_1_event_images.jsonl')
+    s71_path = os.path.join(data_dir, 'event_images.jsonl')
     s71_records = _read_jsonl(s71_path, required=True)
     for rec in s71_records:
         if not _manifest_image_exists(rec, data_dir):
@@ -492,7 +490,7 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
     logger.info(f"stage7_1: {len(s71_records)} records loaded")
 
     # 3b. stage7_2 app screenshots.
-    s72_path = os.path.join(data_dir, 'stage7_2_app_screenshots.jsonl')
+    s72_path = os.path.join(data_dir, 'app_screenshots.jsonl')
     s72_records = _read_jsonl(s72_path, required=True)
     for rec in s72_records:
         if not _manifest_image_exists(rec, data_dir):
@@ -527,7 +525,7 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
     logger.info(f"stage7_2: {len(s72_records)} records loaded")
 
     # 3c. stage7_3 tickets, transfers, and social-feed screenshots.
-    s73_path = os.path.join(data_dir, 'stage7_3_tickets.jsonl')
+    s73_path = os.path.join(data_dir, 'tickets.jsonl')
     s73_records = _read_jsonl(s73_path, required=True)
     for rec in s73_records:
         if not _manifest_image_exists(rec, data_dir):
@@ -551,7 +549,7 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
     logger.info(f"stage7_3: {len(s73_records)} records loaded")
 
     # 3d. stage7 group-chat screenshots.
-    gc_path = os.path.join(data_dir, 'stage7_group_chats.jsonl')
+    gc_path = os.path.join(data_dir, 'group_chats.jsonl')
     gc_image_count = 0
     gc_records = _read_jsonl(gc_path, required=True)
 
@@ -663,7 +661,7 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
             total_images_records.append(img_record)
 
     _write_jsonl(merged_records, merged_output)
-    total_images_output = merged_output.replace('stage10_merged', 'stage10_total_images')
+    total_images_output = merged_output.replace('merged_memories', 'total_images')
     _write_jsonl(total_images_records, total_images_output)
     logger.info(f"Merged {len(merged_records)} sub-events with "
                 f"{sum(len(r['images']) for r in merged_records)} total images")
@@ -722,11 +720,11 @@ def main():
                         help='Base directory containing images (default: image/)')
     
     parser.add_argument('--output-file', type=str,
-                        default=os.path.join(PROJECT_ROOT, 'output', 'data', 'stage10_image_summaries.jsonl'),
+                        default=os.path.join(PROJECT_ROOT, 'output', 'data', 'image_summaries.jsonl'),
                         help='Output JSONL file path')
     
     parser.add_argument('--profiles-file', type=str,
-                        default=os.path.join(PROJECT_ROOT, 'output', 'data', 'stage1_basic_profiles.jsonl'),
+                        default=os.path.join(PROJECT_ROOT, 'output', 'data', 'basic_profiles.jsonl'),
                         help='Stage1 profiles file for nationality info')
     
     parser.add_argument('--uuid-filter', type=int, nargs='+', default=None,
@@ -745,15 +743,15 @@ def main():
                         help='Skip Phase 2 (merge), only run Phase 1 (summary generation)')
     
     parser.add_argument('--merged-output', type=str,
-                        default=os.path.join(PROJECT_ROOT, 'output', 'data', 'stage10_merged.jsonl'),
+                        default=os.path.join(PROJECT_ROOT, 'output', 'data', 'merged_memories.jsonl'),
                         help='Merged output JSONL file path')
     
     parser.add_argument('--sub-events-file', type=str,
-                        default=os.path.join(PROJECT_ROOT, 'output', 'data', 'stage4_5_sub_events.jsonl'),
+                        default=os.path.join(PROJECT_ROOT, 'output', 'data', 'sub_events.jsonl'),
                         help='Sub-events JSONL for event metadata')
     
     parser.add_argument('--events-file', type=str,
-                        default=os.path.join(PROJECT_ROOT, 'output', 'data', 'stage4_annual_events.jsonl'),
+                        default=os.path.join(PROJECT_ROOT, 'output', 'data', 'annual_events.jsonl'),
                         help='Annual events JSONL for short-term event metadata')
     
     parser.add_argument('--workers', type=int, default=4,
@@ -764,7 +762,6 @@ def main():
     
     args = parser.parse_args()
     
-    # ── Phase 2 only mode ──
     if args.merge_only:
         data_dir = os.path.dirname(args.output_file)
         merge_all_images(
@@ -900,7 +897,6 @@ def main():
     logger.info(f"Output: {args.output_file}")
     logger.info("=" * 70)
 
-    # ── Phase 2: Merge all image JSONL files ──
     if not args.skip_merge:
         data_dir = os.path.dirname(args.output_file)
         merge_all_images(

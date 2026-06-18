@@ -50,7 +50,6 @@ if hasattr(sys.stderr, 'reconfigure'):
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
-# --- Logging (the 'fix_app2' logger; the llm-info functions log here too) ---
 logger = logging.getLogger('fix_app2')
 logger.setLevel(logging.DEBUG)
 fh = logging.FileHandler(os.path.join(LOG_DIR, 'fix_app2.log'), encoding='utf-8')
@@ -90,9 +89,7 @@ def render_screenshot(page, html_content, png_path, html_path=None, keep_html=Fa
 
     return True
 
-# ═══════════════════════════════════════════════════════════════════
 # Main process
-# ═══════════════════════════════════════════════════════════════════
 
 def main():
     parser = argparse.ArgumentParser(description='Generate ticket/money/friend screenshots (V2)')
@@ -100,7 +97,7 @@ def main():
                         choices=['ticket', 'money', 'friend'])
     parser.add_argument('--uuid-filter', type=int, nargs='+', default=None)
     parser.add_argument('--events-file', type=str,
-                        default=os.path.join(config.OUTPUT_DIR, 'data', 'stage4_annual_events.jsonl'))
+                        default=os.path.join(config.OUTPUT_DIR, 'data', 'annual_events.jsonl'))
     parser.add_argument('--output-dir', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'image'))
     parser.add_argument('--events-per-type', type=int, default=20)
@@ -112,7 +109,7 @@ def main():
                         default=os.path.join(config.OUTPUT_DIR, 'image'),
                         help='Base directory for event images (uid0/book, uid0/video, etc.)')
     parser.add_argument('--sub-events-file', type=str,
-                        default=os.path.join(config.OUTPUT_DIR, 'data', 'stage4_5_sub_events.jsonl'),
+                        default=os.path.join(config.OUTPUT_DIR, 'data', 'sub_events.jsonl'),
                         help='stage4.5 sub-events JSONL for expanding mid/long-term events')
     parser.add_argument('--force', action='store_true',
                         help='Ignore existing screenshots and regenerate from scratch')
@@ -147,9 +144,9 @@ def main():
         logger.info(f"[uuid={_uid}] Events expanded: {len(original_events)} -> {len(expanded)}")
     # Read base info
     data_dir = os.path.dirname(args.events_file)
-    profiles_file = os.path.join(data_dir, 'stage1_basic_profiles.jsonl')
+    profiles_file = os.path.join(data_dir, 'basic_profiles.jsonl')
     profiles = {r['uuid']: r for r in read_jsonl(profiles_file)} if os.path.exists(profiles_file) else {}
-    init_states_file = os.path.join(data_dir, 'stage2_init_states.jsonl')
+    init_states_file = os.path.join(data_dir, 'init_states.jsonl')
     init_states = {r['uuid']: r for r in read_jsonl(init_states_file)} if os.path.exists(init_states_file) else {}
 
     # Load templates
@@ -336,7 +333,7 @@ def main():
         logger.info(f"Updated {args.events_file}")
 
     # Save the standalone JSONL, even when empty.
-    jsonl_path = os.path.join(os.path.dirname(args.events_file), 'stage7_3_tickets.jsonl')
+    jsonl_path = os.path.join(os.path.dirname(args.events_file), 'tickets.jsonl')
     write_jsonl(jsonl_records, jsonl_path)
     logger.info(f"Saved standalone JSONL: {jsonl_path} ({len(jsonl_records)} records)")
 
@@ -345,9 +342,7 @@ def main():
     logger.info("=" * 60)
 
 
-# ===================================================================== #
 # Domain generator -- thin uniform entry point for the future pipeline DAG.
-# ===================================================================== #
 
 class DocumentGenerator(Generator):
     """Generate per-persona document payloads (ticket / money / social feed).

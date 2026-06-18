@@ -69,12 +69,10 @@ __all__ = [
 ]
 
 
-# ============================================================================
 # Event expansion (stage 4.5 sub-event integration)
-# ============================================================================
 
 def load_sub_events_index(sub_events_path):
-    """Load stage4_5_sub_events.jsonl and build an index.
+    """Load sub_events.jsonl and build an index.
 
     Returns:
         dict: {(uuid, parent_event_id): [children_list]}
@@ -121,9 +119,7 @@ def expand_events_for_imaging(uuid, events, sub_events_index):
     return result
 
 
-# ============================================================================
 # Logging
-# ============================================================================
 
 def setup_logger(name, log_file=None, level=logging.INFO):
     """Create a standard logger."""

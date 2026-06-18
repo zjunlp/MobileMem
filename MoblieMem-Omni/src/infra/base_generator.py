@@ -51,9 +51,7 @@ class Generator:
     input_file: Optional[str] = None
     output_file: Optional[str] = None
 
-    # ------------------------------------------------------------------ #
     # The only thing a concrete generator MUST implement.
-    # ------------------------------------------------------------------ #
     def produce(self, record: Record, ctx: Any = None) -> Record:
         """Produce the output record for a single upstream ``record``.
 
@@ -66,9 +64,7 @@ class Generator:
         """Legacy alias for :meth:`produce`; older stages override this."""
         raise NotImplementedError("override produce() (or the legacy process_one())")
 
-    # ------------------------------------------------------------------ #
     # Optional hooks (sensible defaults; override to match legacy logging).
-    # ------------------------------------------------------------------ #
     def set_context(self, record: Record, index: int) -> None:
         """Per-record setup hook (e.g. set the LLM log context). No-op default."""
 
@@ -89,9 +85,7 @@ class Generator:
         record is appended/saved. Lets a generator mutate ``result`` (e.g.
         de-duplicate) and update cross-record state. No-op by default."""
 
-    # ------------------------------------------------------------------ #
     # Shared template loop — the heart of the resume-safe behavior.
-    # ------------------------------------------------------------------ #
     def process_all(
         self,
         inputs: Sequence[Record],
@@ -140,9 +134,7 @@ class Generator:
 
         return records
 
-    # ------------------------------------------------------------------ #
     # Full self-contained lifecycle (used by the future single-CLI / DAG).
-    # ------------------------------------------------------------------ #
     def run(self, ctx: Any = None) -> List[Record]:
         """Read ``input_file``, resume from ``output_file``, process, write.
 

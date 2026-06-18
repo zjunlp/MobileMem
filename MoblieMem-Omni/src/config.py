@@ -12,9 +12,7 @@ import sys
 
 from dotenv import load_dotenv
 
-# ---------------------------------------------------------------------------
 # .env loading (idempotent). Looks for ``src/.env`` next to this file.
-# ---------------------------------------------------------------------------
 SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SRC_DIR)
 
@@ -23,10 +21,8 @@ if os.path.exists(_ENV_PATH):
     load_dotenv(_ENV_PATH, override=True)
 
 
-# ---------------------------------------------------------------------------
 # Console encoding: make Windows consoles print UTF-8 without garbling.
 # Centralized here so individual modules don't each reconfigure stdout/stderr.
-# ---------------------------------------------------------------------------
 def _ensure_utf8_console() -> None:
     for stream in (sys.stdout, sys.stderr):
         try:
@@ -38,9 +34,7 @@ def _ensure_utf8_console() -> None:
 _ensure_utf8_console()
 
 
-# ---------------------------------------------------------------------------
 # Typed env helpers (empty string is treated as "unset")
-# ---------------------------------------------------------------------------
 def _get_str(key: str, default: str) -> str:
     val = os.getenv(key)
     return val if val not in (None, '') else default
@@ -73,18 +67,14 @@ def _get_bool(key: str, default: bool) -> bool:
     return val.strip().lower() in ('1', 'true', 'yes', 'on')
 
 
-# ---------------------------------------------------------------------------
 # Project paths
-# ---------------------------------------------------------------------------
 PROMPTS_DIR = os.path.join(PROJECT_ROOT, 'prompts')
 TEMPLATE_DIR = os.path.join(PROJECT_ROOT, 'templates')
 OUTPUT_DIR = os.path.join(PROJECT_ROOT, 'output')
 LOG_DIR = os.path.join(OUTPUT_DIR, 'logs')
 
 
-# ---------------------------------------------------------------------------
 # Text LLM API (OpenAI-compatible)
-# ---------------------------------------------------------------------------
 OPENAI_API_KEY = _get_str('OPENAI_API_KEY', '')
 OPENAI_BASE_URL = _get_str('OPENAI_BASE_URL', 'https://api.openai.com/v1')
 # Fallback model used by llm_request() when a caller does not pass an explicit
@@ -107,9 +97,7 @@ WAIT_TIME_LOWER = _get_int('WAIT_TIME_LOWER', 10)
 WAIT_TIME_UPPER = _get_int('WAIT_TIME_UPPER', 30)
 
 
-# ---------------------------------------------------------------------------
 # Image generation API (DMXAPI)
-# ---------------------------------------------------------------------------
 DMX_API_KEY = _get_str('DMX_API_KEY', '')
 DMX_BASE_URL = _get_str('DMX_BASE_URL', 'https://www.dmxapi.cn/v1')
 DMX_GENERATION_URL = _get_str('DMX_GENERATION_URL', 'https://www.dmxapi.cn/v1/images/generations')
@@ -119,9 +107,7 @@ DMX_CHINESE_EDIT_MODEL = _get_str('DMX_CHINESE_EDIT_MODEL', DMX_CHINESE_GENERATI
 DMX_CHINESE_EDIT_PROMPT_MAX = _get_int('DMX_CHINESE_EDIT_PROMPT_MAX', 1000)
 
 
-# ---------------------------------------------------------------------------
 # Image generation API (OpenRouter, Gemini image model)
-# ---------------------------------------------------------------------------
 # Images are generated via OpenRouter's Gemini image model by default. OpenRouter
 # serves images through the chat endpoint with modalities=["image", "text"]
 # (not /images/generations), so the backend uses a dedicated code path. Set
@@ -139,14 +125,10 @@ IMAGE_MAX_INPUT_SIDE = _get_int('IMAGE_MAX_INPUT_SIDE', 1024)
 IMAGE_RETRY_TIMES = _get_int('IMAGE_RETRY_TIMES', 30)
 
 
-# ---------------------------------------------------------------------------
 # LLM call logging
-# ---------------------------------------------------------------------------
 LLM_CALL_LOGS_DIR = _get_str('LLM_CALL_LOGS_DIR', os.path.join(OUTPUT_DIR, 'llm_call_logs'))
 LLM_CALL_LOGS_ENABLED = _get_bool('LLM_CALL_LOGS_ENABLED', True)
 
 
-# ---------------------------------------------------------------------------
 # Networking: bypass the system proxy by default to avoid SSL handshake issues.
-# ---------------------------------------------------------------------------
 os.environ.setdefault('NO_PROXY', '*')

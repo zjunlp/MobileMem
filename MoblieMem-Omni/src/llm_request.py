@@ -313,9 +313,7 @@ def get_text_llm_model(is_chinese: bool) -> str:
     return config.TEXT_LLM_MODEL_CN if is_chinese else config.TEXT_LLM_MODEL
 
 
-# ============================================================================
 # LLM call logging framework
-# ============================================================================
 
 _log_context = threading.local()
 

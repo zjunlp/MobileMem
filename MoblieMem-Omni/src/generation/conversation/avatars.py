@@ -291,8 +291,6 @@ def _load_uuid_member_avatars(member_avatar_dir: str, uuid: int) -> List[str]:
             paths.append(os.path.join(member_avatar_dir, fname))
     return paths
 
-# ============================================================================
 # Process single persona
-# ============================================================================
 # (_find_chrome / html_to_png / html_to_multi_png are imported from the
 #  screenshot module at the top of this file.)

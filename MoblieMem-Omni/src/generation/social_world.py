@@ -598,8 +598,8 @@ def generate_social_graph(stage3_records: List[Dict], prompts_dir: str,
     existing = existing or {}
 
     # Load both prompt variants: English (base) and the Chinese (_cn) instructions.
-    prompt_path = os.path.join(prompts_dir, 'stage3_9_social_graph.txt')
-    cn_prompt_path = os.path.join(prompts_dir, 'stage3_9_social_graph_cn.txt')
+    prompt_path = os.path.join(prompts_dir, 'social_graph_en.txt')
+    cn_prompt_path = os.path.join(prompts_dir, 'social_graph_zh.txt')
 
     with open(prompt_path, 'r', encoding='utf-8') as f:
         system_prompt = f.read()
@@ -685,13 +685,10 @@ def generate_social_graph(stage3_records: List[Dict], prompts_dir: str,
     return result
 
 
-# ============================================================================
 # Social-name normalizer (folded from the old stage2_fix_names / Stage 2.1)
-#
 # Detects and fixes problematic keys in stage2 social_relationships (pure
 # relationship words, surname+title, prefixed nicknames, etc.). Reuses the
 # ``_make_unique_name`` / name-pool helpers above for fallback de-duplication.
-# ============================================================================
 
 RELATION_KEYWORDS = {
     '母亲', '父亲', '妈妈', '爸爸', '岳母', '岳父', '婆婆', '公公',
@@ -763,9 +760,7 @@ def is_problematic_name(name: str, rel_type: str) -> bool:
     """Decide whether a social_relationships key needs fixing."""
     return classify_name(name, rel_type) != 'OK'
 
-# ---------------------------------------------------------------------------
 # Regex extraction (disabled; everything is handled by the LLM)
-# ---------------------------------------------------------------------------
 def extract_name_from_key(key: str, category: str) -> Optional[str]:
     return None
 
@@ -888,9 +883,7 @@ def apply_fixes(
 
     return fixed, changes
 
-# ---------------------------------------------------------------------------
 # Main process
-# ---------------------------------------------------------------------------
 
 def fix_social_names(stage2_path: str, prompts_dir: str) -> int:
     """Read stage2 output -> detect -> regex extraction + LLM fix -> overwrite. Returns the total number of fixes."""

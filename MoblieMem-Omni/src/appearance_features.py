@@ -13,7 +13,6 @@ same persona keeps a stable look across runs without baking in a fixed table.
 
 import random
 
-# ── Canonical semantic keys -> localized display words (zh / en) ──
 # en values are self-contained prompt words (already include "eyes"/"nose"/...).
 FACE = {
     "round":      {"zh": "圆脸",   "en": "round face"},
@@ -83,7 +82,6 @@ SKIN = {
 
 LOCALIZE = {"face": FACE, "eyes": EYES, "nose": NOSE, "body": BODY, "skin": SKIN}
 
-# ── Per-nationality-group sampling pools (lists of canonical keys) ──
 POOLS = {
     "Chinese": {
         "face": ["round", "square", "melon_seed", "oval", "long", "square_jaw"],

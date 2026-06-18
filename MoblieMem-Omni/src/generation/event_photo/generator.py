@@ -46,7 +46,6 @@ except ImportError:
     _auto_orient_portrait = None
 
 
-# --- Logging (the 'fix_event_images' logger; the split modules log here too) ---
 LOG_DIR = config.LOG_DIR
 os.makedirs(LOG_DIR, exist_ok=True)
 logging.basicConfig(
@@ -545,11 +544,10 @@ def generate_event_image_for_uuid(uuid: int, event_idx: int, event: Dict,
 
 def main():
     parser = argparse.ArgumentParser(description='Generate all event scene images per uuid (100 events × 10 persons)')
-    # ---- Key hyperparameters ----
     parser.add_argument('--max-workers', type=int, default=2,
                         help='Parallel API calls (default: 2)')
     parser.add_argument('--events-file', type=str,
-                        default=os.path.join(config.OUTPUT_DIR, 'data', 'stage4_annual_events.jsonl'))
+                        default=os.path.join(config.OUTPUT_DIR, 'data', 'annual_events.jsonl'))
     parser.add_argument('--sessions-file', type=str,
                         default=None,
                         help='Deprecated compatibility flag; stage7.1 no longer reads or rewrites stage5 sessions')
@@ -563,7 +561,7 @@ def main():
     parser.add_argument('--face-threshold', type=float, default=FACE_SIMILARITY_THRESHOLD,
                         help='Cosine similarity threshold for face verification')
     parser.add_argument('--sub-events-file', type=str,
-                        default=os.path.join(config.OUTPUT_DIR, 'data', 'stage4_5_sub_events.jsonl'),
+                        default=os.path.join(config.OUTPUT_DIR, 'data', 'sub_events.jsonl'),
                         help='stage4.5 sub-events JSONL for expanding mid/long-term events')
     parser.add_argument('--force', action='store_true',
                         help='Ignore existing images and regenerate from scratch')
@@ -600,11 +598,11 @@ def main():
     events_records = read_jsonl(args.events_file)
     events_by_uuid = {r['uuid']: r for r in events_records}
 
-    # Load nationality map from stage1_basic_profiles.jsonl
-    profiles_file = resolve_companion_data_file(args.events_file, 'stage1_basic_profiles.jsonl')
+    # Load nationality map from basic_profiles.jsonl
+    profiles_file = resolve_companion_data_file(args.events_file, 'basic_profiles.jsonl')
     nationality_map = load_nationality_map(profiles_file)
     profile_map = load_profile_map(profiles_file)
-    init_states_file = resolve_companion_data_file(args.events_file, 'stage2_init_states.jsonl')
+    init_states_file = resolve_companion_data_file(args.events_file, 'init_states.jsonl')
     init_state_map = load_init_state_map(init_states_file)
     if not nationality_map:
         logger.warning("Nationality map is empty, using default 'Chinese' for all uuids")
@@ -637,7 +635,6 @@ def main():
 
     logger.info(f"Total tasks: {len(tasks)}")
 
-    # ── Phase 0: ensure every uuid to be processed has a person reference image ──
     processed_uuids = sorted({uuid for uuid, _, _ in tasks})
     logger.info(f"{'='*60}")
     logger.info(f"Phase 0: Ensure person portraits exist for {len(processed_uuids)} uuids")
@@ -718,8 +715,7 @@ def main():
     if args.sessions_file:
         logger.info("--sessions-file is deprecated and ignored; stage7.1 writes only its event-image manifest")
 
-    # ── Save standalone stage7_1 manifest ──
-    # The DAG declares this node's output as ``stage7_1_event_images.jsonl`` and
+    # The DAG declares this node's output as ``event_images.jsonl`` and
     # ``memory_summary``'s merge consumes it to fold event images into the stage10
     # index. Emit it next to the events file (honors the DAG data directory).
     jsonl_records = []
@@ -747,7 +743,7 @@ def main():
             'best_similarity': info.get('best_similarity') if info else None,
             'scene_prompt': info.get('scene_prompt', '') if info else '',
         })
-    jsonl_output_path = os.path.join(os.path.dirname(args.events_file), 'stage7_1_event_images.jsonl')
+    jsonl_output_path = os.path.join(os.path.dirname(args.events_file), 'event_images.jsonl')
     write_jsonl(jsonl_records, jsonl_output_path)
     logger.info(f"Saved {len(jsonl_records)} records to {jsonl_output_path}")
 
@@ -778,9 +774,7 @@ def main():
     logger.info(f"{'='*60}")
 
 
-# ===================================================================== #
 # Domain generator -- thin uniform entry point for the future pipeline DAG.
-# ===================================================================== #
 
 class EventPhotoGenerator(Generator):
     """Generate per-persona event scene images (one per event, face-verified).

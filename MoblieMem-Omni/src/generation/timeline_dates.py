@@ -37,7 +37,7 @@ RETRY_TIMES = config.RETRY_TIMES
 WAIT_TIME_LOWER = config.WAIT_TIME_LOWER
 WAIT_TIME_UPPER = config.WAIT_TIME_UPPER
 
-# The Chinese system prompt is loaded from an external file (prompts/stage3_important_dates_cn.txt)
+# The Chinese system prompt is loaded from an external file (prompts/important_dates_zh.txt)
 
 
 def load_prompt(prompt_path: str) -> str:
@@ -387,7 +387,7 @@ def generate_important_dates(stage2_records: List[Dict], prompts_dir: str,
         save_callback: Optional function(records) called after each person for incremental save
     """
     # English (base) prompt + the Chinese (_cn) prompt kept for Chinese personas.
-    prompt = load_prompt(os.path.join(prompts_dir, 'stage3_important_dates.txt'))
-    cn_prompt = load_prompt(os.path.join(prompts_dir, 'stage3_important_dates_cn.txt'))
+    prompt = load_prompt(os.path.join(prompts_dir, 'important_dates_en.txt'))
+    cn_prompt = load_prompt(os.path.join(prompts_dir, 'important_dates_zh.txt'))
     generator = ImportantDatesGenerator(prompt, cn_prompt)
     return generator.process_all(stage2_records, existing=existing, save_callback=save_callback)

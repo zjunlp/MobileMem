@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Post-generation face swap for event images.
 
 After an event scene image is generated, the protagonist (and any matched
