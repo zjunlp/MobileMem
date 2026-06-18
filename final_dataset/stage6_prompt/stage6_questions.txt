@@ -1,0 +1,278 @@
+﻿You are a professional QA generation assistant for a memory evaluation dataset.
+
+## Persona Info
+{persona_info}
+
+## Full Sessions Context
+The following context contains the full dialogue, full non-interference memory points, timestamps, and image references for this persona.
+
+{sessions_info}
+
+## Update Memories
+These are the memory points marked with `is_update=true`.
+
+{update_memories}
+
+## Output Language
+{output_language}
+
+## Task
+Generate {question_count} questions of type `{question_type}`.
+
+## Question-Format Ratio Constraints
+- These are hard target ratios for each question type within the final dataset:
+  - `single_hop`: about 30% `multiple_choice`
+  - `multi_hop`: about 15% `multiple_choice`
+  - `knowledge_update`: about 30% `multiple_choice`
+  - `temporal_reasoning`: about 20% `multiple_choice`
+  - `implicit_preference`: about 10% `multiple_choice`
+- For the current `{question_type}` batch, choose `question_format` with this target ratio in mind rather than defaulting almost always to `open_ended`.
+- If the current question type has a nonzero target ratio for `multiple_choice`, actively generate some valid `multiple_choice` questions instead of avoiding them.
+- Keep all other constraints unchanged. This section only changes the target proportion of `multiple_choice` versus `open_ended`.
+
+Strict real-user applicability requirement:
+- Before finalizing each question, ask yourself: "If I were the user using a memory assistant, would I naturally ask this question to recall, verify, compare, plan, or understand my own life context?" Generate only questions that pass this test; reject artificial dataset-style prompts, contrived reasoning puzzles, evaluator-only wording, trivia-like checks, and questions that no real user would plausibly ask in an application.
+- Internally divide the batch into two hidden length buckets for planning only. Do not output these bucket names or mention them anywhere in the JSON.
+- Enforce a hard short-to-long ratio of 1:3 within each batch.
+- If `{question_count}` is divisible by 4, exactly one quarter of the questions must be short and exactly three quarters must be long.
+- If `{question_count}` is not divisible by 4, keep the short count as close as possible to one quarter, and never let the difference exceed 1 question from the exact 1:3 target.
+- Short questions must sound like daily chat with a memory assistant and stay around 18-38 Chinese characters.
+- Long questions must still sound spoken and natural, not analytical or evaluative, and stay around 45-85 Chinese characters.
+- Do not let most questions drift into the middle zone between the two target ranges. The short/long difference should be visible.
+- Short questions may contain at most one short anchor phrase.
+- Long questions may contain at most one situational anchor plus one brief follow-up clause. Do not let them expand into narrative setup.
+- Do not make every question use the same sentence length or the same wording rhythm.
+- Write questions in a casual daily-life chat style, as if the user is talking to a memory assistant. Prefer natural stems such as `你还记得最近一次我……是什么时候吗？`, `你还记得上次我……和……相隔多久吗？`, `帮我想想去年5月份发生了哪些大事？`, `我上次……大概是在什么时候？`, or `帮我回忆一下……`.
+- In these chat-style stems, `你` refers only to the memory assistant; the target persona/user must still be written as `我`.
+- The wording must sound like a real user asking for help remembering life events, timing, people, plans, purchases, travel, health, work, or family matters. Avoid exam-style or dataset-style wording such as `结合这些信息可以看出`, `对比A和B后`, `从上述事件来看`, `这一系列事件说明`, `请概括出`, or similar evaluator phrasing.
+- Forbidden long-form tendencies: do not first retell multiple events and then ask the real question; do not use summary framing such as `这说明`, `反映出`, `加在一起`, `综合来看`, `把这几段经历放在一起`, or similar evaluator-style wording.
+
+You must generate one of the following types exactly as requested:
+
+### single_hop
+- A locally grounded question centered on one event or one situation, but it must still require at least light reasoning, comparison, paraphrase normalization, or aggregation of multiple nearby details.
+- Do not write a pure one-fact lookup question.
+- The answer must still be grounded and unique.
+
+### multi_hop
+- A factual question that requires combining 2-3 facts across dialogue and/or memory points.
+- The answer must still be grounded and unambiguous.
+- In each `multi_hop` batch, include some questions about relationships, social-circle people, family members, colleagues, friends, partners, or other named people around the target persona.
+- Relationship/social-circle `multi_hop` questions should be relatively challenging: they must require linking at least two clues such as a person's name, role, relationship, shared event, prior interaction, preference, responsibility, or change over time.
+- Do not ask simple relationship lookup questions such as "Who is X?" or "What is X's relationship to me?" unless the answer requires resolving multiple clues across different dialogue turns or memory points.
+- Prefer questions that ask which person fits a combined relationship/event/role description, how two people are connected through the persona's life context, or which social-circle person is implied by multiple pieces of evidence.
+- Ask the question directly.
+- Keep the question stem short and concise.
+- Prefer direct questioning with no preamble whenever the target can still be uniquely identified.
+- Minimize scene retelling, background summary, and decorative detail in the question stem.
+- The stem should ask the core question directly rather than first retelling evidence.
+- Do not pack multiple answer-bearing constraints into the stem.
+- Do not expose the reasoning path in the question stem.
+- Do not start a `multi_hop` question with phrasing such as `综合……`, `结合……`, `对比A和B后……`, `根据A和B……`, `从……和……来看……`, `综合上述……`, or similar wording that explicitly tells the reader which pieces of evidence to combine.
+- If a situational anchor is needed, keep it short and neutral rather than narrating the evidence-combination process.
+- If a situational anchor is needed, summarize it in only a few words, such as `那份家庭理财表里`, `年初那次规划里`, or `那次年礼讨论中`.
+- Do not narrate both events, both groups, or the full before/after chain in the question stem.
+- Avoid long stems that first retell the background and then ask the real question. When possible, ask directly in forms like `那份「2025家庭理财目标」表格里，被当作全年理财经底线的两项核心内容分别是什么？`
+
+### knowledge_update
+- A question about the latest or current state after a change.
+- Prefer facts supported by `is_update=true` memory points.
+- Ask about current/latest information rather than outdated information.
+
+### temporal_reasoning
+- A question that requires reasoning over time, order, duration, before/after, or timeline comparison.
+- Prefer time-difference, elapsed-time, interval, gap, or approximate-duration questions over simple earliest/latest ordering questions.
+- Strongly prefer questions that ask how many hours, how many minutes, how long apart, how much earlier/later, or which interval is longer/shorter, as long as the answer still requires contextual reasoning rather than direct subtraction from the question text.
+- Do not overuse simple ranking questions such as `哪个最早`, `哪个最晚`, `谁先谁后`, or `按顺序排列`; treat these as lower-priority fallback forms only when a stronger duration/interval question would be unnatural.
+- For `temporal_reasoning`, prefer comparing two bounded events and asking about their gap, elapsed time, or relative interval, rather than listing three or more events and asking for a direct order.
+- Use event times, dialogue facts, and memory timestamps.
+
+### implicit_preference
+- A question that infers a likely choice or preference from personality traits, preferences, and prior dialogue/memory.
+- The answer must still be supported by the supplied persona profile plus dialogue/memory evidence.
+- Typical examples: travel choice, sport choice, food choice, planning style, leisure preference.
+- `implicit_preference` must not be answerable from one explicit preference sentence alone; it must require at least two different clues from different sources or different moments.
+- For `implicit_preference`, prefer evidence that combines at least two of the following: persona preferences, dialogue behavior, plans, spending choices, routines, corrections, or event-specific decisions.
+- Every Chinese `implicit_preference` question MUST use an advice-seeking format where the user asks the memory assistant for a recommendation: `我遇到了……情况，在……方面你的建议是什么？`
+- For `implicit_preference`, the question must start from a concrete situation the user faces, use `我` for the target persona, and use `你的建议` only to address the assistant. Example structure: `我遇到了[具体情境]，在[选择/安排/处理方式]方面你的建议是什么？`
+- Do not write `implicit_preference` as `我更可能……？`, `我会选择什么？`, `赵云澈更偏好什么？`, or any detached evaluator-style preference question; rewrite it as a natural advice request from the user to the assistant.
+- In Chinese question text, when the target persona is the grammatical subject or main actor, use first-person `我` instead of the persona's full name.
+- When the target persona is only used as an identifier, possessive modifier, or comparison target, keep the persona's full name if needed for clarity.
+- Do not use second-person or third-person shorthand references for the target persona, including but not limited to `你`, `他`, `她`, `you`, `he`, `she`, `they`, `his`, `her`, `their`, `目前`, or `现在` when these words are used as shorthand references to the persona. In `implicit_preference`, `你/你的建议` may refer only to the assistant, never to the target persona.
+- In English output, prefer forms like `What is Zhou Jingchen's ...` instead of `What is your ...` or `What is his ...`.
+- Do not write second-person stems such as `你更可能……`, `你会怎么做……`, or `如果以后你又遇到……`; rewrite them with `我` when the target persona is the explicit subject.
+- For `implicit_preference` multiple-choice questions, all six options must sound like things this persona could plausibly do, choose, prefer, or say in context.
+- Do not make only the correct option concrete while leaving distractors vague, generic, abstract, or underspecified.
+- The correct option must not be noticeably longer, more balanced, more nuanced, or more detailed than the distractors.
+- Distractors must be near-neighbor alternatives in the same decision space, not extreme caricatures or obviously out-of-character behaviors.
+- Do not write an `implicit_preference` question whose correct answer is just a light rewrite of one evidence sentence.
+
+## Question Format
+Each question must also have a `question_format`:
+- `open_ended`
+- `true_false`
+- `multiple_choice`
+
+High-priority override:
+- Only use `open_ended` or `multiple_choice`.
+- Do not generate any `true_false` questions.
+- Do not generate judgment-style stems such as `判断对错：...`, `是否...`, or any yes/no-only question.
+- If a draft question would naturally be `true_false`, rewrite it as either:
+  - `multiple_choice` with six options, or
+  - `open_ended` whose answer is a phrase/span/fact rather than `是/否`.
+- For every `multiple_choice` question, all six options must be explicitly labeled `A. ...`, `B. ...`, `C. ...`, `D. ...`, `E. ...`, and `F. ...`, and the `answer` must be exactly one full option string including the label.
+
+If `question_format` is `multiple_choice`, provide an `options` array.
+If `question_format` is `open_ended` or `true_false`, set `options` to `[]`.
+For `open_ended`, the `answer` must be concise: keep only the essential conclusion and necessary qualifiers, prefer one short phrase or one short sentence, and do not include reasoning steps, evidence narration, background recap, or extra explanation.
+If `question_format` is `true_false`, the `answer` must be exactly `是` or `否` when `output_language` is `zh`, and exactly `Yes` or `No` when `output_language` is `en`.
+For `true_false`, put the explanation and supporting snippets in `evidence`, not in `answer`.
+For `true_false`, the question must be a real judgment statement or explicit yes/no question, not an open-ended question disguised as judgment.
+For `true_false`, only use stems that are naturally answerable by `是` / `否` or `Yes` / `No`.
+For `true_false`, do not use question stems such as `什么`, `哪一个`, `哪一项`, `哪一种`, `哪类`, `谁`, `如何`, `怎样`, `多少`, `多久`, `第几个`, `先……还是……`, `之前还是之后`, or any other form whose natural answer is not binary.
+For `true_false`, if the natural answer would be a phrase, a span, a category, a person, a time, a duration, or a choice among alternatives, then the format must be `open_ended` or `multiple_choice`, not `true_false`.
+For `true_false`, the `answer` field must contain only `是` or `否` in Chinese, or only `Yes` or `No` in English, with no extra explanation, no restatement, and no trailing text.
+For Chinese `true_false` questions, the question text must always begin with the exact prefix `判断对错：`.
+If `question_format` is `multiple_choice`, all options must be at the same semantic level and use similar wording granularity.
+For `multiple_choice`, always provide exactly six options formatted explicitly as `A. ...`, `B. ...`, `C. ...`, `D. ...`, `E. ...`, and `F. ...`.
+For `multiple_choice`, the `answer` must include the option label and exactly match one full option string verbatim, such as `A. ...`, `B. ...`, `C. ...`, `D. ...`, `E. ...`, or `F. ...`.
+For `multiple_choice`, treat the `answer` as a direct copy of one item from `options`: same letter, same wording, same punctuation, same spacing, with no rewriting, shortening, explanation, or extra text.
+For `multiple_choice`, before returning the JSON, verify that `answer` is exactly equal to one and only one string in `options`.
+For `multiple_choice`, keep option lengths roughly balanced. Do not make the correct option much longer, more specific, or more detailed than the distractors.
+For `multiple_choice`, keep all six options VERY close in visible length!!
+For `multiple_choice`, the correct option MUST NOT be the longest option!!
+For `multiple_choice`, the correct option MUST NOT be the shortest option!!
+For `multiple_choice`, after sorting the six options by visible text length from shortest to longest, the correct option MUST rank 3rd or 4th; it must be medium-length, not rank 1st, 2nd, 5th, or 6th.
+For `multiple_choice`, the correct option must be moderate in length and detail: not too short, not too long, not too polished, not too complete, and not too explanatory!!
+For `multiple_choice`, do NOT let the correct option read like a mini reference answer or a polished summary sentence!!
+For `multiple_choice`, keep the correct option slightly restrained rather than fully elaborated!!
+For `multiple_choice`, if one option is much longer, much shorter, much more concrete, much more polished, or much more detailed than the other five, rewrite the WHOLE option set before returning!!
+For `multiple_choice`, after drafting the six options, explicitly compare their lengths and wording density one by one; if the correct option stands out at a glance, rewrite it or rewrite the distractors until the set is visually balanced!!
+For `multiple_choice`, all six options must remain balanced in plausibility, specificity, wording style, and granularity; do not let `E` or `F` become obviously weaker filler choices.
+For `multiple_choice`, every distractor must be partially reasonable and belong to the same decision space as the correct answer.
+For `multiple_choice`, distractors must be plausible and mildly confusing, not obviously wrong, not negative labels, and not invalid choices.
+For `multiple_choice`, all six options must be near-neighbor alternatives under the same constraint set, not one reasonable answer plus five obviously shallow or extreme distractors.
+For `multiple_choice`, the distractors must compete with the correct answer on the same dimensions, such as cost, effort, timing, preference, tradeoff, or planning logic.
+For `multiple_choice`, do NOT let one option be the only one that mentions multiple constraints while the others mention only one!!
+For `multiple_choice`, do NOT let one option be the only one with rich detail while the others are flat, generic, or underexplained!!
+For `multiple_choice`, all six options must stay on the SAME LEVEL of abstraction and the SAME LEVEL of detail!!
+For `multiple_choice`, avoid extreme wording in distractors such as `总是`, `从不`, `完全`, `绝不`, `只要`, `无所谓`, or other exaggerated formulations unless the context truly supports such extremity.
+For `multiple_choice`, do not make the correct option the only balanced, moderate, or nuanced statement while making all distractors caricatured or extreme.
+For `multiple_choice`, do not use options like `复杂的科技小工具`, `不必要的科技功能`, `以上都是`, `以上都不是`, or other meta / negative / throwaway distractors.
+For `multiple_choice`, distractors must not duplicate the correct answer, paraphrase it too closely, or overlap so much that they are effectively the same meaning.
+For `multiple_choice`, prefer sibling categories or nearby alternatives from the same domain.
+For `multiple_choice`, the question stem MUST stay semantically neutral and MUST NOT contain answer-bearing details!!
+For `multiple_choice`, the question stem MUST NOT mention any decisive object, action, relation, attribute, role, tool, motive, tradeoff, or constraint that belongs to the answer space!!
+For `multiple_choice`, the question stem MUST NOT pre-state the key comparison dimension, the hidden tradeoff, or the exact decision frame that would narrow the answer to one option!!
+For `multiple_choice`, if any phrase in the stem would make one option easier to recognize, remove that phrase and rewrite the stem more neutrally!!
+For `multiple_choice`, the stem should only identify the situation minimally and ask the core question directly; it must NOT preview the evidence pattern, answer structure, or correct reasoning route!!
+For `multiple_choice`, NEVER let the stem repeat, paraphrase, summarize, foreshadow, or strongly hint at wording that appears only in the correct option!!
+For `implicit_preference` multiple-choice questions, all six options must be plausible in-character candidates.
+For `implicit_preference` multiple-choice questions, avoid having one option be the only concrete actionable plan while the others are broad attitudes or vague principles.
+For `implicit_preference` multiple-choice questions, keep all six options close in specificity, length, wording style, and realism.
+For `implicit_preference` multiple-choice questions, do not make the correct option the only one that integrates multiple constraints while distractors each ignore obvious context.
+
+## Hard Constraints
+- Do not include any question-type label, subtype label, category label, or annotation prefix in `question`, `answer`, or `options`. Forbidden examples include `multi_hop（社交人物）：`, `multi_hop:`, `多跳（社交人物）：`, `社交人物：`, `single_hop：`, `implicit_preference：`, or any similar metadata-style prefix; output only the natural user-facing question and answer text.
+- For every question type except `implicit_preference`, never use `你` to refer to the target persona in the `question` text. If the target persona is the subject/main actor, write `我`; rewrite stems like `你在……`, `从你……`, `你和……`, `你的……` as `我在……`, `从我……`, `我和……`, `我的……`.
+- For `implicit_preference`, the only allowed use of `你` in the `question` text is `你的建议`, where `你` means the assistant. The target persona must still be written as `我`.
+- Do not generate pure fact-retrieval questions that can be answered by copying one literal phrase from one memory point or one dialogue turn.
+- Every question must require at least one of the following:
+  - combining two or more facts
+  - aggregating multiple details under one situation
+  - temporal/order reasoning
+  - latest-state/update reasoning
+  - preference/attitude inference grounded in multiple clues
+  - light multi-step reasoning rather than direct string lookup
+- Prefer questions that require at least one of: comparison, attribution/归因, integration/整合, or constraint tradeoff/约束权衡.
+- Even for `single_hop`, do not ask "what is X", "where is Y", "who is Z", "when did A happen", or similar questions if the answer is directly stated in exactly one place.
+- Rewrite any draft question that is answerable by a single explicit sentence into a question that requires synthesis, comparison, normalization, or context-aware reasoning.
+- Do not generate direct extraction questions whose answer can be copied almost verbatim from one sentence, one bullet, one memory point, or one screenshot text block.
+- For `open_ended`, do not ask for a bare list, bare field value, or bare fact span unless the question still requires non-trivial comparison, attribution, integration, or tradeoff reasoning.
+- Use the provided full dialogue and memory points as the source of truth.
+- Do not invent facts not grounded in the context.
+- Every answer must be supported by `evidence`.
+- `evidence` must contain the original supporting snippets from the supplied context.
+- For `implicit_preference`, `evidence` should normally contain at least two supporting snippets from different sources, sessions, or moments unless the reasoning truly requires only one bounded local comparison.
+- Prefer diverse sessions and question forms.
+- Questions and answers must be natural, concise, and realistic.
+- If a question depends on a time anchor, date, holiday, location, trip, event name, or other situational anchor from the context, the question must explicitly mention that anchor in the question text.
+- If the context provides concrete anchors such as a date (`2025-xx-xx`), holiday name, city, venue, or event name, and the anchor is not itself the answer being asked for, include it explicitly in the question.
+- Do not use exact dates or exact timestamps in the question text.
+- In question text, only use coarse time expressions such as `2025年5月`, `2025年5月上旬`, `2025年春天`, `2025年下半年`, `春节前后`, `国庆后`, or similarly broad anchors.
+- Do not write precise forms such as `2025-05-03`, `2025年5月3日`, `2025年5月3日晚上9点`, `20:30`, or any other day-level or clock-level timestamp in the question text.
+- If the source context contains exact time, normalize it to month-level, early/mid/late month, quarter-level, half-year-level, season-level, or holiday-relative wording before writing the question.
+- Do not omit available anchors when they are needed to uniquely identify the situation.
+- For temporal questions, do NOT add unnecessary micro-time descriptors in the stem such as `几分钟`, `十来分钟`, `半小时`, `稍晚一些`, `当天稍后`, `过了一会儿`, or similar wording unless that temporal granularity is absolutely necessary to identify the situation!!
+- For temporal questions, when naming the compared events, prefer describing the actions themselves rather than decorating them with extra time modifiers.
+- For temporal questions, write the shortest sufficient event description, for example use `结束群聊后在客厅发呆` rather than `结束群聊后在客厅沙发上发呆几分钟`, unless the omitted part is necessary for disambiguation.
+- Do not expose the answer in the question text.
+- The question must not be solvable from the wording of the question alone.
+- A reader must need the supplied memory, dialogue, image evidence, or context to answer correctly.
+- The stem must not contain enough clues for a strong reader to infer the answer without consulting the underlying context.
+- The question stem must not directly state the correct conclusion, restate the correct option, or reveal uniquely identifying details that make one option obviously correct without consulting the context.
+- For `multiple_choice`, do not let the wording in the question stem overlap too closely with the correct option; the stem must set up the problem, not leak the answer.
+- For `multiple_choice`, keep the stem maximally lean and neutral: do not include any detail that lives in the answer space unless it is strictly required to identify the target situation.
+- For `multiple_choice`, do not mention decisive objects, relationships, constraints, scene details, preference dimensions, or planning criteria in the stem when those details are what separate the options.
+- For `multiple_choice`, if deleting one phrase from the stem would materially reduce bias toward the correct option, that phrase MUST NOT appear in the final stem.
+- Do not build the question stem so that it already encodes the same constraint bundle that appears only in the correct option.
+- For inferential or preference questions, do not write stems like `在处理A与B的冲突时，X更可能给自己设定哪种具体约束？` if that wording already points toward a uniquely moderate self-regulation answer; ask more neutrally and let the options carry the alternatives.
+- Do not restate the full correct proposition, conclusion, preference, interpretation, or timeline in the question text and then merely ask whether it is true.
+- Do not include all decisive details in the question stem in a way that makes the answer trivial without consulting the provided evidence.
+- If a question compares two or more events, do not state every decisive detail in the stem so clearly that the answer can be obtained without context.
+- If a question asks about preference, attitude, style, tendency, or inferred conclusion, the stem should describe the situation rather than directly state the final conclusion to be judged.
+- The stem should usually name the situation and the target of reasoning, but not the decisive evidence, not the hidden tradeoff, and not the answer structure.
+- If the question is about time, order, duration, before/after, latest/current state, or timeline comparison, do not include enough exact dates or timestamps in the question to make the answer mechanically solvable from the question text alone.
+- If the question asks about temporal order or duration, the question must not contain two or more exact dates when direct date comparison or subtraction would trivially reveal the answer.
+- For temporal questions, prefer coarse or fuzzy anchors such as `2025年3月上旬`, `2025年4月中旬`, `春节前`, `春节后不久`, `清明节前后`, `国庆后`, `那次周末`, `那次节前走访`, or similarly vague but still identifiable anchors.
+- For temporal questions, keep at least one key time anchor implicit enough that the answer still requires the supplied memory/dialogue context rather than direct reading of the question.
+- Do not write a temporal question whose answer can be determined from the dates, timestamps, or event order explicitly stated in the question alone.
+- For `temporal_reasoning`, avoid enumerating exact calendar dates for every compared event in the same question.
+- For `temporal_reasoning`, avoid stems that merely list several events and ask the reader to sort them directly.
+- For `temporal_reasoning`, when the source context supports it, prefer asking for approximate elapsed time such as `相隔多久`, `大约几小时后`, `大约提前了多久`, `两次之间间隔多长时间`, or `哪个时间差更大`.
+- Prefer duration/interval questions over pure before/after questions whenever both are possible.
+- Prefer total-duration questions such as how long a multi-step episode took from the first action to the last action, when supported by the timeline.
+- For `temporal_reasoning`, avoid unnecessary wording like `哪一件更早`, `先发生的是哪一个`, or `从时间顺序上看` unless no natural interval/duration formulation is possible!!
+- If asking about hours or minutes, do not place enough exact timestamps in the question text to let the reader mechanically subtract them without consulting the context.
+- For hour/minute gap questions, keep the stem anchored to recognizable situations while leaving the exact computation to the supplied timestamps, dialogue, or memory points.
+- When writing a multiple-choice temporal question, keep all options in the same granularity band for duration (for example all in minutes or all in hours) and avoid making the correct option the only moderate, non-round, or realistically phrased interval.
+- For `true_false` temporal questions, do not restate the full correct timeline or an easily checkable dated statement in the question text; the statement must still require memory/context verification.
+- For `true_false`, do not turn the question into a nearly complete answer statement that only needs a final yes/no judgment.
+- For `true_false`, do not write stems of the form “Based on X and Y, does this mean that [full correct interpretation]?” when the interpretation is already the answer.
+- For `multiple_choice`, do not include wording in the question stem that directly matches, paraphrases, or strongly points to the correct option.
+- For directly grounded factual questions, `open_ended` is allowed.
+- For inferential questions about emotion, preference, habitual liking, likely choice, attitude, personality tendency, or other non-explicit conclusions, do not use a free-form unconstrained question.
+- Such inferential questions must use `true_false`, `multiple_choice`, or `open_ended` with explicit candidate answers stated in the question text.
+- `implicit_preference` questions should default to an `open_ended` advice request using the required `我遇到了……情况，在……方面你的建议是什么？` format. Use `multiple_choice` only when all six options are plausible advice candidates for that same situation.
+- For `implicit_preference`, do not rely on a single quoted preference statement as the whole basis of the question.
+- For `implicit_preference`, the question should require synthesizing at least two clues rather than matching one evidence sentence to one option.
+- If `output_language` is `zh`, generate Chinese `question` and `answer`.
+- If `output_language` is `en`, generate English `question` and `answer`.
+- If the requested type is `knowledge_update` and no real update fact exists, do not invent one; use the strongest available current-state evidence.
+
+## Output Format
+Return strict JSON only.
+
+```json
+{
+  "questions": [
+    {
+      "question": "问题文本或 English question",
+      "answer": "答案文本或 English answer",
+      "question_format": "open_ended",
+      "options": [],
+      "evidence": ["supporting snippet 1", "supporting snippet 2"],
+      "difficulty": "medium",
+      "image_refs": [],
+      "source_session_ids": ["session_id"],
+      "source_event_ids": [0]
+    }
+  ]
+}
+```
+
+## Difficulty Guidance
+- `easy`: do not use; direct one-fact lookup questions are forbidden
+- `medium`: simple combination, local aggregation, normalization, or light reasoning
+- `hard`: multi-step reasoning with temporal or cross-session synthesis
+

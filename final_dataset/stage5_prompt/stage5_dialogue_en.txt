@@ -1,0 +1,150 @@
+You are a professional dialogue data generation assistant. The memory points for this event have already been finalized. Your task is to generate a complete dialogue grounded in those memory points.
+
+## Persona Information
+{persona_info}
+
+## Event Information
+{event_info}
+
+## Existing System Memories
+{system_memories}
+
+## Event Memory Points Already Generated
+{event_memory_points}
+
+## Available Images
+{available_images}
+
+Notes:
+- These images are allowed to be referenced in the dialogue
+- They may include event images, shopping/video/music/book app screenshots, group chat screenshots, and scenery support images
+- `group_chat` images can be used when discussing chat messages, opinions from group members, or how to reply
+- `scenery_*` images should only be used as auxiliary background for environment, weather, maps, notifications, indoor scenes, food, and similar context
+
+## Core Task
+Generate a natural and realistic complete dialogue grounded in the event memory points above.
+
+## Dialogue Role Definition (Highest Priority)
+- `user` is always the target user from "Persona Information", meaning the protagonist or memory subject of the event.
+- `assistant` is always an AI chat assistant, similar to an intelligent assistant inside a chat app. It is not a real participant in the event.
+- This dialogue is not a direct reenactment of a two-person conversation from the event scene. It is a post-event conversation where the target user talks with an AI assistant, and the full event process is naturally reconstructed through recall, follow-up questions, verification, correction, organization, and advice.
+- If the event involves the target user and other people, such as a manager, coworker, friend, partner, family member, or customer, the `assistant` must not role-play as any of those people and must not speak in their voice.
+- The `assistant` may help the user organize the timeline, relationships, causes, process, outcome, next steps, and feelings, but it must always remain an AI assistant.
+- The `user` may use first person to describe their own experience, such as "I was..." or "I talked with..."; the `assistant` should normally address the target user directly as "you" and must not present itself as an event participant.
+- The `assistant` may use the target user's full name only as an opening address or when it is truly needed to disambiguate the target user from other people in the event. Do not repeatedly use the full name elsewhere.
+- Strictly do not refer to the target user in both third person and second person within the same sentence, such as "Chen Zhiyuan this time... you..." or "Chen Zhiyuan, you...". Use second person only, such as "you this time..." or "this sounds like your usual style...".
+- Do not write scene-roleplay dialogue such as "Director Jiang, did you ask for me?" or "Chen Zhiyuan, happy New Year, come in and sit down", where two real event participants directly talk to each other.
+- Correct form example:
+  - `user`: This morning Jiang Lihua called me into her office and said she wanted me to lead a research project. I felt a lot of pressure.
+  - `assistant`: Let me help you sort that out. So on the morning of January 2, 2025, Jiang Lihua formally assigned you to lead the surrounding-county tobacco market standardization research project, right?
+
+Requirements:
+
+1. The dialogue must be driven by memory points
+- Naturally cover several memory points, especially primary memories
+- You may cover part of the secondary memories
+- Do not mechanically restate every memory point one by one
+- Do not directly surface interference memories in the dialogue
+
+2. Keep the dialogue consistent with the event
+- The content must stay consistent with the event name, time, participants, and description
+- Do not introduce new facts that conflict with the memory points
+- If an image is referenced, it must match the available images
+- Event participants may only appear as people recalled, reported, discussed, or organized by the user and assistant; they must not replace the `assistant` as the other side of the dialogue
+
+3. Dialogue form requirements
+- 30-50 turns, preferably long but still natural; do not go below 30 unless the event information is extremely sparse
+- Usually alternate `user` and `assistant`; however, if a message needs an image, split it into two consecutive turns by the same role: text first, image second
+- Language: English
+- `dialogue_goal`: one sentence describing the core purpose of the conversation
+- `dialogue_summary`: 2-3 sentences summarizing the conversation
+- Keep the dialogue natural and specific rather than summary-like
+- `dialogue_goal` and `dialogue_summary` must reflect a user-AI assistant conversation for reviewing or organizing the event; do not describe the dialogue as an in-scene conversation between two real event participants
+- The `assistant` should actively ask follow-up questions and organize key details so the `user` gradually supplies the event's cause, process, people, time, place, decisions, emotions, and outcome
+- Strictly do not use the bracket characters `【` or `】` in `dialogue_goal`, `dialogue_summary`, or any dialogue `content`
+- Strictly do not add source, speaker, medium, or action prefixes at the beginning of dialogue `content`, including but not limited to `（微信）`, `（语音）`, `（程俊尧）`, `（群聊）`, `（电话）`, `（短信）`, or `（图片）`; do not wrap such prefixes in backticks either
+- Dialogue `content` must contain only the natural chat text actually sent or spoken by the role; do not include stage directions, channel labels, parenthesized labels, or speaker labels
+- Add a small amount of natural small talk outside the main event thread, such as greetings, transitions, emotional cushioning, or lightly related everyday remarks
+- Keep small talk limited, usually around 15%-25% of the dialogue, so it improves realism without taking over the event
+- To increase retrieval difficulty, naturally include 1-3 short past-recollection or callback segments, but only when they feel like genuine associations triggered by the current event rather than random inserted side stories
+- Prefer recollections tied to last year, the same holiday, a previous birthday, an earlier similar plan, a past failed attempt, or a previous version of a similar purchase / trip / gift / overtime / fitness / finance situation
+- These recollections may act as related distractors: for example, while discussing this New Year, briefly recall last New Year; while discussing this birthday, mention last year's birthday; while discussing this gift plan, recall a previous similar gift
+- You may also include a small amount of related-but-noncore everyday recollection, such as an old travel habit, a previous budgeting style, a past gathering, or an earlier health reminder, as long as it stays connected to the current topic
+- Keep these recollections brief, natural, and searchable; they must not become long summaries or overpower the current event, and should usually stay within about 10%-20% of the dialogue
+- Past recollections should preferably share a time anchor, person anchor, place anchor, or theme anchor with the current event so that later QA must distinguish between “this time” and “last time / last year”
+- Let them create mild retrieval interference, but do not introduce hard facts that directly conflict with the given memory points; if a past episode is mentioned, make the time and participants distinguishable from the current event
+- Do not turn past recollections into standalone long event summaries; they should appear as brief asides, comparisons, reminders, corrections, or follow-up explanations inside the dialogue
+
+4. Correction segment requirement
+- Include at least one segment where the assistant first makes a plausible but slightly incorrect event-related statement, and the user corrects it
+- The correction should happen while the AI assistant is reviewing, summarizing, inferring, or organizing the event, not because the assistant is role-playing as a real person from the event
+- The mistake must be subtle and natural, such as time, place, participant, preference, sequence, or plan detail, not an obviously absurd error
+- After the correction, the assistant should explicitly acknowledge it and continue with the corrected detail
+- The mistake may differ slightly from the primary or secondary memories, but do not directly surface an interference memory verbatim
+- Use only 1-2 such correction segments in the whole dialogue so it does not feel forced
+
+5. Image reference rule
+- If relevant images exist for the event, they may be referenced, but must be split into two consecutive turns
+- Only the `user` role is allowed to send images.
+- The `assistant` role must never produce an image turn and must never set `image_inline`.
+- The first turn is a text turn: `content` contains text and `image_inline` is null
+- The second turn is an image turn: `content` is an empty string and `image_inline` contains the image file path
+- The image turn must always use role `user`, and the preceding text turn that introduces the image must also be role `user`
+- Do not write `[image:filename]` inside text `content`; images must be expressed only through standalone image turns via `image_inline`
+- If available images are not empty, try to cover more different images
+- If there are only 1-2 candidate images, try to reference all of them
+- If there are 3-5 candidate images, try to reference 2-4 of them
+- If there are more candidate images, prioritize those most directly relevant to the event, but do not force them in unnaturally just to increase coverage
+- Do not repeatedly reference the same image in consecutive turns
+- Image references should stay abstract and natural, such as "I'll send you the order screenshot" or "let me share that chat capture"
+- Do not force obviously irrelevant images into the dialogue
+
+6. Visual-detail constraint (high priority)
+- The dialogue may mention sending an image, screenshot, order page, group chat record, or map, but must not describe what is visually shown inside it
+- Strictly forbid any concrete visual-detail narration in dialogue text, including appearance, clothing, pose, expression, color, count, spatial position, background objects, UI layout, title text, price, rating, review text, map markers, weather icons, and similar visible details
+- Strictly forbid expressions like "this image shows...", "I can see in the screenshot...", "from the picture we can tell...", or "this group chat screenshot means..."
+- If an image must be referenced, treat it only as an attachment or evidence carrier. The text may say "I'll send it to you" or "take a look at this screenshot", but must not reveal answer-bearing visual content
+- The main information in dialogue should come from the event itself, plans, conversation, and memory points rather than spoken image descriptions
+
+7. Memory-to-turn grounding requirement
+- For every non-interference item in `event_memory_points`, also output the dialogue turns that truly support it in the final dialogue
+- These turn ids must use the exact `turn` numbers from the final `dialogue` you return
+- `dialogue_turn_ids` may reference only turns that actually appear in the returned dialogue
+- Prefer the minimal supporting set of 1-4 turns per memory point; if a memory point is not truly grounded in the dialogue, return an empty list `[]`
+- Do not rewrite or repeat the full memory points; only output `memory_id` and its `dialogue_turn_ids`
+
+## Output Format
+Return strict JSON:
+
+```json
+{
+  "dialogue_goal": "...",
+  "dialogue_summary": "...",
+  "dialogue": [
+    {
+      "turn": 1,
+      "role": "user",
+      "content": "...",
+      "image_inline": null
+    },
+    {
+      "turn": 2,
+      "role": "assistant",
+      "content": "...",
+      "image_inline": null
+    }
+  ],
+  "memory_turn_links": [
+    {
+      "memory_id": "0_0_pri_0",
+      "dialogue_turn_ids": [3, 4]
+    }
+  ]
+}
+```
+
+Notes:
+- Output only `dialogue_goal`, `dialogue_summary`, `dialogue`, and `memory_turn_links`
+- Do not output the full `memory_points` again
+- `image_inline` may only use file paths from the available image list
+- `memory_turn_links.memory_id` may only use existing ids from `event_memory_points`

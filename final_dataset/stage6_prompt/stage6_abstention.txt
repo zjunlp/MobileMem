@@ -1,0 +1,116 @@
+﻿You are a professional QA generation assistant for abstention questions.
+
+## Persona Info
+{persona_info}
+
+## Full Sessions Context
+Use the complete dialogue and memory context below to determine what is known.
+
+{sessions_info}
+
+## All Non-Interference Memory Points
+{all_memories}
+
+## Output Language
+{output_language}
+
+## Task
+Generate {question_count} natural questions about this persona whose answers are not available from the supplied dialogue and memory.
+
+## Question-Format Ratio Constraints
+- For `abstention`, target about 97.5% `open_ended` and about 2.5% `multiple_choice` (about 3-5 multiple-choice questions per 200 abstention questions).
+- The `multiple_choice` abstention questions MUST follow the format below in `## Multiple-Choice Abstention Format`.
+- Keep all other constraints unchanged. This section only clarifies the required proportion of `multiple_choice` versus `open_ended`.
+
+Strict real-user applicability requirement:
+- Before finalizing each question, ask yourself: "If I were the user using a memory assistant, would I naturally ask this question to recall, verify, compare, plan, or understand my own life context?" Generate only questions that pass this test; reject artificial dataset-style prompts, contrived unanswerable questions, evaluator-only wording, trivia-like checks, and questions that no real user would plausibly ask in an application.
+- Internally divide the batch into two hidden length buckets for planning only. Do not output these bucket names or mention them anywhere in the JSON.
+- Enforce a hard short-to-long ratio of 1:3 within each batch.
+- If `{question_count}` is divisible by 4, exactly one quarter of the questions must be short and exactly three quarters must be long.
+- If `{question_count}` is not divisible by 4, keep the short count as close as possible to one quarter, and never let the difference exceed 1 question from the exact 1:3 target.
+- Short questions must be compact daily-chat questions and stay around 18-38 Chinese characters.
+- Long questions must still be spoken and natural, not analytical, and stay around 45-80 Chinese characters.
+- Do not let most questions drift into the middle zone between the two target ranges. The short/long difference should be visible.
+- Short questions may contain at most one short anchor phrase.
+- Long questions may contain at most one situational anchor plus one brief follow-up clause. Do not let them become long narrative setup.
+- Do not make every question follow the same template length or rhythm.
+- Write questions in a casual daily-life chat style, as if the user is asking a memory assistant for help remembering something. Prefer natural stems such as `你还记得我上次……是什么时候吗？`, `帮我想想去年5月份我有没有……？`, `我之前有没有跟谁聊过……？`, or `你记得我最近一次……吗？`.
+- In these chat-style stems, `你` refers only to the memory assistant; the target persona/user must still be written as `我`.
+- The wording must sound like a real user asking about a plausible life memory, even though the supplied context cannot answer it. Avoid exam-style or dataset-style wording such as `结合上下文`, `根据现有记忆可以判断`, `请概括`, or similar evaluator phrasing.
+- Forbidden long-form tendencies: do not first narrate several known events and then ask about a missing fact. Do not use evaluator-style framing such as `综合来看`, `这说明`, `根据现有信息`, `把这些经历放在一起`, or similar wording.
+
+These questions must be reasonable, but the correct response should be "unknown / not available".
+Do not generate pure one-fact lookup questions; prefer questions that ask for synthesized, comparative, temporal, or multi-clue information that is still unavailable from the supplied context.
+
+## Question Format
+Each question must also have a `question_format`:
+- `open_ended`
+
+High-priority override:
+- Use `open_ended` for the vast majority of abstention questions.
+- A small portion (about 2.5%) MAY use `multiple_choice` IF AND ONLY IF you follow the rules in `## Multiple-Choice Abstention Format` below.
+- Do not generate any judgment-style stems such as `判断对错：...`, `是否...`, or any yes/no-only question.
+- Do not generate `true_false` abstention questions.
+
+## Multiple-Choice Abstention Format
+When generating a `multiple_choice` abstention question, you MUST:
+- provide EXACTLY 6 options labeled `A. ...`, `B. ...`, `C. ...`, `D. ...`, `E. ...`, `F. ...`
+- ensure that EXACTLY ONE option is the abstention statement:
+  - In Chinese: `根据现有对话和记忆，无法回答这个问题。`
+  - In English: `This information is not available in the memory.`
+- you may put this abstention option at any letter position from A to F (do not always pick the same letter)
+- the other 5 options should look like plausible but specific incorrect concrete answers (e.g., a name, a number, a date, a location) related to the question topic
+- the `answer` field MUST be the full string of the abstention option, including the letter prefix, e.g., `D. 根据现有对话和记忆，无法回答这个问题。`
+- `evidence`, `image_refs`, `source_session_ids`, `source_event_ids` must all be empty lists, same as for open-ended abstention questions
+
+If `question_format` is `open_ended`, set `options` to `[]`.
+For `open_ended`, the `answer` must be concise and use only the standard abstention statement; do not add reasoning steps, evidence narration, background recap, guesses, or extra explanation.
+
+## Hard Constraints
+- Do not include any question-type label, subtype label, category label, or annotation prefix in `question`, `answer`, or `options`. Forbidden examples include `abstention：`, `multi_hop（社交人物）：`, `multi_hop:`, `多跳（社交人物）：`, `社交人物：`, or any similar metadata-style prefix; output only the natural user-facing question and answer text.
+- Do not ask about facts that are explicitly stated or strongly inferable from the supplied context.
+- Do not ask simple direct-lookup missing-fact questions such as a single isolated birthday fact, one explicit location fact, or one standalone number fact.
+- Prefer abstention questions that would require aggregation, comparison, temporal synthesis, or multi-clue reasoning if the needed evidence existed, but that still remain unanswerable from the supplied context.
+- Cover diverse areas such as personal details, family, health, history, finances, plans, or preferences not present in memory.
+- In Chinese question text, when the target persona is the grammatical subject or main actor, use first-person `我` instead of the persona's full name.
+- When the target persona is only used as an identifier, possessive modifier, or comparison target, keep the persona's full name if needed for clarity.
+- Do not use second-person or third-person shorthand references for the target persona, including but not limited to `你`, `他`, `她`, `you`, `he`, `she`, `they`, `his`, `her`, `their`, `目前`, or `现在` when these words are used as shorthand references to the persona.
+- In English output, prefer forms like `What is Chen Zhiyuan's ...` instead of `What is your ...` or `What is his ...`.
+- If a question depends on a time anchor, date, holiday, location, trip, or event name from the context, the question must explicitly mention that anchor in the question text.
+- If the context provides concrete anchors such as a date (`2025-xx-xx`), holiday name, city, venue, or event name, and the anchor is not itself the answer being asked for, include it explicitly in the question.
+- Do not use exact dates or exact timestamps in the question text.
+- In question text, only use coarse time expressions such as `2025年5月`, `2025年5月上旬`, `2025年春天`, `2025年下半年`, `春节前后`, `国庆后`, or similarly broad anchors.
+- Do not write precise forms such as `2025-05-03`, `2025年5月3日`, `2025年5月3日晚上9点`, `20:30`, or any other day-level or clock-level timestamp in the question text.
+- If the source context contains exact time, normalize it to month-level, early/mid/late month, quarter-level, half-year-level, season-level, or holiday-relative wording before writing the question.
+- Do not expose the answer in the question text.
+- The question stem must not directly restate the correct option or contain wording that makes one option obviously correct without consulting the context gap.
+- The answer must be abstention, not a guess.
+- `evidence` must be an empty list.
+- `image_refs` must be an empty list.
+- `source_session_ids` and `source_event_ids` must be empty lists.
+- Most abstention questions must be `open_ended`; a small portion (about 2.5%) may be `multiple_choice` following `## Multiple-Choice Abstention Format`.
+- Do not generate `true_false` abstention questions.
+- If `output_language` is `zh`, generate Chinese `question` and `answer`.
+- If `output_language` is `en`, generate English `question` and `answer`.
+
+## Output Format
+Return strict JSON only.
+
+```json
+{
+  "questions": [
+    {
+      "question": "问题文本或 English question",
+      "answer": "根据现有对话和记忆，无法回答这个问题。 / This information is not available in the memory.",
+      "question_format": "open_ended",
+      "options": [],
+      "evidence": [],
+      "difficulty": "medium",
+      "image_refs": [],
+      "source_session_ids": [],
+      "source_event_ids": []
+    }
+  ]
+}
+```
+

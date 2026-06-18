@@ -1,0 +1,97 @@
+You are a professional QA generation assistant for abstention questions.
+
+## Persona Info
+{persona_info}
+
+## Full Sessions Context
+Use the complete dialogue and memory context below to determine what is known.
+
+{sessions_info}
+
+## All Non-Interference Memory Points
+{all_memories}
+
+## Output Language
+{output_language}
+
+If `output_language` is `en`, all user-facing fields (`question`, `answer`, and
+`options`) must be English only. Source dialogue, memories, screenshots, or
+metadata may contain Chinese UI text; treat that as evidence only and do not copy
+Chinese text into the user-facing QA fields unless the Chinese text itself is the
+exact content being asked about.
+
+## Task
+Generate {question_count} natural questions about this persona whose answers are not available from the supplied dialogue and memory.
+
+## Question-Format Ratio Constraints
+- For `abstention`, target about 97.5% `open_ended` and about 2.5% `multiple_choice` (about 3-5 multiple-choice questions per 200 abstention questions).
+- The `multiple_choice` abstention questions MUST follow the format below in `## Multiple-Choice Abstention Format`.
+- Keep all other constraints unchanged. This section only clarifies the required proportion of `multiple_choice` versus `open_ended`.
+
+## Style Rules
+- Write natural memory-assistant questions that a real user might ask.
+- The user is the target persona. When the user is the actor, use first person such as `I`, `my`, `we`, or `our`.
+- Do not use `you`, `he`, `she`, or `they` to refer to the target persona.
+- Avoid evaluator wording or contrived unanswerable trivia.
+- Prefer questions that would require aggregation, comparison, temporal synthesis, or multi-clue reasoning if the evidence existed.
+- Internally divide the batch into two hidden length buckets for planning only. Do not output these bucket names or mention them anywhere in the JSON.
+- Enforce a hard short-to-long ratio of 1:3 within each batch.
+- If `{question_count}` is divisible by 4, exactly one quarter of the questions must be short and exactly three quarters must be long.
+- If `{question_count}` is not divisible by 4, keep the short count as close as possible to one quarter, and never let the difference exceed 1 question from the exact 1:3 target.
+- Short questions should stay around 8-24 English words.
+- Long questions must still be spoken and natural, not analytical, and stay around 14-36 English words.
+- Do not let most questions drift into the middle zone between the two target ranges. The short/long difference should be visible.
+- Short questions may contain at most one short anchor phrase.
+- Long questions may contain at most one situational anchor plus one brief follow-up clause. Do not let them become long narrative setup.
+- Do not make every question follow the same template length or rhythm.
+
+These questions must be reasonable, but the correct response should be an abstention answer such as `This information is not available in the memory.`
+- Forbidden long-form tendencies: do not first narrate several known events and then ask about a missing fact. Do not use evaluator-style framing such as `based on the current information`, `taken together`, `what this shows`, `from these events`, or similar wording.
+
+## Format Rules
+- Use `open_ended` for the vast majority of abstention questions.
+- A small portion (about 2.5%) may be `multiple_choice` IF AND ONLY IF following `## Multiple-Choice Abstention Format` below.
+- Do not generate `true_false`.
+- For `open_ended` abstention questions, `options` must be `[]`.
+- `evidence` must be `[]`.
+- `image_refs` must be `[]`.
+- `source_session_ids` and `source_event_ids` must be empty lists.
+
+## Multiple-Choice Abstention Format
+When generating a `multiple_choice` abstention question, you MUST:
+- provide EXACTLY 6 options labeled `A. ...`, `B. ...`, `C. ...`, `D. ...`, `E. ...`, `F. ...`
+- ensure that EXACTLY ONE option is the abstention statement: `This information is not available in the memory.`
+- you may put this abstention option at any letter position from A to F (do not always pick the same letter)
+- the other 5 options should look like plausible but specific incorrect concrete answers (a name, a number, a date, a location) related to the question topic
+- the `answer` field MUST be the full string of the abstention option, including the letter prefix, e.g., `D. This information is not available in the memory.`
+- `evidence`, `image_refs`, `source_session_ids`, `source_event_ids` must all be empty lists, same as for open-ended abstention questions
+
+## Hard Constraints
+- Do not include type labels or annotation prefixes in `question` or `answer`.
+- Do not ask about facts that are explicitly stated or strongly inferable from the supplied context.
+- Do not ask simple missing-field lookup questions when a better synthesized unanswerable question is possible.
+- If a time or event anchor is needed, use broad anchors such as a month, holiday period, trip, or city.
+- Do not use exact dates or exact timestamps in the question text.
+- The answer must be abstention, not a guess.
+- If `output_language` is `en`, generate English `question` and `answer`.
+
+## Output Format
+Return strict JSON only.
+
+```json
+{
+  "questions": [
+    {
+      "question": "Question text",
+      "answer": "This information is not available in the memory.",
+      "question_format": "open_ended",
+      "options": [],
+      "evidence": [],
+      "difficulty": "medium",
+      "image_refs": [],
+      "source_session_ids": [],
+      "source_event_ids": []
+    }
+  ]
+}
+```

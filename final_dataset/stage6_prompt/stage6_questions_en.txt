@@ -1,0 +1,131 @@
+You are a professional QA generation assistant for a memory evaluation dataset.
+
+## Persona Info
+{persona_info}
+
+## Full Sessions Context
+The following context contains the full dialogue, full non-interference memory points, timestamps, and image references for this persona.
+
+{sessions_info}
+
+## Update Memories
+These are the memory points marked with `is_update=true`.
+
+{update_memories}
+
+## Output Language
+{output_language}
+
+If `output_language` is `en`, all user-facing fields (`question`, `answer`, and
+`options`) must be English only. Source dialogue, memories, screenshots, or
+metadata may contain Chinese UI text; treat that as evidence only and do not copy
+Chinese text into the user-facing QA fields unless the Chinese text itself is the
+exact content being asked about.
+
+## Task
+Generate {question_count} questions of type `{question_type}`.
+
+## Question-Format Ratio Constraints
+- These are hard target ratios for each question type within the final dataset:
+  - `single_hop`: about 30% `multiple_choice`
+  - `multi_hop`: about 15% `multiple_choice`
+  - `knowledge_update`: about 30% `multiple_choice`
+  - `temporal_reasoning`: about 20% `multiple_choice`
+  - `implicit_preference`: about 10% `multiple_choice`
+- For the current `{question_type}` batch, choose `question_format` with this target ratio in mind rather than defaulting almost always to `open_ended`.
+- If the current question type has a nonzero target ratio for `multiple_choice`, actively generate some valid `multiple_choice` questions instead of avoiding them.
+- Keep all other constraints unchanged. This section only changes the target proportion of `multiple_choice` versus `open_ended`.
+
+## Global Style Rules
+- Write natural user-facing questions, not dataset labels or evaluator wording.
+- The target persona is the user. If the user is the actor in the question, use first person such as `I`, `my`, `we`, or `our`.
+- Do not refer to the target persona as `you`, `he`, `she`, or `they`.
+- Keep stems short, direct, and grounded in realistic memory-assistant use cases.
+- Internally divide the batch into two hidden length buckets for planning only. Do not output these bucket names or mention them anywhere in the JSON.
+- Enforce a hard short-to-long ratio of 1:3 within each batch.
+- If `{question_count}` is divisible by 4, exactly one quarter of the questions must be short and exactly three quarters must be long.
+- If `{question_count}` is not divisible by 4, keep the short count as close as possible to one quarter, and never let the difference exceed 1 question from the exact 1:3 target.
+- Short questions should sound like everyday chat and stay around 8-24 English words.
+- Long questions must still stay spoken and natural, not analytical, and stay around 14-38 English words.
+- Do not let most questions drift into the middle zone between the two target ranges. The short/long difference should be visible.
+- Short questions may contain at most one short anchor phrase.
+- Long questions may contain at most one situational anchor plus one brief follow-up clause. Do not let them turn into long narrative setup.
+- Do not make every question follow the same template length or rhythm.
+- If a situational anchor is needed, include a broad one such as a month, holiday period, trip, city, or event name.
+- Do not use exact dates or exact timestamps in the question text.
+- Do not leak the answer in the stem.
+- Every answer must be grounded in the supplied context and supported by `evidence`.
+- Forbidden long-form tendencies: do not first retell multiple events and then ask the real question; do not use summary framing such as `what this shows`, `taken together`, `from these events`, `reflects`, or similar evaluator-style wording.
+
+## Question-Type Rules
+
+### single_hop
+- Center the question on one event or one situation, but require at least light reasoning, comparison, paraphrase normalization, or aggregation of nearby details.
+- Do not write a pure one-fact lookup question.
+
+### multi_hop
+- Require combining 2-3 clues across dialogue and/or memory.
+- Include some relationship and social-circle questions.
+- Prefer asking which person fits a combined role/event description, how two people are connected, or which person is implied by multiple clues.
+- Ask the question directly. Do not narrate the reasoning path in the stem.
+
+### knowledge_update
+- Ask about the latest or current state after a change.
+- Prefer facts supported by `is_update=true` memory points.
+
+### temporal_reasoning
+- Ask about elapsed time, interval, duration, before/after, or timeline comparison.
+- Prefer interval and duration questions over simple earliest/latest ranking.
+- Do not include enough exact dates or timestamps in the question to make the answer mechanically solvable from the stem alone.
+
+### implicit_preference
+- Infer a likely choice or preference from at least two clues from profile, dialogue, plans, routines, spending, or prior decisions.
+- Frame the question as a natural advice-seeking request from the user to the assistant.
+- Example style: `I’m dealing with [specific situation]. What would you recommend I do?`
+- Do not ask detached evaluator-style questions such as `What would he choose?`
+- In the question text, `you` may refer only to the assistant giving advice, never to the target persona.
+
+## Question Format
+- Only use `open_ended` or `multiple_choice`.
+- Do not generate `true_false`.
+- If `question_format` is `multiple_choice`, provide exactly six options labeled `A. ...` through `F. ...`.
+- For `multiple_choice`, `answer` must exactly match one full option string.
+- For `open_ended`, keep the answer concise and do not include reasoning steps.
+
+## Hard Constraints
+- Do not include any type label, annotation prefix, or metadata wording in `question`, `answer`, or `options`.
+- Do not generate questions answerable by copying one sentence from one memory point or one dialogue turn.
+- Every question must require at least one of: combining multiple facts, aggregating details, temporal reasoning, latest-state reasoning, or multi-clue preference inference.
+- Prefer comparison, attribution, integration, or constraint/tradeoff reasoning.
+- Use the supplied dialogue and memory as the source of truth. Do not invent facts.
+- If a question depends on a date, holiday, location, trip, or event anchor from the context, include that anchor in a broad form in the question.
+- Use broad time expressions like `early this year`, `around the Spring Festival period`, `in the first half of the year`, or `during that weekend`, not exact dates.
+- The stem must not directly state the correct conclusion, restate the correct option, or reveal uniquely identifying answer-bearing details.
+- For `multiple_choice`, keep the stem especially lean and neutral.
+- For `multiple_choice`, all six options must be balanced in length, detail, plausibility, and abstraction level.
+- The correct option must not be obviously the longest, shortest, most polished, or only concrete option.
+- Distractors must be near-neighbor alternatives in the same decision space.
+
+## Output Format
+Return strict JSON only.
+
+```json
+{
+  "questions": [
+    {
+      "question": "Question text",
+      "answer": "Answer text",
+      "question_format": "open_ended",
+      "options": [],
+      "evidence": [
+        "supporting snippet 1",
+        "supporting snippet 2"
+      ],
+      "difficulty": "medium",
+      "image_refs": [],
+      "source_session_ids": [],
+      "source_event_ids": []
+    }
+  ]
+}
+```

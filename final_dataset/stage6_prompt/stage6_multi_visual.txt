@@ -1,0 +1,457 @@
+﻿You are a professional QA generation assistant for `visual_reasoning` questions.
+
+## Persona Info
+{persona_info}
+
+## Event Info
+{event_info}
+
+## Selected Images
+{selected_images}
+
+## Selected Image Metadata
+{selected_image_metadata}
+
+## Selected Image Captions
+{selected_image_captions}
+
+## Full Dialogue
+{dialogue}
+
+## Visual Evidence Turns
+{visual_evidence}
+
+## Full Non-Interference Memory Points
+{memory_points}
+
+## Output Language
+{output_language}
+
+## Task Mode
+{task_mode}
+
+## Task
+Generate {question_count} `visual_reasoning` questions.
+
+All questions must be grounded in the selected images and their image-generation metadata. The image-generation metadata is an internal source for you to understand what is actually shown in the image. Use it to design strong visual-detail questions, but do not leak answer-bearing details into the question stem.
+
+## Caption-Insufficiency Requirement
+Treat ordinary image captions or screenshot summaries as a weak baseline description only.
+
+Your goal is to generate questions whose answers are:
+- NOT safely recoverable from a generic caption or coarse screenshot summary alone
+- still grounded in the image context
+- and REQUIRE the image-generation metadata to answer reliably
+
+In other words, prefer questions where a broad caption like "this is a reading app page showing a book detail screen" would be insufficient, but the richer generation metadata would still support a unique answer.
+
+Reject any draft question if a generic caption could already answer it directly, especially questions about:
+- the obvious visible title alone
+- the obvious main object alone
+- the obvious page type alone
+- the obvious person count alone
+- the obvious large text or headline alone
+- the obvious amount or record name when it is likely to appear explicitly in a caption
+
+Prefer questions whose answer depends on metadata-level distinctions such as:
+- which known person is appearing rather than just "someone is present"
+- which known participants are together rather than just "a group scene"
+- which specific event / record / month / route / transfer / order this image corresponds to
+- which same-type image has the highest value among several candidates
+- which contextual interpretation is supported by the structured generation metadata, not just by a generic screenshot description
+
+## Question-Format Ratio Constraints
+- For `visual_reasoning`, target about 2.5% `multiple_choice` (about 3-5 multiple-choice questions per 200 visual_reasoning questions) and about 97.5% `open_ended` in the final dataset.
+- For the current batch, do not default entirely to `open_ended`; actively generate a small but real portion of valid `multiple_choice` questions.
+- Hard requirement: across the full 200-question pool of `visual_reasoning`, you MUST produce AT LEAST 3 valid `multiple_choice` questions. Do not skip `multiple_choice` entirely. A valid `multiple_choice` question must have EXACTLY 6 options labeled `A. ...` through `F. ...`, and the `answer` MUST be the full string of one option, letter prefix included.
+- For multiple_choice questions, ALL 6 options MUST be in the SAME answer space (consistent answer category):
+  - For "who is X" / "和我一起的是谁" questions, ALL 6 options must be valid person full names. Do NOT use filler options like `我`, `我自己`, `不好判断`, `无法判断`, `不确定`, `myself`, `unknown`, `cannot tell`, `n/a`, or `all of the above`.
+  - For "where" / "在哪里" / "什么地方" questions, ALL 6 options must be valid locations.
+  - For "what" / "什么物品" / "哪类东西" questions, ALL 6 options must be valid concrete objects of the same kind.
+  - For numeric / time questions, ALL 6 options must be values of the same kind (all dates, all amounts, all counts, etc.).
+- Keep all other constraints unchanged. This section only changes the target proportion of `multiple_choice` versus `open_ended`.
+
+## Style Rules
+- Internally divide the batch into two hidden length buckets for planning only. Do not output these bucket names or mention them anywhere in the JSON.
+- Enforce a hard short-to-long ratio of 1:3 within each batch.
+- If `{question_count}` is divisible by 4, exactly one quarter of the questions must be short and exactly three quarters must be long.
+- If `{question_count}` is not divisible by 4, keep the short count as close as possible to one quarter, and never let the difference exceed 1 question from the exact 1:3 target.
+- Short questions should feel like daily chat with a memory assistant and stay around 18-38 Chinese characters.
+- Long questions must still sound spoken and natural, not analytical, and stay around 45-85 Chinese characters.
+- Do not let most questions drift into the middle zone between the two target ranges. The short/long difference should be visible.
+- Short questions may contain at most one short anchor phrase.
+- Long questions may contain at most one situational anchor plus one brief follow-up clause. Do not let them turn into image-story narration.
+- Do not make every question use the same sentence length or the same wording rhythm.
+
+## Core Goal
+The goal is to generate user-meaningful visual QA that requires inspecting image content, not guessing from image labels, filenames, scene tags, or broad semantic categories.
+
+The user should need to look at the image content itself, or compare multiple images carefully, to answer.
+
+The preferred style is not microscopic visual puzzle-solving. The preferred style is the kind of question a real user would naturally ask a memory assistant when trying to understand:
+- who appeared in an image
+- who participated in an event
+- what kind of thing was bought / transferred / watched / read
+- roughly how much was spent in a given month
+- which month had the largest expense among several image-backed records
+- which books were being read in a given month
+- which people were together in a certain scene
+- what event or activity was happening in an image
+
+## Mandatory Type Rules
+- The output `question_type` must conceptually be `visual_reasoning`.
+- Do not output the label itself in the natural-language question.
+- Prefer `open_ended` or `multiple_choice`.
+- Do not generate `true_false`.
+
+## High-Level Composition
+- Around 90% should be visual-detail questions.
+- Around 10% should be statistical questions.
+- If `task_mode` is `statistical`, generate only statistical questions.
+- If `task_mode` is `detail`, generate only non-statistical visual-detail questions.
+
+## What Counts As Valid Visual Reasoning
+Valid targets must be details that are useful to a real user, are not fully answerable from a generic caption alone, and still benefit from the image context plus metadata.
+
+Preferred valid targets include:
+- who the visible person is
+- which known people are appearing together
+- what activity or event is visibly happening
+- what month a visible record belongs to
+- how much money a visible payment / order / ticket / transfer shows
+- which month has the largest visible expense among several images
+- which books are visible in reading screenshots for a given month
+- which video / song / ticket / order / transfer record matches a certain month or scenario
+- what the visible title / object / person / amount is in a screenshot or scene
+
+Still allowed, but not preferred as the main body:
+- visible counts
+- visible numeric comparison
+- visible list-item counting
+
+Only use low-level visual-detail questions when they support a user-meaningful information need. For example:
+- acceptable: `春节前后那张转账页面里，收款人是谁，这笔金额是多少？`
+- acceptable: `上半年这些车票页面里，哪个月对应的票价最高？`
+- acceptable: `今年年初那些读书页面里，我当时在看哪些书？`
+- acceptable: `那张聚会场景图里，和我一起出现的是谁，我们当时在做什么？`
+- not preferred: `左上角哪一块更密集？`
+- not preferred: `更靠左还是更靠右？`
+- not preferred: `顶部哪条线更明显？`
+
+## What Is Forbidden
+Do not generate questions about:
+- atmosphere
+- mood
+- personality
+- preference interpretation
+- life meaning
+- what the image suggests abstractly
+- which image is more suitable for recall / cover / review / reflection
+- which image better represents a state, feeling, decision style, or relationship
+
+Do not generate questions answerable from:
+- image type labels alone
+- event names alone
+- filenames
+- path segments
+- broad category words alone
+- a generic image caption or coarse screenshot summary alone
+
+Do not generate overly microscopic or puzzle-like questions that a normal user would rarely ask, especially:
+- left vs right fine-grained position puzzles
+- top vs bottom tiny-layout puzzles
+- subtle color-block comparison with little user value
+- questions whose only point is local geometric orientation
+- questions about a tiny UI element location with no memory value
+
+Strongly avoid stems like:
+- 更靠左还是更靠右
+- 更靠近上方还是下方
+- 哪一侧的线条更明显
+- 某个小图标位于哪个角落
+- 某个结构离画面边缘更近
+
+unless the location itself is directly tied to a user-meaningful question and the user would plausibly care about it.
+
+## Question Stem Requirements
+The stem must not leak the answer.
+
+When the protagonist is the actor, experiencer, observer, or owner of the scene, the stem must use first person:
+- use `我`
+- use `我们` when it refers to the protagonist plus companions
+
+Do not use second person to refer to the protagonist:
+- forbidden: `你`, `你的`, `你们`
+
+Forbidden examples:
+- 那次你陪父母去超市...
+- 春节前后那段时间里你有一张...
+- 那次周末出门前后，你回看...
+- 上半年有一次你们在家里...
+- 画面中靠近你所在一侧...
+
+Required rewrites:
+- 那次我陪父母去超市...
+- 春节前后那段时间里我有一张...
+- 那次周末出门前后，我回看...
+- 上半年有一次我们在家里...
+- 画面中靠近我所在一侧...
+
+Self-check before output:
+- if the question stem contains `你 / 你的 / 你们` and these words refer to the protagonist side, rewrite the question before returning it
+- do not output any such draft
+
+Every question stem must:
+1. use a fuzzy time range
+2. add one small piece of background information that is unrelated to the answer
+3. use a weak locator phrase that helps retrieve the image but does not reveal the answer
+
+Every question stem must focus on a user-meaningful information need, not just a raw visual micro-detail.
+
+Preferred question families:
+- `图中这个人是谁？`
+- `那个月我花了多少钱？`
+- `那个月我看了哪些书？`
+- `这几个月里哪个月开支最大？`
+- `图里是谁和谁一起参与了什么事情？`
+- `这张页面里显示的是哪一笔消费 / 哪一次出行 / 哪次转账？`
+
+The answer must not be recoverable from a generic caption alone. Do not ask anything whose answer is already fully stated in the stem, event name, memory summary, or likely broad screenshot summary.
+
+The stem must not use:
+- 图1 / 图2 / 第一张 / 第二张
+- Image 1 / Image 2
+- raw file paths
+- raw image ids
+- exact dates
+- exact timestamps
+
+Use fuzzy time anchors like:
+- 今年年初那次
+- 春节前后那段时间
+- 去年夏天某个晚上
+- 那次周末出门前后
+- 那段时间里顺手留的一张
+- 上半年有一次我在家里处理别的事时
+
+The unrelated background detail should be harmless and not answer-bearing, for example:
+- 当时我还在处理别的安排
+- 那会儿并不是专门为了记录这个细节才留图
+- 那次我只是顺手截了一下
+- 当时我还在想着别的事情
+
+Weak locator phrases should identify the image without revealing the answer, for example:
+- 那张出行相关的页面
+- 那张购物过程里留下的页面
+- 那张视频播放界面
+- 那张聊天界面停在中间位置的截图
+- 那张在桌边拍下来的场景图
+- 那张读书页面
+
+The stem must stay short and neutral. Do not narrate the reasoning path.
+- Forbidden long-form tendencies: do not first describe the whole image scene, then the user's mental state, then ask the question. Do not use evaluator-style framing such as `这说明`, `反映出`, `综合来看`, `把这些画面放在一起`, or similar wording.
+
+## Same-Type Constraint For Comparison Questions
+This is a hard rule.
+
+If the question compares two images on a dimension like:
+- 哪个更多
+- 哪个更明显
+- 哪个更密集
+- 哪个更高
+- 哪个更大
+- 哪个更靠右
+
+then those compared images must be of the same image type.
+
+Allowed:
+- ticket vs ticket
+- shopping page vs shopping page
+- transfer page vs transfer page
+- video page vs video page
+- reading page vs reading page
+- friend-post screenshot vs friend-post screenshot
+- group-chat screenshot vs group-chat screenshot
+
+Forbidden:
+- ticket vs portrait
+- shopping page vs event scene
+- video page vs avatar
+- portrait vs UI page
+- event scene vs order page
+
+If the provided images are not suitable for same-type comparison, do not force a comparison question. Generate a single-image detail question instead, or compare only images of the same type from the selected set.
+
+Comparisons should prefer user-meaningful targets such as:
+- which month had the highest visible spending
+- which visible order / ticket / transfer amount is largest
+- which visible reading record belongs to a certain month
+- which screenshot shows which book / song / route / recipient
+
+Do not make left/right or tiny-layout comparison the default comparison family.
+
+## Statistical Question Rules
+Statistical questions must be based on a same-type image set.
+
+Allowed statistical forms:
+- among these travel-related screenshots, which month shows the highest visible fare or total travel spending
+- among these shopping pages, which month has the highest visible spending
+- among these transfer pages, which month has the largest visible outgoing payment
+- among these reading pages, which books were being read in a given month
+- among these ticket / order / transfer / reading screenshots, which visible record is the largest / latest / highest
+
+Preferred statistical questions are month-oriented, record-oriented, and user-useful:
+- 几月份花了多少钱
+- 几月份哪个开支最大
+- 几月份看了哪些书
+- 哪个月的票价最高
+- 哪个月给家人的转账最多
+- 哪个月的购物支出最大
+
+Do not leak the result in the stem.
+
+For statistical answers:
+- provide the final result directly
+- if the question asks “which one”, include the corresponding object and visible value
+- if the question asks “how many”, include the count
+
+Do not generate statistical questions that are only about micro-layout or low-level screen density.
+
+## Answer Detail Grounding Constraint
+The `answer` field MUST be strictly grounded in the provided image metadata
+(such as `scene_prompt`, `participants`, `messages`, `title`, `author`,
+`progress`, `price`, `order_status`, `lyric_line`, `recipient_name`,
+`amount`, etc.). Do NOT introduce any answer-bearing detail that does not
+literally appear in any field of the bound image metadata.
+
+Forbidden answer detail sources (only when these details are NOT literally
+present in the image metadata):
+- colors (e.g., "深色", "琥珀色", "浅蓝色")
+- shapes / fine-grained object types (e.g., "圆形喷泉", "彩色铅笔")
+- brand or platform names (e.g., "拼多多", "1688", "苏泊尔")
+- specific quantities, prices, dates that the metadata does not state
+- weather details (e.g., "下雪", "傍晚黄昏") not in `scene_prompt`
+- any object, person, action, or attribute that the metadata does not
+  literally mention
+
+If the natural answer requires such a detail, drop that detail from the
+answer or change the question to focus on something the metadata can
+support. Do NOT pull answer-bearing facts from `dialogue` or `memory`
+that are absent from the bound image metadata.
+
+Self-check before output:
+- read your draft `answer`
+- verify every concrete noun, color, brand, number, place, action token
+  literally appears somewhere in the bound image metadata
+- if any token does not, rewrite the question or the answer until it does
+
+
+## Image-Type Consistency Constraint
+The visual type mentioned in the question stem MUST match at least one image
+in `bound_image_refs`. The question stem MUST NOT reference any visual type
+that is not present in the Selected Images.
+
+Concrete mapping (Chinese / English):
+- "视频" / "视频页" / "视频页面" / "视频截图" / "弹幕" / "播放量" / "UP主" / "video" → at least one bound image must be of type `video`
+- "购物页" / "订单页" / "商品页" / "店铺页" / "shopping page" → at least one bound image must be of type `shopping`
+- "读书页" / "阅读页" / "阅读页面" / "书页" / "reading page" → at least one bound image must be of type `book`
+- "音乐页" / "这首歌" / "歌曲页" / "歌名" / "歌词" / "music page" → at least one bound image must be of type `music`
+- "群聊" / "聊天截图" / "群聊截图" / "群消息" / "group chat" → at least one bound image must be of type `group_chat` or `group_chat_member`
+- "朋友圈" / "动态" / "post" → at least one bound image must be of type `friend`
+- "头像" / "avatar" → at least one bound image must be of type `group_chat_member`
+- "车票" / "高铁票" / "登机牌" / "train ticket" → at least one bound image must be of type `ticket`
+- "转账" / "收款" / "付款" / "transfer" → at least one bound image must be of type `money`
+- "现场" / "场景" / "画面里" / "scene" → typically `event_scene`
+
+If `Selected Images` does not contain a matching image type for the visual
+concept you want to ask about, do NOT ask about that visual type. Reframe the
+question to use only the image types actually present in `Selected Images`.
+
+Self-check before output:
+- find every visual-type word in your stem
+- verify each such word maps to at least one image type in `bound_image_refs`
+- if not, rewrite the stem (or change the bound image set) before returning
+
+
+## event_scene Interpretation Rules
+When image metadata contains `event_scene`:
+- the protagonist is assumed to participate by default
+- `participants` refers only to known other participants besides the protagonist
+- if `participants` is empty, it may be treated as “only the protagonist” by default
+- but do not equate `participants` length with the visible people count in the image
+- if the question asks about visible people count or which image has more people, rely on scene_prompt or other visible-scene description, not directly on `participants` length
+
+## Allowed Single-Image Questions for event_scene
+For event_scene images you may also generate single-image questions targeting:
+- 图中和我一起的是谁 / 图里出现的是谁
+- 图中我们当时在做什么 / 这是哪一次活动 / 哪一次出行
+- 图中出现的物品 / 场景中明显的环境特征
+
+For these single-image questions:
+- bound_image_refs must contain exactly 1 image, and that image must be of type `event_scene`
+- the answer must come strictly from `participants` and `scene_prompt` in the image-generation metadata
+- if `participants` is empty, the answer for "图中和我一起的是谁" should be "只有我自己" / "only the protagonist"
+- never invent names that are not present in `participants`
+- the question stem must still use first person (`我` / `我们`), not second person
+- if you cannot find enough metadata signal in `scene_prompt` to make the answer unique, do not generate the question
+
+## Evidence Rules
+`evidence` must contain answer sources only.
+
+Each question must also include an internal field `bound_image_refs` in the JSON output.
+- `bound_image_refs` must be an array of exact image_ref strings copied from the provided Selected Images.
+- This field is for pipeline binding only; do not mention it in the natural-language question or answer.
+- `bound_image_refs` must be the MINIMAL image set truly needed for this specific question.
+- For a single-image detail question, `bound_image_refs` must contain exactly 1 image.
+- For a same-type comparison question, `bound_image_refs` should usually contain exactly 2 images, and only include more if the question truly compares more than 2.
+- For a statistical question, `bound_image_refs` must include only the images actually needed to derive the answer, not the whole selected set by default.
+- Do not lazily attach every selected image to every question.
+
+Each evidence item must:
+- be concise
+- be grounded in image-generation metadata, image-related memory points, or directly relevant context
+- include `memory_id=...`
+
+For question design, treat image-generation metadata as necessary evidence rather than optional decoration.
+Prefer questions whose final answer would be underdetermined if the solver only had a generic caption without the richer metadata.
+
+Do not write:
+- prompt rules
+- generation rules
+- policy reminders
+- meta commentary about how the question was created
+
+## Quality Bar
+Reject any draft question if:
+- the stem can be answered from the wording alone
+- the stem directly contains the answer-bearing value
+- the stem uses broad image labels in a way that makes the answer obvious
+- the question is mainly semantic classification instead of visual inspection
+- the comparison is across different image types
+- the question is a low-value micro-detail puzzle rather than a user-meaningful information request
+- the question mainly asks left/right, top/bottom, tiny icon location, or subtle layout position without real memory value
+
+## Output Format
+Return strict JSON only.
+
+```json
+{
+  "questions": [
+    {
+      "question": "自然语言问题",
+      "answer": "简洁答案",
+      "question_format": "open_ended",
+      "options": [],
+      "bound_image_refs": ["image/..."],
+      "evidence": [
+        "memory_id=example_id | content=答案依据"
+      ],
+      "difficulty": "hard",
+      "image_refs": ["selected_image_1", "selected_image_2"],
+      "source_session_ids": ["{session_id}"],
+      "source_event_ids": ["{event_id}"]
+    }
+  ]
+}
+```
+

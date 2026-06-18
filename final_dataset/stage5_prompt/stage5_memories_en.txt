@@ -1,0 +1,97 @@
+You are a professional memory data generation assistant. Generate event-level memory points first, before any dialogue is written.
+
+## Persona Information
+{persona_info}
+
+## Event Information
+{event_info}
+
+## Existing System Memories
+{system_memories}
+
+## Available Images
+{available_images}
+
+## Task Goal
+Your job in this step is to generate memory points only.
+
+These memory points will be used later to generate a dialogue, so they must be:
+
+1. Strongly anchored to time
+- All memory points should align with the event time range
+- Primary memories should reflect core facts during the event
+- Secondary memories should reflect emotions, preferences, attitudes, or plans formed through the event
+- Interference memories should have similar timestamps but contain plausible false details
+- Interference memories should stay very close in time to the corresponding true memory, preferably within the same day, same time window, same holiday period, or same week rather than drifting far away
+
+2. Strongly grounded in the event
+- Use the event itself, its participants, outcomes, and image evidence
+- Do not repeat system memories
+- Avoid vague memories such as “had a good day”
+
+3. Useful for later dialogue generation
+- The memories should be natural candidates to be mentioned in dialogue
+- But write them as concise memory statements, not as dialogue utterances
+
+## Memory Requirements
+
+### 1. Primary memories (2-4 items)
+- `memory_source`: `"primary"`
+- `memory_type`: `"Event Memory"`
+- Core facts that truly happened in the event
+- `importance`: 0.6-0.9
+- `timestamp`: near event start or key occurrence time
+
+### 2. Secondary memories (2-3 items)
+- `memory_source`: `"secondary"`
+- `memory_type`: `"Dialogue Memory"` or `"Preference Memory"`
+- Emotions, preferences, attitudes, habits, or plans formed through this event
+- `importance`: 0.4-0.7
+- `timestamp`: near the later part or the end of the event
+
+### 3. Interference memories (1-3 items)
+- `memory_source`: `"interference"`
+- `memory_type`: `"Event Memory"`
+- Plausible but false variations of the event
+- The error should be subtle, not obviously fake
+- `importance`: 0.3-0.6
+- `timestamp`: close to the corresponding true memory
+- Interference memories must stay topically close to the true memory: prefer the same scene, same people cluster, same plan type, same purchase type, same trip, or the same conversation thread
+- Prefer subtle interference built from one of these error types:
+  - object confusion: a closely related person, gift recipient, discussion target, travel target, or spending target is slightly mixed up
+  - order confusion: the sequence of steps, preparation order, or conversation order is slightly reversed or shifted
+  - year confusion: “this year / last year / last time / previous time” is lightly mixed up while the theme stays highly similar
+- The interference should be retrieval-confusing: it should feel like an easy-to-misremember nearby version of the same theme, not an unrelated new event
+- Do not create absurd errors or a parallel event that is too far from the true memory
+- Avoid large location jumps, wholesale participant replacement, or a total change in event nature unless the source truly makes that confusion plausible
+- Prefer interference of the form “same time neighborhood + same theme + one key fact slightly wrong”
+
+## Output Requirements
+- `memory_id` format: `{uuid}_{event_id}_{source_prefix}_{index}`
+- `source_prefix`: `pri` / `sec` / `int`
+- `timestamp` format: `2025-01-01 10:00:00`
+- `is_update`: true only if this explicitly updates a previous memory
+- `original_memories`: list updated memory_ids if applicable, otherwise `[]`
+
+## Output Format
+Return strict JSON:
+
+```json
+{
+  "memory_points": [
+    {
+      "memory_id": "...",
+      "memory_source": "primary",
+      "memory_type": "Event Memory",
+      "memory_content": "...",
+      "timestamp": "2025-01-01 10:00:00",
+      "importance": 0.8,
+      "is_update": false,
+      "original_memories": [],
+      "image_refs": []
+    }
+  ]
+}
+```
+
+Only output `memory_points`.
