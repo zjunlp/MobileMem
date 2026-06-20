@@ -27,6 +27,10 @@
       box-sizing: border-box;
     }
 
+    [hidden] {
+      display: none !important;
+    }
+
     html {
       scroll-behavior: smooth;
     }
@@ -1002,10 +1006,10 @@
     .github-cta {
       position: relative;
       display: grid;
-      grid-template-rows: auto 1fr auto;
-      gap: 10px;
-      min-height: 162px;
-      padding: 16px;
+      align-content: center;
+      gap: 14px;
+      min-height: 176px;
+      padding: 20px;
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
       background:
@@ -1017,12 +1021,12 @@
     .github-card-head {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
     .github-card-icon {
-      width: 38px;
-      height: 38px;
+      width: 42px;
+      height: 42px;
       display: grid;
       place-items: center;
       border-radius: 50%;
@@ -1033,7 +1037,7 @@
     .github-repo-name {
       display: block;
       color: var(--white);
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 900;
       line-height: 1.1;
     }
@@ -1047,28 +1051,29 @@
     }
 
     .github-button {
-      width: max-content;
+      width: 100%;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 10px;
     }
 
     .github-links {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 2px;
+      width: min(250px, 100%);
+      margin-top: 0;
     }
 
     .github-cta .quote.small {
-      align-self: center;
       margin-bottom: 0;
       color: rgba(255, 255, 255, 0.78);
+      font-size: 15px;
+      line-height: 1.45;
       font-weight: 650;
     }
 
     .github-cta .btn {
-      min-height: 42px;
+      min-height: 46px;
       border-color: rgba(255, 255, 255, 0.2);
       background: rgba(255, 255, 255, 0.09);
       color: var(--white);
@@ -1081,8 +1086,8 @@
     }
 
     .github-icon {
-      width: 19px;
-      height: 19px;
+      width: 18px;
+      height: 18px;
       flex: 0 0 auto;
     }
 
@@ -1337,7 +1342,7 @@
           <p class="quote small" data-lang="zh">MobileMem 作为用户的个人记忆智能体，能够自动理解用户意图，执行跨时间的人脸识别以关联多年间女儿的身份，从海量照片档案中定位 2016 年的生日场景，并返回一家三口围坐在生日蛋糕旁的照片。</p>
           <p class="quote small" data-lang="en">MobileMem acts as the user's personal memory agent, automatically understanding user intent, performing cross-time facial recognition to associate the daughter's identity across years, locating the 2016 birthday scene from a vast photo archive, and returning the photo of the family of three gathered around the birthday cake.</p>
           <div class="actions" aria-label="Project links">
-            <a class="btn" href="#dataset-construction">
+            <a class="btn" href="#features">
               <span data-lang="zh">查看详细</span>
               <span data-lang="en">Details</span>
             </a>
@@ -1410,7 +1415,7 @@
       </div>
     </section>
 
-    <section class="section dataset" id="dataset-construction" aria-labelledby="dataset-title">
+    <section class="section dataset" id="dataset-construction" aria-labelledby="dataset-title" hidden>
       <div class="wrap">
         <div class="center-head">
           <p class="eyebrow">Dataset Construction</p>
@@ -1589,7 +1594,7 @@
               </div>
               <div>
                 <span class="github-repo-name">zjunlp/MobileMem</span>
-                <span class="github-repo-path">README and code repository</span>
+                <span class="github-repo-path">Code repository</span>
               </div>
             </div>
             <p class="quote small" data-lang="zh">Detailed download and usage instructions are maintained in the project repository.</p>
@@ -1601,7 +1606,6 @@
                 </svg>
                 <span>Go to GitHub</span>
               </a>
-              <a class="btn" href="https://github.com/zjunlp/MobileMem/blob/main/MoblieMem-Omni/README.md">README</a>
             </div>
           </div>
         </div>
@@ -1757,25 +1761,19 @@
 
     startTerminalDemo();
 
-    const featureDetails = document.querySelectorAll(".feature-accordion details");
-
-    let syncingFeatureDetails = false;
+    const featureDetails = Array.from(document.querySelectorAll(".feature-accordion details"));
 
     featureDetails.forEach((details) => {
-      details.addEventListener("toggle", () => {
-        if (syncingFeatureDetails) return;
+      const summary = details.querySelector("summary");
+      if (!summary) return;
 
-        if (!details.open) {
-          const anyOpen = Array.from(featureDetails).some((item) => item.open);
-          if (!anyOpen) details.open = true;
-          return;
-        }
+      summary.addEventListener("click", (event) => {
+        event.preventDefault();
+        if (details.open) return;
 
-        syncingFeatureDetails = true;
         featureDetails.forEach((item) => {
-          if (item !== details) item.open = false;
+          item.open = item === details;
         });
-        syncingFeatureDetails = false;
       });
     });
 
