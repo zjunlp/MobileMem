@@ -976,6 +976,20 @@
       line-height: 1.5;
     }
 
+    .terminal-content {
+      display: grid;
+      grid-template-columns: 172px minmax(0, 1fr);
+      min-height: 152px;
+    }
+
+    .terminal-content .quick-options {
+      align-content: start;
+      padding: 10px 8px;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015));
+    }
+
     .terminal-line {
       margin: 0;
       white-space: pre-wrap;
@@ -1062,6 +1076,87 @@
       display: flex;
       width: min(250px, 100%);
       margin-top: 0;
+    }
+
+    .quick-options {
+      display: grid;
+      gap: 6px;
+    }
+
+    .quick-option {
+      position: relative;
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      padding: 0 10px 0 14px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 850;
+      line-height: 1;
+      text-align: left;
+      white-space: nowrap;
+      transition:
+        background 180ms ease,
+        color 180ms ease;
+    }
+
+    .quick-option::before {
+      content: attr(data-step);
+      width: 24px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.64);
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .quick-option::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 3px;
+      border-radius: 999px;
+      background: transparent;
+    }
+
+    .quick-option:hover {
+      background: rgba(255, 255, 255, 0.075);
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .quick-option:focus {
+      outline: none;
+    }
+
+    .quick-option:focus-visible {
+      box-shadow: inset 0 0 0 1px rgba(124, 227, 160, 0.58);
+    }
+
+    .quick-option[aria-pressed="true"] {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--white);
+    }
+
+    .quick-option[aria-pressed="true"]::before {
+      background: #7ce3a0;
+      color: #0b2417;
+    }
+
+    .quick-option[aria-pressed="true"]::after {
+      background: #7ce3a0;
     }
 
     .github-cta .quote.small {
@@ -1273,6 +1368,15 @@
         padding-top: 14px;
       }
 
+      .terminal-content {
+        grid-template-columns: 1fr;
+      }
+
+      .terminal-content .quick-options {
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
       h1 {
         margin-bottom: 14px;
         font-size: 38px;
@@ -1368,7 +1472,6 @@
             <span data-lang="en">MobileMem Features</span>
           </h2>
           <p class="quote small" data-lang="zh">MobileMem 打破应用之间的数据孤岛，将聊天、社交媒体、照片、阅读、购物和日历中的数据统一到单一的“记忆层”中，使手机能够像人一样“记住”你的关系、兴趣和上下文，并在不同场景中主动提供智能服务。</p>
-          <p class="quote small" data-lang="en">MobileMem breaks down data silos between apps, unifying data from chat, social media, photos, reading, shopping, and calendar into a single "memory layer," enabling the phone to "remember" your relationships, interests, and context like a human, and proactively deliver intelligent services across scenarios.</p>
         </div>
         <div class="feature-layout">
           <figure class="framework-figure">
@@ -1583,7 +1686,14 @@
               </span>
               <span>mobilemem-quick-start</span>
             </div>
-            <div class="terminal-body" data-terminal-output aria-live="polite"></div>
+            <div class="terminal-content">
+              <div class="quick-options" aria-label="Quick start command sets">
+                <button class="quick-option" type="button" data-terminal-set="setup" data-step="01" aria-pressed="true">Environment</button>
+                <button class="quick-option" type="button" data-terminal-set="download" data-step="02" aria-pressed="false">Dataset</button>
+                <button class="quick-option" type="button" data-terminal-set="pipeline" data-step="03" aria-pressed="false">Pipeline</button>
+              </div>
+              <div class="terminal-body" data-terminal-output aria-live="polite"></div>
+            </div>
           </div>
           <div class="github-cta">
             <div class="github-card-head">
@@ -1593,8 +1703,8 @@
                 </svg>
               </div>
               <div>
-                <span class="github-repo-name">zjunlp/MobileMem</span>
-                <span class="github-repo-path">Code repository</span>
+                <span class="github-repo-name">Download and Usage</span>
+                <span class="github-repo-path">Choose a quick command set</span>
               </div>
             </div>
             <p class="quote small" data-lang="zh">Detailed download and usage instructions are maintained in the project repository.</p>
@@ -1680,30 +1790,65 @@
     }
 
     const terminalOutput = document.querySelector("[data-terminal-output]");
-    const terminalLines = [
-      { text: "conda create -n mobilemem python=3.11", prompt: true },
-      { text: "conda activate mobilemem", prompt: true },
-      { text: "git clone https://github.com/zjunlp/MobileMem", prompt: true },
-      { text: "pip install -r requirements.txt", prompt: true },
-      { text: "huggingface-cli download --repo-type dataset --resume-download zjunlp/xxx --local-dir OceanBenchmark", prompt: true },
-      { text: "dst = load_dataset(\"zjunlp/xxx\")", prompt: false },
-      { text: "cd MoblieMem-Omni/src", prompt: true },
-      { text: "cp .env.example .env    # fill in your API keys", prompt: true },
-      { text: "python -m pipeline.cli list", prompt: true },
-      { text: "python -m pipeline.cli run", prompt: true },
-      { text: "[done] build multimodal mobile memories", prompt: false }
-    ];
+    const terminalButtons = Array.from(document.querySelectorAll("[data-terminal-set]"));
+    const terminalSets = {
+      setup: [
+        { text: "conda create -n mobilemem python=3.11", prompt: true },
+        { text: "conda activate mobilemem", prompt: true },
+        { text: "git clone https://github.com/zjunlp/MobileMem", prompt: true },
+        { text: "pip install -r requirements.txt", prompt: true }
+      ],
+      download: [
+        { text: "huggingface-cli download --repo-type dataset --resume-download zjunlp/xxx --local-dir OceanBenchmark", prompt: true },
+        { text: "from datasets import load_dataset", prompt: false },
+        { text: "dst = load_dataset(\"zjunlp/xxx\")", prompt: false }
+      ],
+      pipeline: [
+        { text: "cd MoblieMem-Omni/src", prompt: true },
+        { text: "cp .env.example .env    # then fill in your API keys", prompt: true },
+        { text: "python -m pipeline.cli list", prompt: true },
+        { text: "python -m pipeline.cli run", prompt: true }
+      ]
+    };
+    const terminalSetOrder = ["setup", "download", "pipeline"];
+    const terminalTimers = new Set();
+    let terminalCycleIndex = 0;
+    let terminalRunId = 0;
 
-    const startTerminalDemo = () => {
+    const clearTerminalTimers = () => {
+      terminalTimers.forEach((timer) => window.clearTimeout(timer));
+      terminalTimers.clear();
+    };
+
+    const scheduleTerminal = (callback, delay, runId) => {
+      const timer = window.setTimeout(() => {
+        terminalTimers.delete(timer);
+        if (runId === terminalRunId) callback();
+      }, delay);
+      terminalTimers.add(timer);
+    };
+
+    const setActiveTerminalButton = (setName) => {
+      terminalButtons.forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.terminalSet === setName));
+      });
+    };
+
+    const startTerminalDemo = (setName = terminalSetOrder[terminalCycleIndex], shouldContinue = true) => {
       if (!terminalOutput) return;
+      clearTerminalTimers();
+      terminalRunId += 1;
+      const runId = terminalRunId;
+      setActiveTerminalButton(setName);
       terminalOutput.innerHTML = "";
+      const terminalLines = terminalSets[setName];
       let lineIndex = 0;
       let charIndex = 0;
       let activeLine = null;
 
       const trimVisibleLines = () => {
         const lines = terminalOutput.querySelectorAll(".terminal-line");
-        if (lines.length <= 3) return;
+        if (lines.length <= 4) return;
         lines[0].remove();
       };
 
@@ -1719,11 +1864,15 @@
       };
 
       const beginLine = () => {
+        if (runId !== terminalRunId) return;
         removeCursor();
 
         if (lineIndex >= terminalLines.length) {
           appendCursor();
-          window.setTimeout(startTerminalDemo, 1800);
+          if (shouldContinue) {
+            terminalCycleIndex = (terminalSetOrder.indexOf(setName) + 1) % terminalSetOrder.length;
+            scheduleTerminal(() => startTerminalDemo(terminalSetOrder[terminalCycleIndex], true), 1800, runId);
+          }
           return;
         }
 
@@ -1740,6 +1889,7 @@
       };
 
       const typeNextChar = () => {
+        if (runId !== terminalRunId) return;
         removeCursor();
         const terminalLine = terminalLines[lineIndex];
 
@@ -1747,19 +1897,27 @@
           activeLine.textContent += terminalLine.text.charAt(charIndex);
           charIndex += 1;
           appendCursor();
-          window.setTimeout(typeNextChar, 24 + Math.random() * 34);
+          scheduleTerminal(typeNextChar, 24 + Math.random() * 34, runId);
           return;
         }
 
         appendCursor();
         lineIndex += 1;
-        window.setTimeout(beginLine, terminalLine.prompt ? 520 : 900);
+        scheduleTerminal(beginLine, terminalLine.prompt ? 520 : 900, runId);
       };
 
       beginLine();
     };
 
     startTerminalDemo();
+
+    terminalButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        terminalCycleIndex = terminalSetOrder.indexOf(button.dataset.terminalSet);
+        startTerminalDemo(button.dataset.terminalSet, true);
+        button.blur();
+      });
+    });
 
     const featureDetails = Array.from(document.querySelectorAll(".feature-accordion details"));
 
