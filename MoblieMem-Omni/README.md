@@ -281,6 +281,24 @@ python -m pipeline.cli run --from social_world
 python -m pipeline.cli run --uuid 0 --max-events 15
 ```
 
+# Create corresponding dialogues and memory points.
+python src/stage5_sessions.py `
+  --input-file output/data/stage4_annual_events.jsonl `
+  --output-file output/debug/stage5_uuid0.jsonl `
+  --image-dir output/image `
+  --uuid-filter 0 `
+  --max-workers 1 `
+  --session-workers 2
+
+# Generate seven categories of evaluation questions
+python src/stage6_questions.py `
+  --input-file data/stage5_all_users.jsonl `
+  --output-file data/stage6_questions_selected_all_users.jsonl `
+  --uuid-filter 0 `
+  --question-types single_hop multi_hop temporal_reasoning `
+  --target-per-type 200 `
+  --resume-incomplete
+
 ### Stages
 
 Records are written to `output/data/` (JSONL); rendered media to `output/image/`.
