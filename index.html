@@ -1427,7 +1427,7 @@
         <a href="#features">Highlight</a>
         <a href="#application">Application</a>
         <a href="#quick-start">Quick Start</a>
-        <a href="https://github.com/lxj-kai/MobileMem">Github</a>
+        <a href="https://github.com/zjunlp/MobileMem/">Github</a>
       </nav>
       <div class="language-toggle" role="group" aria-label="Language">
         <button type="button" data-toggle-lang="zh" aria-label="Switch language to Chinese">Chinese</button>
@@ -1450,7 +1450,7 @@
               <span data-lang="zh">查看详细</span>
               <span data-lang="en">Details</span>
             </a>
-            <a class="btn" href="https://github.com/lxj-kai/MobileMem">Code</a>
+            <a class="btn" href="https://github.com/zjunlp/MobileMem/">Code</a>
             <a class="btn" href="mailto:contact@example.com">Email</a>
             <button class="btn video-play" type="button" aria-label="OPPO Application Scenarios video">Video</button>
           </div>
@@ -1471,12 +1471,11 @@
             <span data-lang="zh">MobileMem 的特色</span>
             <span data-lang="en">MobileMem Features</span>
           </h2>
-          <p class="quote small" data-lang="zh">MobileMem 打破应用之间的数据孤岛，将聊天、社交媒体、照片、阅读、购物和日历中的数据统一到单一的“记忆层”中，使手机能够像人一样“记住”你的关系、兴趣和上下文，并在不同场景中主动提供智能服务。</p>
         </div>
         <div class="feature-layout">
           <figure class="framework-figure">
             <img src="assets/web/memory-layer.jpg" alt="MobileMem breaks down data silos between apps, unifying data from chat, social media, photos, reading, shopping, and calendar into a single memory layer, enabling the phone to remember your relationships, interests, and context like a human, and proactively deliver intelligent services across scenarios.">
-            <figcaption class="framework-caption" data-lang="zh">MobileMem breaks down data silos between apps, unifying data from chat, social media, photos, reading, shopping, and calendar into a single "memory layer."</figcaption>
+            <figcaption class="framework-caption" data-lang="zh">MobileMem 打破应用之间的数据孤岛，将聊天、社交媒体、照片、阅读、购物和日历中的数据统一到单一的“记忆层”中。</figcaption>
             <figcaption class="framework-caption" data-lang="en">MobileMem breaks down data silos between apps, unifying data from chat, social media, photos, reading, shopping, and calendar into a single "memory layer."</figcaption>
           </figure>
           <div class="feature-accordion" aria-label="MobileMem features">
@@ -1672,7 +1671,7 @@
       <div class="wrap">
         <div class="quick-head">
           <h2 id="quick-title">
-            <span data-lang="zh">Quick Start</span>
+            <span data-lang="zh">快速开始</span>
             <span data-lang="en">Quick Start</span>
           </h2>
         </div>
@@ -1707,7 +1706,7 @@
                 <span class="github-repo-path">Choose a quick command set</span>
               </div>
             </div>
-            <p class="quote small" data-lang="zh">Detailed download and usage instructions are maintained in the project repository.</p>
+            <p class="quote small" data-lang="zh">详细下载和使用说明维护在项目仓库中。</p>
             <p class="quote small" data-lang="en">Detailed download and usage instructions are maintained in the project repository.</p>
             <div class="github-links">
               <a class="btn primary github-button" href="https://github.com/zjunlp/MobileMem/">
@@ -1726,9 +1725,9 @@
       <div class="wrap institutions-grid">
         <div>
           <h2 id="institutions-title">Institutions</h2>
-          <p class="quote small" data-lang="zh">This work is jointly conducted by the following institutions.</p>
+          <p class="quote small" data-lang="zh">本工作由以下机构联合完成。</p>
           <p class="quote small" data-lang="en">This work is jointly conducted by the following institutions.</p>
-          <p class="quote small" data-lang="zh">Developed by OPPO and OpenKG.</p>
+          <p class="quote small" data-lang="zh">由 OPPO 和 OpenKG 开发。</p>
           <p class="quote small" data-lang="en">Developed by OPPO and OpenKG.</p>
         </div>
         <div class="institution-logo-panel" aria-label="Institutions">
@@ -1800,8 +1799,8 @@
       ],
       download: [
         { text: "huggingface-cli download --repo-type dataset --resume-download zjunlp/xxx --local-dir OceanBenchmark", prompt: true },
-        { text: "from datasets import load_dataset", prompt: false },
-        { text: "dst = load_dataset(\"zjunlp/xxx\")", prompt: false }
+        { text: "from datasets import load_dataset", prompt: true },
+        { text: "dst = load_dataset(\"zjunlp/xxx\")", prompt: true }
       ],
       pipeline: [
         { text: "cd MoblieMem-Omni/src", prompt: true },
