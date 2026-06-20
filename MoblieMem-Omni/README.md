@@ -131,12 +131,87 @@ MobileMem-Omni evaluates **7 types** of memory reasoning tasks:
 </div>
 
 ## 🧱 Benchmark Structure
+
 ### Each persona’s data is stored as a JSON:
-| Field          | Description                                                  |
-| -------------- | ------------------------------------------------------------ |
-| `uuid`         | Unique user identifier                                       |
 
+| Field | Description |
+| --- | --- |
+| `uuid` | Unique user identifier |
+| `language` | Language of the persona data, currently either `Chinese` or `en` |
+| `Basic_Profile` | Basic profile information of the persona |
+| `Init_State` | Initial state of the persona, including education, location, occupation, preferences, and social relationships |
+| `Important_Dates` | Important dates associated with the persona |
+| `sessions` | List of multi-turn conversational sessions |
+| `session_stats_summary` | Summary statistics across all sessions of the persona |
+| `_errors` | List of data processing errors; empty if no errors occurred |
 
+### Each `session` contains:
+
+| Field | Description |
+| --- | --- |
+| `session_id` | Unique session identifier |
+| `event_id` | Event identifier; independent events are usually integers, while sub-events are usually strings |
+| `parent_event_id` | Parent event identifier; `null` for independent events |
+| `event_name` | Name of the event |
+| `event_start_time` | Start time of the event |
+| `event_end_time` | End time of the event |
+| `dialogue_goal` | Goal of the dialogue in this session |
+| `dialogue_summary` | Summary of the dialogue in this session |
+| `dialogue` | Sequence of utterances between the user and the assistant |
+| `image_refs` | Categorized image references related to the session |
+| `image_candidates` | List of all candidate image paths available for this session |
+| `own_memory_points` | Memory points generated directly from this session |
+| `shared_parent_memory_points` | Memory points shared from the parent event |
+| `child_event_memories` | Memory points derived from child events; these are also included in `own_memory_points` |
+| `memory_points` | Complete list of memory points available to the session, merged from `own_memory_points` and `shared_parent_memory_points` |
+| `parent_memory_key` | Key used to associate the session with parent-event memories |
+| `session_stats` | Statistics of the current session |
+
+## Dialogue Structure
+
+Each utterance in `dialogue` contains:
+
+| Field | Description |
+| --- | --- |
+| `turn` | Turn index of the utterance |
+| `role` | Speaker role, either `user` or `assistant` |
+| `content_type` | Type of content, either `text` or `image` |
+| `content` | Text content, used when `content_type` is `text` |
+| `image_inline` | Image path, used when `content_type` is `image` |
+
+## Memory Point Structure
+
+`own_memory_points`, `shared_parent_memory_points`, `child_event_memories`, and `memory_points` share the same memory point structure:
+
+| Field | Description |
+| --- | --- |
+| `memory_id` | Unique identifier of the memory point |
+| `memory_source` | Source of the memory, one of `primary`, `secondary`, `interference`, or `system` |
+| `memory_type` | Type of memory, currently including `Persona Memory`, `Event Memory`, `Preference Memory`, `Dialogue Memory`, and `Image Memory` |
+| `memory_content` | Textual description of the memory content |
+| `timestamp` | Time when the memory was created or when the corresponding event occurred |
+| `importance` | Relative importance score ranging from 0 to 1 |
+| `original_memories` | List of original memories related to the current memory point |
+| `image_refs` | List of image paths that support the memory |
+| `dialogue_turn_ids` | List of dialogue turn indices that support the memory |
+
+## Question Structure
+
+Each question contains:
+
+| Field | Description |
+| --- | --- |
+| `question_id` | Unique question identifier |
+| `question` | Question text; for multiple-choice questions, the options are also included in this string |
+| `answer` | Ground-truth answer |
+| `question_format` | Format of the question, either `multiple_choice` or `open_ended` |
+| `question_type` | Type of the question |
+| `difficulty` | Difficulty level of the question, one of `easy`, `medium`, or `hard`; this field is missing in a small number of records |
+| `evidence` | List of evidence supporting the answer |
+| `image_refs` | List of image paths involved in the question; this field is missing in a small number of records |
+| `source_session_ids` | List of source session identifiers |
+| `source_event_ids` | List of source event identifiers |
+| `target` | Target type for special questions; only a small number of records contain this field |
 
 # 🏆 Leaderboard
 
