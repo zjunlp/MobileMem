@@ -1,1105 +1,1823 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MobileMem - On-Device Memory Benchmark</title>
-  <meta name="description" content="MobileMem is an on-device long-term memory benchmark and synthesis framework for continually evolving mobile agents, covering heterogeneous traces, multimodal trajectories, and realistic memory QA." />
-  <meta property="og:title" content="MobileMem" />
-  <meta property="og:description" content="On-Device Memory for Continually Evolving Agents." />
-  <meta property="og:type" content="website" />
-  <link rel="stylesheet" href="assets/css/fonts.css?v=20260620-source-fonts" />
-  <link rel="stylesheet" href="assets/css/mem.css?v=20260620-section-gates-3" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MobileMem</title>
+  <meta name="description" content="MobileMem project page">
   <style>
-    .qa-switch {
-      width: 100%;
+    :root {
+      color-scheme: light;
+      --ink: #17211c;
+      --muted: #55625c;
+      --line: #d9e1dc;
+      --paper: #fbfbf8;
+      --wash: #eef6f1;
+      --green: #0f7b4f;
+      --green-dark: #095335;
+      --coral: #c6533f;
+      --gold: #b08a2e;
+      --blue: #286f9e;
+      --white: #ffffff;
+      --shadow: 0 18px 60px rgba(23, 33, 28, 0.12);
+      --nav-h: 72px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid rgba(15, 123, 79, 0.55);
+      outline-offset: 4px;
+    }
+
+    .skip-link {
+      position: fixed;
+      left: 16px;
+      top: 14px;
+      z-index: 20;
+      transform: translateY(-150%);
+      background: var(--ink);
+      color: var(--white);
+      padding: 10px 14px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      height: var(--nav-h);
+      border-bottom: 1px solid rgba(217, 225, 220, 0.82);
+      background: rgba(251, 251, 248, 0.9);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav-inner {
+      width: min(1180px, calc(100% - 40px));
       height: 100%;
       margin: 0 auto;
-      padding: clamp(0.95rem, 1.5vw, 1.2rem);
-      background: #fffdfa;
-      border: 1px solid rgba(15, 23, 42, 0.08);
-      border-radius: 24px;
-      box-shadow: 0 22px 60px rgba(15, 23, 42, 0.08);
-      text-align: left;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .qa-switch__eyebrow {
-      margin: 0 0 0.7rem;
-      color: #334155;
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .qa-switch__viewport {
-      position: relative;
-      min-height: 0;
-      flex: 1;
-    }
-
-    .qa-panel {
-      display: none;
-      min-height: 100%;
-    }
-
-    .qa-panel.is-active {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .qa-card-live {
-      flex: 1;
-      min-height: clamp(180px, 24vh, 260px);
-      padding: clamp(1.05rem, 1.7vw, 1.45rem);
-      border: 3px solid #050505;
-      border-radius: clamp(20px, 2.5vw, 30px);
-      background: #fff;
-      font-family: var(--font-display, "Source Sans Pro", "Microsoft YaHei", sans-serif);
-      font-size: clamp(0.94rem, 1.15vw, 1.14rem);
-      font-weight: 800;
-      line-height: 1.28;
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      gap: 24px;
     }
 
-    .qa-card-live__grid {
-      max-width: 42rem;
-      width: 100%;
-      display: grid;
-      gap: 0.78rem;
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      min-height: 48px;
+      text-decoration: none;
     }
 
-    .qa-card-live p {
-      margin: 0;
-    }
-
-    .qa-card-live .answer {
-      margin-top: 0;
-      padding-top: 0.74rem;
-      border-top: 1px solid rgba(15, 23, 42, 0.08);
-    }
-
-    .qa-evidence__title {
-      margin: 0;
-      color: #334155;
-      font-size: 0.72rem;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .qa-evidence {
-      display: grid;
-      grid-template-columns: auto minmax(0, 1fr);
-      align-items: flex-start;
-      gap: 0.65rem;
-      margin-top: 0.6rem;
-      padding: 0.58rem 0.68rem;
-      border: 1px solid rgba(15, 23, 42, 0.08);
-      border-radius: 16px;
-      background: rgba(51, 65, 85, 0.05);
-    }
-
-    .qa-evidence__bubble {
-      margin: 0;
-      padding: 0;
-      border-radius: 0;
-      background: transparent;
-      font-size: 0.72rem;
-      line-height: 1.3;
-      color: #334155;
-    }
-
-    .qa-evidence__bubble + .qa-evidence__bubble {
-      margin-top: 0.35rem;
-    }
-
-    .qa-evidence__items {
-      display: grid;
-      gap: 0.32rem;
-    }
-
-    .qa-red {
-      color: #d90000;
-      font-weight: 950;
-    }
-
-    .qa-time {
+    .brand-logo {
       display: block;
-      margin-top: 0.12rem;
-      color: #121212;
-      font-size: 0.82em;
-    }
-
-    .qa-switch__tabs {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: flex-start;
-      gap: 0.35rem;
-      margin: 0 0 0.75rem;
-      padding: 0 0 0.72rem;
-      border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-    }
-
-    .qa-switch__tab {
-      appearance: none;
-      border: 1px solid rgba(51, 65, 85, 0.22);
-      border-radius: 999px;
-      background: rgba(51, 65, 85, 0.06);
-      color: #334155;
-      padding: 0.38rem 0.62rem;
-      font: inherit;
-      font-size: 0.7rem;
-      font-weight: 800;
-      cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-    }
-
-    .qa-switch__tab:hover {
-      transform: translateY(-1px);
-    }
-
-    .qa-switch__tab.is-active {
-      background: linear-gradient(120deg, #334155 0%, #475569 55%, #64748b 100%);
-      color: #fff;
-    }
-
-    .qa-switch__cap {
-      margin: 0.7rem 0 0;
-      color: var(--ink-muted, #64748b);
-      font-size: 0.86rem;
-      line-height: 1.55;
-      text-align: center;
-    }
-
-    @media (max-width: 760px) {
-      .qa-card-live__grid {
-        grid-template-columns: 1fr;
-      }
-
-      .qa-switch__viewport {
-        min-height: 0;
-      }
-    }
-
-    #dataset .section__inner {
-      max-width: min(1360px, calc(100vw - 2rem));
-    }
-
-    #dataset .section__title {
-      font-size: clamp(1.65rem, 3.2vw, 2.7rem);
-      line-height: 1.08;
-    }
-
-    #dataset .section__lead {
-      max-width: 760px;
-      margin-bottom: 1rem;
-    }
-
-    .qaqc-oneview {
-      display: grid;
-      grid-template-columns: minmax(360px, 0.82fr) minmax(560px, 1.18fr);
-      gap: clamp(0.9rem, 1.7vw, 1.4rem);
-      align-items: stretch;
-      margin-top: 1rem;
-      width: 100%;
-    }
-
-    .qaqc-accordion {
-      display: grid;
-      gap: 0.7rem;
-      align-content: start;
-      min-height: 100%;
-    }
-
-    .qaqc-acc {
-      border: 1px solid rgba(15, 23, 42, 0.08);
-      border-radius: 18px;
-      background: #fffdfa;
-      box-shadow: 0 12px 34px rgba(15, 23, 42, 0.06);
-      overflow: hidden;
-    }
-
-    .qaqc-acc__head {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 0.62rem;
-      padding: 0.78rem 0.9rem;
-      font-family: var(--font-display, "Source Sans Pro", sans-serif);
-      font-size: 0.96rem;
-      font-weight: 850;
-      text-align: left;
-      color: #111418;
-    }
-
-    .qaqc-acc__head::before {
-      content: "";
-      width: 10px;
-      height: 10px;
-      border-radius: 3px;
-      background: #334155;
-      flex: none;
-    }
-
-    .qaqc-acc__chev {
-      margin-left: auto;
-      color: #647084;
-      font-size: 0.82rem;
-      transition: transform 0.18s ease;
-    }
-
-    .qaqc-acc.is-open .qaqc-acc__chev {
-      transform: rotate(90deg);
-    }
-
-    .qaqc-acc__body {
-      display: none;
-      padding: 0 0.9rem 0.8rem;
-    }
-
-    .qaqc-acc.is-open .qaqc-acc__body {
-      display: block;
-    }
-
-    .qaqc-step {
-      display: flex;
-      gap: 0.65rem;
-      padding: 0.42rem 0;
-      border-top: 1px solid rgba(15, 23, 42, 0.06);
-    }
-
-    .qaqc-step:first-child {
-      border-top: 0;
-    }
-
-    .qaqc-step__n {
-      width: 1.38rem;
-      height: 1.38rem;
-      border-radius: 7px;
-      font-size: 0.72rem;
-      flex: none;
-      background: rgba(51, 65, 85, 0.08);
-      color: #334155;
-      font-family: var(--font-mono, monospace);
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .qaqc-step__b h5 {
-      margin-bottom: 0.08rem;
-      font-size: 0.82rem;
-      line-height: 1.2;
-      color: #111418;
-    }
-
-    .qaqc-step__b p {
-      margin: 0;
-      font-size: 0.7rem;
-      line-height: 1.3;
-      color: #647084;
-    }
-
-    .qaqc-oneview .qa-switch {
-      margin: 0;
-      padding: clamp(0.9rem, 1.45vw, 1.18rem);
-      border-radius: 20px;
-    }
-
-    .qaqc-oneview .qa-switch__eyebrow {
-      margin-bottom: 0.45rem;
-      font-size: 0.7rem;
-    }
-
-    .qaqc-oneview .qa-switch__viewport {
-      min-height: clamp(245px, 31vh, 320px);
-    }
-
-    .qaqc-oneview .qa-card-live {
-      min-height: clamp(165px, 22vh, 220px);
-      padding: clamp(1rem, 1.7vw, 1.35rem);
-      border-width: 3px;
-      font-size: clamp(0.88rem, 1vw, 1.05rem);
-    }
-
-    .qaqc-oneview .qa-card-live__grid {
-      max-width: 37rem;
-      gap: 0.65rem;
-    }
-
-    .qaqc-oneview .qa-evidence {
-      margin-top: 0.55rem;
-      padding: 0.52rem 0.62rem;
-      border-radius: 14px;
-    }
-
-    .qaqc-oneview .qa-evidence__bubble {
-      font-size: 0.64rem;
-    }
-
-    .qaqc-oneview .qa-switch__tabs {
-      margin-bottom: 0.62rem;
-      padding-bottom: 0.58rem;
-      gap: 0.35rem;
-    }
-
-    .qaqc-oneview .qa-switch__tab {
-      padding: 0.38rem 0.62rem;
-      font-size: 0.7rem;
-    }
-
-    .qaqc-oneview .qa-switch__cap {
-      margin-top: 0.45rem;
-      font-size: 0.75rem;
-      line-height: 1.35;
-    }
-
-    @media (max-width: 1100px) {
-      .qaqc-oneview {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .institutions-card {
-      margin: clamp(1.8rem, 4vh, 2.8rem) auto 0;
-      border-top: 4px solid #2f5fa8;
-      border-left: 1px solid rgba(15, 23, 42, 0.08);
-      border-right: 1px solid rgba(15, 23, 42, 0.08);
-      border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-      background: #fff;
-      box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
-      padding: clamp(2rem, 4.6vw, 3.4rem) clamp(1.2rem, 5vw, 4rem);
-    }
-
-    #team .section__title {
-      text-align: center;
-      font-size: clamp(2.4rem, 6vw, 4.8rem);
-      line-height: 0.95;
-      margin-bottom: clamp(1.1rem, 3vh, 1.8rem);
-    }
-
-    .institutions-eyebrow {
-      display: grid;
-      grid-template-columns: minmax(40px, 1fr) auto minmax(40px, 1fr);
-      align-items: center;
-      gap: 1.4rem;
-      margin: 0 0 clamp(1.7rem, 4vh, 2.5rem);
-      color: #8b929e;
-      font-family: var(--font-mono, monospace);
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      text-align: center;
-    }
-
-    .institutions-eyebrow::before,
-    .institutions-eyebrow::after {
-      content: "";
-      height: 1px;
-      background: rgba(15, 23, 42, 0.12);
-    }
-
-    .institution-logos {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: clamp(1.2rem, 3vw, 2rem) 0 clamp(1.6rem, 3vw, 2.2rem);
-      border-bottom: 1px solid rgba(15, 23, 42, 0.10);
-    }
-
-    .institution-combo-logo {
-      display: block;
-      width: min(78vw, 760px);
-      max-height: 150px;
+      width: min(260px, 32vw);
+      height: auto;
+      max-height: 52px;
       object-fit: contain;
     }
 
-    .institutions-note {
-      margin: clamp(1.2rem, 3vh, 1.8rem) 0 0;
-      text-align: center;
-      color: var(--ink-muted, #4b5568);
-      font-size: 0.95rem;
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .institutions-traffic {
-      display: flex;
-      align-items: baseline;
-      justify-content: center;
-      gap: 0.9rem;
-      margin: clamp(1.2rem, 3vh, 1.8rem) 0 0;
-      font-family: var(--font-mono, monospace);
-      color: #9aa1ad;
-      font-size: 0.82rem;
+    .nav-links a {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 14px;
+      border-radius: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
       font-weight: 700;
-      letter-spacing: 0.22em;
+    }
+
+    .nav-links a:hover {
+      background: var(--wash);
+      color: var(--green-dark);
+    }
+
+    .language-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+    }
+
+    .language-toggle button {
+      min-height: 38px;
+      padding: 0 10px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .language-toggle button[aria-pressed="true"] {
+      background: var(--green);
+      color: var(--white);
+    }
+
+    .lang-en [data-lang="zh"],
+    .lang-zh [data-lang="en"] {
+      display: none;
+    }
+
+    main {
+      overflow: hidden;
+    }
+
+    .section {
+      min-height: calc(100vh - var(--nav-h));
+      scroll-margin-top: calc(var(--nav-h) + 14px);
+      display: flex;
+      align-items: center;
+      padding: 42px 0;
+      border-bottom: 1px solid rgba(217, 225, 220, 0.72);
+    }
+
+    .section.compact {
+      min-height: auto;
+      padding: 74px 0;
+    }
+
+    .wrap {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      position: relative;
+      background:
+        linear-gradient(120deg, rgba(238, 246, 241, 0.85), rgba(251, 251, 248, 0.92) 48%, rgba(247, 239, 230, 0.95));
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr);
+      gap: 34px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: none;
+      margin: 0 0 12px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 850;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
-    .institutions-traffic strong {
-      color: #2f5fa8;
-      font-family: var(--font-display, sans-serif);
-      font-size: clamp(1.45rem, 2.4vw, 2rem);
-      font-weight: 850;
-      letter-spacing: 0.02em;
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
     }
 
-    .institutions-traffic span:nth-child(2) {
-      color: #9aa1ad;
+    h1 {
+      margin-bottom: 22px;
+      font-size: clamp(44px, 7vw, 86px);
+      line-height: 0.95;
       letter-spacing: 0;
     }
 
-    @media (max-width: 720px) {
-      .institution-combo-logo { width: min(88vw, 620px); }
-      .institutions-eyebrow {
-        grid-template-columns: 1fr;
-        gap: 0.6rem;
+    h2 {
+      margin-bottom: 24px;
+      font-size: clamp(30px, 4.2vw, 54px);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: 17px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .quote {
+      margin-bottom: 24px;
+      color: #243129;
+      font-size: clamp(18px, 2vw, 23px);
+      line-height: 1.42;
+      font-weight: 580;
+    }
+
+    .quote.small {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+      font-weight: 520;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .btn {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 800;
+      box-shadow: 0 1px 0 rgba(23, 33, 28, 0.04);
+    }
+
+    .btn.primary {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--white);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(23, 33, 28, 0.1);
+    }
+
+    .arrow {
+      font-size: 18px;
+      line-height: 0;
+    }
+
+    .media-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .image-frame {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: 0 12px 34px rgba(23, 33, 28, 0.08);
+    }
+
+    .hero .image-frame {
+      position: relative;
+    }
+
+    .image-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .hero .image-frame img {
+      max-height: 390px;
+      object-fit: contain;
+      object-position: center;
+    }
+
+    .image-frame .video-play {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(255, 255, 255, 0.92);
+      border-radius: 50%;
+      background: var(--coral);
+      color: var(--white);
+      cursor: pointer;
+      font-weight: 900;
+      box-shadow: 0 10px 24px rgba(23, 33, 28, 0.24);
+    }
+
+    .image-frame .video-play::before {
+      content: "";
+      width: 0;
+      height: 0;
+      margin-left: 3px;
+      border-top: 9px solid transparent;
+      border-bottom: 9px solid transparent;
+      border-left: 13px solid var(--white);
+    }
+
+    .image-frame .video-play:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(23, 33, 28, 0.28);
+    }
+
+    .video-modal {
+      width: min(920px, calc(100% - 32px));
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    .video-modal::backdrop {
+      background: rgba(23, 33, 28, 0.55);
+      backdrop-filter: blur(4px);
+    }
+
+    .video-modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .video-modal-head h2 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .video-close {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .video-placeholder {
+      aspect-ratio: 16 / 9;
+      display: grid;
+      place-items: center;
+      min-height: 260px;
+      margin: 0;
+      background: #101411;
+      color: var(--white);
+    }
+
+    .video-placeholder p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .section-head {
+      width: min(860px, 100%);
+      margin-bottom: 30px;
+    }
+
+    .center-head {
+      width: min(980px, 100%);
+      margin: 0 auto 28px;
+      text-align: center;
+    }
+
+    .center-head h2 {
+      display: inline;
+      padding: 0;
+      background: transparent;
+    }
+
+    .framework-figure {
+      overflow: hidden;
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .framework-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: min(58vh, 620px);
+      object-fit: contain;
+      background: var(--white);
+      margin: auto 0;
+    }
+
+    .framework-caption {
+      margin: 0;
+      padding: 10px 16px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .pipeline-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .feature-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.7fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .feature-accordion {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .feature-accordion details {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: 0 8px 22px rgba(23, 33, 28, 0.05);
+    }
+
+    .feature-accordion summary {
+      min-height: 64px;
+      display: grid;
+      grid-template-columns: 38px 1fr 18px;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      list-style: none;
+      font-weight: 850;
+    }
+
+    .feature-accordion summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .feature-accordion summary::after {
+      content: "+";
+      color: var(--green);
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .feature-accordion details[open] summary::after {
+      content: "-";
+    }
+
+    .feature-accordion .step-number {
+      margin: 0;
+    }
+
+    .accordion-body {
+      padding: 0 16px 16px 66px;
+      color: var(--muted);
+    }
+
+    .dataset {
+      background:
+        linear-gradient(rgba(23, 33, 28, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 33, 28, 0.035) 1px, transparent 1px),
+        var(--paper);
+      background-size: 64px 64px;
+      min-height: auto;
+      padding: 20px 0 22px;
+    }
+
+    .dataset .wrap {
+      width: min(1440px, calc(100% - 72px));
+    }
+
+    .dataset .center-head {
+      margin-bottom: 20px;
+    }
+
+    .dataset h2 {
+      display: block;
+      margin-bottom: 26px;
+    }
+
+    .dataset .center-head .quote.small {
+      line-height: 1.36;
+      margin-bottom: 0;
+    }
+
+    .dataset-stage {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(330px, 360px);
+      gap: 24px;
+      align-items: center;
+    }
+
+    .dataset-panel {
+      display: none;
+    }
+
+    .dataset-panel.is-active {
+      display: contents;
+    }
+
+    .dataset-figure {
+      overflow: hidden;
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    .dataset-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      background: var(--white);
+    }
+
+    .dataset-figure figcaption {
+      display: none;
+    }
+
+    .dataset-media {
+      display: grid;
+      align-content: start;
+    }
+
+    .dataset-copy {
+      display: grid;
+      align-content: center;
+      gap: 18px;
+      min-height: 420px;
+    }
+
+    .dataset-copy h3 {
+      margin-bottom: 0;
+      font-size: clamp(26px, 3vw, 38px);
+      line-height: 1.05;
+    }
+
+    .dataset-switcher {
+      display: inline-flex;
+      align-items: center;
+      align-self: start;
+      justify-content: flex-start;
+      gap: 2px;
+      width: max-content;
+      margin: 0;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(238, 246, 241, 0.72);
+    }
+
+    .dataset-switcher button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 26px;
+      min-height: 26px;
+      padding: 0 8px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+      box-shadow: none;
+    }
+
+    .dataset-switcher button[aria-pressed="true"] {
+      background: var(--ink);
+      color: var(--white);
+    }
+
+    .dataset-expression {
+      display: grid;
+      align-content: stretch;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 10px;
+      padding: 16px;
+      min-height: 340px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 12px 34px rgba(23, 33, 28, 0.08);
+    }
+
+    .dataset-expression .quote.small {
+      font-size: 14px;
+      line-height: 1.38;
+    }
+
+    .dataset-expression[data-expression-group="2"] {
+      min-height: 420px;
+    }
+
+    .expression-panel {
+      display: none;
+    }
+
+    .expression-panel.is-active {
+      display: block;
+      align-self: start;
+    }
+
+    .expression-nav {
+      align-self: end;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .expression-nav button {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: var(--white);
+      color: var(--muted);
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 850;
+      box-shadow: 0 3px 10px rgba(23, 33, 28, 0.06);
+    }
+
+    .expression-nav button[aria-pressed="true"] {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: var(--white);
+    }
+
+    .pipeline-card {
+      position: relative;
+      min-height: 190px;
+      padding: 22px 20px;
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--blue);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: 0 12px 34px rgba(23, 33, 28, 0.08);
+    }
+
+    .pipeline-card::after {
+      content: ">";
+      position: absolute;
+      top: 50%;
+      right: -14px;
+      z-index: 1;
+      transform: translateY(-50%);
+      color: #98a49e;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .pipeline-card:last-child::after {
+      content: "";
+    }
+
+    .pipeline-card:nth-child(2) {
+      border-top-color: #ff7d55;
+    }
+
+    .pipeline-card:nth-child(3) {
+      border-top-color: #2ca45f;
+    }
+
+    .pipeline-card:nth-child(4) {
+      border-top-color: #a055e8;
+    }
+
+    .step-number {
+      display: block;
+      margin-bottom: 14px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(360px, 1.05fr);
+      gap: 38px;
+      align-items: center;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      min-height: 150px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: 0 10px 30px rgba(23, 33, 28, 0.06);
+    }
+
+    .contrast-label {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      margin-bottom: 12px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: var(--wash);
+      color: var(--green-dark);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .card.accent-green {
+      border-top: 4px solid var(--green);
+    }
+
+    .card.accent-coral {
+      border-top: 4px solid var(--coral);
+    }
+
+    .card.accent-gold {
+      border-top: 4px solid var(--gold);
+    }
+
+    .card.accent-blue {
+      border-top: 4px solid var(--blue);
+    }
+
+    .card p:last-child {
+      margin-bottom: 0;
+    }
+
+    .figure-note {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .application {
+      background: #f4f7f1;
+    }
+
+    .application-grid {
+      display: grid;
+      grid-template-columns: minmax(360px, 0.85fr) minmax(0, 1.15fr);
+      gap: 30px;
+      align-items: stretch;
+    }
+
+    .quote-panel {
+      padding: 26px;
+      border-radius: 8px;
+      background: var(--green-dark);
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 430px;
+    }
+
+    .quote-panel .eyebrow,
+    .quote-panel .quote.small {
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    .quote-panel .quote {
+      color: var(--white);
+    }
+
+    .application-cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .quick {
+      min-height: auto;
+      scroll-margin-top: calc(var(--nav-h) + 46px);
+      background:
+        linear-gradient(180deg, rgba(251, 251, 248, 1), rgba(239, 243, 238, 1));
+      padding: 16px 0 24px;
+    }
+
+    .quick .wrap {
+      display: grid;
+      gap: 12px;
+    }
+
+    .quick-head {
+      text-align: center;
+    }
+
+    .quick-head h2 {
+      margin-bottom: 0;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.62fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .quick h2 {
+      margin-bottom: 6px;
+      font-size: clamp(30px, 2.9vw, 42px);
+    }
+
+    .quick h3 {
+      margin-bottom: 6px;
+      font-size: 16px;
+    }
+
+    .quick .quote.small {
+      font-size: 14px;
+      line-height: 1.42;
+    }
+
+    .quick .actions {
+      margin-top: 18px;
+    }
+
+    .quick-note {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+    }
+
+    .quick-note p:last-child {
+      margin-bottom: 0;
+    }
+
+    .command-block {
+      margin: 8px 0 0;
+      padding: 10px 12px;
+      border: 1px solid rgba(18, 35, 27, 0.12);
+      border-radius: 8px;
+      background: #12231b;
+      color: #f8fbf4;
+      font-size: 12px;
+      line-height: 1.5;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    .command-block code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    .terminal-demo {
+      overflow: hidden;
+      border: 1px solid rgba(18, 35, 27, 0.18);
+      border-radius: 8px;
+      background: #102018;
+      box-shadow: 0 16px 34px rgba(23, 33, 28, 0.14);
+    }
+
+    .terminal-head {
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 13px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: #182b21;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .terminal-dots {
+      display: inline-flex;
+      gap: 6px;
+    }
+
+    .terminal-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ff6b57;
+    }
+
+    .terminal-dots span:nth-child(2) {
+      background: #f6bd4f;
+    }
+
+    .terminal-dots span:nth-child(3) {
+      background: #35c46a;
+    }
+
+    .terminal-body {
+      min-height: 126px;
+      padding: 12px 15px;
+      color: #f8fbf4;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .terminal-line {
+      margin: 0;
+      white-space: pre-wrap;
+    }
+
+    .terminal-line.prompt::before {
+      content: "$ ";
+      color: #7ce3a0;
+      font-weight: 900;
+    }
+
+    .terminal-cursor {
+      display: inline-block;
+      width: 8px;
+      height: 1.15em;
+      margin-left: 3px;
+      vertical-align: -0.18em;
+      background: #f8fbf4;
+      animation: cursorBlink 0.9s steps(2, start) infinite;
+    }
+
+    @keyframes cursorBlink {
+      50% {
+        opacity: 0;
       }
-      .institutions-eyebrow::before,
-      .institutions-eyebrow::after { display: none; }
+    }
+
+    .github-cta {
+      position: relative;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 10px;
+      min-height: 162px;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, #102018 0%, #172b21 58%, #0f7b4f 140%);
+      box-shadow: 0 16px 34px rgba(23, 33, 28, 0.16);
+      color: var(--white);
+    }
+
+    .github-card-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .github-card-icon {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--white);
+    }
+
+    .github-repo-name {
+      display: block;
+      color: var(--white);
+      font-size: 20px;
+      font-weight: 900;
+      line-height: 1.1;
+    }
+
+    .github-repo-path {
+      display: block;
+      margin-top: 3px;
+      color: rgba(255, 255, 255, 0.64);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .github-button {
+      width: max-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .github-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    .github-cta .quote.small {
+      align-self: center;
+      margin-bottom: 0;
+      color: rgba(255, 255, 255, 0.78);
+      font-weight: 650;
+    }
+
+    .github-cta .btn {
+      min-height: 42px;
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.09);
+      color: var(--white);
+    }
+
+    .github-cta .btn.primary {
+      border-color: var(--white);
+      background: var(--white);
+      color: var(--ink);
+    }
+
+    .github-icon {
+      width: 19px;
+      height: 19px;
+      flex: 0 0 auto;
+    }
+
+    .steps {
+      display: grid;
+      gap: 10px;
+      counter-reset: step;
+    }
+
+    .step {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+    }
+
+    .step::before {
+      content: counter(step);
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--wash);
+      color: var(--green-dark);
+      font-weight: 900;
+    }
+
+    .step p {
+      margin-bottom: 0;
+    }
+
+    .step p + .command-block,
+    .step .command-block + p {
+      margin-top: 8px;
+    }
+
+    .institutions {
+      background: var(--white);
+      color: var(--ink);
+    }
+
+    .institutions-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 28px;
+      align-items: center;
+      text-align: center;
+    }
+
+    .institutions .quote,
+    .institutions .quote.small {
+      color: var(--muted);
+    }
+
+    .institution-logo-panel {
+      width: min(820px, 100%);
+      margin: 0 auto;
+      padding: 28px 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: 0 12px 34px rgba(23, 33, 28, 0.08);
+    }
+
+    .institution-logo-panel img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    @media (max-width: 980px) {
+      :root {
+        --nav-h: 66px;
+      }
+
+      .nav-inner {
+        width: min(100% - 28px, 760px);
+      }
+
+      .brand-logo {
+        width: min(190px, 38vw);
+        max-height: 42px;
+      }
+
+      .nav-links {
+        gap: 0;
+      }
+
+      .nav-links a {
+        padding: 0 9px;
+        font-size: 13px;
+      }
+
+      .section {
+        min-height: auto;
+        padding: 38px 0;
+      }
+
+      .wrap {
+        width: min(100% - 28px, 760px);
+      }
+
+      .dataset .wrap {
+        width: min(100% - 28px, 760px);
+      }
+
+      .hero-grid,
+      .two-col,
+      .feature-layout,
+      .dataset-stage,
+      .application-grid,
+      .quick-grid,
+      .institutions-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .quote-panel {
+        min-height: auto;
+      }
+
+      .pipeline-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .pipeline-card::after {
+        content: "";
+      }
+
+      .media-stack {
+        order: -1;
+      }
+    }
+
+    @media (max-width: 700px) {
+      :root {
+        --nav-h: 124px;
+      }
+
+      .site-nav {
+        height: auto;
+      }
+
+      .nav-inner {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+          "brand lang"
+          "links links";
+        min-height: var(--nav-h);
+        align-items: center;
+        gap: 6px;
+        padding: 8px 0;
+      }
+
+      .brand {
+        grid-area: brand;
+      }
+
+      .nav-links {
+        grid-area: links;
+        grid-column: 1 / -1;
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+
+      .language-toggle {
+        grid-area: lang;
+        justify-self: end;
+      }
+
+      .nav-links a {
+        flex: 0 0 auto;
+      }
+
+      .quick {
+        padding-top: 14px;
+      }
+
+      h1 {
+        margin-bottom: 14px;
+        font-size: 38px;
+      }
+
+      .quote {
+        font-size: 17px;
+      }
+
+      .hero .quote.small {
+        font-size: 14px;
+        line-height: 1.45;
+      }
+
+      .hero .actions {
+        margin-top: 16px;
+      }
+
+      .hero .image-frame img {
+        max-height: 230px;
+      }
+
+      .feature-grid,
+      .application-cards,
+      .pipeline-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .image-frame .video-play {
+        right: 12px;
+        bottom: 12px;
+        width: 42px;
+        height: 42px;
+      }
+
     }
   </style>
-  <script>document.documentElement.classList.add('js');</script>
 </head>
-<body>
-
-  <div class="bg-decor" aria-hidden="true"></div>
-  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
-
-  <header class="site-nav" id="siteNav">
-    <div class="site-nav__inner">
-      <a href="#top" class="site-nav__brand">Mobile<em>Mem</em></a>
-      <ul class="site-nav__links" id="navLinks">
-        <li><a href="#highlights" data-i18n="nav.abstract">Highlights</a></li>
-        <li><a href="#mobilemem-entry" data-i18n="nav.dataset">MobileMem Dataset</a></li>
-        <li><a href="#omni-entry" data-i18n="nav.omni">MobileMem-Omni Dataset</a></li>
-      </ul>
-      <nav class="subnav" id="navSub4" aria-hidden="true" aria-label="Section 4">
-        <a href="#mobilemem-entry" class="subnav__home" data-i18n="nav.dataset">§4 Dataset</a>
-        <a href="#keme" data-i18n="ch4.t2">KEME</a>
-        <a href="#dataset" data-i18n="ch4.t3">QA &amp; QC</a>
-        <a href="#results" data-i18n="ch4.t4">Experiments</a>
+<body class="lang-zh">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-nav" aria-label="Primary navigation">
+    <div class="nav-inner">
+      <a class="brand" href="#mobilemem" aria-label="MobileMem home">
+        <img class="brand-logo" src="assets/web/institutions-transparent.png" alt="OPPO and OpenKG.CN">
+      </a>
+      <nav class="nav-links" aria-label="Section navigation">
+        <a href="#mobilemem">MobileMem</a>
+        <a href="#features">Highlight</a>
+        <a href="#application">Application</a>
+        <a href="#quick-start">Quick Start</a>
+        <a href="https://github.com/lxj-kai/MobileMem">Github</a>
       </nav>
-      <nav class="subnav" id="navSub5" aria-hidden="true" aria-label="Section 5">
-        <a href="#omni-entry" class="subnav__home" data-i18n="nav.omni">§5 Omni</a>
-        <a href="#omni-overview" data-i18n="sub.build">Construction</a>
-        <a href="#omni-stats" data-i18n="sub.stats">At a Glance</a>
-        <a href="#omni-results" data-i18n="sub.results">Main results</a>
-        <a href="#omni-analysis" data-i18n="sub.analysis">Analysis</a>
-      </nav>
-      <div class="site-nav__actions">
-        <button type="button" class="lang-btn edit-only" id="exportEdits">Export</button>
-        <button type="button" class="lang-btn" id="editToggle">Edit</button>
-        <button type="button" class="lang-btn" id="langToggle" data-i18n="lang.toggle">中文</button>
-        <button type="button" class="menu-btn" id="menuBtn" aria-label="Menu"><span></span></button>
+      <div class="language-toggle" role="group" aria-label="Language">
+        <button type="button" data-toggle-lang="en" aria-label="Switch language to English">English</button>
       </div>
     </div>
   </header>
 
-  <nav class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
-    <a href="#highlights" data-i18n="nav.abstract">Highlights</a>
-    <a href="#mobilemem-entry" data-i18n="nav.dataset">MobileMem Dataset</a>
-    <a href="#omni-entry" data-i18n="nav.omni">MobileMem-Omni Dataset</a>
-  </nav>
-
-  <main id="top">
-
-    <!-- Hero -->
-    <section class="hero">
-      <div class="hero__glow" aria-hidden="true"></div>
-      <div class="hero__glow hero__glow--2" aria-hidden="true"></div>
-      <div class="hero__grid">
-        <div class="hero__copy reveal">
-          <p class="hero__badge" data-i18n="hero.badge">Preprint · OPPO × OpenKG</p>
-          <h1 class="hero__title">
-            <span data-i18n="hero.t1">MobileMem</span>
-            <span class="line2" data-i18n="hero.t2">On-Device Memory for Continually Evolving Agents</span>
-          </h1>
-          <p class="hero__subtitle" data-i18n="hero.sub">MobileMem, featuring real-user participation, multimodal interactions, and multi-source content, is established through a multi-stage pipeline.</p>
-          <p class="hero__authors" data-i18n="hero.affil">OPPO · OpenKG</p>
-          <div class="hero__cta">
-            <a href="#" class="btn btn--primary" data-i18n="cta.paper">Paper</a>
-            <a href="#" class="btn" data-i18n="cta.code">Code</a>
-            <a href="#" class="btn" data-i18n="cta.data">Dataset</a>
-            <a href="mailto:shuofei@zju.edu.cn,zhangningyu@zju.edu.cn,huajunsir@zju.edu.cn" class="btn" data-i18n="cta.results">Email</a>
-          </div>
-          <div class="hero-proof reveal reveal-d1" aria-label="MobileMem benchmark highlights">
-            <div class="hero-proof__item"><strong>16</strong><span>User trajectories</span></div>
-            <div class="hero-proof__item"><strong>19,060</strong><span>Images</span></div>
-            <div class="hero-proof__item"><strong>7,415</strong><span>QA pairs</span></div>
-            <div class="hero-proof__item"><strong>7</strong><span>Question types</span></div>
+  <main id="main">
+    <section class="section hero" id="mobilemem" aria-labelledby="mobilemem-title">
+      <div class="wrap hero-grid">
+        <div>
+          <p class="eyebrow">Why MobileMem</p>
+          <h1 id="mobilemem-title">MobileMem</h1>
+          <p class="quote" data-lang="zh">MobileMem：面向持续演进智能体的端侧记忆</p>
+          <p class="quote" data-lang="en">MobileMem: On-Device Memory for Continually Evolving Agents</p>
+          <p class="quote small" data-lang="zh">MobileMem 作为用户的个人记忆智能体，能够自动理解用户意图，执行跨时间的人脸识别以关联多年间女儿的身份，从海量照片档案中定位 2016 年的生日场景，并返回一家三口围坐在生日蛋糕旁的照片。</p>
+          <p class="quote small" data-lang="en">MobileMem acts as the user's personal memory agent, automatically understanding user intent, performing cross-time facial recognition to associate the daughter's identity across years, locating the 2016 birthday scene from a vast photo archive, and returning the photo of the family of three gathered around the birthday cake.</p>
+          <div class="actions" aria-label="Project links">
+            <a class="btn" href="#dataset-construction">
+              <span data-lang="zh">查看详细</span>
+              <span data-lang="en">Details</span>
+            </a>
+            <a class="btn" href="https://github.com/lxj-kai/MobileMem">Code</a>
+            <a class="btn" href="mailto:contact@example.com">Email</a>
+            <button class="btn video-play" type="button" aria-label="OPPO Application Scenarios video">Video</button>
           </div>
         </div>
-
-        <div class="mem-field reveal reveal-d2" id="memField" aria-label="Interactive 3D memory field">
-          <div class="mem-field__head">
-            <span>MEMORY FIELD</span>
-            <div class="mem-persona-tabs" aria-label="Memory persona switcher">
-              <button type="button" class="mem-persona-tab is-active" data-mem-persona="uid0">Persona A</button>
-              <button type="button" class="mem-persona-tab" data-mem-persona="uid10">Persona B</button>
-            </div>
-          </div>
-          <canvas id="memCanvas"></canvas>
-          <div class="mem-field__hint" data-i18n="field.hint">DRAG TO ROTATE · CLICK A NODE</div>
-          <div class="mem-field__info" id="memInfo">
-            <div class="mem-field__info-head">
-              <img class="mem-field__info-img" id="memInfoImg" alt="" />
-              <div class="mem-field__info-meta">
-                <div class="mem-field__info-t"><span class="mem-field__dot"></span><span id="memInfoTitle"></span></div>
-                <div class="mem-field__info-en" id="memInfoEn"></div>
-              </div>
-            </div>
-            <div class="mem-field__info-d" id="memInfoDesc"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section section--screen" id="highlights">
-      <div class="section__inner">
-        <div class="overview-grid">
-          <div class="overview-copy reveal">
-            <p class="section__kicker" data-i18n="ov.kicker">Overview</p>
-            <h2 class="section__title"><span data-i18n="ov.title1">Reserved for</span> <span class="grad-text" data-i18n="ov.title2">paper-aligned content</span></h2>
-            <p class="section__lead" data-i18n="ov.lead">This overview area is intentionally left open and will be filled after the corresponding LaTeX manuscript sections are synchronized.</p>
-            <div class="contrib-list">
-              <article class="contrib-card">
-                <span>01</span>
-                <h3 data-i18n="card.keme.t">Reserved section</h3>
-                <p data-i18n="card.keme.d">Content will be added here after the corresponding LaTeX manuscript section is synchronized.</p>
-              </article>
-              <article class="contrib-card">
-                <span>02</span>
-                <h3 data-i18n="card.omni.t">Reserved section</h3>
-                <p data-i18n="card.omni.d">Content will be added here after the corresponding LaTeX manuscript section is synchronized.</p>
-              </article>
-              <article class="contrib-card">
-                <span>03</span>
-                <h3 data-i18n="card.stats.t">Reserved section</h3>
-                <p data-i18n="card.stats.d">Content will be added here after the corresponding LaTeX manuscript section is synchronized.</p>
-              </article>
-            </div>
-          </div>
-          <div class="overview-evidence reveal reveal-d1">
-            <div class="overview-placeholder" aria-label="Reserved manuscript figure">
-              <div class="overview-placeholder__sheet">
-                <div class="overview-placeholder__bar"></div>
-                <div class="overview-placeholder__grid">
-                  <span></span><span></span><span></span><span></span>
-                </div>
-                <div class="overview-placeholder__lines">
-                  <i></i><i></i><i></i>
-                </div>
-              </div>
-              <p data-i18n="ov.placeholder">Reserved for manuscript figure</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- MobileMem Dataset entry -->
-    <section class="section chapter-entry" id="mobilemem-entry" aria-label="MobileMem Dataset entry">
-      <div class="chapter-entry__inner">
-        <header class="chapter-entry__head reveal">
-          <h2 data-i18n="entry.mobilemem.title">MobileMem Dataset</h2>
-        </header>
-        <div class="chapter-entry__stage reveal reveal-d1">
-          <figure class="chapter-entry__figure">
-            <img src="assets/media/paper2/keme_framework.png" alt="KEME framework overview" loading="lazy" />
+        <div class="media-stack">
+          <figure class="image-frame">
+            <img src="assets/web/daughter-case-replacement.png" alt="MobileMem acts as the user's personal memory agent, automatically understanding user intent, performing cross-time facial recognition to associate the daughter's identity across years, locating the 2016 birthday scene from a vast photo archive, and returning the photo of the family of three gathered around the birthday cake.">
           </figure>
-          <a class="chapter-entry__cta" href="#keme" data-entry-target="keme" data-entry-gate="mobilemem">
-            <span class="chapter-entry__icon" aria-hidden="true"></span>
-            <span data-i18n="entry.mobilemem">View MobileMem Dataset</span>
-          </a>
         </div>
       </div>
     </section>
 
-    <!-- KEME -->
-    <section class="section section--screen sec--center is-gated" id="keme" data-gate-section="mobilemem">
-      <div class="section__inner">
-        <p class="section__kicker reveal" data-i18n="keme.kicker">Core Framework</p>
-        <h2 class="section__title reveal" data-i18n="keme.title">KEME: knowledge-guided experience synthesis for evolving memory</h2>
-        <p class="section__lead reveal reveal-d1" data-i18n="keme.lead">KEME treats the fragmented user-app sessions as foundational knowledge anchors that reflect what has already occurred and must be preserved. Guided by user persona knowledge and temporal constraints, KEME hierarchically organizes these anchored sessions into a unified interaction stream.</p>
-        <figure class="paper-fig reveal reveal-d2" style="margin:1.6rem auto 0;width:100%">
-          <div class="paper-fig__media" data-zoom="assets/media/paper2/keme_framework.png">
-            <img src="assets/media/paper2/keme_framework.png" alt="KEME framework overview" loading="lazy" />
-          </div>
-          <figcaption class="paper-fig__cap"><b data-i18n="fig.keme.t">KEME framework</b> —<span data-i18n="fig.keme.d">An illustrative example of closed-loop trajectory synthesis with anchored knowledge and experience.</span></figcaption>
-        </figure>
-        <div class="keme-loop reveal reveal-d2">
-          <div class="keme-stage" style="--c:#1E90FF"><div class="keme-stage__n">01</div><h4 data-i18n="keme.x1.h">A·plan —Knowledge-Guided Planner</h4><p data-i18n="keme.x1.d">Builds a temporal event graph and recursively expands it.</p></div>
-          <div class="keme-stage" style="--c:#FF8C64"><div class="keme-stage__n">02</div><h4 data-i18n="keme.x2.h">A·ground —Knowledge Anchor Grounder</h4><p data-i18n="keme.x2.d">Assigns anchored app sessions to compatible event nodes.</p></div>
-          <div class="keme-stage" style="--c:#2DA44E"><div class="keme-stage__n">03</div><h4 data-i18n="keme.x3.h">A·realize —Experience Realizer</h4><p data-i18n="keme.x3.d">Synthesizes leaf sessions and drives persona evolution.</p></div>
-          <div class="keme-stage" style="--c:#A855F7"><div class="keme-stage__n">04</div><h4 data-i18n="keme.x4.h">A·revise —Experience-Driven Reviser</h4><p data-i18n="keme.x4.d">Updates the remaining graph in a bottom-up feedback loop.</p></div>
-        </div>      </div>
-    </section>
-
-    <!-- §4.3 · QA synthesis + quality control -->
-    <section class="section section--band section--screen sec--center is-gated" id="dataset" data-gate-section="mobilemem">
-      <div class="section__inner">
-        <p class="section__kicker reveal" data-i18n="ds.kicker">§4.3 · QA Synthesis &amp; Quality Control</p>
-        <h2 class="section__title reveal"><span data-i18n="ds.title1">From anchored trajectory to</span> <span class="grad-text" data-i18n="ds.title2">evaluable QA</span></h2>
-        <p class="section__lead reveal reveal-d1" data-i18n="ds.lead">The entire trajectory construction process can be conceptualized as the generation of a hierarchical tree structure.</p>
-
-        <div class="qaqc-oneview reveal reveal-d2">
-          <div class="qaqc-accordion" data-qaqc-accordion>
-            <section class="qaqc-acc" data-qaqc-acc>
-              <button class="qaqc-acc__head" type="button" aria-expanded="false">
-                <span data-i18n="ds.syn.h">QA Synthesis</span>
-                <span class="qaqc-acc__chev" aria-hidden="true">›</span>
-              </button>
-              <div class="qaqc-acc__body">
-                <div class="qaqc-step"><span class="qaqc-step__n">1</span><div class="qaqc-step__b"><h5 data-i18n="ds.syn.1t">Leaf level →atomic QA</h5><p data-i18n="ds.syn.1d">Each leaf generates question-answer pairs from its own trajectory segment.</p></div></div>
-                <div class="qaqc-step"><span class="qaqc-step__n">2</span><div class="qaqc-step__b"><h5 data-i18n="ds.syn.2t">Internal nodes →complex QA</h5><p data-i18n="ds.syn.2d">Each node uses child QA as building blocks to synthesize complex cross-session questions; unused child pairs are sampled and passed upward.</p></div></div>
-                <div class="qaqc-step"><span class="qaqc-step__n">3</span><div class="qaqc-step__b"><h5 data-i18n="ds.syn.3t">Dynamic tool book</h5><p data-i18n="ds.syn.3d">During traversal the agent can extend the question-type tool book with new types on the fly.</p></div></div>
+    <section class="section" id="features" aria-labelledby="features-title">
+      <div class="wrap">
+        <div class="center-head">
+          <p class="eyebrow">MobileMem Features</p>
+          <h2 id="features-title">
+            <span data-lang="zh">MobileMem 的特色：与传统记忆的区别</span>
+            <span data-lang="en">MobileMem Features</span>
+          </h2>
+          <p class="quote small" data-lang="zh">MobileMem 打破应用之间的数据孤岛，将聊天、社交媒体、照片、阅读、购物和日历中的数据统一到单一的“记忆层”中，使手机能够像人一样“记住”你的关系、兴趣和上下文，并在不同场景中主动提供智能服务。</p>
+          <p class="quote small" data-lang="en">MobileMem breaks down data silos between apps, unifying data from chat, social media, photos, reading, shopping, and calendar into a single "memory layer," enabling the phone to "remember" your relationships, interests, and context like a human, and proactively deliver intelligent services across scenarios.</p>
+        </div>
+        <div class="feature-layout">
+          <figure class="framework-figure">
+            <img src="assets/web/memory-layer.jpg" alt="MobileMem breaks down data silos between apps, unifying data from chat, social media, photos, reading, shopping, and calendar into a single memory layer, enabling the phone to remember your relationships, interests, and context like a human, and proactively deliver intelligent services across scenarios.">
+            <figcaption class="framework-caption" data-lang="zh">MobileMem breaks down data silos between apps, unifying data from chat, social media, photos, reading, shopping, and calendar into a single "memory layer."</figcaption>
+            <figcaption class="framework-caption" data-lang="en">MobileMem breaks down data silos between apps, unifying data from chat, social media, photos, reading, shopping, and calendar into a single "memory layer."</figcaption>
+          </figure>
+          <div class="feature-accordion" aria-label="MobileMem features">
+            <details open>
+              <summary>
+                <span class="step-number">01</span>
+                <span data-lang="zh">多源应用记忆</span>
+                <span data-lang="en">Heterogeneity and Multi-Source</span>
+              </summary>
+              <div class="accordion-body">
+                <p class="quote small" data-lang="zh">真实的移动环境不仅包括人与助手的对话，也包括复杂的第三方应用生态系统。用户在这些应用中的交互在格式和语义上本身就是异构的。MobileMem 被设计为反映这一现实，要求记忆系统处理来自多样应用源的实时消息流，而不是依赖单一同质的交互流。</p>
+                <p class="quote small" data-lang="en">Real-world mobile environments include not only human-assistant dialogues but also a complex ecosystem of third-party applications. User interactions across these apps are inherently heterogeneous in both format and semantics. MobileMem is designed to reflect this reality by requiring memory systems to process real-time message streams originating from diverse application sources, rather than relying on a single homogeneous interaction stream.</p>
               </div>
-            </section>
-            <section class="qaqc-acc is-open" data-qaqc-acc>
-              <button class="qaqc-acc__head" type="button" aria-expanded="true">
-                <span data-i18n="ds.qc.h">Quality Control</span>
-                <span class="qaqc-acc__chev" aria-hidden="true">›</span>
-              </button>
-              <div class="qaqc-acc__body">
-                <div class="qaqc-step"><span class="qaqc-step__n">1</span><div class="qaqc-step__b"><h5 data-i18n="ds.qc.1t">Agent spot-checks</h5><p data-i18n="ds.qc.1d">Manual spot-checks across agent outputs; KEME's tuned prompts and built-in verification keep quality consistently high.</p></div></div>
-                <div class="qaqc-step"><span class="qaqc-step__n">2</span><div class="qaqc-step__b"><h5 data-i18n="ds.qc.2t">Trajectory refinement</h5><p data-i18n="ds.qc.2d">Overlapping sessions from simultaneous independent events are merged, followed by author-led manual inspection.</p></div></div>
-                <div class="qaqc-step"><span class="qaqc-step__n">3</span><div class="qaqc-step__b"><h5 data-i18n="ds.qc.3t">QA verification</h5><p data-i18n="ds.qc.3d">LLMs verify evidence sufficiency and flag highly similar or redundant questions; low-quality items are rewritten by an LLM.</p></div></div>
-                <div class="qaqc-step"><span class="qaqc-step__n">4</span><div class="qaqc-step__b"><h5 data-i18n="ds.qc.4t">Final manual review</h5><p data-i18n="ds.qc.4d">A final manual inspection eliminates any remaining artifacts to guarantee reliability.</p></div></div>
+            </details>
+            <details>
+              <summary>
+                <span class="step-number">02</span>
+                <span data-lang="zh">非侵入式观察</span>
+                <span data-lang="en">Observation and Participation-Based Interactions</span>
+              </summary>
+              <div class="accordion-body">
+                <p class="quote small" data-lang="zh">在真实移动场景中，用户大部分时间都在与各类应用交互，而不是直接与 AI 助手互动。为确保无缝的用户体验，配备长期记忆系统的助手必须以非侵入方式运行，通过被动观察学习用户活动，而不是打断用户工作流。</p>
+                <p class="quote small" data-lang="en">In real-world mobile scenarios, users spend the majority of their time interacting with various applications rather than directly engaging with an AI assistant. To ensure a seamless user experience, an assistant equipped with a long-term memory system must operate in a non-intrusive manner, learning from the user's activities through passive observation rather than interrupting their workflow.</p>
               </div>
-            </section>
-          </div>
-
-          <div class="qa-switch" data-qa-switch>
-          <p class="qa-switch__eyebrow">Examples across QA types</p>
-          <div class="qa-switch__tabs" role="tablist" aria-label="QA example types">
-            <button class="qa-switch__tab is-active" type="button" data-qa-target="relationship">Relationship</button>
-            <button class="qa-switch__tab" type="button" data-qa-target="single">Single-Hop</button>
-            <button class="qa-switch__tab" type="button" data-qa-target="multi">Multi-Hop</button>
-            <button class="qa-switch__tab" type="button" data-qa-target="adversarial">Adversarial</button>
-            <button class="qa-switch__tab" type="button" data-qa-target="temporal">Temporal</button>
-          </div>
-          <div class="qa-switch__viewport">
-            <article class="qa-panel is-active" data-qa-panel="relationship">
-              <div class="qa-card-live">
-                <div class="qa-card-live__grid">
-                  <div>
-                    <p>Question: Whom did the user mention he sends funny short videos to more often?</p>
-                    <p>A. Colleagues in the team group<br>B. His wife<br>C. His parents<br>D. Clients</p>
-                    <p class="answer">Answer: B. His wife</p>
-                  </div>
-                </div>
+            </details>
+            <details>
+              <summary>
+                <span class="step-number">03</span>
+                <span data-lang="zh">隐私友好合成</span>
+                <span data-lang="en">Realism-Guided Synthetic Data</span>
+              </summary>
+              <div class="accordion-body">
+                <p class="quote small" data-lang="zh">在真实移动环境中，用户交互天然包含大量敏感个人信息。从多个应用收集原始、未处理日志会带来隐私风险，包括潜在的重新识别和机密个人属性暴露。为缓解这些问题，MobileMem 采用现实引导的构建范式，充分保护用户隐私和安全。</p>
+                <p class="quote small" data-lang="en">In real-world mobile environments, user interactions naturally contain a wide range of sensitive personal information. Collecting raw, unprocessed logs from multiple apps poses privacy risks, including potential re-identification and the exposure of confidential personal attributes. To mitigate these concerns, MobileMem adopts a realism-guided construction paradigm fully protecting user privacy and security.</p>
               </div>
-              <div class="qa-evidence">
-                <p class="qa-evidence__title">Evidence</p>
-                <div class="qa-evidence__items">
-                  <p class="qa-evidence__bubble">User: I mainly watch comedy ... <span class="qa-red">I'll send the good ones to my wife to see her reaction, but I rarely post in the work group</span> ... <span class="qa-time">Timestamp: 2024.12.09 21:07:43</span></p>
-                </div>
-              </div>
-            </article>
-
-            <article class="qa-panel" data-qa-panel="single">
-              <div class="qa-card-live">
-                <div class="qa-card-live__grid">
-                  <div>
-                    <p>Question: Among the transportation expenses on 2024-11-23, what was the payment method for the user's 'Haidian Zhixing Parking Lot' bill?</p>
-                    <p>A. WeChat Pay<br>B. Alipay<br>C. Cash<br>D. Bank Card</p>
-                    <p class="answer">Answer: Cash</p>
-                  </div>
-                </div>
-              </div>
-              <div class="qa-evidence">
-                <p class="qa-evidence__title">Evidence</p>
-                <div class="qa-evidence__items">
-                  <p class="qa-evidence__bubble">Bill: A billing record is generated between the user and Haidian Zhixing Parking Lot. Item: ... <span class="qa-red">Payment Method: Cash</span> <span class="qa-time">Timestamp: 2024-11-23 17:18:00</span></p>
-                </div>
-              </div>
-            </article>
-
-            <article class="qa-panel" data-qa-panel="multi">
-              <div class="qa-card-live">
-                <div class="qa-card-live__grid">
-                  <div>
-                    <p>Question: Which errand did the user finish after leaving the parking lot and before sending the evening work update?</p>
-                    <p>A. Picked up a package<br>B. Bought coffee<br>C. Returned a library book<br>D. Printed meeting notes</p>
-                    <p class="answer">Answer: A. Picked up a package</p>
-                  </div>
-                </div>
-              </div>
-              <div class="qa-evidence">
-                <p class="qa-evidence__title">Evidence</p>
-                <div class="qa-evidence__items">
-                  <p class="qa-evidence__bubble">Location: The user leaves Haidian Zhixing Parking Lot ... <span class="qa-red">arrives at the parcel locker</span> ... <span class="qa-time">Timestamp: 2024-11-23 17:31:00</span></p>
-                  <p class="qa-evidence__bubble">Message: Evening status update sent to the project group ... <span class="qa-red">after picking up the package</span> ... <span class="qa-time">Timestamp: 2024-11-23 18:02:00</span></p>
-                </div>
-              </div>
-            </article>
-
-            <article class="qa-panel" data-qa-panel="adversarial">
-              <div class="qa-card-live">
-                <div class="qa-card-live__grid">
-                  <p>Question: How many minutes does the user's commute from home to work usually take?</p>
-                  <p class="answer">Answer: There is currently not enough information to determine the exact duration.</p>
-                </div>
-              </div>
-            </article>
-
-            <article class="qa-panel" data-qa-panel="temporal">
-              <div class="qa-card-live">
-                <div class="qa-card-live__grid">
-                  <div>
-                    <p>Question: For the task 'Complete a deep analysis article on AI technology trends', what was the original deadline, and on which date was it marked as completed?</p>
-                    <p class="answer">Answer:<br>Deadline: 2024-11-20;<br>Completed on 2024-11-21</p>
-                  </div>
-                </div>
-              </div>
-              <div class="qa-evidence">
-                <p class="qa-evidence__title">Evidence</p>
-                <div class="qa-evidence__items">
-                  <p class="qa-evidence__bubble">Note: The user adds a to-do item: 'Complete a deep Analysis Article on AI Technology Trends' <span class="qa-red">Due: 2024-11-20 00:00:00</span> ... <span class="qa-time">Timestamp: 2024.11.13 00:00:00</span></p>
-                  <p class="qa-evidence__bubble">Note: The user completes a to-do item: 'Complete a deep Analysis Article on AI Technology Trends' ... <span class="qa-red">Timestamp: 2024.11.21 00:00:00</span></p>
-                </div>
-              </div>
-            </article>
-          </div>
-
+            </details>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Results -->
-    <section class="section section--screen sec--center results-lab is-gated" id="results" data-gate-section="mobilemem">
-      <div class="section__inner">
-        <header class="results-head">
-          <p class="section__kicker reveal" data-i18n="res.kicker">§4.5 · Experiments &amp; Analysis</p>
-          <h2 class="section__title reveal" data-i18n="res.title">Memory methods on MobileMem</h2>
-          <p class="section__lead reveal reveal-d1" data-i18n="res.lead">We further evaluate whether KEME can synthesize answer-preserving but retrieval-harder trajectories.</p>
-        </header>
-        <div class="hard-figure-layout reveal reveal-d2">
-          <figure class="hard-paper-figure">
-            <div class="hard-paper-figure__table">
-              <table>
-                <thead>
-                  <tr><th></th><th colspan="2">RAG</th><th colspan="2">EverMemOS</th></tr>
-                  <tr><th></th><th>Top-k=5</th><th>Top-k=10</th><th>Top-k=5</th><th>Top-k=10</th></tr>
-                </thead>
-                <tbody>
-                  <tr><th>LongMemEval</th><td>40.00</td><td>50.00</td><td>90.00</td><td>100.00</td></tr>
-                  <tr><th>KEME</th><td>20.00</td><td>40.00</td><td>80.00</td><td>90.00</td></tr>
-                </tbody>
-              </table>
-              <p data-i18n="fig.hard.a">(a) Average performance across two memory systems on LongMemEval and KEME</p>
-            </div>
-            <div class="hard-paper-figure__plots">
-              <figure>
-                <div class="hard-paper-figure__media" data-zoom="assets/media/paper2/hd_length.png">
-                  <img src="assets/media/paper2/hd_length.png" alt="Trajectory length distribution" loading="lazy" />
-                </div>
-                <figcaption data-i18n="fig.hard.b">(b) Trajectory length distribution</figcaption>
-              </figure>
-              <figure>
-                <div class="hard-paper-figure__media" data-zoom="assets/media/paper2/hd_rank.png">
-                  <img src="assets/media/paper2/hd_rank.png" alt="Source evidence rank analysis" loading="lazy" />
-                </div>
-                <figcaption data-i18n="fig.hard.c">(c) Source evidence rank analysis</figcaption>
+    <section class="section dataset" id="dataset-construction" aria-labelledby="dataset-title">
+      <div class="wrap">
+        <div class="center-head">
+          <p class="eyebrow">Dataset Construction</p>
+          <h2 id="dataset-title">
+            <span data-lang="zh">Dataset Construction</span>
+            <span data-lang="en">Dataset Construction</span>
+          </h2>
+          <p class="quote small" data-lang="zh">如下所示，MobileMem 具有真实用户参与、多模态交互和多源内容，并通过多阶段管线构建。</p>
+          <p class="quote small" data-lang="en">As illustrated below, MobileMem, featuring real-user participation, multimodal interactions, and multi-source content, is established through a multi-stage pipeline.</p>
+        </div>
+        <div class="dataset-stage">
+          <div class="dataset-panel is-active" data-dataset-panel="1">
+            <div class="dataset-media">
+              <figure class="dataset-figure">
+                <img src="assets/web/dataset-keme-1.png" alt="An illustrative example of KEME.">
               </figure>
             </div>
-          </figure>
-          <aside class="hard-text-panel">
-            <h3 data-i18n="res.c3.t">Hard-distractor synthesis</h3>
-            <p data-i18n="res.hard.p1">Starting from LongMemEval, we select 10 questions, retain their evidence sessions, and use GPT-5.2 to generate compatible medium-grained profiles and difficulty-enhancing guidelines.</p>
-            <p data-i18n="res.hard.p2">As shown in Figure, despite shorter trajectories, retrieval becomes significantly harder: RAG drops from 40.00% to 20.00% at top-k=5, and EverMemOS drops from 90.00% to 80.00%.</p>
-            <p data-i18n="res.hard.p3">How evidence and distractors are arranged in the trajectory can be more influential than trajectory length alone, highlighting the ability of KEME to synthesize short but hard trajectories.</p>
-            <p data-i18n="res.hard.p4">A representative failure occurs on question 50635ada, where the correct answer is Premier Silver.</p>
-          </aside>
-        </div>
-      </div>
-    </section>
-
-    <!-- MobileMem-Omni Dataset entry -->
-    <section class="section chapter-entry chapter-entry--omni" id="omni-entry" aria-label="MobileMem-Omni Dataset entry">
-      <div class="chapter-entry__inner">
-        <header class="chapter-entry__head reveal">
-          <h2 data-i18n="entry.omni.title">MobileMem-Omni Dataset</h2>
-        </header>
-        <div class="chapter-entry__stage reveal reveal-d1">
-          <figure class="chapter-entry__figure">
-            <img src="assets/media/paper2/omni_framework.png" alt="Overview of the MobileMem framework" loading="lazy" />
-          </figure>
-          <a class="chapter-entry__cta" href="#omni-overview" data-entry-target="omni-overview" data-entry-gate="omni">
-            <span class="chapter-entry__icon" aria-hidden="true"></span>
-            <span data-i18n="entry.omni">View MobileMem-Omni Dataset</span>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- §5.1 · Benchmark Construction -->
-    <section class="section section--screen is-gated" id="omni-overview" data-gate-section="omni">
-      <div class="section__inner">
-        <header class="section-head section-head--center reveal">
-          <p class="section__kicker" data-i18n="c1.kicker">§5.1 · Benchmark Construction</p>
-          <h2 class="section__title"><span data-i18n="c1.t1">Built through a</span> <span class="grad-text" data-i18n="c1.t2">multi-stage pipeline</span></h2>
-        </header>
-        <p class="section__lead section__lead--center reveal reveal-d1" data-i18n="c1.lead">As illustrated below, MobileMem —featuring real-user participation, multimodal interactions, and multi-source content —is established through a multi-stage pipeline. Specifically, the benchmark includes 16 distinct user trajectories.</p>
-        <div class="split split--media-left">
-          <div class="split__text">
-            <div class="pipe reveal reveal-d2" style="margin-top:0.6rem">
-          <div class="pcar">
-            <div class="pcar__stage">
-              <article class="pcar__panel is-active" data-step="1"><h3 class="pcar__title" data-i18n="pipe.s1.t">Persona &amp; Memory</h3><p class="pcar__text" data-i18n="pipe.s1.long">To balance authenticity, diversity, and scalability, MobileMem builds personas through a hybrid approach: half are derived from representative hired participants that reference real participant data, and half are virtual personas generated from those real examples. A unified Schema then organizes basic attributes, previous-year status, and key milestones into the core memory structure —8 real and 8 virtual personas in total.</p></article>
-              <article class="pcar__panel" data-step="2"><h3 class="pcar__title" data-i18n="pipe.s2.t">Knowledge Graph</h3><p class="pcar__text" data-i18n="pipe.s2.long">Each persona is represented by three components: a basic information vector B capturing core identity and background, an initial state vector S capturing status and daily patterns before interaction, and a personal knowledge graph G built from social relationships. G centers on the persona, with frequent and significant contacts as surrounding nodes; every node description is enriched by GPT-5.1 and turned into reference photos via the Seedream text-to-image model.</p></article>
-              <article class="pcar__panel" data-step="3"><h3 class="pcar__title" data-i18n="pipe.s3.t">Event Building</h3><p class="pcar__text" data-i18n="pipe.s3.long">Driven by the persona knowledge graph, MobileMem generates the events that form the backbone of each trajectory in three stages: Important Date Collection anchors personally and culturally significant dates; Event Building expands them into a personalized one-year event sequence; and Step Breakdown decomposes every event into temporally ordered sub-event steps, each annotated with the mobile apps and image types involved.</p></article>
-              <article class="pcar__panel" data-step="4"><h3 class="pcar__title" data-i18n="pipe.s4.t">Dialogue Synthesis</h3><p class="pcar__text" data-i18n="pipe.s4.long">Event steps become concrete multimodal dialogues in two phases. Memory Point Decomposition breaks each step into fine-grained textual and visual memory points; Session Generation then lets GPT-5.1 act as an agent to weave them into natural dialogue turns and matching images —produced via HTML rendering, text-to-image, and image-editing tools, with reference photos keeping characters consistent. Sessions are concatenated in temporal order into the full trajectory.</p></article>
-              <article class="pcar__panel" data-step="5"><h3 class="pcar__title" data-i18n="pipe.s5.t">Question Generation</h3><p class="pcar__text" data-i18n="pipe.s5.long">To systematically assess memory systems, evaluation questions are built from the generated memory points and step information. They span seven categories: Single-Hop, Multi-Hop, Knowledge Update, Temporal Reasoning, Implicit Preference, Abstention, and Visual Reasoning.</p></article>
-            </div>
-            <ol class="pcar__dots">
-              <li><button type="button" class="pcar__dot is-active" data-step="1" aria-label="Stage 1">1</button></li>
-              <li><button type="button" class="pcar__dot" data-step="2" aria-label="Stage 2">2</button></li>
-              <li><button type="button" class="pcar__dot" data-step="3" aria-label="Stage 3">3</button></li>
-              <li><button type="button" class="pcar__dot" data-step="4" aria-label="Stage 4">4</button></li>
-              <li><button type="button" class="pcar__dot" data-step="5" aria-label="Stage 5">5</button></li>
-            </ol>
-          </div>
-            </div>
-          </div>
-          <figure class="paper-fig paper-fig--contain split__photo reveal reveal-d1">
-            <div class="paper-fig__media" data-zoom="assets/media/paper2/omni_framework.png">
-              <img src="assets/media/paper2/omni_framework.png" alt="Overview of the MobileMem framework" loading="lazy" />
-            </div>
-            <figcaption class="paper-fig__cap" data-i18n="c1.fig">Figure 1 · The five-stage MobileMem framework.</figcaption>
-          </figure>
-        </div>
-      </div>
-    </section>
-
-    <!-- §5 · Dataset at a Glance -->
-    <section class="section section--band section--screen is-gated" id="omni-stats" data-gate-section="omni">
-      <div class="section__inner">
-        <header class="section-head section-head--center reveal">
-          <p class="section__kicker" data-i18n="glance.kicker">§5 · Dataset at a Glance</p>
-          <h2 class="section__title"><span data-i18n="glance.t1">A multimodal benchmark</span> <span class="grad-text" data-i18n="glance.t2">built at scale</span></h2>
-        </header>
-        <div class="split">
-          <figure class="paper-fig paper-fig--contain split__photo reveal reveal-d1">
-            <div class="paper-fig__media" data-zoom="assets/media/paper2/glance_concept.png">
-              <img src="assets/media/paper2/glance_concept.png" alt="MobileMem as a lifelong personal memory agent" loading="lazy" />
-            </div>
-            <figcaption class="paper-fig__cap" data-i18n="glance.fig">MobileMem as a lifelong personal memory agent —evolving memory that grasps both the story and its significance.</figcaption>
-          </figure>
-          <div class="split__text">
-            <div class="accordion--omni reveal reveal-d1">
-              <details class="acc-item" open>
-                <summary class="acc-head"><span class="acc-chip">01</span><span class="acc-title" data-i18n="glance.q.h">Seven question types</span><span class="acc-chevron" aria-hidden="true"></span></summary>
-                <div class="acc-panel">
-                  <p class="acc-quote" data-i18n="omni.s4.q2">To systematically assess memory system performance, we construct evaluation questions based on the generated memory points and step information using GPT-5.1. The question set covers seven predefined categories: (1) Single-Hop: retrieve a single factual piece; (2) Multi-Hop: synthesize information from multiple factual pieces; (3) Knowledge Update: incorporate new information and revise outdated memory; (4) Temporal Reasoning: capture time-related cues and reason; (5) Implicit Preference: infer latent user attributes or preferences; (6) Abstention: correctly decline to answer when information is absent; (7) Visual Reasoning: interpret and reason over visual content.</p>
-                </div>
-              </details>
-              <details class="acc-item">
-                <summary class="acc-head"><span class="acc-chip">02</span><span class="acc-title" data-i18n="glance.src.h">Multi-source &amp; multimodal</span><span class="acc-chevron" aria-hidden="true"></span></summary>
-                <div class="acc-panel">
-                  <p class="acc-quote" data-i18n="omni.s1.q3">A key feature is that these visual content originate from diverse sources, including device cameras, mobile applications, and shared media. This multi-source design ensures that the benchmark reflects the heterogeneous nature of real-world mobile experiences. Additionally, the benchmark supports multilingual interactions, where users may communicate in different languages based on their linguistic background, and memory systems must maintain cross-lingual consistency.</p>
-                  <p class="glance-card__sub" data-i18n="glance.tools.h">Image generation tools</p>
-                  <p class="acc-quote" data-i18n="glance.tools.q">For image generation, we employ three types of tools: HTML rendering, text-to-image models, and image editing models. For text-to-image and image-editing models, Seedream is the primary choice; when the generation quality is unsatisfactory, other models are used sequentially as alternatives.</p>
-                </div>
-              </details>
-              <details class="acc-item">
-                <summary class="acc-head"><span class="acc-chip">03</span><span class="acc-title" data-i18n="glance.qc.h">Quality control</span><span class="acc-chevron" aria-hidden="true"></span></summary>
-                <div class="acc-panel">
-                  <p class="acc-quote" data-i18n="glance.qc.q1">To ensure the reliability, we apply quality control procedures to both generated images and evaluation questions. After the filtering process, a total of 19,060 images and 7,415 question-answer pairs are retained in the final benchmark.</p>
-                  <p class="acc-quote" data-i18n="glance.qc.q2">We employ GPT-5.1 as an image filtering agent to assess generated images. For images involving human faces generated by image-editing models, we additionally apply face-recognition tools from the InsightFace library to compare against the persona's initial reference photos, filtering out images below the similarity threshold for same-person identification.</p>
-                  <p class="acc-quote" data-i18n="glance.qc.q3">We use GPT-5.1 as a question quality agent to automatically evaluate each generated question, checking whether it can be correctly answered based on the source memory points and filtering out questions with unreasonable information or answer errors.</p>
-                </div>
-              </details>
-            </div>
-          </div>
-        </div>
-
-        <div class="stats-strip stats-strip--row reveal reveal-d2">
-          <div class="stat-cell"><div class="stat-cell__n" data-count="16">0</div><div class="stat-cell__l" data-i18n="glance.n1">User trajectories</div></div>
-          <div class="stat-cell"><div class="stat-cell__n" data-count="19060">0</div><div class="stat-cell__l" data-i18n="glance.n3">Images</div></div>
-          <div class="stat-cell"><div class="stat-cell__n" data-count="7415">0</div><div class="stat-cell__l" data-i18n="glance.n4">QA pairs</div></div>
-          <div class="stat-cell"><div class="stat-cell__n" data-count="7">0</div><div class="stat-cell__l" data-i18n="glance.n5">Question types</div></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- MobileMem-Omni · Experiments & Analysis -->
-    <section class="section section--band section--screen is-gated" id="omni-results" data-gate-section="omni">
-      <div class="section__inner">
-        <header class="section-head section-head--center reveal">
-          <p class="section__kicker" data-i18n="res2.kicker">§5.2 · Results</p>
-          <h2 class="section__title"><span data-i18n="res2.t1">Comparing</span> <span class="grad-text" data-i18n="res2.t2">memory methods</span></h2>
-        </header>
-        <p class="section__lead section__lead--center reveal reveal-d1" data-i18n="omni.s5.q1">As shown in Table, we observe a clear performance hierarchy across different families of approaches. Specialized memory-augmented frameworks consistently outperform long context and RAG types of methods across almost all tasks and backbone models.</p>
-        <div class="rsub-nav rsub-nav--center reveal reveal-d2">
-          <button type="button" class="rsub-btn is-active" data-rsub="text" data-i18n="tbl.textual">Textual Memory Methods</button>
-          <button type="button" class="rsub-btn" data-rsub="mm" data-i18n="tbl.multimodal">Multimodal Memory Methods</button>
-        </div>
-        <div class="rsub-panel is-active reveal reveal-d2" data-rsub="text">
-          <div class="result-table-wrap">
-            <table class="result-table result-table--paper">
-              <thead><tr><th data-i18n="tbl.method">Method</th><th data-i18n="tbl.single">Single</th><th data-i18n="tbl.multi">Multi</th><th data-i18n="tbl.update">Update</th><th data-i18n="tbl.temporal">Temporal</th><th data-i18n="tbl.abst">Abst.</th><th data-i18n="tbl.pref">Pref.</th><th data-i18n="tbl.visual">Visual</th><th data-i18n="tbl.judge">Judge</th><th>F1</th></tr></thead>
-              <tbody>
-                <tr class="grp"><td colspan="10" data-i18n="tbl.gpt">GPT-5.4-mini</td></tr>
-                <tr><td>Long Context</td><td>17.2</td><td>10.2</td><td>21.5</td><td>19.3</td><td>18.1</td><td>34.0</td><td>12.2</td><td>19.1</td><td>20.5</td></tr>
-                <tr><td>NaiveRAG</td><td>24.9</td><td>20.4</td><td>16.5</td><td>19.0</td><td>7.4</td><td>8.6</td><td>14.5</td><td>15.4</td><td>10.4</td></tr>
-                <tr><td>LangMem</td><td>21.8</td><td>19.2</td><td>27.5</td><td>29.9</td><td>12.0</td><td>49.0</td><td>15.0</td><td>24.9</td><td>7.5</td></tr>
-                <tr><td>Mem0</td><td>26.9</td><td>25.9</td><td>27.3</td><td>27.4</td><td>7.1</td><td>44.0</td><td>15.0</td><td>24.7</td><td>9.6</td></tr>
-                <tr><td>LightMem</td><td>37.4</td><td>33.0</td><td>38.2</td><td>38.9</td><td>19.2</td><td>46.3</td><td>25.8</td><td class="best">33.8</td><td class="best">21.5</td></tr>
-                <tr><td>EverMemOS</td><td class="best">47.0</td><td class="best">40.4</td><td class="best">46.8</td><td class="best">43.5</td><td>7.0</td><td class="best">60.3</td><td class="best">34.1</td><td class="best">39.4</td><td>12.2</td></tr>
-                <tr class="grp"><td colspan="10" data-i18n="tbl.qwen">Qwen3-VL-8B-Instruct</td></tr>
-                <tr><td>Long Context</td><td>4.1</td><td>4.3</td><td>5.1</td><td>9.2</td><td>6.3</td><td>6.5</td><td>6.8</td><td>5.9</td><td>12.8</td></tr>
-                <tr><td>NaiveRAG</td><td>5.1</td><td>5.6</td><td>2.8</td><td>5.3</td><td>7.5</td><td>0.7</td><td>2.4</td><td>4.2</td><td>4.4</td></tr>
-                <tr><td>LangMem</td><td>17.4</td><td>14.2</td><td>18.7</td><td>17.1</td><td>13.8</td><td>30.2</td><td>8.2</td><td>17.3</td><td>2.4</td></tr>
-                <tr><td>Mem0</td><td>25.9</td><td>23.2</td><td>31.8</td><td>23.7</td><td>13.0</td><td>50.5</td><td>16.8</td><td>26.7</td><td>8.8</td></tr>
-                <tr><td>LightMem</td><td>30.1</td><td>26.4</td><td>29.7</td><td>23.2</td><td class="best">20.8</td><td>36.1</td><td>22.2</td><td class="best">27.1</td><td class="best">16.9</td></tr>
-                <tr><td>EverMemOS</td><td>28.1</td><td>27.2</td><td>27.8</td><td>26.3</td><td>13.8</td><td>32.0</td><td>19.2</td><td>24.8</td><td>3.6</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="rsub-panel reveal reveal-d2" data-rsub="mm">
-          <div class="result-table-wrap">
-            <table class="result-table result-table--paper">
-              <thead><tr><th data-i18n="tbl.method">Method</th><th data-i18n="tbl.single">Single</th><th data-i18n="tbl.multi">Multi</th><th data-i18n="tbl.update">Update</th><th data-i18n="tbl.temporal">Temporal</th><th data-i18n="tbl.abst">Abst.</th><th data-i18n="tbl.pref">Pref.</th><th data-i18n="tbl.visual">Visual</th><th data-i18n="tbl.judge">Judge</th><th>F1</th></tr></thead>
-              <tbody>
-                <tr class="grp"><td colspan="10" data-i18n="tbl.gpt">GPT-5.4-mini</td></tr>
-                <tr><td>Multimodal Long Context</td><td>34.9</td><td>20.4</td><td>30.9</td><td>31.3</td><td>14.0</td><td>17.2</td><td>21.9</td><td class="best">24.4</td><td>18.3</td></tr>
-                <tr><td>SigLIP + NaiveRAG</td><td>23.1</td><td>16.8</td><td>19.7</td><td>18.1</td><td>4.8</td><td>33.8</td><td>9.6</td><td>18.0</td><td>10.0</td></tr>
-                <tr><td>Universal RAG</td><td>22.6</td><td>17.6</td><td>22.1</td><td>21.2</td><td>4.9</td><td>39.0</td><td>7.6</td><td>19.3</td><td>9.5</td></tr>
-                <tr><td>M²A</td><td>22.6</td><td>17.6</td><td>22.1</td><td>21.2</td><td>4.9</td><td>39.0</td><td>7.6</td><td>19.3</td><td>9.5</td></tr>
-                <tr class="grp"><td colspan="10" data-i18n="tbl.qwen">Qwen3-VL-8B-Instruct</td></tr>
-                <tr><td>Multimodal Long Context</td><td>16.7</td><td>11.6</td><td>18.3</td><td>19.0</td><td>1.4</td><td>9.3</td><td>13.5</td><td class="best">12.8</td><td>12.2</td></tr>
-                <tr><td>SigLIP + NaiveRAG</td><td>10.9</td><td>9.9</td><td>9.8</td><td>11.9</td><td>15.6</td><td>17.5</td><td>4.4</td><td>11.6</td><td>4.6</td></tr>
-                <tr><td>Universal RAG</td><td>14.8</td><td>12.3</td><td>15.9</td><td>11.5</td><td>13.1</td><td>26.6</td><td>3.2</td><td>14.2</td><td>4.6</td></tr>
-                <tr><td>M²A</td><td>14.8</td><td>12.3</td><td>15.9</td><td>11.5</td><td>13.1</td><td>26.6</td><td>3.2</td><td>14.2</td><td>4.6</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <figcaption class="paper-fig__cap" style="margin-top:0.6rem" data-i18n="omni.tbl.cap">Question-answering performance of methods. Scores for each task are evaluated using LLM-as-a-Judge.</figcaption>
-      </div>
-    </section>
-
-    <!-- §5.3 · In-depth Analysis -->
-    <section class="section section--screen is-gated" id="omni-analysis" data-gate-section="omni">
-      <div class="section__inner">
-        <header class="section-head section-head--center reveal">
-          <p class="section__kicker" data-i18n="ana.kicker">§5.3 · Analysis</p>
-          <h2 class="section__title"><span data-i18n="ana.t1">In-depth</span> <span class="grad-text" data-i18n="ana.t2">analysis</span></h2>
-        </header>
-        <div class="ana-row reveal reveal-d1">
-          <div class="ana-col">
-            <div class="ana-desc">
-              <h3 class="ana-desc__h" data-i18n="ana.b1">Captions: a trade-off</h3>
-              <p data-i18n="omni.s5.q2">As shown in Figure, incorporating image captions into NaiveRAG yields a trade-off: performance improves on visual-reasoning questions but declines on text-oriented questions.</p>
-            </div>
-            <figure class="paper-fig paper-fig--contain paper-fig--widefill">
-              <div class="paper-fig__media" data-zoom="assets/media/paper2/visual_bar.png">
-                <img src="assets/media/paper2/visual_bar.png" alt="LLM-Judge performance changes of NaiveRAG with captions" loading="lazy" />
+            <div class="dataset-expression" data-expression-group="1">
+              <div class="dataset-switcher" aria-label="Dataset switcher">
+                <button type="button" data-dataset-tab="1" aria-pressed="true">MobileMem Dataset</button>
+                <button type="button" data-dataset-tab="2" aria-pressed="false">MobileMem-Omni Dataset</button>
               </div>
-              <figcaption class="paper-fig__cap" data-i18n="omni.s5.fig1">LLM-Judge performance (%) changes of NaiveRAG: captions improve visual reasoning but degrade other text-oriented questions.</figcaption>
-            </figure>
-          </div>
-          <div class="ana-col">
-            <div class="ana-desc">
-              <h3 class="ana-desc__h" data-i18n="ana.b2">Language × time span</h3>
-              <p data-i18n="rtab.q3">Memory performance improves as event span increases —short-term events are the most difficult, while longer events yield better results. Meanwhile, a notable gap persists between English and Chinese: most methods score lower on Chinese questions, indicating memory mechanisms remain primarily optimized for English.</p>
-            </div>
-            <figure class="paper-fig paper-fig--contain">
-              <div class="paper-fig__media" data-zoom="assets/media/paper2/radar.png">
-                <img src="assets/media/paper2/radar.png" alt="Event-type radar across languages and time spans" loading="lazy" />
+              <div class="expression-panel is-active" data-expression-panel="1-1">
+                <h3>Core Framework</h3>
+                <p class="quote small" data-lang="zh">KEME 将零散的用户-App 会话作为基础知识锚点，反映已经发生且必须保留的内容。在用户画像知识和时间约束的引导下，KEME 将这些锚定会话分层组织成统一的交互流。</p>
+                <p class="quote small" data-lang="en">KEME treats the fragmented user-app sessions as foundational knowledge anchors that reflect what has already occurred and must be preserved. Guided by user persona knowledge and temporal constraints, KEME hierarchically organizes these anchored sessions into a unified interaction stream.</p>
               </div>
-              <figcaption class="paper-fig__cap" data-i18n="omni.s5.fig2">Radar chart of event type LLM-Judge performance (%). Events are divided by interaction language: Chinese, English; and by event span: short-term, medium-term, long-term.</figcaption>
-            </figure>
-          </div>
-          <div class="ana-col">
-            <div class="ana-desc">
-              <h3 class="ana-desc__h" data-i18n="ana.b3">Common error patterns</h3>
-              <p data-i18n="omni.s5.q3">As shown in Figure, we present common errors observed across different methods. For multimodal memory approaches, they tend to generate erroneous memories by retrieving images of the same type as the target but irrelevant to the actual answer, such as confusing similar screenshots from different contexts.</p>
-            </div>
-            <figure class="paper-fig paper-fig--contain">
-              <div class="paper-fig__media" data-zoom="assets/media/paper2/case.png">
-                <img src="assets/media/paper2/case.png" alt="Case analysis of memory errors" loading="lazy" />
+              <div class="expression-panel" data-expression-panel="1-2">
+                <h3>A:plan - Knowledge-Guided Planner</h3>
+                <p class="quote small" data-lang="zh">从人物画像根节点构建时序事件图，并递归展开：粗粒度生活阶段 -> 更细的子事件图 -> 叶级会话，并按拓扑顺序展开。</p>
+                <p class="quote small" data-lang="en">Builds a temporal event graph from the persona root and recursively expands it: coarse life phases →finer sub-event graphs →leaf-level sessions, expanded in topological order.</p>
               </div>
-              <figcaption class="paper-fig__cap" data-i18n="omni.s5.fig3">Case analysis. (a) shows the dialogue containing the correct answer, while (b), (c), and (d) show the dialogue sources of incorrect memory information from memory methods.</figcaption>
-            </figure>
+              <div class="expression-panel" data-expression-panel="1-3">
+                <h3>A:ground - Knowledge Anchor Grounder</h3>
+                <p class="quote small" data-lang="zh">将每个锚定的 App 会话分配到时间兼容的事件节点；若没有节点适配，则修订事件图，使每个锚点都可落地，并向下传播非矛盾约束。</p>
+                <p class="quote small" data-lang="en">Assigns each anchored app session to a time-compatible event node; when none fits, it revises the graph so every anchor is groundable, propagating a non-contradiction constraint downward.</p>
+              </div>
+              <div class="expression-panel" data-expression-panel="1-4">
+                <h3>A:realize - Experience Realizer</h3>
+                <p class="quote small" data-lang="zh">在叶节点采纳或合并锚定内容，或合成上下文一致的人机对话，并通过版本跟踪属性和证据链接驱动人物画像演化。</p>
+                <p class="quote small" data-lang="en">At leaf nodes it adopts or merges anchored content, or synthesizes context-consistent human-assistant dialogue, and drives persona evolution with version-tracked attributes and evidence links.</p>
+              </div>
+              <div class="expression-panel" data-expression-panel="1-5">
+                <h3>A:revise - Experience-Driven Reviser</h3>
+                <p class="quote small" data-lang="zh">每次展开后，它会更新剩余图，增添、移除或调整未来事件与边，以解决不一致并丰富结构，形成自底向上的反馈循环。</p>
+                <p class="quote small" data-lang="en">After each expansion it updates the remaining graph —adding, removing or adjusting future events and edges to resolve inconsistencies and enrich structure, forming a bottom-up feedback loop.</p>
+              </div>
+              <div class="expression-nav" aria-label="Dataset 1 expression switcher">
+                <button type="button" data-expression-tab="1-1" aria-pressed="true">1</button>
+                <button type="button" data-expression-tab="1-2" aria-pressed="false">2</button>
+                <button type="button" data-expression-tab="1-3" aria-pressed="false">3</button>
+                <button type="button" data-expression-tab="1-4" aria-pressed="false">4</button>
+                <button type="button" data-expression-tab="1-5" aria-pressed="false">5</button>
+              </div>
+            </div>
+          </div>
+          <div class="dataset-panel" data-dataset-panel="2">
+            <div class="dataset-media">
+              <figure class="dataset-figure">
+                <img src="assets/web/dataset-omni-1.png" alt="The overview of MobileMem-Omni framework.">
+              </figure>
+            </div>
+            <div class="dataset-expression" data-expression-group="2">
+              <div class="dataset-switcher" aria-label="Dataset switcher">
+                <button type="button" data-dataset-tab="1" aria-pressed="false">MobileMem Dataset</button>
+                <button type="button" data-dataset-tab="2" aria-pressed="true">MobileMem-Omni Dataset</button>
+              </div>
+              <div class="expression-panel is-active" data-expression-panel="2-1">
+                <h3>Persona &amp; Memory</h3>
+                <p class="quote small" data-lang="zh">为平衡真实性、多样性与可扩展性，MobileMem 采用混合方式构建人物画像：一半来自代表性受雇参与者并参考真实参与者数据，另一半由这些真实样例生成虚拟画像。统一 Schema 进一步组织基础属性、上一年状态和关键里程碑，形成核心记忆结构，共 8 个真实画像和 8 个虚拟画像。</p>
+                <p class="quote small" data-lang="en">To balance authenticity, diversity, and scalability, MobileMem builds personas through a hybrid approach: half are derived from representative hired participants that reference real participant data, and half are virtual personas generated from those real examples. A unified Schema then organizes basic attributes, previous-year status, and key milestones into the core memory structure —8 real and 8 virtual personas in total.</p>
+              </div>
+              <div class="expression-panel" data-expression-panel="2-2">
+                <h3>Knowledge Graph</h3>
+                <p class="quote small" data-lang="zh">每个人物画像由三部分表示：基础信息向量 B 捕捉核心身份与背景，初始状态向量 S 捕捉交互前的状态和日常模式，个人知识图谱 G 则由社会关系构建。G 以人物为中心，以频繁且重要的联系人作为周围节点；每个节点描述由 GPT-5.1 丰富，并通过 Seedream 文生图模型转化为参考照片。</p>
+                <p class="quote small" data-lang="en">Each persona is represented by three components: a basic information vector B capturing core identity and background, an initial state vector S capturing status and daily patterns before interaction, and a personal knowledge graph G built from social relationships. G centers on the persona, with frequent and significant contacts as surrounding nodes; every node description is enriched by GPT-5.1 and turned into reference photos via the Seedream text-to-image model.</p>
+              </div>
+              <div class="expression-panel" data-expression-panel="2-3">
+                <h3>Event Building</h3>
+                <p class="quote small" data-lang="zh">在人物知识图谱驱动下，MobileMem 分三阶段生成构成每条轨迹主干的事件：重要日期收集锚定个人和文化上重要的日期；事件构建将其扩展为个性化的一年事件序列；步骤拆解把每个事件分解为按时间排序的子事件步骤，并为每一步标注涉及的移动应用和图像类型。</p>
+                <p class="quote small" data-lang="en">Driven by the persona knowledge graph, MobileMem generates the events that form the backbone of each trajectory in three stages: Important Date Collection anchors personally and culturally significant dates; Event Building expands them into a personalized one-year event sequence; and Step Breakdown decomposes every event into temporally ordered sub-event steps, each annotated with the mobile apps and image types involved.</p>
+              </div>
+              <div class="expression-panel" data-expression-panel="2-4">
+                <h3>Dialogue Synthesis</h3>
+                <p class="quote small" data-lang="zh">事件步骤通过两个阶段变成具体的多模态对话。记忆点拆解将每个步骤分解为细粒度文本和视觉记忆点；随后会话生成让 GPT-5.1 作为 agent，将它们编织成自然对话轮次和匹配图像，这些图像通过 HTML 渲染、文生图和图像编辑工具生成，并用参考照片保持人物一致性。会话按时间顺序拼接成完整轨迹。</p>
+                <p class="quote small" data-lang="en">Event steps become concrete multimodal dialogues in two phases. Memory Point Decomposition breaks each step into fine-grained textual and visual memory points; Session Generation then lets GPT-5.1 act as an agent to weave them into natural dialogue turns and matching images —produced via HTML rendering, text-to-image, and image-editing tools, with reference photos keeping characters consistent. Sessions are concatenated in temporal order into the full trajectory.</p>
+              </div>
+              <div class="expression-panel" data-expression-panel="2-5">
+                <h3>Question Generation</h3>
+                <p class="quote small" data-lang="zh">为系统评估记忆能力，评测问题基于生成的记忆点和步骤信息构建，覆盖七类：单跳、多跳、知识更新、时间推理、隐式偏好、拒答和视觉推理。</p>
+                <p class="quote small" data-lang="en">To systematically assess memory systems, evaluation questions are built from the generated memory points and step information. They span seven categories: Single-Hop, Multi-Hop, Knowledge Update, Temporal Reasoning, Implicit Preference, Abstention, and Visual Reasoning.</p>
+              </div>
+              <div class="expression-nav" aria-label="Dataset 2 expression switcher">
+                <button type="button" data-expression-tab="2-1" aria-pressed="true">1</button>
+                <button type="button" data-expression-tab="2-2" aria-pressed="false">2</button>
+                <button type="button" data-expression-tab="2-3" aria-pressed="false">3</button>
+                <button type="button" data-expression-tab="2-4" aria-pressed="false">4</button>
+                <button type="button" data-expression-tab="2-5" aria-pressed="false">5</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Team -->
-    <section class="section section--screen" id="team">
-      <div class="section__inner">
-        <p class="section__kicker reveal" data-i18n="team.kicker">Affiliation</p>
-        <h2 class="section__title reveal" data-i18n="team.title">Institutions</h2>
-        <div class="institutions-card reveal reveal-d1">
-          <p class="institutions-eyebrow" data-i18n="team.eyebrow">This work is jointly conducted by the following institutions</p>
-          <div class="institution-logos" aria-label="OPPO and OpenKG institutions">
-            <img class="institution-combo-logo" src="assets/media/logos/institutions_oppo_openkg.png" alt="OPPO and OpenKG.CN 中文开放知识图谱" loading="lazy" />
+    <section class="section application" id="application" aria-labelledby="application-title-zh">
+      <div class="wrap">
+        <div class="center-head">
+          <p class="eyebrow">Application</p>
+          <h2 id="application-title-zh" data-lang="zh">MobileMem 的应用场景</h2>
+          <h2 id="application-title-en" data-lang="en">Application Scenarios</h2>
+        </div>
+        <div class="application-grid">
+        <div class="quote-panel">
+          <div>
+            <p class="eyebrow">Application</p>
+            <h2>Mobile Agents</h2>
           </div>
-          <div class="institutions-traffic" aria-label="Page views"><span data-i18n="team.views">Page views</span><span>•</span><strong id="busuanzi_value_page_pv">0</strong></div>
-          <p class="institutions-note" data-i18n="team.note">Developed by OPPO and OpenKG.</p>
+          <p class="quote" data-lang="zh">MobileMem 提供统一的基准测试框架，能够与现有移动智能体生态系统无缝集成，包括任务理解、记忆检索问答、网页搜索、响应安全和执行模块。</p>
+          <p class="quote" data-lang="en">MobileMem provides a unified benchmarking framework that seamlessly integrates with the existing mobile agent ecosystem, including task understanding, memory retrieval QA, web search, response safety, and execution modules.</p>
+          <p class="quote small" data-lang="zh">通过与记忆中间件和持续学习框架对齐，它自然适配真实产品管线，并支持 AI 移动体验的快速迭代周期。</p>
+          <p class="quote small" data-lang="en">By aligning with memory middleware and continuous learning frameworks, it naturally fits into real product pipelines and enables rapid iteration cycles for AI-powered mobile experiences.</p>
+        </div>
+        <div class="application-cards">
+          <article class="card accent-green">
+            <h3>On-Device Intelligence</h3>
+            <p class="quote small" data-lang="zh">通过将长期记忆评估从能力展示转向可测量、可比较、可迭代的评估，MobileMem 直接帮助手机厂商定义端侧智能，并评估个人助手体验。</p>
+            <p class="quote small" data-lang="en">By shifting long-term memory evaluation from capability demonstration to measurable, comparable, and iterative assessment, MobileMem directly informs how mobile manufacturers define on-device intelligence and evaluate personal assistant experiences.</p>
+          </article>
+          <article class="card accent-coral">
+            <h3>User Memory Value</h3>
+            <p class="quote small" data-lang="zh">从核心上看，该基准将用户的长期多模态记忆作为个性化的中心单元。</p>
+            <p class="quote small" data-lang="en">At its core, the benchmark prioritizes the user's long-term multimodal memory as the central unit of personalization.</p>
+          </article>
+          <article class="card accent-gold">
+            <h3>Standardization</h3>
+            <p class="quote small" data-lang="zh">该基准已经在单一框架中统一了基础记忆、认知记忆、偏好记忆和视觉推理，同时将评估建立在真实用户数据、一年时间跨度和多样化多模态事件流之上。</p>
+            <p class="quote small" data-lang="en">The benchmark already unifies foundational memory, cognitive memory, preference memory, and visual reasoning within a single framework, while grounding evaluation in real user data, one-year temporal spans, and diverse multimodal event streams.</p>
+          </article>
+          <article class="card accent-blue">
+            <h3>OPPO Application Scenarios</h3>
+            <p class="quote small" data-lang="zh">MobileMem 已集成到 OPPO 的 AI 助手开发流程中，用于系统评估并增强生产级移动场景中的长期记忆能力。</p>
+            <p class="quote small" data-lang="en">MobileMem has been integrated into OPPO's AI assistant development pipeline to systematically evaluate and enhance long-term memory capabilities in production-grade mobile scenarios.</p>
+          </article>
+        </div>
         </div>
       </div>
     </section>
 
+    <section class="section quick" id="quick-start" aria-labelledby="quick-title">
+      <div class="wrap">
+        <div class="quick-head">
+          <h2 id="quick-title">
+            <span data-lang="zh">Quick Start</span>
+            <span data-lang="en">Quick Start</span>
+          </h2>
+        </div>
+        <div class="quick-grid">
+          <div class="terminal-demo" aria-label="Quick start terminal">
+            <div class="terminal-head">
+              <span class="terminal-dots" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+              <span>mobilemem-quick-start</span>
+            </div>
+            <div class="terminal-body" data-terminal-output aria-live="polite"></div>
+          </div>
+          <div class="github-cta">
+            <div class="github-card-head">
+              <div class="github-card-icon" aria-hidden="true">
+                <svg class="github-icon" viewBox="0 0 16 16">
+                  <path fill="currentColor" d="M8 0C3.58 0 0 3.67 0 8.2c0 3.62 2.29 6.69 5.47 7.77.4.08.55-.18.55-.4 0-.2-.01-.86-.01-1.56-2.01.38-2.53-.5-2.69-.95-.09-.23-.48-.95-.82-1.14-.28-.16-.68-.55-.01-.56.63-.01 1.08.59 1.23.83.72 1.24 1.87.89 2.33.68.07-.53.28-.89.51-1.09-1.78-.21-3.64-.91-3.64-4.04 0-.89.31-1.62.82-2.19-.08-.21-.36-1.04.08-2.16 0 0 .67-.22 2.2.84A7.43 7.43 0 0 1 8 3.96c.68 0 1.36.09 2 .28 1.53-1.06 2.2-.84 2.2-.84.44 1.12.16 1.95.08 2.16.51.57.82 1.3.82 2.19 0 3.14-1.87 3.83-3.65 4.04.29.26.54.75.54 1.51 0 1.09-.01 1.97-.01 2.24 0 .22.15.48.55.4A8.08 8.08 0 0 0 16 8.2C16 3.67 12.42 0 8 0Z"/>
+                </svg>
+              </div>
+              <div>
+                <span class="github-repo-name">zjunlp/MobileMem</span>
+                <span class="github-repo-path">README and code repository</span>
+              </div>
+            </div>
+            <p class="quote small" data-lang="zh">Detailed download and usage instructions are maintained in the project repository.</p>
+            <p class="quote small" data-lang="en">Detailed download and usage instructions are maintained in the project repository.</p>
+            <div class="github-links">
+              <a class="btn primary github-button" href="https://github.com/zjunlp/MobileMem/">
+                <svg class="github-icon" viewBox="0 0 16 16" aria-hidden="true">
+                  <path fill="currentColor" d="M8 0C3.58 0 0 3.67 0 8.2c0 3.62 2.29 6.69 5.47 7.77.4.08.55-.18.55-.4 0-.2-.01-.86-.01-1.56-2.01.38-2.53-.5-2.69-.95-.09-.23-.48-.95-.82-1.14-.28-.16-.68-.55-.01-.56.63-.01 1.08.59 1.23.83.72 1.24 1.87.89 2.33.68.07-.53.28-.89.51-1.09-1.78-.21-3.64-.91-3.64-4.04 0-.89.31-1.62.82-2.19-.08-.21-.36-1.04.08-2.16 0 0 .67-.22 2.2.84A7.43 7.43 0 0 1 8 3.96c.68 0 1.36.09 2 .28 1.53-1.06 2.2-.84 2.2-.84.44 1.12.16 1.95.08 2.16.51.57.82 1.3.82 2.19 0 3.14-1.87 3.83-3.65 4.04.29.26.54.75.54 1.51 0 1.09-.01 1.97-.01 2.24 0 .22.15.48.55.4A8.08 8.08 0 0 0 16 8.2C16 3.67 12.42 0 8 0Z"/>
+                </svg>
+                <span>Go to GitHub</span>
+              </a>
+              <a class="btn" href="https://github.com/zjunlp/MobileMem/blob/main/MoblieMem-Omni/README.md">README</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section compact institutions" id="institutions" aria-labelledby="institutions-title">
+      <div class="wrap institutions-grid">
+        <div>
+          <h2 id="institutions-title">Institutions</h2>
+          <p class="quote small" data-lang="zh">This work is jointly conducted by the following institutions.</p>
+          <p class="quote small" data-lang="en">This work is jointly conducted by the following institutions.</p>
+          <p class="quote small" data-lang="zh">Developed by OPPO and OpenKG.</p>
+          <p class="quote small" data-lang="en">Developed by OPPO and OpenKG.</p>
+        </div>
+        <div class="institution-logo-panel" aria-label="Institutions">
+          <img src="assets/web/institutions-transparent.png" alt="OPPO and OpenKG.CN, 中文开放知识图谱">
+        </div>
+      </div>
+    </section>
   </main>
-
-  <div class="lightbox" id="lightbox" aria-hidden="true">
-    <button type="button" class="lightbox__close" id="lightboxClose" aria-label="Close">&#10005;</button>
-    <img id="lightboxImg" src="" alt="" />
-  </div>
-
-  <script data-page-view-script="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-  <script src="assets/js/mem.js?v=20260620-real-views-1"></script>
+  <dialog class="video-modal" id="oppo-video-modal" aria-labelledby="oppo-video-title">
+    <div class="video-modal-head">
+      <h2 id="oppo-video-title">OPPO Application Scenarios</h2>
+      <button class="video-close" type="button" aria-label="Close video modal">&times;</button>
+    </div>
+    <div class="video-placeholder">
+      <p>Video placeholder</p>
+    </div>
+  </dialog>
   <script>
-    document.querySelectorAll('[data-qaqc-accordion]').forEach((root) => {
-      const items = Array.from(root.querySelectorAll('[data-qaqc-acc]'));
+    const languageToggle = document.querySelector("[data-toggle-lang]");
 
-      items.forEach((item) => {
-        const button = item.querySelector('.qaqc-acc__head');
-        button?.addEventListener('click', () => {
-          items.forEach((candidate) => {
-            const isOpen = candidate === item;
-            candidate.classList.toggle('is-open', isOpen);
-            candidate.querySelector('.qaqc-acc__head')?.setAttribute('aria-expanded', String(isOpen));
-          });
+    const setLanguageToggle = (lang) => {
+      if (!languageToggle) return;
+      const nextLang = lang === "zh" ? "en" : "zh";
+      languageToggle.dataset.toggleLang = nextLang;
+      languageToggle.textContent = nextLang === "en" ? "English" : "Chinese";
+      languageToggle.setAttribute(
+        "aria-label",
+        nextLang === "en" ? "Switch language to English" : "Switch language to Chinese"
+      );
+    };
+
+    if (languageToggle) {
+      languageToggle.addEventListener("click", () => {
+        const lang = languageToggle.dataset.toggleLang;
+        document.body.classList.toggle("lang-zh", lang === "zh");
+        document.body.classList.toggle("lang-en", lang === "en");
+        setLanguageToggle(lang);
+      });
+    }
+
+    setLanguageToggle("zh");
+
+    const videoModal = document.querySelector("#oppo-video-modal");
+    const videoPlay = document.querySelector(".video-play");
+    const videoClose = document.querySelector(".video-close");
+
+    if (videoModal && videoPlay && videoClose) {
+      videoPlay.addEventListener("click", () => {
+        videoModal.showModal();
+      });
+
+      videoClose.addEventListener("click", () => {
+        videoModal.close();
+      });
+
+      videoModal.addEventListener("click", (event) => {
+        if (event.target === videoModal) videoModal.close();
+      });
+    }
+
+    const terminalOutput = document.querySelector("[data-terminal-output]");
+    const terminalLines = [
+      { text: "conda create -n mobilemem python=3.11", prompt: true },
+      { text: "conda activate mobilemem", prompt: true },
+      { text: "git clone https://github.com/zjunlp/MobileMem", prompt: true },
+      { text: "pip install -r requirements.txt", prompt: true },
+      { text: "huggingface-cli download --repo-type dataset --resume-download zjunlp/xxx --local-dir OceanBenchmark", prompt: true },
+      { text: "dst = load_dataset(\"zjunlp/xxx\")", prompt: false },
+      { text: "cd MoblieMem-Omni/src", prompt: true },
+      { text: "cp .env.example .env    # fill in your API keys", prompt: true },
+      { text: "python -m pipeline.cli list", prompt: true },
+      { text: "python -m pipeline.cli run", prompt: true },
+      { text: "[done] build multimodal mobile memories", prompt: false }
+    ];
+
+    const startTerminalDemo = () => {
+      if (!terminalOutput) return;
+      terminalOutput.innerHTML = "";
+      let lineIndex = 0;
+      let charIndex = 0;
+      let activeLine = null;
+
+      const trimVisibleLines = () => {
+        const lines = terminalOutput.querySelectorAll(".terminal-line");
+        if (lines.length <= 3) return;
+        lines[0].remove();
+      };
+
+      const removeCursor = () => {
+        const cursor = terminalOutput.querySelector(".terminal-cursor");
+        if (cursor) cursor.remove();
+      };
+
+      const appendCursor = () => {
+        const cursor = document.createElement("span");
+        cursor.className = "terminal-cursor";
+        terminalOutput.append(cursor);
+      };
+
+      const beginLine = () => {
+        removeCursor();
+
+        if (lineIndex >= terminalLines.length) {
+          appendCursor();
+          window.setTimeout(startTerminalDemo, 1800);
+          return;
+        }
+
+        const terminalLine = terminalLines[lineIndex];
+        const line = document.createElement("p");
+        line.className = `terminal-line${terminalLine.prompt ? " prompt" : ""}`;
+        line.textContent = "";
+        terminalOutput.append(line);
+        trimVisibleLines();
+
+        activeLine = line;
+        charIndex = 0;
+        typeNextChar();
+      };
+
+      const typeNextChar = () => {
+        removeCursor();
+        const terminalLine = terminalLines[lineIndex];
+
+        if (charIndex < terminalLine.text.length) {
+          activeLine.textContent += terminalLine.text.charAt(charIndex);
+          charIndex += 1;
+          appendCursor();
+          window.setTimeout(typeNextChar, 24 + Math.random() * 34);
+          return;
+        }
+
+        appendCursor();
+        lineIndex += 1;
+        window.setTimeout(beginLine, terminalLine.prompt ? 520 : 900);
+      };
+
+      beginLine();
+    };
+
+    startTerminalDemo();
+
+    const featureDetails = document.querySelectorAll(".feature-accordion details");
+
+    let syncingFeatureDetails = false;
+
+    featureDetails.forEach((details) => {
+      details.addEventListener("toggle", () => {
+        if (syncingFeatureDetails) return;
+
+        if (!details.open) {
+          const anyOpen = Array.from(featureDetails).some((item) => item.open);
+          if (!anyOpen) details.open = true;
+          return;
+        }
+
+        syncingFeatureDetails = true;
+        featureDetails.forEach((item) => {
+          if (item !== details) item.open = false;
         });
+        syncingFeatureDetails = false;
       });
     });
 
-    document.querySelectorAll('[data-qa-switch]').forEach((root) => {
-      const panels = Array.from(root.querySelectorAll('[data-qa-panel]'));
-      const tabs = Array.from(root.querySelectorAll('[data-qa-target]'));
+    const datasetTabs = document.querySelectorAll("[data-dataset-tab]");
+    const datasetPanels = document.querySelectorAll("[data-dataset-panel]");
+    const expressionTabs = document.querySelectorAll("[data-expression-tab]");
+    const expressionPanels = document.querySelectorAll("[data-expression-panel]");
 
-      tabs.forEach((tab) => {
-        tab.addEventListener('click', () => {
-          const target = tab.dataset.qaTarget;
+    const setExpression = (target) => {
+      const group = target.split("-")[0];
 
-          panels.forEach((panel) => {
-            panel.classList.toggle('is-active', panel.dataset.qaPanel === target);
-          });
-
-          tabs.forEach((item) => {
-            const isActive = item === tab;
-            item.classList.toggle('is-active', isActive);
-            item.setAttribute('aria-pressed', String(isActive));
-          });
-        });
+      expressionPanels.forEach((panel) => {
+        const sameGroup = panel.dataset.expressionPanel.startsWith(`${group}-`);
+        panel.classList.toggle("is-active", panel.dataset.expressionPanel === target);
+        if (!sameGroup) return;
       });
 
-      tabs.forEach((item) => {
-        item.setAttribute('aria-pressed', String(item.classList.contains('is-active')));
+      expressionTabs.forEach((item) => {
+        if (!item.dataset.expressionTab.startsWith(`${group}-`)) return;
+        item.setAttribute("aria-pressed", String(item.dataset.expressionTab === target));
+      });
+    };
+
+    datasetTabs.forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.datasetTab;
+
+        datasetPanels.forEach((panel) => {
+          panel.classList.toggle("is-active", panel.dataset.datasetPanel === target);
+        });
+
+        datasetTabs.forEach((item) => {
+          item.setAttribute("aria-pressed", String(item.dataset.datasetTab === target));
+        });
+
+        setExpression(`${target}-1`);
+      });
+    });
+
+    expressionTabs.forEach((button) => {
+      button.addEventListener("click", () => {
+        setExpression(button.dataset.expressionTab);
       });
     });
   </script>
