@@ -297,7 +297,6 @@ python src/stage6_questions.py `
   --question-types single_hop multi_hop temporal_reasoning `
   --target-per-type 200 `
   --resume-incomplete
-  
 ```
 
 ### Stages
