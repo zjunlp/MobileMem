@@ -279,7 +279,6 @@ python -m pipeline.cli run --from social_world
 
 # Restrict to specific persona uuid(s) and cap the events per persona
 python -m pipeline.cli run --uuid 0 --max-events 15
-```
 
 # Create corresponding dialogues and memory points.
 python src/stage5_sessions.py `
@@ -298,6 +297,8 @@ python src/stage6_questions.py `
   --question-types single_hop multi_hop temporal_reasoning `
   --target-per-type 200 `
   --resume-incomplete
+  
+```
 
 ### Stages
 
