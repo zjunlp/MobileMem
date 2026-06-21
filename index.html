@@ -193,7 +193,7 @@
 
     .hero-grid {
       display: grid;
-      grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr);
+      grid-template-columns: minmax(0, 0.86fr) minmax(460px, 1.14fr);
       gap: 34px;
       align-items: center;
     }
@@ -318,6 +318,726 @@
       max-height: 390px;
       object-fit: contain;
       object-position: center;
+    }
+
+    .case-stage {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(220px, 0.78fr) minmax(330px, 1.22fr);
+      gap: 16px;
+      min-height: 430px;
+      padding: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(18, 35, 27, 0.14);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(239, 248, 242, 0.96) 62%, rgba(246, 238, 226, 0.9));
+      box-shadow: 0 18px 46px rgba(23, 33, 28, 0.14);
+      isolation: isolate;
+    }
+
+    .case-stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        linear-gradient(90deg, rgba(15, 123, 79, 0.045) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(15, 123, 79, 0.04) 1px, transparent 1px);
+      background-size: 34px 34px;
+      opacity: 0.55;
+    }
+
+    .case-flow {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+      overflow: hidden;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .case-story-panel {
+      min-width: 0;
+      display: grid;
+      align-items: stretch;
+    }
+
+    .case-story-panel img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      max-height: 430px;
+      object-fit: contain;
+      object-position: center;
+      border-radius: 8px;
+    }
+
+    .case-badge {
+      width: max-content;
+      max-width: 100%;
+      padding: 6px 9px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 11px;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    .case-question,
+    .case-answer {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: #f8fbf4;
+      color: var(--ink);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+    }
+
+    .case-question {
+      animation: none;
+    }
+
+    .case-answer {
+      align-self: end;
+      max-width: 92%;
+      background: #f8fbf4;
+      animation: none;
+    }
+
+    .case-phone {
+      min-height: 100%;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      overflow: hidden;
+      border: 9px solid #102018;
+      border-radius: 28px;
+      background: #f7fbf6;
+      box-shadow:
+        inset 0 0 0 1px rgba(18, 35, 27, 0.12),
+        0 18px 36px rgba(23, 33, 28, 0.18);
+    }
+
+    .case-phone-top {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 14px;
+      color: rgba(255, 255, 255, 0.82);
+      background: #102018;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .case-phone-top::after {
+      content: "";
+      position: absolute;
+      top: 14px;
+      width: 38px;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.24);
+    }
+
+    .case-chat {
+      display: grid;
+      align-content: end;
+      gap: 8px;
+      min-height: 246px;
+      padding: 9px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(239, 248, 242, 0.92));
+    }
+
+    .case-chat.is-active {
+      align-content: start;
+      align-items: start;
+    }
+
+    .case-message {
+      width: 100%;
+      max-width: 100%;
+      color: var(--ink);
+      display: none;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .case-message.is-visible {
+      display: flex;
+    }
+
+    .case-message.user {
+      justify-self: end;
+      flex-direction: row-reverse;
+      width: min(100%, 200px);
+    }
+
+    .case-message.agent {
+      justify-self: start;
+      width: min(100%, 202px);
+    }
+
+    .case-avatar {
+      flex: 0 0 24px;
+      width: 24px;
+      height: 24px;
+      margin-top: 9px;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.92);
+      border-radius: 50%;
+      background: var(--white);
+      box-shadow: 0 6px 14px rgba(23, 33, 28, 0.12);
+    }
+
+    .case-avatar img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .case-bubble {
+      flex: 1 1 auto;
+      min-width: 0;
+      max-width: calc(100% - 30px);
+      padding: 8px 9px;
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: 0 8px 18px rgba(23, 33, 28, 0.1);
+    }
+
+    .case-message.user .case-bubble {
+      background: #dff8e8;
+    }
+
+    .case-message p {
+      margin: 0;
+      font-size: 11px;
+      line-height: 1.35;
+      font-weight: 850;
+    }
+
+    .case-reasoning {
+      width: min(100%, 202px);
+    }
+
+    .case-reasoning.is-collapsing {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.96);
+      transition:
+        opacity 280ms ease,
+        transform 280ms ease;
+    }
+
+    .case-reasoning .case-bubble {
+      position: relative;
+      padding: 7px;
+      overflow: hidden;
+    }
+
+    .case-current-thought {
+      position: relative;
+      min-height: 120px;
+      padding: 8px;
+      border: 1px solid rgba(18, 35, 27, 0.08);
+      border-radius: 7px;
+      background: rgba(248, 251, 244, 0.82);
+      color: var(--ink);
+      transition:
+        background 220ms ease,
+        border-color 220ms ease,
+        transform 220ms ease;
+    }
+
+    .case-current-thought::before {
+      content: attr(data-step);
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      width: 15px;
+      height: 15px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--green);
+      color: var(--white);
+      font-size: 8px;
+      font-weight: 950;
+      box-shadow: 0 0 0 5px rgba(15, 123, 79, 0.08);
+    }
+
+    .case-current-thought.is-changing {
+      border-color: rgba(15, 123, 79, 0.3);
+      background: rgba(15, 123, 79, 0.1);
+      transform: translateX(2px);
+    }
+
+    .case-current-thought b,
+    .case-current-thought span {
+      display: block;
+    }
+
+    .case-current-thought b {
+      max-width: calc(100% - 24px);
+      margin-bottom: 3px;
+      color: var(--green-dark);
+      font-size: 9px;
+      line-height: 1.1;
+      font-weight: 950;
+    }
+
+    .case-current-thought span {
+      max-width: calc(100% - 22px);
+      font-size: 9px;
+      line-height: 1.25;
+      font-weight: 850;
+    }
+
+    .case-thought-proof {
+      display: grid;
+      gap: 5px;
+      margin-top: 7px;
+      padding: 5px;
+      border: 1px solid rgba(15, 123, 79, 0.16);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .case-thought-proof img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 86px;
+      border: 1px solid rgba(18, 35, 27, 0.08);
+      border-radius: 6px;
+      object-fit: contain;
+      box-shadow: 0 5px 12px rgba(23, 33, 28, 0.1);
+    }
+
+    .case-thought-proof em {
+      display: block;
+      color: var(--green-dark);
+      font-size: 8px;
+      line-height: 1.2;
+      font-style: normal;
+      font-weight: 950;
+    }
+
+    .case-thought-proof small {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 8px;
+      line-height: 1.2;
+      font-weight: 800;
+    }
+
+    .case-reject-list {
+      display: grid;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .case-reject-list span {
+      display: block;
+      padding: 3px 5px;
+      border-radius: 5px;
+      background: rgba(204, 62, 115, 0.1);
+      color: #8a2148;
+      font-size: 8px;
+      line-height: 1.2;
+      font-weight: 900;
+    }
+
+    .case-reject-list span.is-match {
+      background: rgba(15, 123, 79, 0.12);
+      color: var(--green-dark);
+    }
+
+    .case-result-photo {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      margin-top: 7px;
+      overflow: hidden;
+      border: 1px solid rgba(18, 35, 27, 0.12);
+      border-radius: 8px;
+      background: #f8fbf4;
+      object-fit: cover;
+    }
+
+    .case-composer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: end;
+      padding: 10px;
+      border-top: 1px solid rgba(18, 35, 27, 0.1);
+      background: rgba(255, 255, 255, 0.96);
+    }
+
+    .case-composer-text {
+      min-height: 36px;
+      max-height: 72px;
+      margin: 0;
+      padding: 9px 10px;
+      overflow: hidden;
+      border: 1px solid rgba(18, 35, 27, 0.12);
+      border-radius: 8px;
+      background: #f8fbf4;
+      color: var(--ink);
+      font-size: 11px;
+      line-height: 1.35;
+      font-weight: 800;
+    }
+
+    .case-cursor {
+      display: inline-block;
+      width: 7px;
+      height: 1.1em;
+      margin-left: 2px;
+      vertical-align: -0.18em;
+      background: var(--green);
+      animation: cursorBlink 0.9s steps(2, start) infinite;
+    }
+
+    .case-send {
+      min-height: 36px;
+      padding: 0 12px;
+      border: 1px solid rgba(15, 123, 79, 0.18);
+      border-radius: 8px;
+      background: rgba(15, 123, 79, 0.08);
+      color: rgba(9, 83, 53, 0.42);
+      font: inherit;
+      font-size: 11px;
+      font-weight: 900;
+      transition:
+        background 220ms ease,
+        color 220ms ease,
+        transform 220ms ease;
+    }
+
+    .case-send.is-ready {
+      background: #7ce3a0;
+      color: #0b2417;
+      box-shadow: 0 0 0 6px rgba(124, 227, 160, 0.12);
+    }
+
+    .case-send.is-sent {
+      transform: translateY(-2px);
+    }
+
+    .case-speaker {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .case-question p,
+    .case-answer p {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 800;
+    }
+
+    .case-layer-stack {
+      display: grid;
+      gap: 8px;
+      padding: 2px 0;
+    }
+
+    .case-node {
+      position: relative;
+      padding: 9px 10px 9px 32px;
+      border: 1px solid rgba(124, 227, 160, 0.2);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.07);
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 12px;
+      font-weight: 850;
+      animation: casePulse 2.6s ease-in-out infinite;
+    }
+
+    .case-node:nth-child(2) {
+      animation-delay: 0.45s;
+    }
+
+    .case-node:nth-child(3) {
+      animation-delay: 0.9s;
+    }
+
+    .case-node::before {
+      content: attr(data-step);
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      width: 17px;
+      height: 17px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      transform: translateY(-50%);
+      background: #7ce3a0;
+      color: #102018;
+      font-size: 10px;
+      font-weight: 950;
+    }
+
+    .case-evidence {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .case-evidence-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 950;
+    }
+
+    .case-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .case-live::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: caseBlink 1.4s ease-in-out infinite;
+    }
+
+    .case-agent-trace {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .trace-card {
+      position: relative;
+      min-height: 64px;
+      padding: 9px 9px 9px 30px;
+      overflow: hidden;
+      border: 1px solid rgba(18, 35, 27, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.72);
+      color: rgba(23, 33, 28, 0.66);
+      opacity: 0.82;
+      transition:
+        opacity 260ms ease,
+        background 260ms ease,
+        border-color 260ms ease,
+        color 260ms ease,
+        transform 260ms ease;
+    }
+
+    .trace-card::before {
+      content: attr(data-step);
+      position: absolute;
+      left: 9px;
+      top: 10px;
+      width: 16px;
+      height: 16px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(15, 123, 79, 0.12);
+      color: rgba(9, 83, 53, 0.62);
+      font-size: 9px;
+      font-weight: 950;
+    }
+
+    .trace-card b,
+    .trace-card small {
+      display: block;
+    }
+
+    .trace-card b {
+      margin-bottom: 3px;
+      font-size: 11px;
+      line-height: 1.15;
+    }
+
+    .trace-card small {
+      font-size: 10px;
+      line-height: 1.25;
+      font-weight: 760;
+    }
+
+    .trace-card.is-active {
+      opacity: 1;
+      border-color: rgba(15, 123, 79, 0.32);
+      background: rgba(15, 123, 79, 0.1);
+      color: var(--ink);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(23, 33, 28, 0.08);
+    }
+
+    .trace-card.is-active::before {
+      background: var(--green);
+      color: var(--white);
+    }
+
+    .trace-card.is-done {
+      border-color: rgba(15, 123, 79, 0.22);
+      color: var(--green-dark);
+    }
+
+    .case-image-wrap {
+      position: relative;
+      min-height: 300px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+    }
+
+    .case-image-wrap img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      padding: 8px;
+    }
+
+    .case-chip {
+      position: absolute;
+      z-index: 2;
+      padding: 5px 8px;
+      border-radius: 999px;
+      color: var(--white);
+      font-size: 10px;
+      font-weight: 950;
+      line-height: 1;
+      box-shadow: 0 8px 18px rgba(23, 33, 28, 0.16);
+      animation: caseFloat 3.4s ease-in-out infinite;
+    }
+
+    .case-chip.green {
+      background: var(--green);
+    }
+
+    .case-chip.coral {
+      background: #cc3e73;
+    }
+
+    .case-chip.blue {
+      background: #2f6fdf;
+    }
+
+    .case-chip.top-left {
+      top: 14px;
+      left: 16px;
+    }
+
+    .case-chip.top-right {
+      top: 38px;
+      right: 18px;
+      animation-delay: 0.4s;
+    }
+
+    .case-chip.mid-right {
+      top: 92px;
+      right: 14px;
+      animation-delay: 0.8s;
+    }
+
+    .case-chip.bottom-right {
+      right: 22px;
+      bottom: 18px;
+      animation-delay: 1.2s;
+    }
+
+    .case-timeline {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .case-timeline span {
+      min-width: 0;
+      padding: 8px 10px;
+      overflow: hidden;
+      border: 1px solid rgba(18, 35, 27, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 850;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .case-timeline span:last-child {
+      border-color: rgba(15, 123, 79, 0.28);
+      background: rgba(15, 123, 79, 0.1);
+      color: var(--green-dark);
+    }
+
+    @keyframes caseRise {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes casePulse {
+      50% {
+        border-color: rgba(124, 227, 160, 0.56);
+        background: rgba(124, 227, 160, 0.12);
+      }
+    }
+
+    @keyframes caseBlink {
+      50% {
+        opacity: 0.36;
+      }
+    }
+
+    @keyframes thinkingDot {
+      0%,
+      80%,
+      100% {
+        opacity: 0.34;
+        transform: translateY(0);
+      }
+      40% {
+        opacity: 1;
+        transform: translateY(-3px);
+      }
+    }
+
+    @keyframes caseFloat {
+      50% {
+        transform: translateY(-4px);
+      }
     }
 
     .image-frame .video-play {
@@ -1320,6 +2040,26 @@
       .media-stack {
         order: -1;
       }
+
+      .case-stage {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .case-flow {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+      }
+
+      .case-badge,
+      .case-layer-stack {
+        grid-column: 1 / -1;
+      }
+
+      .case-answer {
+        max-width: 100%;
+      }
     }
 
     @media (max-width: 700px) {
@@ -1375,6 +2115,24 @@
       .terminal-content .quick-options {
         border-right: 0;
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .case-stage {
+        padding: 10px;
+        gap: 10px;
+      }
+
+      .case-flow {
+        grid-template-columns: 1fr;
+        padding: 10px;
+      }
+
+      .case-image-wrap {
+        min-height: 230px;
+      }
+
+      .case-timeline {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       h1 {
@@ -1456,9 +2214,65 @@
           </div>
         </div>
         <div class="media-stack">
-          <figure class="image-frame">
-            <img src="assets/web/daughter-case-replacement.png" alt="MobileMem acts as the user's personal memory agent, automatically understanding user intent, performing cross-time facial recognition to associate the daughter's identity across years, locating the 2016 birthday scene from a vast photo archive, and returning the photo of the family of three gathered around the birthday cake.">
-          </figure>
+          <div class="case-stage" aria-label="MobileMem daughter birthday case demo">
+            <div class="case-flow">
+              <div class="case-phone">
+                <div class="case-phone-top">Mobile Assistant</div>
+                <div class="case-chat" data-case-chat aria-live="polite">
+                  <div class="case-message user" data-case-user-message>
+                    <span class="case-avatar" aria-hidden="true">
+                      <img src="assets/web/case-user-avatar.jpg" alt="">
+                    </span>
+                    <div class="case-bubble">
+                      <p data-case-user-text>Could you find the photo from my daughter's 7th birthday?</p>
+                    </div>
+                  </div>
+                  <div class="case-message agent case-reasoning" data-case-thinking aria-label="MobileMem reasoning">
+                    <span class="case-avatar" aria-hidden="true">
+                      <img src="assets/web/case-ai-avatar.png" alt="">
+                    </span>
+                    <div class="case-bubble">
+                      <div class="case-current-thought" data-case-current-thought data-step="1">
+                        <b>Personalized KG</b>
+                        <span>Find daughter and family relations.</span>
+                        <div class="case-thought-proof">
+                          <img src="assets/web/case-daughter-identity.jpg" alt="Daughter identified by MobileMem.">
+                          <div>
+                            <em>Daughter found</em>
+                            <small>user - daughter relation</small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="case-message agent" data-case-reply>
+                    <span class="case-avatar" aria-hidden="true">
+                      <img src="assets/web/case-ai-avatar.png" alt="">
+                    </span>
+                    <div class="case-bubble">
+                      <p data-case-reply-text>Got it. Is this the one?</p>
+                      <img class="case-result-photo" src="assets/web/case-result-birthday.jpg" alt="A family photo around a birthday cake returned by MobileMem.">
+                    </div>
+                  </div>
+                  <div class="case-message user case-confirm" data-case-confirm>
+                    <span class="case-avatar" aria-hidden="true">
+                      <img src="assets/web/case-user-avatar.jpg" alt="">
+                    </span>
+                    <div class="case-bubble">
+                      <p data-case-confirm-text>That's it, thank you.</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="case-composer">
+                  <p class="case-composer-text" data-case-typed></p>
+                  <button class="case-send" type="button" data-case-send>Send</button>
+                </div>
+              </div>
+            </div>
+            <div class="case-story-panel">
+              <img src="assets/web/case-story-layout.png" alt="Evolving lifelong personalized agent memory. MobileMem grasps both story and significance across user, daughter, school, family trip, and 7th birthday memories.">
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -1759,17 +2573,6 @@
       );
     };
 
-    if (languageToggle) {
-      languageToggle.addEventListener("click", () => {
-        const lang = languageToggle.dataset.toggleLang;
-        document.body.classList.toggle("lang-zh", lang === "zh");
-        document.body.classList.toggle("lang-en", lang === "en");
-        setLanguageToggle(lang);
-      });
-    }
-
-    setLanguageToggle("en");
-
     const videoModal = document.querySelector("#oppo-video-modal");
     const videoPlay = document.querySelector(".video-play");
     const videoClose = document.querySelector(".video-close");
@@ -1787,6 +2590,319 @@
         if (event.target === videoModal) videoModal.close();
       });
     }
+
+    const caseTyped = document.querySelector("[data-case-typed]");
+    const caseSend = document.querySelector("[data-case-send]");
+    const caseChat = document.querySelector("[data-case-chat]");
+    const caseUserMessage = document.querySelector("[data-case-user-message]");
+    const caseUserText = document.querySelector("[data-case-user-text]");
+    const caseThinking = document.querySelector("[data-case-thinking]");
+    const caseReply = document.querySelector("[data-case-reply]");
+    const caseReplyText = document.querySelector("[data-case-reply-text]");
+    const caseConfirm = document.querySelector("[data-case-confirm]");
+    const caseConfirmText = document.querySelector("[data-case-confirm-text]");
+    const caseStatus = document.querySelector("[data-case-status]");
+    const traceCards = Array.from(document.querySelectorAll("[data-trace-step]"));
+    const caseCurrentThought = document.querySelector("[data-case-current-thought]");
+    const caseCopy = {
+      en: {
+        prompt: "Could you find the photo from my daughter's 7th birthday?",
+        reply: "Got it. Is this the one?",
+        confirm: "That's it, thank you.",
+        send: "Send",
+        sent: "Sent",
+        status: {
+          typing: "typing",
+          ready: "ready",
+          retrieving: "retrieving",
+          result: "result found"
+        },
+        thoughts: [
+          {
+            title: "Personalized KG",
+            text: "Find daughter and family relations.",
+            proof: {
+              img: "assets/web/case-daughter-identity.jpg",
+              title: "Daughter found",
+              text: "user - daughter relation",
+              alt: "Daughter identified by MobileMem."
+            }
+          },
+          {
+            title: "Multimodal Mem Bank",
+            text: "Search school, trip, and birthday photo memories.",
+            proof: {
+              img: "assets/web/case-memory-bank.jpg",
+              title: "Candidate memories",
+              text: "school, trip, birthday",
+              alt: "Candidate memories searched by MobileMem."
+            },
+            checks: [
+              { text: "Reject: Dau. School, not birthday" },
+              { text: "Reject: Family Trip, no cake" },
+              { text: "Keep: 7th Birthday candidate", match: true }
+            ]
+          },
+          {
+            title: "LTM Reasoning",
+            text: "Use 2016 and 7th birthday to rank the birthday scene.",
+            proof: {
+              img: "assets/web/case-reasoning-match.jpg",
+              title: "Cross-time match",
+              text: "daughter + 2016 birthday",
+              alt: "Cross-time reasoning match for the birthday scene."
+            },
+            checks: [
+              { text: "Match: daughter across years", match: true },
+              { text: "Match: 2016 + 7th birthday", match: true },
+              { text: "Match: family around cake", match: true }
+            ]
+          },
+          {
+            title: "Result",
+            text: "Select the grounded photo for the final reply.",
+            proof: {
+              img: "assets/web/case-result-birthday.jpg",
+              title: "Grounded photo",
+              text: "family gathered around cake",
+              alt: "Grounded birthday result photo."
+            }
+          }
+        ]
+      },
+      zh: {
+        prompt: "帮我找一下我女儿 7 岁生日时拍的照片。",
+        reply: "找到啦！您看是不是这张？",
+        confirm: "是的，谢谢你啊",
+        send: "发送",
+        sent: "已发送",
+        status: {
+          typing: "输入中",
+          ready: "待发送",
+          retrieving: "检索中",
+          result: "已找到"
+        },
+        thoughts: [
+          {
+            title: "个性化知识图谱",
+            text: "识别女儿身份，并找到用户与女儿的关系。",
+            proof: {
+              img: "assets/web/case-daughter-identity.jpg",
+              title: "识别到女儿",
+              text: "用户 - 女儿关系",
+              alt: "MobileMem 识别出的女儿照片。"
+            }
+          },
+          {
+            title: "多模态记忆库",
+            text: "检索学校、旅行、生日等候选照片记忆。",
+            proof: {
+              img: "assets/web/case-memory-bank.jpg",
+              title: "候选记忆",
+              text: "学校 / 旅行 / 生日",
+              alt: "MobileMem 检索到的候选记忆。"
+            },
+            checks: [
+              { text: "排除：女儿开学，不是生日" },
+              { text: "排除：家庭出游，没有蛋糕" },
+              { text: "保留：7 岁生日候选", match: true }
+            ]
+          },
+          {
+            title: "长程记忆推理",
+            text: "结合 2016 年与 7 岁生日线索，对候选照片排序。",
+            proof: {
+              img: "assets/web/case-reasoning-match.jpg",
+              title: "跨时间匹配",
+              text: "女儿 + 2016 年生日",
+              alt: "跨时间推理匹配生日场景。"
+            },
+            checks: [
+              { text: "匹配：跨年份女儿身份", match: true },
+              { text: "匹配：2016 年 + 7 岁生日", match: true },
+              { text: "匹配：一家人围着蛋糕", match: true }
+            ]
+          },
+          {
+            title: "结果",
+            text: "选择有依据的生日照片，准备回复用户。",
+            proof: {
+              img: "assets/web/case-result-birthday.jpg",
+              title: "命中照片",
+              text: "一家人围着生日蛋糕",
+              alt: "命中的生日照片。"
+            }
+          }
+        ]
+      }
+    };
+    let caseLang = document.body.classList.contains("lang-zh") ? "zh" : "en";
+    let phoneThoughts = caseCopy[caseLang].thoughts;
+    const caseThoughtDelay = 2300;
+    const caseResultDelay = 1800;
+    const caseTimers = new Set();
+    let caseRunId = 0;
+
+    Object.values(caseCopy).flatMap((copy) => copy.thoughts).forEach((thought) => {
+      if (!thought.proof) return;
+      const image = new Image();
+      image.src = thought.proof.img;
+    });
+
+    const clearCaseTimers = () => {
+      caseTimers.forEach((timer) => window.clearTimeout(timer));
+      caseTimers.clear();
+    };
+
+    const scheduleCase = (callback, delay, runId) => {
+      const timer = window.setTimeout(() => {
+        caseTimers.delete(timer);
+        if (runId === caseRunId) callback();
+      }, delay);
+      caseTimers.add(timer);
+    };
+
+    const setCaseStatus = (text) => {
+      if (caseStatus) caseStatus.textContent = text;
+    };
+
+    const currentCaseCopy = () => caseCopy[caseLang] || caseCopy.en;
+
+    const renderPhoneThought = (index) => {
+      const thought = phoneThoughts[index] || phoneThoughts[phoneThoughts.length - 1];
+      const proof = thought.proof
+        ? `<div class="case-thought-proof"><img src="${thought.proof.img}" alt="${thought.proof.alt}"><div><em>${thought.proof.title}</em><small>${thought.proof.text}</small></div></div>`
+        : "";
+      const checks = thought.checks
+        ? `<div class="case-reject-list">${thought.checks.map((check) => `<span class="${check.match ? "is-match" : ""}">${check.text}</span>`).join("")}</div>`
+        : "";
+      return `<b>${thought.title}</b><span>${thought.text}</span>${proof}${checks}`;
+    };
+
+    const resetCaseDemo = () => {
+      const copy = currentCaseCopy();
+      phoneThoughts = copy.thoughts;
+      if (caseUserText) caseUserText.textContent = copy.prompt;
+      if (caseReplyText) caseReplyText.textContent = copy.reply;
+      if (caseConfirmText) caseConfirmText.textContent = copy.confirm;
+      if (caseTyped) caseTyped.innerHTML = '<span class="case-cursor"></span>';
+      if (caseSend) {
+        caseSend.classList.remove("is-ready", "is-sent");
+        caseSend.textContent = copy.send;
+      }
+      if (caseUserMessage) caseUserMessage.classList.remove("is-visible");
+      if (caseChat) caseChat.classList.remove("is-active");
+      if (caseThinking) caseThinking.classList.remove("is-visible", "is-collapsing");
+      if (caseReply) caseReply.classList.remove("is-visible");
+      if (caseConfirm) caseConfirm.classList.remove("is-visible");
+      traceCards.forEach((card) => card.classList.remove("is-active", "is-done"));
+      if (caseCurrentThought) {
+        caseCurrentThought.classList.remove("is-changing");
+        caseCurrentThought.dataset.step = "1";
+        caseCurrentThought.innerHTML = renderPhoneThought(0);
+      }
+      setCaseStatus(copy.status.typing);
+    };
+
+    const runCaseDemo = () => {
+      if (!caseTyped || !caseSend || !caseChat || !caseUserMessage || !caseThinking || !caseReply || !caseCurrentThought) return;
+      clearCaseTimers();
+      caseRunId += 1;
+      const runId = caseRunId;
+      resetCaseDemo();
+      let charIndex = 0;
+      const copy = currentCaseCopy();
+      const casePrompt = copy.prompt;
+
+      const typeNext = () => {
+        if (charIndex < casePrompt.length) {
+          const text = casePrompt.slice(0, charIndex + 1);
+          caseTyped.innerHTML = `${text}<span class="case-cursor"></span>`;
+          charIndex += 1;
+          scheduleCase(typeNext, 28 + Math.random() * 28, runId);
+          return;
+        }
+
+        caseTyped.textContent = casePrompt;
+        caseSend.classList.add("is-ready");
+        setCaseStatus(copy.status.ready);
+        scheduleCase(sendPrompt, 620, runId);
+      };
+
+      const sendPrompt = () => {
+        caseSend.classList.add("is-sent");
+        caseSend.textContent = copy.sent;
+        caseTyped.innerHTML = "";
+        caseChat.classList.add("is-active");
+        caseUserMessage.classList.add("is-visible");
+        setCaseStatus(copy.status.retrieving);
+        scheduleCase(() => {
+          caseThinking.classList.add("is-visible");
+          activateTrace(0);
+        }, 420, runId);
+      };
+
+      const setPhoneThought = (index) => {
+        const thought = phoneThoughts[index] || phoneThoughts[phoneThoughts.length - 1];
+        caseCurrentThought.dataset.step = String(index + 1);
+        caseCurrentThought.classList.add("is-changing");
+        caseCurrentThought.innerHTML = renderPhoneThought(index);
+        scheduleCase(() => {
+          caseCurrentThought.classList.remove("is-changing");
+        }, 420, runId);
+      };
+
+      const activateTrace = (index) => {
+        traceCards.forEach((card, cardIndex) => {
+          card.classList.toggle("is-active", cardIndex === index);
+          card.classList.toggle("is-done", cardIndex < index);
+        });
+        setPhoneThought(index);
+
+        if (index < phoneThoughts.length - 1) {
+          scheduleCase(() => activateTrace(index + 1), caseThoughtDelay, runId);
+          return;
+        }
+
+        scheduleCase(() => {
+          traceCards.forEach((card) => {
+            card.classList.remove("is-active");
+            card.classList.add("is-done");
+          });
+          caseThinking.classList.add("is-collapsing");
+          setCaseStatus(copy.status.result);
+          scheduleCase(() => {
+            caseThinking.classList.remove("is-visible", "is-collapsing");
+            caseReply.classList.add("is-visible");
+            scheduleCase(() => {
+              if (caseConfirm) caseConfirm.classList.add("is-visible");
+              scheduleCase(runCaseDemo, 3000, runId);
+            }, 900, runId);
+          }, 320, runId);
+        }, caseResultDelay, runId);
+      };
+
+      typeNext();
+    };
+
+    const setCaseLanguage = (lang) => {
+      caseLang = lang === "zh" ? "zh" : "en";
+      runCaseDemo();
+    };
+
+    if (languageToggle) {
+      languageToggle.addEventListener("click", () => {
+        const lang = languageToggle.dataset.toggleLang;
+        document.body.classList.toggle("lang-zh", lang === "zh");
+        document.body.classList.toggle("lang-en", lang === "en");
+        setLanguageToggle(lang);
+        setCaseLanguage(lang);
+      });
+    }
+
+    setLanguageToggle("en");
+
+    runCaseDemo();
 
     const terminalOutput = document.querySelector("[data-terminal-output]");
     const terminalButtons = Array.from(document.querySelectorAll("[data-terminal-set]"));
