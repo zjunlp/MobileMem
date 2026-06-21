@@ -1141,10 +1141,87 @@
       font-weight: 800;
     }
 
+    .case-relation-proof {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      margin-top: 7px;
+    }
+
+    .case-relation-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 76px;
+      border: 1px solid rgba(15, 123, 79, 0.18);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 5px 12px rgba(23, 33, 28, 0.08);
+    }
+
+    .case-relation-card img {
+      display: block;
+      width: 100%;
+      height: 56px;
+      object-fit: cover;
+      object-position: center 34%;
+    }
+
+    .case-relation-card small {
+      display: block;
+      padding: 3px 4px;
+      color: var(--green-dark);
+      font-size: 7.2px;
+      line-height: 1.1;
+      font-weight: 950;
+      text-align: center;
+    }
+
+    .lang-en .case-relation-card small {
+      font-size: 6.8px;
+      line-height: 1.05;
+    }
+
+    .case-relation-card::before {
+      content: attr(data-year);
+      position: absolute;
+      left: 4px;
+      top: 4px;
+      padding: 1px 5px 2px;
+      border-radius: 999px;
+      background: rgba(15, 123, 79, 0.9);
+      color: #fff;
+      font-size: 7px;
+      line-height: 1;
+      font-weight: 950;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.16);
+    }
+
+    .case-relation-proof::before,
+    .case-relation-proof::after {
+      content: "";
+      position: absolute;
+      top: calc(50% - 7px);
+      width: 2px;
+      height: 14px;
+      border-radius: 999px;
+      background: rgba(15, 123, 79, 0.58);
+      box-shadow: 0 0 0 2px rgba(15, 123, 79, 0.08);
+      z-index: 2;
+    }
+
+    .case-relation-proof::before {
+      left: 23.5%;
+    }
+
+    .case-relation-proof::after {
+      right: 23.5%;
+    }
+
     .case-reject-list {
       display: grid;
-      gap: 4px;
-      margin-top: 6px;
+      gap: 3px;
+      margin-top: 5px;
     }
 
     .case-reject-list span {
@@ -1153,7 +1230,7 @@
       border-radius: 5px;
       background: rgba(204, 62, 115, 0.1);
       color: #8a2148;
-      font-size: 8px;
+      font-size: 7.6px;
       line-height: 1.2;
       font-weight: 900;
     }
@@ -3024,21 +3101,209 @@
       100% { opacity: 0; transform: scale(1.12); }
     }
 
+    .memory-room .px-relation-board {
+      position: absolute;
+      left: 42.4%;
+      top: 7.2%;
+      width: 15.6%;
+      height: 25.5%;
+      padding: 0;
+      opacity: 0;
+      transform: translateY(4px) scale(.96);
+      pointer-events: none;
+      z-index: 6;
+    }
+
+    .memory-room .px-relation-board::before,
+    .memory-room .px-relation-board::after {
+      display: none;
+    }
+
+    .memory-room[data-room-step="1"] .px-relation-board {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition: opacity 260ms ease, transform 260ms ease;
+    }
+
+    .memory-room[data-room-step="1"] .px-relation-board::before,
+    .memory-room[data-room-step="1"] .px-relation-board::after {
+      animation: none;
+    }
+
+    .memory-room .px-relation-card {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: 1fr auto auto;
+      border: 1px solid rgba(153, 246, 168, 0.82);
+      border-radius: 5px;
+      background: rgba(8, 46, 34, 0.86);
+      box-shadow:
+        0 3px 0 rgba(0, 0, 0, 0.25),
+        0 0 12px rgba(97, 255, 127, 0.3),
+        inset 0 0 18px rgba(67, 229, 98, 0.12);
+      opacity: 0;
+      transform: translateY(8px) scale(.92);
+    }
+
+    .memory-room[data-room-step="1"] .px-relation-card {
+      animation: pxRelationCycle 7.2s steps(4, end) infinite;
+    }
+
+    .memory-room[data-room-step="1"] .px-relation-card:nth-child(1) { animation-delay: 0s; }
+    .memory-room[data-room-step="1"] .px-relation-card:nth-child(2) { animation-delay: 1.8s; }
+    .memory-room[data-room-step="1"] .px-relation-card:nth-child(3) { animation-delay: 3.6s; }
+    .memory-room[data-room-step="1"] .px-relation-card:nth-child(4) { animation-delay: 5.4s; }
+
+    .memory-room .px-relation-card img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      object-fit: cover;
+      object-position: center 34%;
+      image-rendering: auto;
+      filter: saturate(1.08) contrast(1.04);
+    }
+
+    .memory-room .px-relation-card span {
+      padding: 3px 4px 4px;
+      background: rgba(13, 96, 58, 0.96);
+      color: #f1ffe9;
+      font-size: 7.2px;
+      line-height: 1;
+      font-weight: 950;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .lang-en .memory-room .px-relation-card span[data-lang="en"],
+    .lang-zh .memory-room .px-relation-card span[data-lang="zh"] {
+      display: block;
+    }
+
+    .memory-room .px-relation-card .px-thought {
+      padding: 4px 5px 5px;
+      border-top: 1px solid rgba(166, 255, 180, 0.34);
+      background: rgba(7, 33, 25, 0.96);
+      color: #dbffd2;
+      font-size: 7.2px;
+      line-height: 1.12;
+      font-weight: 850;
+      text-align: center;
+      white-space: normal;
+    }
+
+    .lang-en .memory-room .px-relation-card .px-thought[data-lang="en"],
+    .lang-zh .memory-room .px-relation-card .px-thought[data-lang="zh"] {
+      display: block;
+    }
+
+    .memory-room .px-relation-card::before {
+      content: attr(data-year);
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      padding: 1px 4px 2px;
+      border-radius: 2px;
+      background: rgba(18, 156, 91, 0.92);
+      color: #fff;
+      font-size: 6px;
+      line-height: 1;
+      font-weight: 950;
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.24);
+    }
+
+    @keyframes pxRelationCycle {
+      0% { opacity: 0; transform: translateY(8px) scale(.9); filter: brightness(2); }
+      7%, 20% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1.05); }
+      24%, 100% { opacity: 0; transform: translateY(-6px) scale(.96); filter: brightness(1.4); }
+    }
+
+    @keyframes pxRelationLink {
+      0%, 24% { opacity: 0; transform: scaleY(.15); }
+      25%, 72% { opacity: 1; transform: scaleY(1); }
+      73%, 100% { opacity: .38; transform: scaleY(1); }
+    }
+
     .memory-room .px-screen {
       position: absolute;
-      left: 35%;
-      top: 76%;
-      width: 30%;
-      height: 13%;
+      left: 33.4%;
+      top: 73.9%;
+      width: 33.2%;
+      height: 15.4%;
       opacity: 0;
       overflow: hidden;
-      border-radius: 3px;
-      transition: opacity 360ms ease;
-      z-index: 4;
+      border: 2px solid rgba(98, 244, 255, 0.82);
+      border-radius: 4px;
+      background:
+        linear-gradient(180deg, rgba(30, 126, 149, 0.52), rgba(6, 44, 58, 0.94)),
+        #082f3d;
+      box-shadow:
+        0 0 0 2px rgba(9, 44, 52, 0.8),
+        0 0 13px rgba(84, 236, 255, 0.75),
+        inset 0 0 18px rgba(72, 225, 246, 0.34);
+      padding: 5px 7px 17px;
+      transition: opacity 360ms ease, filter 360ms ease;
+      z-index: 6;
     }
-    .memory-room .px-screen img { width: 100%; height: 100%; object-fit: cover; image-rendering: auto; }
-    .memory-room[data-room-step="4"] .px-screen { opacity: 1; animation: pxScreenOn 520ms ease; }
-    @keyframes pxScreenOn { 0% { opacity: 0; filter: brightness(2.4); } 100% { opacity: 1; filter: brightness(1); } }
+    .memory-room .px-screen::before,
+    .memory-room .px-screen::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .memory-room .px-screen::before {
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.18), transparent 14%, transparent 86%, rgba(255, 255, 255, 0.16)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.30), rgba(17, 217, 239, 0.08) 36%, rgba(10, 45, 54, 0.18));
+      mix-blend-mode: screen;
+    }
+    .memory-room .px-screen::after {
+      background:
+        repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.17) 0 1px, transparent 1px 4px),
+        radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.18), transparent 58%);
+      opacity: 0.72;
+    }
+    .memory-room .px-screen img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center center;
+      image-rendering: auto;
+      filter: saturate(1.14) contrast(1.08) brightness(1.04);
+      transform: none;
+      background: rgba(3, 22, 29, 0.62);
+      border: 1px solid rgba(218, 255, 249, 0.72);
+      box-shadow: 0 0 0 1px rgba(7, 74, 89, 0.7);
+    }
+    .memory-room .px-screen .px-screen-label {
+      position: absolute;
+      left: 50%;
+      bottom: 5px;
+      z-index: 3;
+      transform: translateX(-50%);
+      padding: 2px 7px 3px;
+      border: 1px solid rgba(227, 255, 220, 0.78);
+      border-radius: 2px;
+      background: rgba(7, 68, 45, 0.86);
+      color: #f5fff4;
+      font-size: 7px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: 0;
+      white-space: nowrap;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.26);
+    }
+    .memory-room[data-room-step="4"] .px-screen { opacity: 1; animation: pxScreenOn 760ms steps(4, end); }
+    @keyframes pxScreenOn {
+      0% { opacity: 0; filter: brightness(2.5) saturate(1.6); transform: translateY(4px) scaleX(.92); }
+      45% { opacity: 1; filter: brightness(1.8) saturate(1.4); transform: translateY(0) scaleX(1.02); }
+      100% { opacity: 1; filter: brightness(1); transform: translateY(0) scaleX(1); }
+    }
 
     .memory-room .room-agent {
       position: absolute;
@@ -3055,7 +3320,7 @@
       z-index: 8;
     }
     .memory-room[data-room-step="0"] { --agent-x: 50%; --agent-y: 66%; }
-    .memory-room[data-room-step="1"] { --agent-x: 52%; --agent-y: 50%; }
+    .memory-room[data-room-step="1"] { --agent-x: 52%; --agent-y: 60%; }
     .memory-room[data-room-step="2"] { --agent-x: 24%; --agent-y: 64%; }
     .memory-room[data-room-step="3"] { --agent-x: 74%; --agent-y: 66%; }
     .memory-room[data-room-step="4"] { --agent-x: 55%; --agent-y: 67%; }
@@ -3099,36 +3364,50 @@
     .memory-room .room-agent .room-bubble {
       position: absolute;
       left: 50%;
-      bottom: 86%;
+      bottom: 82%;
       top: auto;
-      transform: translate(-50%, 0) scale(.9);
+      transform: translate(-50%, 0) scale(.88);
       transform-origin: bottom center;
-      min-width: 70px;
-      max-width: 150px;
+      min-width: 56px;
+      max-width: 128px;
       width: max-content;
       height: auto;
       min-height: 0;
       max-height: none;
       white-space: normal;
       overflow: visible;
-      padding: 5px 8px;
-      border: 2px solid #173824;
-      border-radius: 8px;
-      background: #f4ead2;
-      color: #14301e;
-      font-size: 9.5px;
-      line-height: 1.25;
+      padding: 4px 7px 5px;
+      border: 1px solid rgba(169, 238, 179, 0.9);
+      border-radius: 3px;
+      background: rgba(11, 48, 36, 0.88);
+      color: #ecffe9;
+      font-size: 8.7px;
+      line-height: 1.18;
       font-weight: 800;
       text-align: center;
       opacity: 0;
       image-rendering: auto;
-      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.22);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.28), 0 0 8px rgba(77, 236, 125, 0.22);
       transition: opacity 200ms ease;
       z-index: 9;
     }
     .memory-room[data-room-step="2"] .room-agent .room-bubble {
       left: 96%;
       transform: translate(-8%, 0) scale(.9);
+      transform-origin: bottom left;
+    }
+    .memory-room[data-room-step="1"] .room-agent .room-bubble {
+      left: 92%;
+      bottom: 50%;
+      max-width: 94px;
+      transform: translate(-8%, 0) scale(.84);
+      transform-origin: bottom left;
+    }
+    .memory-room[data-room-step="4"] .room-agent .room-bubble {
+      left: 96%;
+      bottom: 55%;
+      max-width: 92px;
+      transform: translate(-10%, 0) scale(.82);
       transform-origin: bottom left;
     }
     .memory-room .room-agent .room-bubble::after {
@@ -3138,7 +3417,7 @@
       top: 100%;
       transform: translateX(-50%);
       border: 5px solid transparent;
-      border-top-color: #173824;
+      border-top-color: rgba(11, 48, 36, 0.88);
     }
     .memory-room .room-bubble .room-bubble-text { display: block; }
     .memory-room .room-agent .room-bubble.is-pop {
@@ -3149,6 +3428,12 @@
     .memory-room[data-room-step="2"] .room-agent .room-bubble.is-pop {
       transform: translate(-8%, 0) scale(1);
     }
+    .memory-room[data-room-step="1"] .room-agent .room-bubble.is-pop {
+      transform: translate(-8%, 0) scale(.9);
+    }
+    .memory-room[data-room-step="4"] .room-agent .room-bubble.is-pop {
+      transform: translate(-10%, 0) scale(.9);
+    }
     @keyframes pxBubblePop {
       0% { opacity: 0; transform: translate(-50%, 4px) scale(.5); }
       100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
@@ -3157,20 +3442,24 @@
     .memory-room .room-caption {
       position: absolute;
       left: 50%;
-      top: 12px;
+      top: 11.2%;
       transform: translateX(-50%);
       width: auto;
-      max-width: 92%;
+      max-width: 36%;
       height: auto;
       z-index: 10;
-      padding: 4px 10px;
-      border: 2px solid rgba(255, 255, 255, 0.6);
-      border-radius: 7px;
-      background: rgba(22, 120, 71, 0.94);
-      color: #ffffff;
-      box-shadow: 0 3px 8px rgba(20, 60, 40, 0.22);
-      font-size: 10px;
-      line-height: 1.3;
+      padding: 2px 7px;
+      border: 1px solid rgba(103, 232, 139, 0.64);
+      border-radius: 2px;
+      background:
+        linear-gradient(180deg, rgba(14, 76, 48, 0.58), rgba(7, 42, 31, 0.72));
+      color: #dfffcc;
+      box-shadow:
+        0 2px 0 rgba(5, 28, 21, 0.52),
+        0 0 8px rgba(96, 244, 129, 0.24),
+        inset 0 1px 0 rgba(212, 255, 219, 0.16);
+      font-size: 7.2px;
+      line-height: 1;
       font-weight: 800;
       text-align: center;
       white-space: nowrap;
@@ -3240,11 +3529,22 @@
                       <div class="case-current-thought" data-case-current-thought data-step="1">
                         <b>Personalized KG</b>
                         <span>Find daughter and family relations.</span>
-                        <div class="case-thought-proof">
-                          <img src="assets/web/case-daughter-identity.jpg" alt="Daughter identified by MobileMem.">
-                          <div>
-                            <em>Daughter found</em>
-                            <small>user - daughter relation</small>
+                        <div class="case-relation-proof">
+                          <div class="case-relation-card" data-year="2026">
+                            <img src="assets/web/case-user-2026.jpg" alt="Current user portrait.">
+                            <small>User</small>
+                          </div>
+                          <div class="case-relation-card" data-year="2026">
+                            <img src="assets/web/case-daughter-2026.jpg" alt="Current daughter portrait.">
+                            <small>Daughter</small>
+                          </div>
+                          <div class="case-relation-card" data-year="2016">
+                            <img src="assets/web/case-user-2016.jpg" alt="Past user portrait.">
+                            <small>User</small>
+                          </div>
+                          <div class="case-relation-card" data-year="2016">
+                            <img src="assets/web/case-daughter-2016.jpg" alt="Past daughter portrait.">
+                            <small>Daughter</small>
                           </div>
                         </div>
                       </div>
@@ -3276,16 +3576,6 @@
             </div>
             <div class="case-story-panel">
               <div class="memory-room" data-memory-room data-room-step="0" aria-label="Animated MobileMem agent room">
-                <div class="room-caption" aria-live="polite">
-                  <span class="step-1" data-lang="zh">个性化知识图谱：识别女儿与家庭关系</span>
-                  <span class="step-1" data-lang="en">Personalized KG: identify daughter and family relations</span>
-                  <span class="step-2" data-lang="zh">多模态记忆库：翻找学校、旅行、生日候选照片</span>
-                  <span class="step-2" data-lang="en">Multimodal Mem Bank: search school, trip, and birthday candidates</span>
-                  <span class="step-3" data-lang="zh">长程记忆推理：匹配 2016、7 岁生日与蛋糕场景</span>
-                  <span class="step-3" data-lang="en">LTM Reasoning: match 2016, 7th birthday, and cake scene</span>
-                  <span class="step-4" data-lang="zh">结果：返回有依据的生日照片</span>
-                  <span class="step-4" data-lang="en">Result: return the grounded birthday photo</span>
-                </div>
                 <div class="px-scene">
                 <img class="room-bg" src="assets/web/pixel-room-compact.png" alt="" aria-hidden="true">
 
@@ -3294,6 +3584,33 @@
                 <div class="px-zone reason" aria-hidden="true"></div>
                 <div class="px-zone result" aria-hidden="true"></div>
                 <div class="walk-area" aria-hidden="true"></div>
+
+                <div class="px-relation-board" aria-hidden="true">
+                  <div class="px-relation-card" data-year="2026">
+                    <img src="assets/web/case-user-2026.jpg" alt="">
+                    <span data-lang="zh">用户</span><span data-lang="en">USER</span>
+                    <em class="px-thought" data-lang="zh">先确定当前请求者身份</em>
+                    <em class="px-thought" data-lang="en">Identify the current requester.</em>
+                  </div>
+                  <div class="px-relation-card" data-year="2026">
+                    <img src="assets/web/case-daughter-2026.jpg" alt="">
+                    <span data-lang="zh">女儿</span><span data-lang="en">DAUGHTER</span>
+                    <em class="px-thought" data-lang="zh">找到当前照片中的女儿</em>
+                    <em class="px-thought" data-lang="en">Find the daughter today.</em>
+                  </div>
+                  <div class="px-relation-card" data-year="2016">
+                    <img src="assets/web/case-user-2016.jpg" alt="">
+                    <span data-lang="zh">用户</span><span data-lang="en">USER</span>
+                    <em class="px-thought" data-lang="zh">回溯 2016 年的用户</em>
+                    <em class="px-thought" data-lang="en">Trace the user in 2016.</em>
+                  </div>
+                  <div class="px-relation-card" data-year="2016">
+                    <img src="assets/web/case-daughter-2016.jpg" alt="">
+                    <span data-lang="zh">女儿</span><span data-lang="en">DAUGHTER</span>
+                    <em class="px-thought" data-lang="zh">匹配过去照片里的女儿</em>
+                    <em class="px-thought" data-lang="en">Match the past daughter.</em>
+                  </div>
+                </div>
 
                 <div class="px-rifle" aria-hidden="true">
                   <div class="px-cand"><img src="assets/web/case-daughter-identity.jpg" alt=""><span class="px-x">NOT IT</span></div>
@@ -3306,6 +3623,10 @@
 
                 <div class="px-screen" aria-hidden="true">
                   <img src="assets/web/case-result-birthday.jpg" alt="">
+                  <span class="px-screen-label">
+                    <span data-lang="zh">命中照片</span>
+                    <span data-lang="en">MATCHED PHOTO</span>
+                  </span>
                 </div>
 
                 <div class="room-agent" aria-hidden="true">
@@ -3666,13 +3987,18 @@
         thoughts: [
           {
             title: "Personalized KG",
-            text: "Find daughter and family relations.",
-            proof: {
-              img: "assets/web/case-daughter-identity.jpg",
-              title: "Daughter found",
-              text: "user - daughter relation",
-              alt: "Daughter identified by MobileMem."
-            }
+            text: "Link family across years.",
+            relationProof: [
+              { year: "2026", img: "assets/web/case-user-2026.jpg", label: "User now", alt: "Current user portrait." },
+              { year: "2026", img: "assets/web/case-daughter-2026.jpg", label: "Daughter now", alt: "Current daughter portrait." },
+              { year: "2016", img: "assets/web/case-user-2016.jpg", label: "User 2016", alt: "Past user portrait." },
+              { year: "2016", img: "assets/web/case-daughter-2016.jpg", label: "Daughter 2016", alt: "Past daughter portrait." }
+            ],
+            checks: [
+              { text: "Find: current daughter", match: true },
+              { text: "Find: past daughter", match: true },
+              { text: "Link: user - daughter", match: true }
+            ]
           },
           {
             title: "Multimodal Mem Bank",
@@ -3731,13 +4057,18 @@
         thoughts: [
           {
             title: "个性化知识图谱",
-            text: "识别女儿身份，并找到用户与女儿的关系。",
-            proof: {
-              img: "assets/web/case-daughter-identity.jpg",
-              title: "识别到女儿",
-              text: "用户 - 女儿关系",
-              alt: "MobileMem 识别出的女儿照片。"
-            }
+            text: "先定位当前用户与女儿，再回溯到 2016 年家庭记忆中的用户与女儿。",
+            relationProof: [
+              { year: "2026", img: "assets/web/case-user-2026.jpg", label: "当前用户", alt: "当前用户照片。" },
+              { year: "2026", img: "assets/web/case-daughter-2026.jpg", label: "当前女儿", alt: "当前女儿照片。" },
+              { year: "2016", img: "assets/web/case-user-2016.jpg", label: "过去用户", alt: "过去用户照片。" },
+              { year: "2016", img: "assets/web/case-daughter-2016.jpg", label: "过去女儿", alt: "过去女儿照片。" }
+            ],
+            checks: [
+              { text: "找到：女儿当前照片", match: true },
+              { text: "找到：女儿过去照片", match: true },
+              { text: "确认：用户 - 女儿关系", match: true }
+            ]
           },
           {
             title: "多模态记忆库",
@@ -3784,13 +4115,17 @@
     };
     let caseLang = document.body.classList.contains("lang-zh") ? "zh" : "en";
     let phoneThoughts = caseCopy[caseLang].thoughts;
-    const caseThoughtDelay = 2300;
+    const roomBubbleCopy = {
+      en: ["Reading each identity cue", "Searching memories", "Matching time + cake", "Photo found"],
+      zh: ["逐张读取身份线索", "检索记忆照片", "匹配时间与蛋糕", "已找到照片"]
+    };
+    const caseThoughtDelays = [7600, 3000, 3000, 2400];
     const caseResultDelay = 1800;
     const caseTimers = new Set();
     let caseRunId = 0;
     const roomAgentFootPoints = [
       { x: 50, y: 66 },
-      { x: 52, y: 50 },
+      { x: 52, y: 60 },
       { x: 24, y: 64 },
       { x: 74, y: 66 },
       { x: 55, y: 67 }
@@ -3799,9 +4134,9 @@
       [roomAgentFootPoints[0]],
       [
         { x: 50, y: 66 },
-        { x: 50.5, y: 62 },
-        { x: 51, y: 58 },
-        { x: 51.5, y: 54 },
+        { x: 50.8, y: 64 },
+        { x: 51.2, y: 62 },
+        { x: 51.6, y: 61 },
         roomAgentFootPoints[1]
       ],
       [
@@ -3879,13 +4214,16 @@
 
     const renderPhoneThought = (index) => {
       const thought = phoneThoughts[index] || phoneThoughts[phoneThoughts.length - 1];
+      const relationProof = thought.relationProof
+        ? `<div class="case-relation-proof">${thought.relationProof.map((item) => `<div class="case-relation-card" data-year="${item.year}"><img src="${item.img}" alt="${item.alt}"><small>${item.label}</small></div>`).join("")}</div>`
+        : "";
       const proof = thought.proof
         ? `<div class="case-thought-proof"><img src="${thought.proof.img}" alt="${thought.proof.alt}"><div><em>${thought.proof.title}</em><small>${thought.proof.text}</small></div></div>`
         : "";
       const checks = thought.checks
         ? `<div class="case-reject-list">${thought.checks.map((check) => `<span class="${check.match ? "is-match" : ""}">${check.text}</span>`).join("")}</div>`
         : "";
-      return `<b>${thought.title}</b><span>${thought.text}</span>${proof}${checks}`;
+      return `<b>${thought.title}</b><span>${thought.text}</span>${relationProof}${proof}${checks}`;
     };
 
     const measureCasePhoneHeight = () => {
@@ -3976,7 +4314,8 @@
         });
         walkRoomAgentToStep(index + 1, runId);
         if (roomBubble && roomBubbleText && phoneThoughts[index]) {
-          roomBubbleText.textContent = phoneThoughts[index].text;
+          const roomTexts = roomBubbleCopy[caseLang] || roomBubbleCopy.en;
+          roomBubbleText.textContent = roomTexts[index] || phoneThoughts[index].text;
           roomBubble.classList.remove("is-pop");
           scheduleCase(() => {
             void roomBubble.offsetWidth;
@@ -3986,7 +4325,7 @@
         setPhoneThought(index);
 
         if (index < phoneThoughts.length - 1) {
-          scheduleCase(() => activateTrace(index + 1), caseThoughtDelay, runId);
+          scheduleCase(() => activateTrace(index + 1), caseThoughtDelays[index] || 3000, runId);
           return;
         }
 
