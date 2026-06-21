@@ -325,7 +325,7 @@
       display: grid;
       grid-template-columns: minmax(220px, 0.78fr) minmax(330px, 1.22fr);
       gap: 16px;
-      min-height: 430px;
+      height: 466px;
       padding: 18px;
       overflow: hidden;
       border: 1px solid rgba(18, 35, 27, 0.14);
@@ -352,6 +352,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      height: 430px;
       min-width: 0;
       overflow: hidden;
       border-radius: 8px;
@@ -410,7 +411,8 @@
     }
 
     .case-phone {
-      min-height: 100%;
+      height: 430px;
+      min-height: 0;
       display: grid;
       grid-template-rows: auto 1fr auto;
       overflow: hidden;
@@ -449,7 +451,8 @@
       display: grid;
       align-content: end;
       gap: 8px;
-      min-height: 246px;
+      min-height: 0;
+      overflow: hidden;
       padding: 9px;
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(239, 248, 242, 0.92));
@@ -2120,11 +2123,18 @@
       .case-stage {
         padding: 10px;
         gap: 10px;
+        height: auto;
+        min-height: 0;
       }
 
       .case-flow {
         grid-template-columns: 1fr;
         padding: 10px;
+        height: auto;
+      }
+
+      .case-phone {
+        height: 430px;
       }
 
       .case-image-wrap {
