@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Walk Area Editor</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17211c;
+      --muted: #5d6a62;
+      --green: #0f7b4f;
+      --line: #d9e1dc;
+      --paper: #f6faf6;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(120deg, #f1f8f2, #fbfbf8 50%, #f7efe6);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    main {
+      width: min(1420px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(520px, 1fr) 420px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .stage-card,
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 16px 34px rgba(23, 33, 28, 0.1);
+    }
+
+    .stage-card {
+      padding: 14px;
+    }
+
+    .stage-head,
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border: 1px solid rgba(18, 35, 27, 0.16);
+      border-radius: 8px;
+      background: #15221a;
+      cursor: crosshair;
+      user-select: none;
+    }
+
+    .stage img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+      pointer-events: none;
+    }
+
+    svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .poly-fill {
+      fill: rgba(124, 227, 160, 0.22);
+      stroke: #0f7b4f;
+      stroke-width: 0.8;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .poly-line {
+      fill: none;
+      stroke: #0f7b4f;
+      stroke-width: 0.9;
+      stroke-dasharray: 3 2;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .point {
+      fill: #ffffff;
+      stroke: #0f7b4f;
+      stroke-width: 1.2;
+      cursor: grab;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .point:active {
+      cursor: grabbing;
+    }
+
+    .point-label {
+      fill: #102018;
+      font-size: 4px;
+      font-weight: 900;
+      paint-order: stroke;
+      stroke: #ffffff;
+      stroke-width: 1.1px;
+      pointer-events: none;
+    }
+
+    .panel {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    button.primary {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--white);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    textarea,
+    pre {
+      width: 100%;
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdf9;
+      color: #1d2a23;
+      font: 12px/1.45 Consolas, "SFMono-Regular", Menlo, monospace;
+    }
+
+    textarea {
+      min-height: 88px;
+      padding: 10px;
+      resize: vertical;
+    }
+
+    pre {
+      min-height: 88px;
+      overflow: auto;
+      padding: 10px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .status {
+      min-height: 24px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="layout">
+      <section class="stage-card">
+        <div class="stage-head">
+          <div>
+            <h1>Agent Walk Area Editor</h1>
+            <p class="hint">Click to add points. Drag points to adjust. Double-click the stage to close the polygon.</p>
+          </div>
+          <p class="hint"><span id="point-count">0</span> points</p>
+        </div>
+        <div class="stage" id="stage" aria-label="Walk area editor">
+          <img src="assets/web/pixel-room-compact.png" alt="">
+          <svg id="overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <polygon id="polygon" class="poly-fill" points=""></polygon>
+            <polyline id="polyline" class="poly-line" points=""></polyline>
+            <g id="points"></g>
+          </svg>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-head">
+          <h1>Output</h1>
+          <p class="hint" id="closed-state">open</p>
+        </div>
+        <div class="buttons">
+          <button class="primary" id="close-btn" type="button">Close Polygon</button>
+          <button id="undo-btn" type="button">Undo</button>
+          <button id="clear-btn" type="button">Clear</button>
+          <button id="copy-btn" type="button">Copy CSS</button>
+        </div>
+        <p class="status" id="status"></p>
+
+        <div class="field">
+          <label for="css-output">CSS polygon</label>
+          <textarea id="css-output" spellcheck="false" readonly></textarea>
+        </div>
+
+        <div class="field">
+          <label for="json-output">Normalized points</label>
+          <pre id="json-output"></pre>
+        </div>
+
+        <div class="field">
+          <label for="js-output">JS ready</label>
+          <pre id="js-output"></pre>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const stage = document.querySelector("#stage");
+    const polygon = document.querySelector("#polygon");
+    const polyline = document.querySelector("#polyline");
+    const pointsLayer = document.querySelector("#points");
+    const pointCount = document.querySelector("#point-count");
+    const closedState = document.querySelector("#closed-state");
+    const cssOutput = document.querySelector("#css-output");
+    const jsonOutput = document.querySelector("#json-output");
+    const jsOutput = document.querySelector("#js-output");
+    const status = document.querySelector("#status");
+    const closeBtn = document.querySelector("#close-btn");
+    const undoBtn = document.querySelector("#undo-btn");
+    const clearBtn = document.querySelector("#clear-btn");
+    const copyBtn = document.querySelector("#copy-btn");
+
+    let points = [];
+    let closed = false;
+    let draggingIndex = null;
+
+    const clamp = (value) => Math.max(0, Math.min(100, value));
+    const round = (value) => Math.round(value * 10) / 10;
+
+    const eventToPoint = (event) => {
+      const rect = stage.getBoundingClientRect();
+      return {
+        x: round(clamp(((event.clientX - rect.left) / rect.width) * 100)),
+        y: round(clamp(((event.clientY - rect.top) / rect.height) * 100))
+      };
+    };
+
+    const formatPoints = () => points.map((point) => `${point.x},${point.y}`).join(" ");
+    const formatCss = () => `clip-path: polygon(${points.map((point) => `${point.x}% ${point.y}%`).join(", ")});`;
+
+    const render = () => {
+      const pointString = formatPoints();
+      polygon.setAttribute("points", closed ? pointString : "");
+      polyline.setAttribute("points", pointString);
+
+      pointsLayer.innerHTML = points.map((point, index) => `
+        <g>
+          <circle class="point" data-index="${index}" cx="${point.x}" cy="${point.y}" r="1.35"></circle>
+          <text class="point-label" x="${point.x + 1.7}" y="${point.y - 1.5}">${index + 1}</text>
+        </g>
+      `).join("");
+
+      pointCount.textContent = String(points.length);
+      closedState.textContent = closed ? "closed" : "open";
+      closeBtn.disabled = points.length < 3 || closed;
+      undoBtn.disabled = points.length === 0;
+      copyBtn.disabled = points.length < 3;
+
+      cssOutput.value = points.length >= 3 ? formatCss() : "";
+      jsonOutput.textContent = JSON.stringify(points, null, 2);
+      jsOutput.textContent = `const agentWalkArea = ${JSON.stringify(points)};`;
+    };
+
+    stage.addEventListener("click", (event) => {
+      if (event.target.classList.contains("point")) return;
+      if (closed) return;
+      points.push(eventToPoint(event));
+      render();
+    });
+
+    stage.addEventListener("dblclick", () => {
+      if (points.length >= 3) {
+        closed = true;
+        render();
+      }
+    });
+
+    pointsLayer.addEventListener("pointerdown", (event) => {
+      const target = event.target.closest(".point");
+      if (!target) return;
+      draggingIndex = Number(target.dataset.index);
+      target.setPointerCapture(event.pointerId);
+    });
+
+    pointsLayer.addEventListener("pointermove", (event) => {
+      if (draggingIndex === null) return;
+      points[draggingIndex] = eventToPoint(event);
+      render();
+    });
+
+    pointsLayer.addEventListener("pointerup", () => {
+      draggingIndex = null;
+    });
+
+    closeBtn.addEventListener("click", () => {
+      if (points.length < 3) return;
+      closed = true;
+      render();
+    });
+
+    undoBtn.addEventListener("click", () => {
+      points.pop();
+      if (points.length < 3) closed = false;
+      render();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      points = [];
+      closed = false;
+      render();
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      if (points.length < 3) return;
+      await navigator.clipboard.writeText(formatCss());
+      status.textContent = "Copied CSS polygon.";
+      window.setTimeout(() => {
+        status.textContent = "";
+      }, 1600);
+    });
+
+    render();
+  </script>
+</body>
+</html>

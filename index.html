@@ -185,6 +185,10 @@
       margin: 0 auto;
     }
 
+    .hero .wrap {
+      width: min(1450px, calc(100% - 40px));
+    }
+
     .hero {
       position: relative;
       background:
@@ -193,8 +197,8 @@
 
     .hero-grid {
       display: grid;
-      grid-template-columns: minmax(0, 0.86fr) minmax(460px, 1.14fr);
-      gap: 34px;
+      grid-template-columns: minmax(580px, 0.92fr) minmax(760px, 1.08fr);
+      gap: 26px;
       align-items: center;
     }
 
@@ -217,7 +221,7 @@
 
     h1 {
       margin-bottom: 22px;
-      font-size: clamp(44px, 7vw, 86px);
+      font-size: clamp(44px, 6vw, 78px);
       line-height: 0.95;
       letter-spacing: 0;
     }
@@ -323,10 +327,11 @@
     .case-stage {
       position: relative;
       display: grid;
-      grid-template-columns: minmax(220px, 0.78fr) minmax(330px, 1.22fr);
-      gap: 16px;
+      grid-template-columns: 230px minmax(500px, 560px);
+      gap: 12px;
+      justify-content: center;
       min-height: calc(var(--case-phone-h, 500px) + 36px);
-      padding: 18px;
+      padding: 18px 16px;
       overflow: hidden;
       border: 1px solid rgba(18, 35, 27, 0.14);
       border-radius: 8px;
@@ -361,19 +366,513 @@
     }
 
     .case-story-panel {
+      position: relative;
       min-width: 0;
       display: grid;
       align-items: stretch;
+      min-height: var(--case-phone-h, 500px);
+      overflow: hidden;
+      border: 1px solid rgba(18, 35, 27, 0.12);
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 74% 18%, rgba(124, 227, 160, 0.24), transparent 34%),
+        linear-gradient(145deg, rgba(252, 255, 249, 0.98), rgba(232, 243, 235, 0.94) 58%, rgba(246, 238, 226, 0.88));
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.72),
+        0 14px 28px rgba(23, 33, 28, 0.08);
+      perspective: 900px;
     }
 
-    .case-story-panel img {
+    .memory-room {
+      position: relative;
+      width: 100%;
+      height: var(--case-phone-h, 500px);
+      min-height: 500px;
+      overflow: hidden;
+      color: var(--white);
+      background:
+        linear-gradient(180deg, rgba(12, 24, 17, 0.18), rgba(12, 24, 17, 0.42)),
+        #17211c;
+      box-shadow:
+        inset 0 0 0 2px rgba(16, 55, 38, 0.6),
+        inset 0 0 0 4px rgba(124, 227, 160, 0.16),
+        inset 0 0 64px rgba(8, 16, 11, 0.5);
+    }
+
+    .memory-room::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 40% 54%, transparent 0 22%, rgba(8, 16, 11, 0.06) 46%, rgba(8, 16, 11, 0.34) 100%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.08));
+      pointer-events: none;
+    }
+
+    .memory-room::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 16;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 3px, 6px 6px, 6px 6px;
+      opacity: 0.5;
+      mix-blend-mode: soft-light;
+    }
+
+    .room-caption {
+      position: absolute;
+      left: 18px;
+      top: 16px;
+      z-index: 30;
+      min-height: 36px;
+      padding: 8px 10px;
+      border: 1px solid rgba(124, 227, 160, 0.34);
+      border-radius: 8px;
+      background: rgba(9, 22, 15, 0.72);
+      box-shadow:
+        0 12px 24px rgba(0, 0, 0, 0.22),
+        0 0 0 5px rgba(124, 227, 160, 0.06);
+      backdrop-filter: blur(10px);
+    }
+
+    .room-caption span {
+      display: none;
+      color: #dff8e8;
+      font-size: 11px;
+      line-height: 1.25;
+      font-weight: 950;
+    }
+
+    .lang-en .memory-room[data-room-step="1"] .room-caption .step-1[data-lang="en"],
+    .lang-en .memory-room[data-room-step="2"] .room-caption .step-2[data-lang="en"],
+    .lang-en .memory-room[data-room-step="3"] .room-caption .step-3[data-lang="en"],
+    .lang-en .memory-room[data-room-step="4"] .room-caption .step-4[data-lang="en"],
+    .lang-zh .memory-room[data-room-step="1"] .room-caption .step-1[data-lang="zh"],
+    .lang-zh .memory-room[data-room-step="2"] .room-caption .step-2[data-lang="zh"],
+    .lang-zh .memory-room[data-room-step="3"] .room-caption .step-3[data-lang="zh"],
+    .lang-zh .memory-room[data-room-step="4"] .room-caption .step-4[data-lang="zh"] {
+      display: block;
+    }
+
+    .room-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 48% center;
+      filter: saturate(0.96) contrast(1.02);
+    }
+
+    .room-hotspot {
+      position: absolute;
+      z-index: 4;
+      border: 1px solid rgba(124, 227, 160, 0.2);
+      border-radius: 8px;
+      background: rgba(124, 227, 160, 0.06);
+      opacity: 0;
+      box-shadow: inset 0 0 18px rgba(124, 227, 160, 0.08);
+    }
+
+    .room-hotspot::after {
+      content: "";
+      position: absolute;
+      inset: -7px;
+      border: 1px solid rgba(124, 227, 160, 0.3);
+      border-radius: inherit;
+      opacity: 0;
+      animation: pixelPing 1.7s ease-out infinite;
+    }
+
+    .room-hotspot.kg {
+      left: 118px;
+      top: 72px;
+      width: 160px;
+      height: 132px;
+      transform: skewY(-6deg);
+    }
+
+    .room-hotspot.bank {
+      left: 18px;
+      top: 84px;
+      width: 118px;
+      height: 286px;
+    }
+
+    .room-hotspot.reason {
+      right: 32px;
+      bottom: 46px;
+      width: 152px;
+      height: 124px;
+      transform: skewX(-14deg);
+    }
+
+    .room-hotspot.result {
+      right: 22px;
+      top: 92px;
+      width: 188px;
+      height: 132px;
+    }
+
+    .room-photo-card {
+      position: absolute;
+      z-index: 21;
+      width: 92px;
+      padding: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.46);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 14px 24px rgba(0, 0, 0, 0.28);
+      opacity: 0;
+    }
+
+    .room-photo-card img {
+      display: block;
+      width: 100%;
+      height: 58px;
+      border-radius: 6px;
+      object-fit: cover;
+      image-rendering: auto;
+    }
+
+    .room-photo-card.school {
+      left: 56px;
+      top: 246px;
+      transform: rotate(-8deg) translate(-18px, 20px) scale(0.92);
+    }
+
+    .room-photo-card.trip {
+      left: 154px;
+      top: 284px;
+      transform: rotate(8deg) translate(-14px, 20px) scale(0.92);
+    }
+
+    .room-photo-card.birthday {
+      right: 146px;
+      bottom: 106px;
+      transform: rotate(-3deg) translate(12px, 22px) scale(0.94);
+    }
+
+    .room-tag {
+      display: block;
+      margin-top: 5px;
+      padding: 3px 5px;
+      border-radius: 999px;
+      background: rgba(204, 62, 115, 0.1);
+      color: #8a2148;
+      font-size: 8px;
+      line-height: 1;
+      font-weight: 950;
+      text-align: center;
+    }
+
+    .room-tag.match {
+      background: rgba(15, 123, 79, 0.12);
+      color: var(--green-dark);
+    }
+
+    .room-agent {
+      position: absolute;
+      left: 42%;
+      top: 53%;
+      z-index: 24;
+      width: 146px;
+      aspect-ratio: 0.78;
+      transform-origin: 50% 96%;
+      will-change: transform;
+      filter: drop-shadow(0 18px 18px rgba(0, 0, 0, 0.34));
+    }
+
+    .room-agent::before {
+      content: "";
+      position: absolute;
+      left: 31%;
+      bottom: 6px;
+      z-index: -1;
+      width: 42%;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.32);
+      transform: translateY(5px);
+      animation: pixelShadow 760ms steps(2, end) infinite;
+    }
+
+    .room-agent-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      animation: pixelAgentIdle 760ms steps(2, end) infinite;
+    }
+
+    .room-agent img {
       display: block;
       width: 100%;
       height: 100%;
-      max-height: var(--case-phone-h, 500px);
       object-fit: contain;
-      object-position: center;
+      image-rendering: pixelated;
+    }
+
+    .room-orbit {
+      position: absolute;
+      left: 12%;
+      top: 0;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(124, 227, 160, 0.72);
+      border-radius: 50%;
+      animation: roomOrbit 2s linear infinite;
+    }
+
+    .room-orbit::after {
+      content: "";
+      position: absolute;
+      right: -3px;
+      top: 9px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #7ce3a0;
+      box-shadow: 0 0 10px rgba(124, 227, 160, 0.7);
+    }
+
+    .memory-room[data-room-step="1"] .room-hotspot.kg,
+    .memory-room[data-room-step="2"] .room-hotspot.bank,
+    .memory-room[data-room-step="3"] .room-hotspot.reason,
+    .memory-room[data-room-step="4"] .room-hotspot.result {
+      opacity: 1;
+      animation: pixelHotspot 520ms steps(3, end) both;
+      box-shadow:
+        inset 0 0 28px rgba(124, 227, 160, 0.18),
+        0 0 28px rgba(124, 227, 160, 0.22);
+    }
+
+    .memory-room[data-room-step="0"] .room-agent {
+      transform: translate(-22px, 34px) scale(0.96);
+    }
+
+    .memory-room[data-room-step="1"] .room-agent {
+      animation: pixelWalkToKg 780ms steps(7, end) both;
+    }
+
+    .memory-room[data-room-step="2"] .room-agent {
+      animation: pixelWalkToBank 780ms steps(7, end) both;
+    }
+
+    .memory-room[data-room-step="3"] .room-agent {
+      animation: pixelWalkToDesk 860ms steps(8, end) both;
+    }
+
+    .memory-room[data-room-step="4"] .room-agent {
+      animation: pixelWalkToResult 820ms steps(8, end) both;
+    }
+
+    .memory-room[data-room-step="3"] .room-photo-card.birthday,
+    .memory-room[data-room-step="4"] .room-photo-card.birthday {
+      opacity: 1;
+      box-shadow:
+        0 18px 28px rgba(23, 33, 28, 0.18),
+        0 0 0 6px rgba(124, 227, 160, 0.12);
+    }
+
+    .memory-room[data-room-step="3"] .room-photo-card.birthday {
+      animation: pixelCardToDesk 640ms steps(6, end) both;
+    }
+
+    .memory-room[data-room-step="4"] .room-photo-card.birthday {
+      animation: pixelCardToScreen 640ms steps(6, end) both;
+    }
+
+    .room-scan-beam {
+      position: absolute;
+      right: 44px;
+      bottom: 64px;
+      z-index: 19;
+      width: 178px;
+      height: 116px;
+      overflow: hidden;
+      border: 1px solid rgba(124, 227, 160, 0.24);
       border-radius: 8px;
+      background:
+        linear-gradient(90deg, rgba(124, 227, 160, 0.18) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(124, 227, 160, 0.14) 1px, transparent 1px),
+        rgba(12, 30, 20, 0.4);
+      background-size: 18px 18px;
+      opacity: 0;
+      transform: skewX(-14deg);
+    }
+
+    .room-scan-beam::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      width: 46%;
+      background: linear-gradient(90deg, transparent, rgba(124, 227, 160, 0.46), transparent);
+      transform: translateX(-100%);
+      animation: roomScan 1.2s steps(6, end) infinite;
+    }
+
+    .memory-room[data-room-step="3"] .room-scan-beam {
+      opacity: 1;
+      animation: pixelBeamIn 260ms steps(2, end) both;
+    }
+
+    /* 翻检覆盖记忆墙照片图谱区（贴合背景真实照片，非凭空浮卡） */
+    .room-rifle {
+      position: absolute;
+      left: 40px;
+      top: 62px;
+      z-index: 22;
+      width: 244px;
+      height: 168px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .memory-room[data-room-step="2"] .room-rifle {
+      opacity: 1;
+    }
+
+    /* 候选 = 在记忆墙照片上游走的扫描框 */
+    .cand {
+      position: absolute;
+      width: 74px;
+      padding: 3px;
+      border: 2px solid rgba(124, 227, 160, 0.92);
+      border-radius: 5px;
+      background: rgba(8, 20, 14, 0.45);
+      box-shadow:
+        0 0 10px rgba(124, 227, 160, 0.5),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+      opacity: 0;
+    }
+
+    .cand img {
+      display: block;
+      width: 100%;
+      height: 46px;
+      object-fit: cover;
+      border-radius: 3px;
+      image-rendering: auto;
+    }
+
+    .cand-x,
+    .cand-o {
+      position: absolute;
+      left: 50%;
+      bottom: 4px;
+      transform: translateX(-50%);
+      padding: 1px 6px;
+      border-radius: 999px;
+      font-size: 7px;
+      line-height: 1.1;
+      font-weight: 950;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .cand-x {
+      background: rgba(204, 62, 115, 0.95);
+      color: #fff;
+    }
+
+    .cand-o {
+      background: rgba(15, 123, 79, 0.98);
+      color: #eafff1;
+    }
+
+    /* 散布在记忆墙各照片节点位置扫描 */
+    .cand:nth-child(1) { left: 2%; top: 2%; }
+    .cand:nth-child(2) { left: 40%; top: 0%; }
+    .cand:nth-child(3) { left: 71%; top: 16%; }
+    .cand:nth-child(4) { left: 10%; top: 46%; }
+    .cand:nth-child(5) { left: 46%; top: 54%; }
+    .cand:nth-child(6) { left: 76%; top: 50%; }
+
+    .cand-hit {
+      left: 33%;
+      top: 22%;
+      width: 98px;
+      border-color: #7ce3a0;
+      box-shadow:
+        0 0 16px rgba(124, 227, 160, 0.75),
+        0 0 0 3px rgba(124, 227, 160, 0.5);
+    }
+
+    .cand-hit img {
+      height: 62px;
+    }
+
+    .memory-room[data-room-step="2"] .cand:not(.cand-hit) {
+      animation: wallLight 0.5s steps(6, end) both;
+    }
+
+    .memory-room[data-room-step="2"] .cand:nth-child(1) { animation-delay: 0.05s; }
+    .memory-room[data-room-step="2"] .cand:nth-child(2) { animation-delay: 0.29s; }
+    .memory-room[data-room-step="2"] .cand:nth-child(3) { animation-delay: 0.53s; }
+    .memory-room[data-room-step="2"] .cand:nth-child(4) { animation-delay: 0.77s; }
+    .memory-room[data-room-step="2"] .cand:nth-child(5) { animation-delay: 1.01s; }
+    .memory-room[data-room-step="2"] .cand:nth-child(6) { animation-delay: 1.25s; }
+
+    .memory-room[data-room-step="2"] .cand-hit {
+      animation: pixelHit 0.6s steps(5, end) 1.5s both;
+    }
+
+    .room-crt {
+      position: absolute;
+      inset: 0;
+      z-index: 17;
+      height: 42%;
+      pointer-events: none;
+      background: linear-gradient(180deg, transparent, rgba(124, 227, 160, 0.07) 50%, transparent);
+      opacity: 0.5;
+      animation: roomCrtRoll 5.5s linear infinite;
+    }
+
+    .room-bubble {
+      position: absolute;
+      left: 50%;
+      top: -4px;
+      z-index: 27;
+      max-width: 158px;
+      min-width: 56px;
+      transform: translate(-50%, -100%);
+      padding: 5px 9px;
+      border: 2px solid #103726;
+      border-radius: 8px;
+      background: #eafff1;
+      color: #0f3b27;
+      font-size: 10px;
+      line-height: 1.3;
+      font-weight: 900;
+      text-align: center;
+      box-shadow:
+        0 3px 0 #103726,
+        0 0 0 3px rgba(124, 227, 160, 0.4);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .room-bubble::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -8px;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 7px solid #103726;
+    }
+
+    .room-bubble.is-pop {
+      opacity: 1;
+      animation: pixelBubblePop 0.34s steps(3, end) both;
     }
 
     .case-badge {
@@ -667,13 +1166,9 @@
     .case-result-photo {
       display: block;
       width: 100%;
-      aspect-ratio: 16 / 9;
-      margin-top: 7px;
-      overflow: hidden;
-      border: 1px solid rgba(18, 35, 27, 0.12);
-      border-radius: 8px;
-      background: #f8fbf4;
-      object-fit: cover;
+      height: auto;
+      margin-top: 6px;
+      border-radius: 7px;
     }
 
     .case-composer {
@@ -1041,6 +1536,188 @@
       50% {
         transform: translateY(-4px);
       }
+    }
+
+    @keyframes roomAgentBob {
+      50% {
+        transform: translateY(-5px);
+      }
+    }
+
+    @keyframes roomAgentSearch {
+      0%,
+      100% {
+        transform: rotate(-22deg);
+      }
+      50% {
+        transform: rotate(18deg);
+      }
+    }
+
+    @keyframes roomOrbit {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes roomLinePulse {
+      50% {
+        opacity: 0.48;
+        box-shadow: 0 0 12px rgba(124, 227, 160, 0.6);
+      }
+    }
+
+    @keyframes roomScan {
+      to {
+        transform: translateX(260%);
+      }
+    }
+
+    /* pixel agent 舞台动画：站立呼吸 / 影子 / 巡视行走 / 热点 / 照片卡 / 扫描 */
+    @keyframes pixelAgentIdle {
+      0%, 100% { transform: translateY(0) scaleY(1); }
+      50% { transform: translateY(-3px) scaleY(1.015); }
+    }
+
+    @keyframes pixelShadow {
+      0%, 100% { transform: translateY(5px) scaleX(1); opacity: 0.85; }
+      50% { transform: translateY(5px) scaleX(0.84); opacity: 0.62; }
+    }
+
+    /* 连贯巡视路线：基位 → KG 绿墙 → 左书架 → 右桌 → 右屏，过程含踏步起伏 */
+    @keyframes pixelWalkToKg {
+      0% { transform: translate(-22px, 34px) scale(0.96); }
+      25% { transform: translate(-18px, 8px) scale(0.92); }
+      50% { transform: translate(-12px, -6px) scale(0.88); }
+      75% { transform: translate(-8px, -34px) scale(0.85); }
+      100% { transform: translate(-4px, -46px) scale(0.82); }
+    }
+
+    @keyframes pixelWalkToBank {
+      0% { transform: translate(-4px, -46px) scale(0.82); }
+      25% { transform: translate(-46px, -34px) scale(0.84); }
+      50% { transform: translate(-82px, -22px) scale(0.87); }
+      75% { transform: translate(-116px, -4px) scale(0.89); }
+      100% { transform: translate(-138px, -2px) scale(0.9); }
+    }
+
+    @keyframes pixelWalkToDesk {
+      0% { transform: translate(-138px, -2px) scale(0.9); }
+      25% { transform: translate(-80px, 16px) scale(0.95); }
+      50% { transform: translate(-24px, 34px) scale(1); }
+      75% { transform: translate(22px, 48px) scale(1.05); }
+      100% { transform: translate(52px, 56px) scale(1.08); }
+    }
+
+    @keyframes pixelWalkToResult {
+      0% { transform: translate(52px, 56px) scale(1.08); }
+      25% { transform: translate(64px, 54px) scale(1.07); }
+      50% { transform: translate(74px, 52px) scale(1.06); }
+      75% { transform: translate(82px, 51px) scale(1.06); }
+      100% { transform: translate(88px, 50px) scale(1.06); }
+    }
+
+    @keyframes pixelHotspot {
+      0% { opacity: 0; }
+      60% { opacity: 1; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes pixelPing {
+      0% { opacity: 0.55; transform: scale(0.9); }
+      100% { opacity: 0; transform: scale(1.32); }
+    }
+
+    @keyframes pixelCardSchool {
+      0% { opacity: 0; transform: rotate(-8deg) translate(-18px, 44px) scale(0.7); }
+      100% { opacity: 1; transform: rotate(-8deg) translate(-18px, 20px) scale(0.92); }
+    }
+
+    @keyframes pixelCardTrip {
+      0% { opacity: 0; transform: rotate(8deg) translate(-14px, 44px) scale(0.7); }
+      100% { opacity: 1; transform: rotate(8deg) translate(-14px, 20px) scale(0.92); }
+    }
+
+    @keyframes pixelCardBirthday {
+      0% { opacity: 0; transform: rotate(-3deg) translate(12px, 46px) scale(0.7); }
+      100% { opacity: 1; transform: rotate(-3deg) translate(12px, 22px) scale(0.94); }
+    }
+
+    @keyframes pixelCardToDesk {
+      0% { opacity: 0; transform: rotate(-3deg) translate(12px, 32px) scale(0.78); }
+      60% { opacity: 1; transform: rotate(-2deg) translate(2px, 10px) scale(1); }
+      100% { opacity: 1; transform: rotate(-2deg) translate(2px, 10px) scale(1); }
+    }
+
+    @keyframes pixelCardToScreen {
+      0% { opacity: 1; transform: rotate(-2deg) translate(2px, 10px) scale(1); }
+      100% { opacity: 1; transform: rotate(0deg) translate(-6px, 2px) scale(1.04); }
+    }
+
+    @keyframes pixelBeamIn {
+      0% { opacity: 0; transform: skewX(-14deg) scale(0.82); }
+      100% { opacity: 1; transform: skewX(-14deg) scale(1); }
+    }
+
+    /* 记忆墙扫描框：原地闪入→否决→闪出（位置由各 cand 定） */
+    @keyframes pixelRifle {
+      0% { opacity: 0; transform: scale(0.55); }
+      22% { opacity: 1; transform: scale(1.05); }
+      62% { opacity: 1; transform: scale(1); }
+      86% { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 0; transform: scale(0.8); }
+    }
+
+    /* step2 候选逐张点亮：暗淡待检 → 亮起高亮检查 → 回暗（dim 态在 delay 期间由 fill:both 反向生效，呈现「背景贴着很多照片」感） */
+    @keyframes wallLight {
+      0% {
+        opacity: 0.24;
+        filter: brightness(0.62) saturate(0.7);
+        transform: scale(0.95);
+        border-color: rgba(124, 227, 160, 0.32);
+        box-shadow: 0 0 0 rgba(124, 227, 160, 0);
+      }
+      26% {
+        opacity: 1;
+        filter: brightness(1.2) saturate(1.12);
+        transform: scale(1.08);
+        border-color: rgba(124, 227, 160, 1);
+        box-shadow:
+          0 0 16px rgba(124, 227, 160, 0.85),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.26);
+      }
+      64% {
+        opacity: 1;
+        filter: brightness(1) saturate(1);
+        transform: scale(1);
+        box-shadow: 0 0 9px rgba(124, 227, 160, 0.5);
+      }
+      100% {
+        opacity: 0.24;
+        filter: brightness(0.6) saturate(0.6);
+        transform: scale(0.95);
+        border-color: rgba(124, 227, 160, 0.3);
+        box-shadow: 0 0 0 rgba(124, 227, 160, 0);
+      }
+    }
+
+    /* 命中：生日照放大并停留 */
+    @keyframes pixelHit {
+      0% { opacity: 0; transform: scale(0.5); }
+      45% { opacity: 1; transform: scale(1.16); }
+      100% { opacity: 1; transform: scale(1.05); }
+    }
+
+    /* 头顶状态气泡弹入 */
+    @keyframes pixelBubblePop {
+      0% { opacity: 0; transform: translate(-50%, -86%) scale(0.6); }
+      100% { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+    }
+
+    /* CRT 扫描光带缓慢下移 */
+    @keyframes roomCrtRoll {
+      0% { transform: translateY(-120%); }
+      100% { transform: translateY(320%); }
     }
 
     .image-frame .video-play {
@@ -2063,6 +2740,19 @@
       .case-answer {
         max-width: 100%;
       }
+
+      .case-story-panel {
+        min-height: 390px;
+      }
+
+      .memory-room {
+        height: 390px;
+        min-height: 390px;
+      }
+
+      .room-agent {
+        width: 96px;
+      }
     }
 
     @media (max-width: 700px) {
@@ -2137,6 +2827,29 @@
         height: var(--case-phone-h, auto);
       }
 
+      .case-story-panel {
+        min-height: 330px;
+      }
+
+      .memory-room {
+        height: 330px;
+        min-height: 330px;
+      }
+
+      .room-caption {
+        left: 12px;
+        top: 12px;
+        right: 12px;
+      }
+
+      .room-agent {
+        width: 78px;
+      }
+
+      .room-photo-card {
+        width: 72px;
+      }
+
       .case-image-wrap {
         min-height: 230px;
       }
@@ -2180,6 +2893,288 @@
         height: 42px;
       }
 
+    }
+    /* ===================== Pixel agent stage (2D pixel rebuild) ===================== */
+    .case-story-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .memory-room {
+      position: relative;
+      width: 100%;
+      aspect-ratio: auto;
+      height: var(--case-phone-h, 500px) !important;
+      max-height: var(--case-phone-h, 500px);
+      --agent-x: 50%;
+      --agent-y: 66%;
+      --agent-walk-area: polygon(22.5% 40.1%, 34.8% 40.2%, 66.2% 44.1%, 63.4% 40.8%, 63.7% 49.3%, 64.5% 52.9%, 66.9% 53.9%, 69.7% 55.5%, 72% 56.4%, 72.7% 58.9%, 74.9% 59.9%, 77.5% 62.4%, 79.4% 64.5%, 85.4% 67.9%, 87.1% 65.1%, 92% 73.3%, 89.8% 75%, 85.1% 76.9%, 81.9% 79.3%, 79.7% 83.7%, 77.5% 86.3%, 74.2% 84.9%, 72% 81%, 70.9% 77.5%, 69.8% 71.9%, 63.7% 70%, 58.4% 70.3%, 54.6% 69.8%, 48.6% 69.8%, 45.6% 69.7%, 34.8% 69.7%, 30.1% 69.8%, 22.5% 75.6%, 20.8% 81.3%, 13.3% 80.5%, 12.8% 84.9%, 10.3% 86.5%, 2.7% 83.8%, 3.8% 78.3%, 5.3% 75.2%, 10.6% 71.9%, 19.2% 65.6%, 21.8% 61.2%, 18.8% 56.9%, 16.3% 52.9%, 18.8% 48.6%, 23.2% 46.1%, 23.2% 43.7%, 23.2% 41.2%);
+      margin: 0 auto;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #18251c;
+      background-image: none;
+      image-rendering: pixelated;
+      box-shadow: 0 14px 34px rgba(60, 110, 80, 0.22), inset 0 0 0 3px rgba(150, 190, 165, 0.7);
+    }
+    .memory-room .room-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+      animation: none;
+    }
+
+    .memory-room .px-scene {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      aspect-ratio: auto;
+      overflow: hidden;
+      border: 0;
+      z-index: 1;
+    }
+
+    .memory-room .walk-area {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      clip-path: var(--agent-walk-area);
+      background: rgba(124, 227, 160, 0.18);
+      outline: 2px solid rgba(124, 227, 160, 0.6);
+    }
+
+    .memory-room .px-zone {
+      display: none;
+    }
+    .memory-room .px-zone.kg     { left: 27%; top: 7%;  width: 42%; height: 25%; }
+    .memory-room .px-zone.bank   { left: 3%;  top: 25%; width: 22%; height: 40%; }
+    .memory-room .px-zone.reason { left: 68%; top: 30%; width: 27%; height: 28%; }
+    .memory-room .px-zone.result { left: 30%; top: 74%; width: 40%; height: 18%; }
+    .memory-room[data-room-step="1"] .px-zone.kg,
+    .memory-room[data-room-step="2"] .px-zone.bank,
+    .memory-room[data-room-step="3"] .px-zone.reason,
+    .memory-room[data-room-step="4"] .px-zone.result {
+      opacity: 1;
+      animation: pxZonePulse 1.1s ease-in-out infinite;
+    }
+    @keyframes pxZonePulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.5); } }
+
+    .memory-room .px-rifle {
+      position: absolute;
+      left: 16%;
+      top: 40%;
+      width: 74px;
+      height: 74px;
+      transform: translate(-50%, 0);
+      opacity: 0;
+      transition: opacity 220ms ease;
+      z-index: 6;
+    }
+    .memory-room[data-room-step="2"] .px-rifle { opacity: 1; }
+    .memory-room .px-cand { position: absolute; inset: 0; opacity: 0; }
+    .memory-room .px-cand img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border: 3px solid #f4ead2;
+      border-radius: 5px;
+      box-shadow: 0 5px 0 rgba(0, 0, 0, 0.28);
+      image-rendering: auto;
+    }
+    .memory-room .px-x,
+    .memory-room .px-o {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) rotate(-7deg);
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 950;
+      color: #fff;
+      white-space: nowrap;
+      letter-spacing: .3px;
+    }
+    .memory-room .px-x { background: #cc3e57; box-shadow: 0 2px 0 rgba(0,0,0,.3); }
+    .memory-room .px-o { background: #1f9d57; box-shadow: 0 2px 0 rgba(0,0,0,.3); }
+    .memory-room[data-room-step="2"] .px-cand:not(.px-hit) { animation: pxCand 5.4s linear infinite; }
+    .memory-room[data-room-step="2"] .px-cand:nth-child(1) { animation-delay: 0s; }
+    .memory-room[data-room-step="2"] .px-cand:nth-child(2) { animation-delay: .7s; }
+    .memory-room[data-room-step="2"] .px-cand:nth-child(3) { animation-delay: 1.4s; }
+    .memory-room[data-room-step="2"] .px-cand:nth-child(4) { animation-delay: 2.1s; }
+    .memory-room[data-room-step="2"] .px-cand:nth-child(5) { animation-delay: 2.8s; }
+    @keyframes pxCand {
+      0% { opacity: 0; transform: scale(.9); }
+      3% { opacity: 1; transform: scale(1); }
+      10% { opacity: 1; }
+      14% { opacity: 0; }
+      100% { opacity: 0; }
+    }
+    .memory-room[data-room-step="2"] .px-hit { animation: pxHit 5.4s ease infinite; }
+    @keyframes pxHit {
+      0%, 60% { opacity: 0; transform: scale(.7); }
+      67% { opacity: 1; transform: scale(1.2); }
+      95% { opacity: 1; transform: scale(1.12); }
+      100% { opacity: 0; transform: scale(1.12); }
+    }
+
+    .memory-room .px-screen {
+      position: absolute;
+      left: 35%;
+      top: 76%;
+      width: 30%;
+      height: 13%;
+      opacity: 0;
+      overflow: hidden;
+      border-radius: 3px;
+      transition: opacity 360ms ease;
+      z-index: 4;
+    }
+    .memory-room .px-screen img { width: 100%; height: 100%; object-fit: cover; image-rendering: auto; }
+    .memory-room[data-room-step="4"] .px-screen { opacity: 1; animation: pxScreenOn 520ms ease; }
+    @keyframes pxScreenOn { 0% { opacity: 0; filter: brightness(2.4); } 100% { opacity: 1; filter: brightness(1); } }
+
+    .memory-room .room-agent {
+      position: absolute;
+      left: var(--agent-x);
+      top: var(--agent-y);
+      width: 100px;
+      transform: translate(-50%, -100%);
+      transition: left 140ms steps(2, end), top 140ms steps(2, end);
+      animation: none !important;
+      background: none !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      z-index: 8;
+    }
+    .memory-room[data-room-step="0"] { --agent-x: 50%; --agent-y: 66%; }
+    .memory-room[data-room-step="1"] { --agent-x: 52%; --agent-y: 50%; }
+    .memory-room[data-room-step="2"] { --agent-x: 24%; --agent-y: 64%; }
+    .memory-room[data-room-step="3"] { --agent-x: 74%; --agent-y: 66%; }
+    .memory-room[data-room-step="4"] { --agent-x: 55%; --agent-y: 67%; }
+    .memory-room[data-room-step="0"] .room-agent,
+    .memory-room[data-room-step="1"] .room-agent,
+    .memory-room[data-room-step="2"] .room-agent,
+    .memory-room[data-room-step="3"] .room-agent,
+    .memory-room[data-room-step="4"] .room-agent {
+      transform: translate(-50%, -100%) !important;
+    }
+    .memory-room .px-hero {
+      display: block;
+      width: 100%;
+      height: auto;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 6px 3px rgba(20, 50, 30, 0.20));
+      animation: pxHover 2.6s ease-in-out infinite;
+    }
+    @keyframes pxHover {
+      0%, 100% { transform: translateY(-1px); }
+      50%      { transform: translateY(-9px); }
+    }
+    .memory-room .room-agent::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -3px;
+      transform: translateX(-50%);
+      width: 52%;
+      height: 9px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(20, 50, 30, 0.32), rgba(20, 50, 30, 0) 70%);
+      animation: pxHoverShadow 2.6s ease-in-out infinite;
+      z-index: -1;
+    }
+    @keyframes pxHoverShadow {
+      0%, 100% { transform: translateX(-50%) scale(1);    opacity: .55; }
+      50%      { transform: translateX(-50%) scale(.78);  opacity: .35; }
+    }
+
+    .memory-room .room-agent .room-bubble {
+      position: absolute;
+      left: 50%;
+      bottom: 86%;
+      top: auto;
+      transform: translate(-50%, 0) scale(.9);
+      transform-origin: bottom center;
+      min-width: 70px;
+      max-width: 150px;
+      width: max-content;
+      height: auto;
+      min-height: 0;
+      max-height: none;
+      white-space: normal;
+      overflow: visible;
+      padding: 5px 8px;
+      border: 2px solid #173824;
+      border-radius: 8px;
+      background: #f4ead2;
+      color: #14301e;
+      font-size: 9.5px;
+      line-height: 1.25;
+      font-weight: 800;
+      text-align: center;
+      opacity: 0;
+      image-rendering: auto;
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.22);
+      transition: opacity 200ms ease;
+      z-index: 9;
+    }
+    .memory-room[data-room-step="2"] .room-agent .room-bubble {
+      left: 96%;
+      transform: translate(-8%, 0) scale(.9);
+      transform-origin: bottom left;
+    }
+    .memory-room .room-agent .room-bubble::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: #173824;
+    }
+    .memory-room .room-bubble .room-bubble-text { display: block; }
+    .memory-room .room-agent .room-bubble.is-pop {
+      opacity: 1;
+      transform: translate(-50%, 0) scale(1);
+      animation: pxBubblePop 280ms ease;
+    }
+    .memory-room[data-room-step="2"] .room-agent .room-bubble.is-pop {
+      transform: translate(-8%, 0) scale(1);
+    }
+    @keyframes pxBubblePop {
+      0% { opacity: 0; transform: translate(-50%, 4px) scale(.5); }
+      100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    }
+
+    .memory-room .room-caption {
+      position: absolute;
+      left: 50%;
+      top: 12px;
+      transform: translateX(-50%);
+      width: auto;
+      max-width: 92%;
+      height: auto;
+      z-index: 10;
+      padding: 4px 10px;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      border-radius: 7px;
+      background: rgba(22, 120, 71, 0.94);
+      color: #ffffff;
+      box-shadow: 0 3px 8px rgba(20, 60, 40, 0.22);
+      font-size: 10px;
+      line-height: 1.3;
+      font-weight: 800;
+      text-align: center;
+      white-space: nowrap;
+      image-rendering: auto;
     }
   </style>
 </head>
@@ -2280,7 +3275,45 @@
               </div>
             </div>
             <div class="case-story-panel">
-              <img src="assets/web/case-story-layout.png" alt="Evolving lifelong personalized agent memory. MobileMem grasps both story and significance across user, daughter, school, family trip, and 7th birthday memories.">
+              <div class="memory-room" data-memory-room data-room-step="0" aria-label="Animated MobileMem agent room">
+                <div class="room-caption" aria-live="polite">
+                  <span class="step-1" data-lang="zh">个性化知识图谱：识别女儿与家庭关系</span>
+                  <span class="step-1" data-lang="en">Personalized KG: identify daughter and family relations</span>
+                  <span class="step-2" data-lang="zh">多模态记忆库：翻找学校、旅行、生日候选照片</span>
+                  <span class="step-2" data-lang="en">Multimodal Mem Bank: search school, trip, and birthday candidates</span>
+                  <span class="step-3" data-lang="zh">长程记忆推理：匹配 2016、7 岁生日与蛋糕场景</span>
+                  <span class="step-3" data-lang="en">LTM Reasoning: match 2016, 7th birthday, and cake scene</span>
+                  <span class="step-4" data-lang="zh">结果：返回有依据的生日照片</span>
+                  <span class="step-4" data-lang="en">Result: return the grounded birthday photo</span>
+                </div>
+                <div class="px-scene">
+                <img class="room-bg" src="assets/web/pixel-room-compact.png" alt="" aria-hidden="true">
+
+                <div class="px-zone kg" aria-hidden="true"></div>
+                <div class="px-zone bank" aria-hidden="true"></div>
+                <div class="px-zone reason" aria-hidden="true"></div>
+                <div class="px-zone result" aria-hidden="true"></div>
+                <div class="walk-area" aria-hidden="true"></div>
+
+                <div class="px-rifle" aria-hidden="true">
+                  <div class="px-cand"><img src="assets/web/case-daughter-identity.jpg" alt=""><span class="px-x">NOT IT</span></div>
+                  <div class="px-cand"><img src="assets/web/case-memory-bank.jpg" alt=""><span class="px-x">NO CAKE</span></div>
+                  <div class="px-cand"><img src="assets/web/case-daughter-identity.jpg" alt=""><span class="px-x">2019?</span></div>
+                  <div class="px-cand"><img src="assets/web/case-memory-bank.jpg" alt=""><span class="px-x">WRONG DAY</span></div>
+                  <div class="px-cand"><img src="assets/web/case-memory-bank.jpg" alt=""><span class="px-x">SKIP</span></div>
+                  <div class="px-cand px-hit"><img src="assets/web/case-result-birthday.jpg" alt=""><span class="px-o">MATCH</span></div>
+                </div>
+
+                <div class="px-screen" aria-hidden="true">
+                  <img src="assets/web/case-result-birthday.jpg" alt="">
+                </div>
+
+                <div class="room-agent" aria-hidden="true">
+                  <div class="room-bubble"><span class="room-bubble-text"></span></div>
+                  <img class="px-hero" src="assets/web/pixel-agent.png" alt="">
+                </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2614,6 +3647,9 @@
     const caseStatus = document.querySelector("[data-case-status]");
     const traceCards = Array.from(document.querySelectorAll("[data-trace-step]"));
     const caseCurrentThought = document.querySelector("[data-case-current-thought]");
+    const memoryRoom = document.querySelector("[data-memory-room]");
+    const roomBubble = document.querySelector(".room-bubble");
+    const roomBubbleText = roomBubble ? roomBubble.querySelector(".room-bubble-text") : null;
     const caseCopy = {
       en: {
         prompt: "Could you find the photo from my daughter's 7th birthday?",
@@ -2752,6 +3788,46 @@
     const caseResultDelay = 1800;
     const caseTimers = new Set();
     let caseRunId = 0;
+    const roomAgentFootPoints = [
+      { x: 50, y: 66 },
+      { x: 52, y: 50 },
+      { x: 24, y: 64 },
+      { x: 74, y: 66 },
+      { x: 55, y: 67 }
+    ];
+    const roomAgentPaths = [
+      [roomAgentFootPoints[0]],
+      [
+        { x: 50, y: 66 },
+        { x: 50.5, y: 62 },
+        { x: 51, y: 58 },
+        { x: 51.5, y: 54 },
+        roomAgentFootPoints[1]
+      ],
+      [
+        { x: 52, y: 50 },
+        { x: 47, y: 54 },
+        { x: 41, y: 59 },
+        { x: 35, y: 64 },
+        { x: 29, y: 65 },
+        roomAgentFootPoints[2]
+      ],
+      [
+        { x: 24, y: 64 },
+        { x: 34, y: 66 },
+        { x: 45, y: 67 },
+        { x: 56, y: 67 },
+        { x: 66, y: 66 },
+        roomAgentFootPoints[3]
+      ],
+      [
+        { x: 74, y: 66 },
+        { x: 69, y: 67 },
+        { x: 64, y: 68 },
+        { x: 60, y: 68 },
+        roomAgentFootPoints[4]
+      ]
+    ];
 
     Object.values(caseCopy).flatMap((copy) => copy.thoughts).forEach((thought) => {
       if (!thought.proof) return;
@@ -2775,6 +3851,28 @@
 
     const setCaseStatus = (text) => {
       if (caseStatus) caseStatus.textContent = text;
+    };
+
+    const setRoomAgentStep = (step) => {
+      if (!memoryRoom) return;
+      const safeStep = Math.max(0, Math.min(roomAgentFootPoints.length - 1, step));
+      const point = roomAgentFootPoints[safeStep];
+      memoryRoom.dataset.roomStep = String(safeStep);
+      memoryRoom.style.setProperty("--agent-x", `${point.x}%`);
+      memoryRoom.style.setProperty("--agent-y", `${point.y}%`);
+    };
+
+    const walkRoomAgentToStep = (step, runId) => {
+      if (!memoryRoom) return;
+      const safeStep = Math.max(0, Math.min(roomAgentPaths.length - 1, step));
+      memoryRoom.dataset.roomStep = String(safeStep);
+      const path = roomAgentPaths[safeStep];
+      path.forEach((point, pointIndex) => {
+        scheduleCase(() => {
+          memoryRoom.style.setProperty("--agent-x", `${point.x}%`);
+          memoryRoom.style.setProperty("--agent-y", `${point.y}%`);
+        }, pointIndex * 145, runId);
+      });
     };
 
     const currentCaseCopy = () => caseCopy[caseLang] || caseCopy.en;
@@ -2818,6 +3916,8 @@
         caseCurrentThought.dataset.step = "1";
         caseCurrentThought.innerHTML = renderPhoneThought(0);
       }
+      setRoomAgentStep(0);
+      if (roomBubble) roomBubble.classList.remove("is-pop");
       setCaseStatus(copy.status.typing);
     };
 
@@ -2874,6 +3974,15 @@
           card.classList.toggle("is-active", cardIndex === index);
           card.classList.toggle("is-done", cardIndex < index);
         });
+        walkRoomAgentToStep(index + 1, runId);
+        if (roomBubble && roomBubbleText && phoneThoughts[index]) {
+          roomBubbleText.textContent = phoneThoughts[index].text;
+          roomBubble.classList.remove("is-pop");
+          scheduleCase(() => {
+            void roomBubble.offsetWidth;
+            roomBubble.classList.add("is-pop");
+          }, Math.min(760, (roomAgentPaths[index + 1]?.length || 1) * 145 + 80), runId);
+        }
         setPhoneThought(index);
 
         if (index < phoneThoughts.length - 1) {
