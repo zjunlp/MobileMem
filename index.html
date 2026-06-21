@@ -325,7 +325,7 @@
       display: grid;
       grid-template-columns: minmax(220px, 0.78fr) minmax(330px, 1.22fr);
       gap: 16px;
-      height: 466px;
+      min-height: calc(var(--case-phone-h, 500px) + 36px);
       padding: 18px;
       overflow: hidden;
       border: 1px solid rgba(18, 35, 27, 0.14);
@@ -352,7 +352,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      height: 430px;
+      height: var(--case-phone-h, 500px);
       min-width: 0;
       overflow: hidden;
       border-radius: 8px;
@@ -370,7 +370,7 @@
       display: block;
       width: 100%;
       height: 100%;
-      max-height: 430px;
+      max-height: var(--case-phone-h, 500px);
       object-fit: contain;
       object-position: center;
       border-radius: 8px;
@@ -411,7 +411,7 @@
     }
 
     .case-phone {
-      height: 430px;
+      height: var(--case-phone-h, auto);
       min-height: 0;
       display: grid;
       grid-template-rows: auto 1fr auto;
@@ -2130,11 +2130,11 @@
       .case-flow {
         grid-template-columns: 1fr;
         padding: 10px;
-        height: auto;
+        height: var(--case-phone-h, auto);
       }
 
       .case-phone {
-        height: 430px;
+        height: var(--case-phone-h, auto);
       }
 
       .case-image-wrap {
@@ -2756,6 +2756,7 @@
     Object.values(caseCopy).flatMap((copy) => copy.thoughts).forEach((thought) => {
       if (!thought.proof) return;
       const image = new Image();
+      image.addEventListener("load", () => measureCasePhoneHeight(), { once: true });
       image.src = thought.proof.img;
     });
 
@@ -2789,9 +2790,15 @@
       return `<b>${thought.title}</b><span>${thought.text}</span>${proof}${checks}`;
     };
 
+    const measureCasePhoneHeight = () => {
+      const stage = document.querySelector(".case-stage");
+      if (stage) stage.style.setProperty("--case-phone-h", "500px");
+    };
+
     const resetCaseDemo = () => {
       const copy = currentCaseCopy();
       phoneThoughts = copy.thoughts;
+      measureCasePhoneHeight();
       if (caseUserText) caseUserText.textContent = copy.prompt;
       if (caseReplyText) caseReplyText.textContent = copy.reply;
       if (caseConfirmText) caseConfirmText.textContent = copy.confirm;
