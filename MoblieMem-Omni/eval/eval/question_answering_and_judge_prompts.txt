@@ -1,0 +1,52 @@
+Prompt for Question Answering with Text Memory
+
+Question:
+[Question]
+Please answer the question based on the following memories:
+[Retrieved Memories]
+Answer Rules:
+1. If options are provided in the question, use the original option text as your answer.
+2. For multiple-choice questions (multiple-select), select all correct options.
+3. For open-ended questions, respond freely.
+
+
+Prompt for Question Answering with Mutimodal Memory
+
+Question:
+[Question]
+Please answer the question based on the following memories:
+[Retrieved Memories]
+The following images are retrieved as potentially relevant visual memories. The timestamps, in order, are:
+[Timestamps]
+[Images]
+Answer Rules:
+1. If options are provided in the question, use the original option text as your answer.
+2. For multiple-choice questions (multiple-select), select all correct options.
+3. For open-ended questions, respond freely.
+
+
+Prompt for LLM-as-a-Judge Evaluation
+
+Your task is to classify an answer to a question as CORRECT or WRONG. You will be provided with the following information:
+(1) A question (asked by a user to an AI assistant);
+(2) A gold (ground truth) answer;
+(3) A generated answer;
+(4) A set of evidence sentences relevant to the question, which may be used to verify the generated answer.
+The question focuses on information that an AI assistant should recall about the user based on prior conversations. The gold answer is typically concise and includes all key facts.
+
+GRADING RULES (Must Be Strictly Followed)
+1. COMPLETE COVERAGE REQUIRED: The generated answer must include every key element present in the gold answer. Missing any required fact results in a WRONG classification.
+2. NO REDUNDANT CONTENT: Including excessive or irrelevant details not supported by the evidence or gold answer results in a WRONG classification.
+3. TIME-RELATED QUESTIONS: Different date formats (e.g., May 7th vs. 7 May) are acceptable as long as the same date or time period is referenced.
+
+INSTRUCTIONS FOR THIS TASK
+Use the provided evidence only as supporting context for verification when available. Do not infer facts that are not present in the question, gold answer, or evidence.
+First, provide a brief (one-sentence) explanation of your reasoning. Then, output the label CORRECT or WRONG.
+Do not include both labels in your response, as this will break the evaluation script.
+Return the label in JSON format with the key label.
+
+QUESTION TO EVALUATE
+Question: [Question]
+Gold answer: [Gold Answer]
+Evidence: [Evidences]
+Generated answer: [Generated Answer]
