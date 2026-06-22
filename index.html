@@ -2736,6 +2736,29 @@
       height: auto;
     }
 
+    .institution-counter {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(217, 225, 220, 0.82);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .institution-counter .counter-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .institution-counter strong {
+      color: var(--green-dark);
+      font-variant-numeric: tabular-nums;
+      font-weight: 950;
+    }
+
     @media (max-width: 980px) {
       :root {
         --nav-h: 66px;
@@ -3910,6 +3933,13 @@
         </div>
         <div class="institution-logo-panel" aria-label="Institutions">
           <img src="assets/web/institutions-transparent.png" alt="OPPO and OpenKG.CN, 中文开放知识图谱">
+          <div class="institution-counter" aria-label="Page views">
+            <span class="counter-item">
+              <span data-lang="zh">访问量</span>
+              <span data-lang="en">Page views</span>
+              <strong id="busuanzi_value_site_pv">--</strong>
+            </span>
+          </div>
         </div>
       </div>
     </section>
@@ -3919,10 +3949,11 @@
       <h2 id="oppo-video-title">OPPO Application Scenarios</h2>
       <button class="video-close" type="button" aria-label="Close video modal">&times;</button>
     </div>
-    <div class="video-placeholder">
+  <div class="video-placeholder">
       <p>Video placeholder</p>
     </div>
   </dialog>
+  <script defer src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
   <script>
     const languageToggle = document.querySelector("[data-toggle-lang]");
 
