@@ -10,7 +10,7 @@
 [![HuggingFace](https://img.shields.io/badge/🤗-Dataset-yellow?style=flat-square)](https://huggingface.co/datasets/yourusername/MobileMem-Omni)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square&logo=opensourceinitiative&logoColor=white)](#license)
 
-**MobileMem-Omni** is the **first large-scale benchmark** specifically designed for evaluating **long-term multimodal memory** in **mobile scenarios**.
+**MobileMem-Omni** is the large-scale benchmark specifically designed for evaluating **long-term multimodal memory** in **mobile scenarios**.
 
 </div>
 
