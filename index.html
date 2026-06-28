@@ -1042,12 +1042,17 @@
       box-shadow: 0 6px 14px rgba(23, 33, 28, 0.12);
     }
 
-    .case-avatar img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+	    .case-avatar img {
+	      display: block;
+	      width: 100%;
+	      height: 100%;
+	      object-fit: cover;
+	    }
+
+	    .case-avatar img.xiaobu-avatar {
+	      transform: scale(1.42);
+	      transform-origin: center 54%;
+	    }
 
     .case-bubble {
       flex: 1 1 auto;
@@ -1874,28 +1879,29 @@
       box-shadow: 0 14px 28px rgba(23, 33, 28, 0.28);
     }
 
-    .video-modal {
-      width: min(920px, calc(100% - 32px));
-      padding: 0;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--white);
-      box-shadow: var(--shadow);
-    }
+	    .video-modal {
+	      width: min(520px, calc(100% - 32px));
+	      padding: 0;
+	      border: 1px solid rgba(255, 255, 255, 0.16);
+	      border-radius: 8px;
+	      background: #0a0f0d;
+	      box-shadow: 0 28px 90px rgba(7, 13, 10, 0.46);
+	    }
 
     .video-modal::backdrop {
       background: rgba(23, 33, 28, 0.55);
       backdrop-filter: blur(4px);
     }
 
-    .video-modal-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 16px 18px;
-      border-bottom: 1px solid var(--line);
-    }
+	    .video-modal-head {
+	      display: flex;
+	      align-items: center;
+	      justify-content: space-between;
+	      gap: 16px;
+	      padding: 16px 18px;
+	      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	      color: #ffffff;
+	    }
 
     .video-modal-head h2 {
       margin: 0;
@@ -1908,31 +1914,34 @@
       height: 40px;
       display: grid;
       place-items: center;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--white);
-      color: var(--ink);
-      cursor: pointer;
-      font-size: 24px;
-      line-height: 1;
-    }
+	      border: 1px solid var(--line);
+	      border-radius: 8px;
+	      background: rgba(255, 255, 255, 0.08);
+	      color: #ffffff;
+	      cursor: pointer;
+	      font-size: 24px;
+	      line-height: 1;
+	    }
 
-    .video-placeholder {
-      aspect-ratio: 16 / 9;
-      display: grid;
-      place-items: center;
-      min-height: 260px;
-      margin: 0;
-      background: #101411;
-      color: var(--white);
-    }
+	    .oppo-video {
+	      display: block;
+	      width: min(100%, 430px);
+	      max-height: min(78vh, 820px);
+	      aspect-ratio: 720 / 1582;
+	      margin: 0 auto;
+	      background: #050806;
+	      object-fit: contain;
+	    }
 
-    .video-placeholder p {
-      margin: 0;
-      color: rgba(255, 255, 255, 0.78);
-      font-size: 15px;
-      font-weight: 700;
-    }
+	    .video-player-shell {
+	      display: grid;
+	      place-items: center;
+	      margin: 0;
+	      padding: 16px;
+	      background:
+	        radial-gradient(circle at 50% 0%, rgba(15, 123, 79, 0.2), transparent 42%),
+	        #0a0f0d;
+	    }
 
     .section-head {
       width: min(860px, 100%);
@@ -3908,7 +3917,7 @@
                   </div>
                   <div class="case-message agent case-reasoning" data-case-thinking aria-label="MobileMem reasoning">
                     <span class="case-avatar" aria-hidden="true">
-                      <img src="assets/web/xiaobu-avatar.png" alt="">
+	                      <img class="xiaobu-avatar" src="assets/web/xiaobu-avatar.png" alt="">
                     </span>
                     <div class="case-bubble">
                       <div class="case-current-thought" data-case-current-thought data-step="1">
@@ -3937,7 +3946,7 @@
                   </div>
                   <div class="case-message agent" data-case-reply>
                     <span class="case-avatar" aria-hidden="true">
-                      <img src="assets/web/xiaobu-avatar.png" alt="">
+	                      <img class="xiaobu-avatar" src="assets/web/xiaobu-avatar.png" alt="">
                     </span>
                     <div class="case-bubble">
                       <p data-case-reply-text>Got it. Is this the one?</p>
@@ -4398,15 +4407,17 @@
       </div>
     </section>
   </main>
-  <dialog class="video-modal" id="oppo-video-modal" aria-labelledby="oppo-video-title">
-    <div class="video-modal-head">
-      <h2 id="oppo-video-title">OPPO Application Scenarios</h2>
-      <button class="video-close" type="button" aria-label="Close video modal">&times;</button>
-    </div>
-  <div class="video-placeholder">
-      <p>Video placeholder</p>
-    </div>
-  </dialog>
+	  <dialog class="video-modal" id="oppo-video-modal" aria-labelledby="oppo-video-title">
+	    <div class="video-modal-head">
+	      <h2 id="oppo-video-title">OPPO Application Scenarios</h2>
+	      <button class="video-close" type="button" aria-label="Close video modal">&times;</button>
+	    </div>
+	  <div class="video-player-shell">
+	      <video class="oppo-video" controls preload="metadata" playsinline data-oppo-video>
+	        <source src="assets/web/videos/oppo-application-scenarios.mp4" type="video/mp4">
+	      </video>
+	    </div>
+	  </dialog>
 	  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
 	  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js"></script>
 	  <script>
@@ -4430,23 +4441,34 @@
       );
     };
 
-    const videoModal = document.querySelector("#oppo-video-modal");
-    const videoPlay = document.querySelector(".video-play");
-    const videoClose = document.querySelector(".video-close");
+	    const videoModal = document.querySelector("#oppo-video-modal");
+	    const videoPlay = document.querySelector(".video-play");
+	    const videoClose = document.querySelector(".video-close");
+	    const oppoVideo = document.querySelector("[data-oppo-video]");
 
-    if (videoModal && videoPlay && videoClose) {
-      videoPlay.addEventListener("click", () => {
-        videoModal.showModal();
-      });
+	    if (videoModal && videoPlay && videoClose) {
+	      videoPlay.addEventListener("click", () => {
+	        videoModal.showModal();
+	        if (oppoVideo) {
+	          oppoVideo.currentTime = 0;
+	          oppoVideo.play().catch(() => {});
+	        }
+	      });
 
-      videoClose.addEventListener("click", () => {
-        videoModal.close();
-      });
+	      videoClose.addEventListener("click", () => {
+	        videoModal.close();
+	      });
 
-      videoModal.addEventListener("click", (event) => {
-        if (event.target === videoModal) videoModal.close();
-      });
-    }
+	      videoModal.addEventListener("click", (event) => {
+	        if (event.target === videoModal) videoModal.close();
+	      });
+
+	      videoModal.addEventListener("close", () => {
+	        if (!oppoVideo) return;
+	        oppoVideo.pause();
+	        oppoVideo.currentTime = 0;
+	      });
+	    }
 
     const caseTyped = document.querySelector("[data-case-typed]");
     const caseSend = document.querySelector("[data-case-send]");
