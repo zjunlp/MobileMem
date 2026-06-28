@@ -995,10 +995,15 @@
       align-content: end;
       gap: 8px;
       min-height: 0;
-      overflow: hidden;
+      overflow: hidden auto;
+      scrollbar-width: none;
       padding: 9px;
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(239, 248, 242, 0.92));
+    }
+
+    .case-chat::-webkit-scrollbar {
+      display: none;
     }
 
     .case-chat.is-active {
@@ -1295,6 +1300,137 @@
       height: auto;
       margin-top: 6px;
       border-radius: 7px;
+    }
+
+    .case-followup {
+      width: min(100%, 208px);
+    }
+
+    .case-album {
+      width: min(100%, 214px);
+    }
+
+    .case-album .case-bubble {
+      padding: 7px;
+    }
+
+    .case-memory-album {
+      position: relative;
+      margin-top: 6px;
+      padding: 5px 5px 7px;
+      overflow: hidden;
+      border: 1px solid rgba(15, 123, 79, 0.18);
+      border-radius: 7px;
+      background:
+        radial-gradient(circle at 50% 48%, rgba(255, 255, 255, 0.84), transparent 38%),
+        linear-gradient(135deg, rgba(248, 251, 244, 0.96), rgba(223, 248, 232, 0.94));
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+        0 8px 16px rgba(23, 33, 28, 0.08);
+    }
+
+    .case-memory-album-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 4px;
+    }
+
+    .case-album-card {
+      position: relative;
+      min-height: 44px;
+      overflow: hidden;
+      border-radius: 5px;
+      background: #e8f0eb;
+      box-shadow: 0 1px 0 rgba(23, 33, 28, 0.08);
+    }
+
+    .case-album-card img {
+      display: block;
+      width: 100%;
+      height: 44px;
+      object-fit: cover;
+      filter: saturate(1.06) contrast(1.02);
+    }
+
+    .case-album-card.school img {
+      object-position: 8% 13%;
+    }
+
+    .case-album-card.lake img {
+      object-position: 92% 14%;
+    }
+
+    .case-album-card.family img {
+      object-position: 18% 82%;
+    }
+
+    .case-album-card.birthday img {
+      object-position: center 45%;
+    }
+
+    .case-album-card span {
+      position: absolute;
+      left: 4px;
+      top: 4px;
+      max-width: calc(100% - 8px);
+      padding: 2px 5px 3px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(204, 62, 115, 0.92);
+      color: #fff;
+      font-size: 7px;
+      line-height: 1;
+      font-weight: 950;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .case-album-card.family span,
+    .case-album-card.birthday span {
+      top: auto;
+      bottom: 4px;
+    }
+
+    .case-album-card.family span {
+      background: rgba(15, 123, 79, 0.92);
+    }
+
+    .case-album-title {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 116px;
+      min-height: 24px;
+      padding: 3px 8px 4px;
+      transform: translate(-50%, -50%) rotate(2deg);
+      border-radius: 999px;
+      background: #0f7b4f;
+      color: #fff;
+      font-size: 8px;
+      line-height: 1.1;
+      font-weight: 950;
+      text-align: center;
+      box-shadow:
+        0 2px 0 rgba(0, 0, 0, 0.16),
+        0 0 0 3px rgba(255, 255, 255, 0.84);
+    }
+
+    .case-album-more {
+      margin: 5px 1px 0;
+      color: var(--muted);
+      font-size: 8.5px;
+      line-height: 1.2;
+      font-weight: 850;
+    }
+
+    .case-album-more u {
+      color: #286f9e;
+      text-underline-offset: 2px;
     }
 
     .case-composer {
@@ -3692,6 +3828,16 @@
       white-space: nowrap;
       box-shadow: 0 2px 0 rgba(0, 0, 0, 0.26);
     }
+    .memory-room .px-screen .screen-label-album {
+      display: none;
+    }
+    .memory-room[data-case-phase="album"] .px-screen .screen-label-match {
+      display: none !important;
+    }
+    .lang-en .memory-room[data-case-phase="album"] .px-screen .screen-label-album[data-lang="en"],
+    .lang-zh .memory-room[data-case-phase="album"] .px-screen .screen-label-album[data-lang="zh"] {
+      display: inline;
+    }
     .memory-room[data-room-step="4"] .px-screen { opacity: 1; animation: pxScreenOn 760ms steps(4, end); }
     @keyframes pxScreenOn {
       0% { opacity: 0; filter: brightness(2.5) saturate(1.6); transform: translateY(4px) scaleX(.92); }
@@ -3953,12 +4099,48 @@
                       <img class="case-result-photo" src="assets/web/case-result-birthday.jpg" alt="A family photo around a birthday cake returned by MobileMem.">
                     </div>
                   </div>
-                  <div class="case-message user case-confirm" data-case-confirm>
+                  <div class="case-message user case-followup" data-case-followup>
                     <span class="case-avatar" aria-hidden="true">
                       <img src="assets/web/case-user-avatar.jpg" alt="">
                     </span>
                     <div class="case-bubble">
-                      <p data-case-confirm-text>That's it, thank you.</p>
+                      <p data-case-followup-text>Yes. Do you remember other important photos from that year? Make an album for her birthday.</p>
+                    </div>
+                  </div>
+                  <div class="case-message agent case-album" data-case-album-reply>
+                    <span class="case-avatar" aria-hidden="true">
+                      <img class="xiaobu-avatar" src="assets/web/xiaobu-avatar.png" alt="">
+                    </span>
+                    <div class="case-bubble">
+                      <p data-case-album-text>OK, her album is ready.</p>
+                      <div class="case-memory-album" aria-label="Memories from 2016 album preview">
+                        <div class="case-memory-album-grid">
+                          <div class="case-album-card school">
+                            <img src="assets/web/case-memory-bank.jpg" alt="">
+                            <span data-lang="zh">开学日</span><span data-lang="en">School Day</span>
+                          </div>
+                          <div class="case-album-card lake">
+                            <img src="assets/web/case-memory-bank.jpg" alt="">
+                            <span data-lang="zh">西湖</span><span data-lang="en">West Lake</span>
+                          </div>
+                          <div class="case-album-card family">
+                            <img src="assets/web/case-memory-bank.jpg" alt="">
+                            <span data-lang="zh">全家</span><span data-lang="en">Family</span>
+                          </div>
+                          <div class="case-album-card birthday">
+                            <img src="assets/web/case-result-birthday.jpg" alt="">
+                            <span data-lang="zh">7 岁生日</span><span data-lang="en">7th Birthday</span>
+                          </div>
+                        </div>
+                        <strong class="case-album-title">
+                          <span data-lang="zh">2016 年的回忆</span>
+                          <span data-lang="en">Memories from 2016</span>
+                        </strong>
+                        <p class="case-album-more">
+                          <span data-lang="zh">点击<u>这里</u>查看更多...</span>
+                          <span data-lang="en">Click <u>here</u> to see more...</span>
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -4018,8 +4200,10 @@
                 <div class="px-screen" aria-hidden="true">
                   <img src="assets/web/case-result-birthday.jpg" alt="">
                   <span class="px-screen-label">
-                    <span data-lang="zh">命中照片</span>
-                    <span data-lang="en">MATCHED PHOTO</span>
+                    <span class="screen-label-match" data-lang="zh">命中照片</span>
+                    <span class="screen-label-match" data-lang="en">MATCHED PHOTO</span>
+                    <span class="screen-label-album" data-lang="zh">相册完成</span>
+                    <span class="screen-label-album" data-lang="en">ALBUM READY</span>
                   </span>
                 </div>
 
@@ -4472,14 +4656,17 @@
 
     const caseTyped = document.querySelector("[data-case-typed]");
     const caseSend = document.querySelector("[data-case-send]");
+    const casePhone = document.querySelector(".case-phone");
     const caseChat = document.querySelector("[data-case-chat]");
     const caseUserMessage = document.querySelector("[data-case-user-message]");
     const caseUserText = document.querySelector("[data-case-user-text]");
     const caseThinking = document.querySelector("[data-case-thinking]");
     const caseReply = document.querySelector("[data-case-reply]");
     const caseReplyText = document.querySelector("[data-case-reply-text]");
-    const caseConfirm = document.querySelector("[data-case-confirm]");
-    const caseConfirmText = document.querySelector("[data-case-confirm-text]");
+    const caseFollowup = document.querySelector("[data-case-followup]");
+    const caseFollowupText = document.querySelector("[data-case-followup-text]");
+    const caseAlbumReply = document.querySelector("[data-case-album-reply]");
+    const caseAlbumText = document.querySelector("[data-case-album-text]");
     const caseStatus = document.querySelector("[data-case-status]");
     const traceCards = Array.from(document.querySelectorAll("[data-trace-step]"));
     const caseCurrentThought = document.querySelector("[data-case-current-thought]");
@@ -4490,14 +4677,16 @@
       en: {
         prompt: "Could you find the photo from my daughter's 7th birthday?",
         reply: "Got it. Is this the one?",
-        confirm: "That's it, thank you.",
+        followup: "Yes. Do you remember other important photos from that year? Make an album for her birthday.",
+        album: "OK, her album is ready.",
         send: "Send",
         sent: "Sent",
         status: {
           typing: "typing",
           ready: "ready",
           retrieving: "retrieving",
-          result: "result found"
+          result: "result found",
+          album: "album ready"
         },
         thoughts: [
           {
@@ -4560,14 +4749,16 @@
       zh: {
         prompt: "帮我找一下我女儿 7 岁生日时拍的照片。",
         reply: "找到啦！您看是不是这张？",
-        confirm: "是的，谢谢你啊",
+        followup: "是的。你还记得那一年其他重要照片吗？帮她做一本生日相册。",
+        album: "好的，她的相册已经准备好了。",
         send: "发送",
         sent: "已发送",
         status: {
           typing: "输入中",
           ready: "待发送",
           retrieving: "检索中",
-          result: "已找到"
+          result: "已找到",
+          album: "相册已生成"
         },
         thoughts: [
           {
@@ -4703,6 +4894,13 @@
       if (caseStatus) caseStatus.textContent = text;
     };
 
+    const scrollCaseChatToLatest = () => {
+      if (!caseChat) return;
+      window.requestAnimationFrame(() => {
+        caseChat.scrollTo({ top: caseChat.scrollHeight, behavior: "smooth" });
+      });
+    };
+
     const setRoomAgentStep = (step) => {
       if (!memoryRoom) return;
       const safeStep = Math.max(0, Math.min(roomAgentFootPoints.length - 1, step));
@@ -4723,6 +4921,20 @@
           memoryRoom.style.setProperty("--agent-y", `${point.y}%`);
         }, pointIndex * 145, runId);
       });
+    };
+
+    const setRoomCasePhase = (phase) => {
+      if (memoryRoom) memoryRoom.dataset.casePhase = phase;
+    };
+
+    const popRoomBubble = (text, runId, delay = 0) => {
+      if (!roomBubble || !roomBubbleText) return;
+      roomBubbleText.textContent = text;
+      roomBubble.classList.remove("is-pop");
+      scheduleCase(() => {
+        void roomBubble.offsetWidth;
+        roomBubble.classList.add("is-pop");
+      }, delay, runId);
     };
 
     const currentCaseCopy = () => caseCopy[caseLang] || caseCopy.en;
@@ -4752,7 +4964,8 @@
       measureCasePhoneHeight();
       if (caseUserText) caseUserText.textContent = copy.prompt;
       if (caseReplyText) caseReplyText.textContent = copy.reply;
-      if (caseConfirmText) caseConfirmText.textContent = copy.confirm;
+      if (caseFollowupText) caseFollowupText.textContent = copy.followup;
+      if (caseAlbumText) caseAlbumText.textContent = copy.album;
       if (caseTyped) caseTyped.innerHTML = '<span class="case-cursor"></span>';
       if (caseSend) {
         caseSend.classList.remove("is-ready", "is-sent");
@@ -4760,9 +4973,11 @@
       }
       if (caseUserMessage) caseUserMessage.classList.remove("is-visible");
       if (caseChat) caseChat.classList.remove("is-active");
+      if (caseChat) caseChat.scrollTop = 0;
       if (caseThinking) caseThinking.classList.remove("is-visible", "is-collapsing");
       if (caseReply) caseReply.classList.remove("is-visible");
-      if (caseConfirm) caseConfirm.classList.remove("is-visible");
+      if (caseFollowup) caseFollowup.classList.remove("is-visible");
+      if (caseAlbumReply) caseAlbumReply.classList.remove("is-visible");
       traceCards.forEach((card) => card.classList.remove("is-active", "is-done"));
       if (caseCurrentThought) {
         caseCurrentThought.classList.remove("is-changing");
@@ -4770,6 +4985,7 @@
         caseCurrentThought.innerHTML = renderPhoneThought(0);
       }
       setRoomAgentStep(0);
+      setRoomCasePhase("search");
       if (roomBubble) roomBubble.classList.remove("is-pop");
       setCaseStatus(copy.status.typing);
     };
@@ -4805,9 +5021,11 @@
         caseTyped.innerHTML = "";
         caseChat.classList.add("is-active");
         caseUserMessage.classList.add("is-visible");
+        scrollCaseChatToLatest();
         setCaseStatus(copy.status.retrieving);
         scheduleCase(() => {
           caseThinking.classList.add("is-visible");
+          scrollCaseChatToLatest();
           activateTrace(0);
         }, 420, runId);
       };
@@ -4830,12 +5048,11 @@
         walkRoomAgentToStep(index + 1, runId);
         if (roomBubble && roomBubbleText && phoneThoughts[index]) {
           const roomTexts = roomBubbleCopy[caseLang] || roomBubbleCopy.en;
-          roomBubbleText.textContent = roomTexts[index] || phoneThoughts[index].text;
-          roomBubble.classList.remove("is-pop");
-          scheduleCase(() => {
-            void roomBubble.offsetWidth;
-            roomBubble.classList.add("is-pop");
-          }, Math.min(760, (roomAgentPaths[index + 1]?.length || 1) * 145 + 80), runId);
+          popRoomBubble(
+            roomTexts[index] || phoneThoughts[index].text,
+            runId,
+            Math.min(760, (roomAgentPaths[index + 1]?.length || 1) * 145 + 80)
+          );
         }
         setPhoneThought(index);
 
@@ -4854,10 +5071,27 @@
           scheduleCase(() => {
             caseThinking.classList.remove("is-visible", "is-collapsing");
             caseReply.classList.add("is-visible");
+            scrollCaseChatToLatest();
             scheduleCase(() => {
-              if (caseConfirm) caseConfirm.classList.add("is-visible");
-              scheduleCase(runCaseDemo, 3000, runId);
-            }, 900, runId);
+              if (caseFollowup) {
+                caseFollowup.classList.add("is-visible");
+                scrollCaseChatToLatest();
+              }
+              scheduleCase(() => {
+                setCaseStatus(copy.status.album);
+                setRoomCasePhase("album");
+                const albumRoomTexts = caseLang === "zh"
+                  ? ["整理 2016 年重要照片", "生日相册已完成"]
+                  : ["Collecting 2016 memories", "Album ready"];
+                popRoomBubble(albumRoomTexts[0], runId);
+                scheduleCase(() => popRoomBubble(albumRoomTexts[1], runId), 850, runId);
+                if (caseAlbumReply) {
+                  caseAlbumReply.classList.add("is-visible");
+                  scrollCaseChatToLatest();
+                }
+                scheduleCase(runCaseDemo, 5200, runId);
+              }, 1250, runId);
+            }, 950, runId);
           }, 320, runId);
         }, caseResultDelay, runId);
       };
