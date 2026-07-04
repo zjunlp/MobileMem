@@ -2096,43 +2096,85 @@
       background: transparent;
     }
 
-	    .framework-figure {
-	      overflow: hidden;
-	      margin: 0;
-	      border: 1px solid var(--line);
-	      border-radius: 8px;
-	      background: var(--white);
-	      box-shadow: var(--shadow);
-	      display: flex;
-	      flex-direction: column;
-	      justify-content: flex-start;
-	    }
+    #features {
+      position: relative;
+      isolation: isolate;
+      align-items: flex-start;
+      min-height: auto;
+      padding: 54px 0 64px;
+      background:
+        linear-gradient(90deg, rgba(15, 123, 79, 0.035) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(40, 111, 158, 0.035) 1px, transparent 1px),
+        radial-gradient(circle at 14% 18%, rgba(23, 132, 84, 0.11), transparent 28%),
+        radial-gradient(circle at 84% 76%, rgba(40, 111, 158, 0.1), transparent 30%),
+        #fbfcf9;
+      background-size: 42px 42px, 42px 42px, auto, auto, auto;
+    }
 
-	    .framework-figure img {
-	      display: block;
-	      width: 100%;
-	      height: auto;
-	      max-height: min(58vh, 620px);
-	      object-fit: contain;
-	      background: var(--white);
-	      margin: 0;
-	      padding: 16px;
-	      transition: opacity 220ms ease, transform 220ms ease, filter 220ms ease;
-	    }
+    #features .wrap {
+      width: min(1320px, calc(100% - 48px));
+    }
 
-	    .framework-figure img.is-swapping {
-	      opacity: 0.18;
-	      transform: scale(0.985);
-	      filter: blur(2px);
-	    }
+    .framework-figure {
+      position: relative;
+      height: clamp(520px, calc(100vh - var(--nav-h) - 230px), 620px);
+      min-height: 0;
+      overflow: hidden;
+      margin: 0;
+      border: 1px solid rgba(15, 83, 53, 0.14);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(234, 246, 239, 0.9)),
+        var(--white);
+      box-shadow: 0 34px 90px rgba(23, 33, 28, 0.16);
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      justify-content: stretch;
+    }
 
-	    .framework-caption {
-	      margin: 0;
-	      padding: 10px 16px;
-	      border-top: 1px solid var(--line);
+    .framework-figure::before {
+      content: "";
+      position: absolute;
+      inset: 16px;
+      z-index: 0;
+      border: 1px solid rgba(15, 123, 79, 0.12);
+      border-radius: 8px;
+      pointer-events: none;
+    }
+
+    .framework-figure img {
+      position: relative;
+      z-index: 1;
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      object-fit: contain;
+      object-position: center;
+      background: transparent;
+      margin: 0;
+      padding: clamp(18px, 2.6vw, 34px);
+      transition: opacity 220ms ease, transform 220ms ease, filter 220ms ease;
+    }
+
+    .framework-figure img.is-swapping {
+      opacity: 0.16;
+      transform: scale(0.985);
+      filter: blur(2px);
+    }
+
+    .framework-caption {
+      position: relative;
+      z-index: 1;
+      min-height: 58px;
+      margin: 0;
+      padding: 12px 18px 16px;
+      border-top: 1px solid rgba(15, 83, 53, 0.12);
+      background: rgba(255, 255, 255, 0.76);
       color: var(--muted);
-      font-size: 14px;
+      font-size: 13px;
       line-height: 1.35;
+      font-weight: 760;
     }
 
     .pipeline-grid {
@@ -2143,42 +2185,49 @@
 
     .feature-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.7fr);
-      gap: 24px;
+      grid-template-columns: minmax(0, 1.05fr) minmax(430px, 0.95fr);
+      gap: 28px;
       align-items: stretch;
     }
 
     .feature-accordion {
       display: grid;
-      gap: 12px;
+      gap: 10px;
       align-content: start;
+      min-width: 0;
     }
 
-	    .feature-accordion details {
-	      overflow: hidden;
-	      border: 1px solid var(--line);
-	      border-radius: 8px;
-	      background: var(--white);
-	      box-shadow: 0 8px 22px rgba(23, 33, 28, 0.05);
-	      transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
-	    }
+    .feature-accordion details {
+      overflow: hidden;
+      border: 1px solid rgba(15, 83, 53, 0.13);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 10px 28px rgba(23, 33, 28, 0.06);
+      transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+    }
 
-	    .feature-accordion details[open] {
-	      border-color: rgba(15, 123, 79, 0.38);
-	      background: linear-gradient(135deg, #ffffff 0%, #f5fbf7 100%);
-	      box-shadow: 0 14px 34px rgba(15, 123, 79, 0.11);
-	    }
+    .feature-accordion details[open] {
+      border-color: rgba(15, 123, 79, 0.4);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(241, 249, 244, 0.95));
+      box-shadow: 0 18px 46px rgba(15, 123, 79, 0.13);
+    }
 
-	    .feature-accordion summary {
-	      min-height: 64px;
-	      display: grid;
-      grid-template-columns: 38px 1fr 18px;
+    .feature-accordion details:hover {
+      transform: translateY(-1px);
+      border-color: rgba(15, 123, 79, 0.3);
+    }
+
+    .feature-accordion summary {
+      min-height: 70px;
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) 22px;
       align-items: center;
       gap: 12px;
-      padding: 12px 16px;
+      padding: 13px 16px;
       cursor: pointer;
       list-style: none;
-      font-weight: 850;
+      font-weight: 900;
     }
 
     .feature-accordion summary::-webkit-details-marker {
@@ -2187,24 +2236,70 @@
 
     .feature-accordion summary::after {
       content: "+";
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: rgba(15, 123, 79, 0.08);
       color: var(--green);
-      font-size: 22px;
-      font-weight: 900;
+      font-size: 18px;
+      font-weight: 950;
       line-height: 1;
     }
 
-	    .feature-accordion details[open] summary::after {
-	      content: "-";
-	    }
+    .feature-accordion details[open] summary::after {
+      content: "-";
+    }
 
-	    .feature-accordion .step-number {
-	      margin: 0;
-	    }
+    .feature-accordion .step-number {
+      width: 42px;
+      height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      border: 1px solid rgba(15, 123, 79, 0.18);
+      border-radius: 999px;
+      background: #eef7f2;
+      color: var(--green-dark);
+      font-size: 12px;
+      letter-spacing: 0;
+    }
 
-	    .accordion-body {
-	      padding: 0 16px 16px 66px;
-	      color: var(--muted);
-	    }
+    .feature-summary-copy {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .feature-summary-copy strong {
+      color: #12231b;
+      font-size: clamp(16px, 1.15vw, 19px);
+      line-height: 1.1;
+      font-weight: 950;
+    }
+
+    .feature-summary-copy small {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.2;
+      font-weight: 820;
+    }
+
+    .accordion-body {
+      padding: 0 18px 18px 70px;
+      color: var(--muted);
+    }
+
+    .accordion-body .quote.small {
+      margin-bottom: 0;
+      color: #243129;
+      font-size: clamp(14px, 1vw, 16px);
+      line-height: 1.58;
+      font-weight: 650;
+    }
 
     .dataset {
       background:
@@ -2496,85 +2591,109 @@
       font-size: 13px;
     }
 
-	    .application {
-	      overflow: hidden;
-	      align-items: start;
-	      padding: 44px 0 56px;
-	      background:
-	        linear-gradient(180deg, #fbfcf9 0%, #eef6f2 50%, #f8fbf8 100%);
-	    }
+    .application {
+      position: relative;
+      overflow: hidden;
+      align-items: start;
+      min-height: calc(100vh - var(--nav-h) + 220px);
+      padding: 44px 0 76px;
+      isolation: isolate;
+      background:
+        radial-gradient(circle at 72% 18%, rgba(54, 157, 103, 0.16), transparent 32%),
+        radial-gradient(circle at 14% 82%, rgba(40, 111, 158, 0.1), transparent 30%),
+        linear-gradient(180deg, #f8fbf8 0%, #eef6f2 48%, #fbfcf9 100%);
+    }
 
-	    .application .wrap {
-	      width: min(1240px, calc(100% - 40px));
-	    }
+    .application::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        linear-gradient(90deg, rgba(15, 123, 79, 0.04) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(15, 123, 79, 0.035) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent);
+    }
 
-	    .application-layout {
-	      display: grid;
-	      grid-template-columns: minmax(420px, 0.82fr) minmax(540px, 1.18fr);
-	      gap: 26px;
-	      align-items: stretch;
-	      margin-top: 22px;
-	    }
+    .application .wrap {
+      width: min(1320px, calc(100% - 48px));
+    }
 
-	    .application-accordion {
-	      display: grid;
-	      align-content: start;
-	      gap: 10px;
-	      min-width: 0;
-	    }
+    .application-layout {
+      display: grid;
+      grid-template-columns: minmax(440px, 0.86fr) minmax(620px, 1.14fr);
+      gap: 28px;
+      align-items: stretch;
+      margin-top: 18px;
+    }
 
-	    .application-item {
-	      border: 1px solid rgba(15, 83, 53, 0.14);
-	      border-radius: 8px;
-	      background: rgba(255, 255, 255, 0.78);
-	      box-shadow: 0 14px 42px rgba(23, 33, 28, 0.08);
-	      overflow: hidden;
-	      transition:
-	        border-color 180ms ease,
-	        background 180ms ease,
-	        box-shadow 180ms ease,
-	        transform 180ms ease;
-	      will-change: transform, opacity;
-	    }
+    .application-accordion {
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      min-width: 0;
+      max-height: clamp(520px, calc(100vh - var(--nav-h) - 214px), 640px);
+      overflow-y: auto;
+      padding-right: 4px;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+      scrollbar-color: rgba(15, 123, 79, 0.34) transparent;
+    }
 
-	    .application-item[open] {
-	      border-color: rgba(15, 123, 79, 0.36);
-	      background: #ffffff;
-	      box-shadow: 0 20px 56px rgba(23, 33, 28, 0.14);
-	    }
+    .application-item {
+      border: 1px solid rgba(15, 83, 53, 0.14);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 14px 42px rgba(23, 33, 28, 0.08);
+      overflow: hidden;
+      transition:
+        border-color 180ms ease,
+        background 180ms ease,
+        box-shadow 180ms ease,
+        transform 180ms ease;
+      will-change: transform, opacity;
+    }
 
-	    .application-item:hover {
-	      transform: translateY(-1px);
-	      border-color: rgba(15, 123, 79, 0.32);
-	    }
+    .application-item[open] {
+      border-color: rgba(15, 123, 79, 0.38);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(241, 249, 244, 0.95));
+      box-shadow: 0 22px 62px rgba(23, 33, 28, 0.15);
+    }
 
-	    .application-item summary {
-	      min-height: 76px;
-	      display: grid;
-	      grid-template-columns: 38px minmax(0, 1fr) 24px;
-	      align-items: center;
-	      gap: 12px;
-	      padding: 14px 16px;
-	      cursor: pointer;
-	      list-style: none;
-	    }
+    .application-item:hover {
+      transform: translateY(-1px);
+      border-color: rgba(15, 123, 79, 0.32);
+    }
+
+    .application-item summary {
+      min-height: 66px;
+      display: grid;
+      grid-template-columns: 36px minmax(0, 1fr) 24px;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      list-style: none;
+    }
 
 	    .application-item summary::-webkit-details-marker {
 	      display: none;
 	    }
 
-	    .application-index {
-	      width: 38px;
-	      height: 38px;
-	      display: inline-flex;
-	      align-items: center;
-	      justify-content: center;
-	      border-radius: 999px;
-	      background: #e9f4ef;
-	      color: var(--green-dark);
-	      font-size: 12px;
-	      font-weight: 950;
-	    }
+    .application-index {
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: #e9f4ef;
+      color: var(--green-dark);
+      font-size: 12px;
+      font-weight: 950;
+    }
 
 	    .application-summary-copy {
 	      display: grid;
@@ -2584,7 +2703,7 @@
 
 	    .application-summary-copy strong {
 	      color: #12231b;
-	      font-size: 18px;
+	      font-size: 17px;
 	      line-height: 1.08;
 	      font-weight: 950;
 	    }
@@ -2637,19 +2756,26 @@
 	      opacity: 0;
 	    }
 
-	    .application-body {
-	      max-height: clamp(190px, calc(100vh - var(--nav-h) - 360px), 320px);
-	      overflow: auto;
-	      padding: 0 18px 18px 66px;
-	    }
+    .application-body {
+      max-height: clamp(188px, calc(100vh - var(--nav-h) - 452px), 276px);
+      overflow: auto;
+      padding: 0 16px 16px 62px;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+      scrollbar-color: rgba(15, 123, 79, 0.36) transparent;
+    }
 
-	    .application-body p {
-	      margin: 0;
-	      color: #26382f;
-	      font-size: clamp(14px, 0.98vw, 16px);
-	      line-height: 1.58;
-	      font-weight: 680;
-	    }
+    .application-body p {
+      margin: 0;
+      color: #26382f;
+      font-size: clamp(14px, 0.92vw, 15px);
+      line-height: 1.54;
+      font-weight: 650;
+    }
+
+    .application-body p + p {
+      margin-top: 12px;
+    }
 
 	    .application-source {
 	      display: block;
@@ -2662,43 +2788,44 @@
 	      text-transform: uppercase;
 	    }
 
-	    .application-visual {
-	      position: sticky;
-	      top: calc(var(--nav-h) + 24px);
-	      align-self: start;
-	      min-width: 0;
-	      margin: 0;
-	      padding: 14px;
-	      border: 1px solid rgba(15, 83, 53, 0.16);
-	      border-radius: 8px;
-	      background:
-	        linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(237, 246, 242, 0.92));
-	      box-shadow: 0 30px 82px rgba(23, 33, 28, 0.16);
-	      will-change: transform, opacity;
-	    }
+    .application-visual {
+      position: sticky;
+      top: calc(var(--nav-h) + 24px);
+      align-self: start;
+      min-width: 0;
+      margin: 0;
+      padding: 10px;
+      border: 1px solid rgba(15, 83, 53, 0.16);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(237, 246, 242, 0.9));
+      box-shadow: 0 34px 90px rgba(23, 33, 28, 0.18);
+      will-change: transform, opacity;
+    }
 
-	    .application-image-shell {
-	      position: relative;
-	      min-height: clamp(410px, calc(100vh - var(--nav-h) - 230px), 620px);
-	      overflow: hidden;
-	      border-radius: 6px;
-	      background:
-	        linear-gradient(90deg, rgba(15, 123, 79, 0.08) 1px, transparent 1px),
-	        linear-gradient(180deg, rgba(40, 111, 158, 0.08) 1px, transparent 1px),
-	        #ffffff;
-	      background-size: 34px 34px;
-	    }
+    .application-image-shell {
+      position: relative;
+      min-height: clamp(360px, calc(100vh - var(--nav-h) - 320px), 520px);
+      overflow: hidden;
+      border-radius: 6px;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(15, 123, 79, 0.12), transparent 38%),
+        linear-gradient(90deg, rgba(15, 123, 79, 0.08) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(40, 111, 158, 0.08) 1px, transparent 1px),
+        #ffffff;
+      background-size: auto, 34px 34px, 34px 34px, auto;
+    }
 
-	    .application-image-shell img {
-	      position: absolute;
-	      inset: 0;
-	      width: 100%;
-	      height: 100%;
-	      padding: 22px;
-	      object-fit: contain;
-	      transform-origin: center center;
-	      will-change: transform, opacity;
-	    }
+    .application-image-shell img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      padding: 18px;
+      object-fit: contain;
+      transform-origin: center center;
+      will-change: transform, opacity;
+    }
 
 	    .application-visual-caption {
 	      display: flex;
@@ -3209,6 +3336,16 @@
 		        gap: 18px;
 		      }
 
+		      .application {
+		        padding-bottom: 96px;
+		      }
+
+		      .application-accordion {
+		        max-height: none;
+		        overflow-y: visible;
+		        padding-right: 0;
+		      }
+
 		      .application-visual {
 		        position: relative;
 		        top: auto;
@@ -3224,6 +3361,7 @@
 			      }
 
 	      .framework-figure {
+	        height: auto;
 	        min-height: auto;
 	      }
 
@@ -3322,6 +3460,10 @@
 
 		      .application .wrap {
 		        width: min(100% - 28px, 760px);
+		      }
+
+		      .application {
+		        padding-bottom: 190px;
 		      }
 
 		      .application-layout {
@@ -4222,7 +4364,7 @@
     <section class="section" id="features" aria-labelledby="features-title">
       <div class="wrap">
         <div class="center-head">
-          <p class="eyebrow">MobileMem Features</p>
+          <p class="eyebrow">Research Features</p>
           <h2 id="features-title">
             <span data-lang="zh">MobileMem 的特色</span>
             <span data-lang="en">MobileMem Features</span>
@@ -4230,55 +4372,106 @@
 	        </div>
 	        <div class="feature-layout">
 	          <figure class="framework-figure">
-	            <img id="feature-visual-image" src="assets/web/features/on-device-ecosystem.png" alt="On-device memory ecosystem with a system-level memory layer, standardized protocol layer, and application-specific memory layer.">
+	            <img id="feature-visual-image" src="assets/web/case-story-layout.png" alt="Personal memory agent case showing identity linking, memory search, reasoning, and a grounded birthday photo.">
 	            <figcaption class="framework-caption">
-	              <span id="feature-caption-zh" data-lang="zh">端侧记忆生态：系统级记忆层通过标准协议协调各应用专属记忆。</span>
-	              <span id="feature-caption-en" data-lang="en">On-device memory ecosystem: a system-level memory layer coordinates application-specific memories through standardized protocols.</span>
+	              <span id="feature-caption-zh" data-lang="zh">MobileMem 作为用户的个人记忆智能体。</span>
+	              <span id="feature-caption-en" data-lang="en">MobileMem acts as a personal memory agent.</span>
 	            </figcaption>
 	          </figure>
 	          <div class="feature-accordion" aria-label="MobileMem features">
-	            <details open data-feature-image="assets/web/features/on-device-ecosystem.png" data-feature-alt="On-device memory ecosystem with a system-level memory layer, standardized protocol layer, and application-specific memory layer." data-caption-zh="端侧记忆生态：系统级记忆层通过标准协议协调各应用专属记忆。" data-caption-en="On-device memory ecosystem: a system-level memory layer coordinates application-specific memories through standardized protocols.">
+	            <details open data-feature-image="assets/web/case-story-layout.png" data-feature-alt="Personal memory agent case showing identity linking, memory search, reasoning, and a grounded birthday photo." data-caption-zh="MobileMem 作为用户的个人记忆智能体。" data-caption-en="MobileMem acts as a personal memory agent.">
 	              <summary>
 	                <span class="step-number">01</span>
-	                <span data-lang="zh">端侧长期记忆评测</span>
-	                <span data-lang="en">On-Device Memory Benchmark</span>
+	                <span class="feature-summary-copy">
+	                  <strong>
+	                    <span data-lang="zh">从推理到记忆</span>
+	                    <span data-lang="en">From Reasoning to Remembering</span>
+	                  </strong>
+	                  <small>
+	                    <span data-lang="zh">下一代个人助手的核心能力</span>
+	                    <span data-lang="en">A foundation for personal assistants</span>
+	                  </small>
+	                </span>
 	              </summary>
 	              <div class="accordion-body">
-	                <p class="quote small" data-lang="zh">MobileMem 面向端侧个人助手，系统评测移动记忆架构的核心能力，包括层次化记忆组织、知识图谱构建、记忆合成与巩固、持续更新以及资源感知检索。</p>
-	                <p class="quote small" data-lang="en">MobileMem evaluates the core capabilities of mobile memory architectures, including hierarchical memory organization, knowledge graph construction, memory synthesis and consolidation, continual updating, and resource-aware retrieval.</p>
+	                <p class="quote small" data-lang="zh">因此，AI 的未来不仅在于推理，也在于记忆。</p>
+	                <p class="quote small" data-lang="en">Consequently, the future of AI lies not only in reasoning but also in remembering.</p>
 	              </div>
 	            </details>
-	            <details data-feature-image="assets/web/features/multimodal-trajectories.png" data-feature-alt="Multiple mobile applications and interaction records feeding into a unified memory layer." data-caption-zh="跨应用轨迹：聊天、社交、照片、阅读、购物和航旅等应用共同构成移动端记忆流。" data-caption-en="Cross-app trajectories: chat, social media, photos, reading, shopping, travel, and other apps form a mobile memory stream.">
+	            <details data-feature-image="assets/web/features/multimodal-trajectories.png" data-feature-alt="Multiple mobile applications and interaction records feeding into a unified memory layer." data-caption-zh="MobileMem 打破应用之间的数据孤岛。" data-caption-en="MobileMem breaks down data silos between apps.">
 	              <summary>
 	                <span class="step-number">02</span>
-	                <span data-lang="zh">异构多模态移动轨迹</span>
-	                <span data-lang="en">Heterogeneous Mobile Trajectories</span>
+	                <span class="feature-summary-copy">
+	                  <strong>
+	                    <span data-lang="zh">移动记忆的形态</span>
+	                    <span data-lang="en">Mobile Memory Streams</span>
+	                  </strong>
+	                  <small>
+	                    <span data-lang="zh">多模态、跨应用、时间连续</span>
+	                    <span data-lang="en">Multimodal, cross-application, temporal</span>
+	                  </small>
+	                </span>
 	              </summary>
 	              <div class="accordion-body">
-	                <p class="quote small" data-lang="zh">MobileMem 不只评测人机对话记忆，而是把移动端历史建模为异构动作流：自然语言对话、应用操作、界面状态、通知、应用记录，以及截图和视觉内容。</p>
-	                <p class="quote small" data-lang="en">MobileMem models mobile history as a stream of heterogeneous actions: utterances, app operations, interface states, notifications, application-specific records, screenshots, and visual content.</p>
+	                <p class="quote small" data-lang="zh">这类数据天然具有多模态、跨应用和强时间连续性。重要用户记忆往往表现为分布在不同模态和应用中的事件。</p>
+	                <p class="quote small" data-lang="en">Such data are inherently multimodal, cross-application, and strongly temporally continuous. Important user memories often manifest as events distributed across different modalities and applications.</p>
 	              </div>
 	            </details>
-	            <details data-feature-image="assets/web/features/keme-synthesis.png" data-feature-alt="MobileMem-Omni construction pipeline from persona and memory modeling to knowledge graph generation, multimodal dialogue synthesis, event building, and question generation." data-caption-zh="知识图谱驱动合成：从移动画像和个人知识图谱生成长期、多模态、可评测的记忆轨迹。" data-caption-en="Knowledge graph-driven synthesis: mobile personas and personal knowledge graphs generate long-horizon, multimodal, evaluable memory trajectories.">
+	            <details data-feature-image="assets/web/features/on-device-ecosystem.png" data-feature-alt="On-device memory ecosystem with a system-level memory layer, standardized protocol layer, and application-specific memory layer." data-caption-zh="这两个组件可以通过标准化协议协作，形成统一的记忆生态。" data-caption-en="These two components can collaborate through standardized protocols, forming a unified memory ecosystem whose capability exceeds the simple aggregation of individual modules.">
 	              <summary>
 	                <span class="step-number">03</span>
-	                <span data-lang="zh">知识驱动隐私合成</span>
-	                <span data-lang="en">Knowledge-Grounded Synthesis</span>
+	                <span class="feature-summary-copy">
+	                  <strong>
+	                    <span data-lang="zh">复合记忆架构</span>
+	                    <span data-lang="en">Composite Memory Architecture</span>
+	                  </strong>
+	                  <small>
+	                    <span data-lang="zh">系统级记忆层与应用专属记忆</span>
+	                    <span data-lang="en">System-level and application-specific memory</span>
+	                  </small>
+	                </span>
 	              </summary>
 	              <div class="accordion-body">
-	                <p class="quote small" data-lang="zh">KEME 将碎片化 user-app 会话作为知识锚点，在用户画像知识和时间约束引导下，组织成长时序、一致且持续演化的交互轨迹，并生成高质量问答。</p>
-	                <p class="quote small" data-lang="en">KEME treats fragmented user-app sessions as knowledge anchors, organizing them into coherent, long-horizon, evolving trajectories under persona knowledge and temporal constraints, then producing high-quality QA pairs.</p>
+	                <p class="quote small" data-lang="zh">相反，我们设想一种由两个互补组件构成的复合记忆架构。这两个组件可以通过标准化协议协作，形成统一的记忆生态，其能力超过各个模块的简单叠加。</p>
+	                <p class="quote small" data-lang="en">Instead, we envision a composite memory architecture consisting of two complementary components. These two components can collaborate through standardized protocols, forming a unified memory ecosystem whose capability exceeds the simple aggregation of individual modules.</p>
 	              </div>
 	            </details>
-	            <details data-feature-image="assets/web/features/oppo-application.png" data-feature-alt="Breeno personal memory agent examples showing multimodal memory retrieval and proactive reminders on mobile devices." data-caption-zh="OPPO 产品闭环：以小布式端侧助手场景持续评测记忆中间件、检索策略和个性化体验。" data-caption-en="OPPO product loop: assistant scenarios evaluate memory middleware, retrieval strategies, and personalized experiences.">
+	            <details data-feature-image="assets/web/features/keme-synthesis.png" data-feature-alt="MobileMem-Omni construction pipeline from persona and memory modeling to knowledge graph generation, multimodal dialogue synthesis, event building, and question generation." data-caption-zh="这个图谱锚定了所有后续合成过程。" data-caption-en="This graph anchors all subsequent synthesis.">
 	              <summary>
 	                <span class="step-number">04</span>
-	                <span data-lang="zh">OPPO 小布评测闭环</span>
-	                <span data-lang="en">OPPO Assistant Evaluation Loop</span>
+	                <span class="feature-summary-copy">
+	                  <strong>
+	                    <span data-lang="zh">KEME 合成框架</span>
+	                    <span data-lang="en">KEME Synthesis Framework</span>
+	                  </strong>
+	                  <small>
+	                    <span data-lang="zh">知识锚点、用户画像与时间约束</span>
+	                    <span data-lang="en">Anchors, persona knowledge, temporal constraints</span>
+	                  </small>
+	                </span>
 	              </summary>
 	              <div class="accordion-body">
-	                <p class="quote small" data-lang="zh">MobileMem 已接入 OPPO AI 助手研发流程，用真实用户轨迹、多语言和多模态任务，持续评估端侧记忆中间件、RAG 策略和端到端助手体验。</p>
-	                <p class="quote small" data-lang="en">MobileMem has been integrated into OPPO's AI assistant development pipeline to evaluate on-device memory middleware, RAG strategies, and end-to-end assistant experiences with realistic user trajectories.</p>
+	                <p class="quote small" data-lang="zh">在用户画像知识和时间约束的引导下，KEME 将这些锚定会话分层组织成统一的交互流，同时随着用户经历随时间展开，逐步合成人机交互。</p>
+	                <p class="quote small" data-lang="en">Guided by user persona knowledge and temporal constraints, KEME hierarchically organizes these anchored sessions into a unified interaction stream, while progressively synthesizing human-assistant interactions that naturally emerge as the user’s experiences unfold over time.</p>
+	              </div>
+	            </details>
+	            <details data-feature-image="assets/web/dataset-omni-1.png" data-feature-alt="MobileMem-Omni framework overview showing real-user participation, multimodal interaction, and multi-source content." data-caption-zh="这些基准形成了评估移动经验中结构化知识合成、组织和检索的综合框架。" data-caption-en="Together, these benchmarks provide a comprehensive framework for assessing how effectively memory systems synthesize, organize, and retrieve structured knowledge from raw mobile experiences.">
+	              <summary>
+	                <span class="step-number">05</span>
+	                <span class="feature-summary-copy">
+	                  <strong>
+	                    <span data-lang="zh">双场景基准</span>
+	                    <span data-lang="en">Two Benchmark Scenarios</span>
+	                  </strong>
+	                  <small>
+	                    <span data-lang="zh">文本 MobileMem 与多模态 MobileMem-Omni</span>
+	                    <span data-lang="en">Textual MobileMem and multimodal MobileMem-Omni</span>
+	                  </small>
+	                </span>
+	              </summary>
+	              <div class="accordion-body">
+	                <p class="quote small" data-lang="zh">这些基准共同提供了一个综合框架，用于评估记忆系统从原始移动经验中合成、组织和检索结构化知识的有效性。</p>
+	                <p class="quote small" data-lang="en">Together, these benchmarks provide a comprehensive framework for assessing how effectively memory systems synthesize, organize, and retrieve structured knowledge from raw mobile experiences.</p>
 	              </div>
 	            </details>
 	          </div>
@@ -4392,128 +4585,130 @@
       </div>
     </section>
 
-	    <section class="section application" id="application" aria-labelledby="application-title-zh">
-	      <div class="wrap">
-	        <div class="center-head">
-	          <p class="eyebrow">Application</p>
-	          <h2 id="application-title-zh" data-lang="zh">MobileMem 的应用场景</h2>
-	          <h2 id="application-title-en" data-lang="en">Application Scenarios</h2>
-	        </div>
-	        <div class="application-layout" data-application-showcase>
-	          <div class="application-accordion">
-	            <details class="application-item" open data-application-image="assets/web/features/on-device-ecosystem.png" data-application-alt="MobileMem ecosystem diagram with mobile agent modules and on-device memory middleware." data-application-caption-en="Ecosystem" data-application-caption-zh="生态系统" data-application-kicker-en="Mobile Agents · 01" data-application-kicker-zh="移动智能体 · 01">
-	              <summary>
-	                <span class="application-index">01</span>
-	                <span class="application-summary-copy">
-	                  <strong>
-	                    <span data-lang="zh">生态系统</span>
-	                    <span data-lang="en">Ecosystem</span>
-	                  </strong>
-	                  <small>
-	                    <span data-lang="zh">现有移动智能体生态与产品管线</span>
-	                    <span data-lang="en">Existing mobile agent ecosystem and product pipelines</span>
-	                  </small>
-	                </span>
-	                <span class="application-chevron" aria-hidden="true"></span>
-	              </summary>
-	              <div class="application-body">
-	                <p data-lang="zh">MobileMem 提供了一个统一的评测框架，可无缝接入现有移动智能体生态，包括任务理解、记忆检索 QA、网页搜索、回复安全和执行模块。通过与记忆中间件和持续学习框架对齐，它能够自然融入真实产品管线，并为 AI 驱动的移动体验带来快速迭代周期。</p>
-	                <p data-lang="en">MobileMem provides a unified benchmarking framework that seamlessly integrates with the existing mobile agent ecosystem, including task understanding, memory retrieval QA, web search, response safety, and execution modules. By aligning with memory middleware and continuous learning frameworks, it naturally fits into real product pipelines and enables rapid iteration cycles for AI-powered mobile experiences.</p>
-	              </div>
-	            </details>
-	            <details class="application-item" data-application-image="assets/web/framework-large-1.png" data-application-alt="MobileMem framework overview showing memory synthesis, benchmark construction, and evaluation pipeline." data-application-caption-en="Standardization" data-application-caption-zh="标准化" data-application-kicker-en="Mobile Agents · 02" data-application-kicker-zh="移动智能体 · 02">
-	              <summary>
-	                <span class="application-index">02</span>
-	                <span class="application-summary-copy">
-	                  <strong>
-	                    <span data-lang="zh">标准化</span>
-	                    <span data-lang="en">Standardization</span>
-	                  </strong>
-	                  <small>
-	                    <span data-lang="zh">数据格式、评测协议与版本管理</span>
-	                    <span data-lang="en">Data formats, protocols, and version management</span>
-	                  </small>
-	                </span>
-	                <span class="application-chevron" aria-hidden="true"></span>
-	              </summary>
-	              <div class="application-body">
-	                <p data-lang="zh">该基准已经在单一框架内统一了基础记忆、认知记忆、偏好记忆和视觉推理，同时将评测建立在真实用户数据、一年时间跨度和多样化多模态事件流之上。随着数据格式、评测协议、问题类型边界和版本管理的持续标准化，MobileMem 为发展成为行业级标准乃至国家标准奠定了坚实基础。</p>
-	                <p data-lang="en">The benchmark already unifies foundational memory, cognitive memory, preference memory, and visual reasoning within a single framework, while grounding evaluation in real user data, one-year temporal spans, and diverse multimodal event streams. With continued efforts to standardize data formats, evaluation protocols, question-type boundaries, and version management, MobileMem lays a solid foundation for evolving into an industry-wide standard and ultimately a national standard.</p>
-	              </div>
-	            </details>
-	            <details class="application-item" data-application-image="assets/web/xiaobu-functional-cabin-white.png" data-application-alt="Xiaobu assistant in a functional on-device memory cabin." data-application-caption-en="On-Device Intelligence" data-application-caption-zh="端侧智能" data-application-kicker-en="Mobile Agents · 03" data-application-kicker-zh="移动智能体 · 03">
-	              <summary>
-	                <span class="application-index">03</span>
-	                <span class="application-summary-copy">
-	                  <strong>
-	                    <span data-lang="zh">端侧智能</span>
-	                    <span data-lang="en">On-Device Intelligence</span>
-	                  </strong>
-	                  <small>
-	                    <span data-lang="zh">真实约束下可度量的助手体验</span>
-	                    <span data-lang="en">Measurable assistant experience under real-world constraints</span>
-	                  </small>
-	                </span>
-	                <span class="application-chevron" aria-hidden="true"></span>
-	              </summary>
-	              <div class="application-body">
-	                <p data-lang="zh">通过将长期记忆评测从能力展示转向可度量、可比较、可迭代的评估，MobileMem 直接支撑移动厂商定义端侧智能并评估个人助手体验。它为记忆质量、检索准确率和推理鲁棒性提供清晰指标，这些指标对于在真实约束下调优和部署端侧模型至关重要。</p>
-	                <p data-lang="en">By shifting long-term memory evaluation from capability demonstration to measurable, comparable, and iterative assessment, MobileMem directly informs how mobile manufacturers define on-device intelligence and evaluate personal assistant experiences. It provides clear metrics for memory quality, retrieval accuracy, and reasoning robustness, which are essential for tuning and deploying on-device models under real-world constraints.</p>
-	              </div>
-	            </details>
-	            <details class="application-item" data-application-image="assets/web/case-story-layout.png" data-application-alt="A personal memory case layout showing family photos, memory retrieval, and assistant reasoning." data-application-caption-en="User Memory Value" data-application-caption-zh="用户记忆价值" data-application-kicker-en="Mobile Agents · 04" data-application-kicker-zh="移动智能体 · 04">
-	              <summary>
-	                <span class="application-index">04</span>
-	                <span class="application-summary-copy">
-	                  <strong>
-	                    <span data-lang="zh">用户记忆价值</span>
-	                    <span data-lang="en">User Memory Value</span>
-	                  </strong>
-	                  <small>
-	                    <span data-lang="zh">以长期多模态记忆作为个性化核心</span>
-	                    <span data-lang="en">Long-term multimodal memory as personalization core</span>
-	                  </small>
-	                </span>
-	                <span class="application-chevron" aria-hidden="true"></span>
-	              </summary>
-	              <div class="application-body">
-	                <p data-lang="zh">从本质上看，该基准将用户的长期多模态记忆作为个性化的核心单元。通过对真实用户轨迹、多语言交互和长时间跨度真实生活事件进行建模，它使 AI 智能体能够提供真正有帮助、具备上下文感知并持续演化的辅助能力。这将移动 AI 的价值主张从通用回复转向深度个性化、记忆驱动的体验，同时尊重用户隐私并适应个人生活方式。</p>
-	                <p data-lang="en">At its core, the benchmark prioritizes the user's long-term multimodal memory as the central unit of personalization. By modeling authentic user trajectories, multilingual interactions, and real-life events over extended periods, it enables AI agents to deliver genuinely helpful, context-aware, and evolving assistance. This shifts the value proposition of mobile AI from generic responses to deeply personalized, memory-driven experiences that respect user privacy and adapt to individual lifestyles.</p>
-	              </div>
-	            </details>
-	            <details class="application-item" data-application-image="assets/web/features/oppo-application.png" data-application-alt="OPPO assistant application examples for long-term memory evaluation." data-application-caption-en="OPPO Application Scenarios" data-application-caption-zh="OPPO 应用场景" data-application-kicker-en="Mobile Agents · 05" data-application-kicker-zh="移动智能体 · 05">
-	              <summary>
-	                <span class="application-index">05</span>
-	                <span class="application-summary-copy">
-	                  <strong>
-	                    <span data-lang="zh">OPPO 应用场景</span>
-	                    <span data-lang="en">OPPO Application Scenarios</span>
-	                  </strong>
-	                  <small>
-	                    <span data-lang="zh">OPPO 生态中的生产级移动场景</span>
-	                    <span data-lang="en">Production-grade mobile scenarios in OPPO's ecosystem</span>
-	                  </small>
-	                </span>
-	                <span class="application-chevron" aria-hidden="true"></span>
-	              </summary>
-	              <div class="application-body">
-	                <p data-lang="zh">MobileMem 已经接入 OPPO 的 AI 助手研发流程，用于系统性评估并增强生产级移动场景中的长期记忆能力。在 OPPO 生态内，该基准支撑多个实际用例。第一，它使 OPPO 能够使用真实用户轨迹和个性化多模态对话，在多跳推理、知识更新、时间推理和视觉推理等多样真实任务中评估端侧记忆中间件性能。第二，该基准通过提供清晰、可复现且反映真实用户交互模式的指标，支持 OPPO 对检索增强生成（RAG）策略和记忆管理策略进行迭代优化。第三，MobileMem 覆盖英文和中文的双语评测框架与 OPPO 的全球市场战略相一致，确保记忆系统在不同语言和文化语境下保持一致表现。第四，该基准促进与 OPPO 现有智能体生态的无缝集成，包括任务理解模块、安全过滤器和执行引擎，从而实现对记忆增强型 AI 助手的端到端验证。通过将评测建立在旅行规划、社交互动、购物活动和内容消费等真实用户行为之上，MobileMem 帮助 OPPO 提供更具上下文感知、更个性化、更注重隐私的 AI 体验，使其能够在长时间跨度内真正适应用户不断演化的生活方式和偏好。</p>
-	                <p data-lang="en">MobileMem has been integrated into OPPO's AI assistant development pipeline to systematically evaluate and enhance long-term memory capabilities in production-grade mobile scenarios. Within OPPO's ecosystem, the benchmark serves multiple practical use cases. First, it enables OPPO to assess on-device memory middleware performance across diverse real-world tasks, including multi-hop reasoning, knowledge updating, temporal reasoning, and visual reasoning, using authentic user trajectories and personalized multimodal dialogues. Second, the benchmark supports OPPO's iterative optimization of retrieval-augmented generation (RAG) strategies and memory management policies by providing clear, reproducible metrics that reflect actual user interaction patterns. Third, MobileMem's bilingual evaluation framework, which covers English and Chinese, aligns with OPPO's global market strategy, ensuring that memory systems perform consistently across different linguistic and cultural contexts. Fourth, the benchmark facilitates seamless integration with OPPO's existing agent ecosystem, including task understanding modules, safety filters, and execution engines, enabling end-to-end validation of memory-augmented AI assistants. By grounding evaluation in real-world user behaviors, such as travel planning, social interactions, shopping activities, and content consumption, MobileMem helps OPPO deliver more context-aware, personalized, and privacy-conscious AI experiences that genuinely adapt to users' evolving lifestyles and preferences over extended periods.</p>
-	              </div>
-	            </details>
-	          </div>
-	          <figure class="application-visual">
-	            <div class="application-image-shell">
-	              <img id="application-visual-image" src="assets/web/features/on-device-ecosystem.png" alt="MobileMem ecosystem diagram with mobile agent modules and on-device memory middleware.">
-	            </div>
-	            <figcaption class="application-visual-caption">
-	              <strong id="application-visual-caption">Ecosystem</strong>
-	              <span id="application-visual-kicker">Mobile Agents · 01</span>
-	            </figcaption>
-	          </figure>
-	        </div>
-	      </div>
-	    </section>
+    <section class="section application" id="application" aria-labelledby="application-title-zh">
+      <div class="wrap">
+        <div class="center-head">
+          <p class="eyebrow">Applications</p>
+          <h2 id="application-title-zh" data-lang="zh">MobileMem 的应用场景</h2>
+          <h2 id="application-title-en" data-lang="en">Application Scenarios</h2>
+        </div>
+        <div class="application-layout" data-application-showcase>
+          <div class="application-accordion">
+            <details class="application-item" open data-application-image="assets/web/application-cinematic.png" data-application-alt="Cinematic OPPO-style mobile memory ecosystem with phone, assistant, and connected memory modules." data-application-caption-en="Ecosystem" data-application-caption-zh="生态系统" data-application-kicker-en="Applications · 01" data-application-kicker-zh="应用场景 · 01">
+              <summary>
+                <span class="application-index">01</span>
+                <span class="application-summary-copy">
+                  <strong>
+                    <span data-lang="zh">生态系统</span>
+                    <span data-lang="en">Ecosystem</span>
+                  </strong>
+                  <small>
+                    <span data-lang="zh">移动 AI 助手长期记忆评测</span>
+                    <span data-lang="en">Long-term memory evaluation for mobile AI assistants</span>
+                  </small>
+                </span>
+                <span class="application-chevron" aria-hidden="true"></span>
+              </summary>
+              <div class="application-body">
+                <p data-lang="zh">MobileMem 被设计为一个统一基准，用于评估移动 AI 助手中的长期记忆，而不是一个独立的记忆系统。其模块化架构可无缝集成到现有移动智能体生态中，包括任务理解、记忆检索、问答、网页搜索、回复安全和执行模块。因此，MobileMem 支持不同记忆架构之间的可复现比较，并促进长期记忆评测接入真实开发管线。</p>
+                <p data-lang="en">MobileMem is designed as a unified benchmark for evaluating long-term memory in mobile AI assistants rather than a standalone memory system. Its modular architecture seamlessly integrates with the existing mobile agent ecosystem, including task understanding, memory retrieval, question answering, web search, response safety, and execution modules. Consequently, MobileMem supports reproducible comparison across different memory architectures and facilitates the integration of long-term memory evaluation into real-world development pipelines.</p>
+              </div>
+            </details>
+            <details class="application-item" data-application-image="assets/web/features/multimodal-trajectories.png" data-application-alt="Multiple native mobile applications and memory sources forming a unified smartphone memory stream." data-application-caption-en="Standardization" data-application-caption-zh="标准化" data-application-kicker-en="Applications · 02" data-application-kicker-zh="应用场景 · 02">
+              <summary>
+                <span class="application-index">02</span>
+                <span class="application-summary-copy">
+                  <strong>
+                    <span data-lang="zh">标准化</span>
+                    <span data-lang="en">Standardization</span>
+                  </strong>
+                  <small>
+                    <span data-lang="zh">真实手机记忆与统一评测框架</span>
+                    <span data-lang="en">Authentic smartphone memory and unified protocols</span>
+                  </small>
+                </span>
+                <span class="application-chevron" aria-hidden="true"></span>
+              </summary>
+              <div class="application-body">
+                <p data-lang="zh">MobileMem 的一个关键特征是，它由真实智能手机记忆构建，而不是合成交互日志或人工整理的用户画像。该基准在单一评测框架中统一了基础记忆、认知记忆、偏好记忆、时间推理和视觉推理，同时将评估建立在约一年真实用户活动之上。MobileMem 建立在原生移动应用生成的异构记忆源之上，包括日历、相册、笔记、文档、待办事项、账单、语音备忘录、屏幕记忆、视频记忆以及其他用户生成记录。</p>
+                <p data-lang="en">A key characteristic of MobileMem is that it is constructed from authentic smartphone memory rather than synthetic interaction logs or manually curated user profiles. The benchmark unifies foundational memory, cognitive memory, preference memory, temporal reasoning, and visual reasoning within a single evaluation framework, while grounding assessment in approximately one year of real user activities. MobileMem is built upon heterogeneous memory sources generated by native mobile applications, including calendars, albums, notes, documents, to-do lists, bills, voice memos, screen memories, video memories, and other user-generated records.</p>
+              </div>
+            </details>
+            <details class="application-item" data-application-image="assets/web/xiaobu-functional-cabin-white.png" data-application-alt="Xiaobu assistant inside a functional on-device memory cabin with visible memory zones and reasoning displays." data-application-caption-en="On-Device Intelligence" data-application-caption-zh="端侧智能" data-application-kicker-en="Applications · 03" data-application-kicker-zh="应用场景 · 03">
+              <summary>
+                <span class="application-index">03</span>
+                <span class="application-summary-copy">
+                  <strong>
+                    <span data-lang="zh">端侧智能</span>
+                    <span data-lang="en">On-Device Intelligence</span>
+                  </strong>
+                  <small>
+                    <span data-lang="zh">可度量、可比较、可持续改进</span>
+                    <span data-lang="en">Measurable, comparable, continuously improvable</span>
+                  </small>
+                </span>
+                <span class="application-chevron" aria-hidden="true"></span>
+              </summary>
+              <div class="application-body">
+                <p data-lang="zh">MobileMem 将长期记忆评测从定性能力展示转向可度量、可比较且可持续改进的评估。该基准为检索准确性、时间一致性、偏好理解、多模态推理和长程知识整合提供综合指标，从而能够客观比较不同记忆架构和检索策略。随着基础模型日益从云服务迁移到边缘设备，MobileMem 为评估可靠、高效、隐私感知且能通过长期用户交互持续演进的记忆系统提供了有效框架。</p>
+                <p data-lang="en">MobileMem shifts long-term memory evaluation from qualitative capability demonstrations to measurable, comparable, and continuously improvable assessment. The benchmark provides comprehensive metrics for retrieval accuracy, temporal consistency, preference understanding, multimodal reasoning, and long-horizon knowledge integration, enabling objective comparison among different memory architectures and retrieval strategies. As foundation models increasingly migrate from cloud services to edge devices, MobileMem offers an effective framework for evaluating reliable, efficient, and privacy-aware memory systems that continuously evolve through long-term user interactions.</p>
+              </div>
+            </details>
+            <details class="application-item" data-application-image="assets/web/daughter-case-replacement.png" data-application-alt="A horizontal personal memory case with a phone dialogue and birthday memory reasoning." data-application-caption-en="User Memory Value" data-application-caption-zh="用户记忆价值" data-application-kicker-en="Applications · 04" data-application-kicker-zh="应用场景 · 04">
+              <summary>
+                <span class="application-index">04</span>
+                <span class="application-summary-copy">
+                  <strong>
+                    <span data-lang="zh">用户记忆价值</span>
+                    <span data-lang="en">User Memory Value</span>
+                  </strong>
+                  <small>
+                    <span data-lang="zh">以长期多模态用户记忆作为个性化基本单元</span>
+                    <span data-lang="en">Long-term multimodal user memory as personalization</span>
+                  </small>
+                </span>
+                <span class="application-chevron" aria-hidden="true"></span>
+              </summary>
+              <div class="application-body">
+                <p data-lang="zh">从核心上看，MobileMem 将长期多模态用户记忆视为个性化的基本单元。不同于主要评估孤立事实回忆的传统问答基准，MobileMem 评估 AI 助手是否能够在扩展时间跨度内持续积累、检索、整合并推理不断演化的用户记忆。通过建模真实用户轨迹、多语言交互、动态偏好和真实世界事件，该基准鼓励开发能够提供上下文感知、主动且持续自适应辅助能力的 AI 助手。</p>
+                <p data-lang="en">At its core, MobileMem treats long-term multimodal user memory as the fundamental unit of personalization. Unlike conventional question answering benchmarks that primarily evaluate isolated factual recall, MobileMem evaluates whether AI assistants can continuously accumulate, retrieve, integrate, and reason over evolving user memories across extended temporal horizons. By modeling authentic user trajectories, multilingual interactions, dynamic preferences, and real-world events, the benchmark encourages the development of AI assistants capable of delivering context-aware, proactive, and continuously adaptive assistance.</p>
+              </div>
+            </details>
+            <details class="application-item" data-application-image="assets/web/application-scenarios-v2.png" data-application-alt="OPPO native memory ecosystem with a central phone, assistant, and structured memories from everyday smartphone usage." data-application-caption-en="OPPO Application Scenarios" data-application-caption-zh="OPPO 应用场景" data-application-kicker-en="Applications · 05" data-application-kicker-zh="应用场景 · 05">
+              <summary>
+                <span class="application-index">05</span>
+                <span class="application-summary-copy">
+                  <strong>
+                    <span data-lang="zh">OPPO 应用场景</span>
+                    <span data-lang="en">OPPO Application Scenarios</span>
+                  </strong>
+                  <small>
+                    <span data-lang="zh">OPPO 原生记忆生态与生产级移动环境</span>
+                    <span data-lang="en">OPPO native memory ecosystem and production mobile environments</span>
+                  </small>
+                </span>
+                <span class="application-chevron" aria-hidden="true"></span>
+              </summary>
+              <div class="application-body">
+                <p data-lang="zh">MobileMem 已经接入 OPPO 的 AI 助手研发流程，用于系统性评估并提升生产级移动环境中的长期记忆能力。该基准建立在 OPPO 原生记忆生态之上，该生态提供了通过日常智能手机使用积累的多样长期记忆集合。这些记忆来源包括日历、相册、笔记、文档、待办事项、账单、语音备忘录、屏幕记忆、视频记忆以及其他用户生成记录，覆盖生产力、沟通、多媒体、金融和日常生活。</p>
+                <p data-lang="zh">其中，屏幕记忆、视频记忆、语音记忆和账单记忆等代表性智能记忆服务，会自动将用户的浏览历史、多媒体收藏、语音提醒、支付记录和其他上下文信息组织成结构化长期记忆。除了记忆检索本身，MobileMem 还通过与任务理解模块、网页搜索系统、安全过滤器和执行引擎无缝集成，支持对记忆增强型 AI 助手进行端到端评测。</p>
+                <p data-lang="en">MobileMem has been integrated into OPPO's AI assistant development pipeline to systematically evaluate and improve long-term memory capabilities in production-grade mobile environments. The benchmark is built upon OPPO's native memory ecosystem, which provides a diverse collection of long-term memory accumulated through everyday smartphone usage. These memory sources include calendars, albums, notes, documents, to-do lists, bills, voice memos, screen memories, video memories, and other user-generated records, covering productivity, communication, multimedia, finance, and daily life.</p>
+                <p data-lang="en">Among them, representative intelligent memory services such as Screen Memory, Video Memory, Voice Memory, and Bill Memory automatically organize users' browsing histories, multimedia collections, spoken reminders, payment records, and other contextual information into structured long-term memories. Beyond memory retrieval itself, MobileMem also supports end-to-end evaluation of memory-augmented AI assistants by integrating seamlessly with task understanding modules, web search systems, safety filters, and execution engines.</p>
+              </div>
+            </details>
+          </div>
+          <figure class="application-visual">
+            <div class="application-image-shell">
+              <img id="application-visual-image" src="assets/web/application-cinematic.png" alt="Cinematic OPPO-style mobile memory ecosystem with phone, assistant, and connected memory modules.">
+            </div>
+            <figcaption class="application-visual-caption">
+              <strong id="application-visual-caption">Ecosystem</strong>
+              <span id="application-visual-kicker">Applications · 01</span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
 
     <section class="section quick" id="quick-start" aria-labelledby="quick-title">
       <div class="wrap">
@@ -5310,6 +5505,7 @@
 			    const applicationKicker = document.getElementById("application-visual-kicker");
 			    const applicationVisual = applicationShowcase?.querySelector(".application-visual");
 			    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+			    const mobileApplicationQuery = window.matchMedia("(max-width: 700px)");
 			    let applicationImageTimer;
 			    let applicationLang = document.body.classList.contains("lang-zh") ? "zh" : "en";
 
@@ -5375,6 +5571,29 @@
 
 		        if (window.gsap && !motionQuery.matches) {
 		          gsap.fromTo(details, { y: 10 }, { y: 0, duration: 0.3, ease: "power3.out" });
+		        }
+
+		        if (mobileApplicationQuery.matches) {
+		          window.setTimeout(() => {
+		            const navOffset = document.querySelector(".site-nav")?.offsetHeight || 0;
+		            const focusGap = Math.min(112, Math.max(84, window.innerHeight * 0.13));
+		            const targetTop = window.scrollY + details.getBoundingClientRect().top - navOffset - focusGap;
+		            window.scrollTo({
+		              top: Math.max(0, targetTop),
+		              behavior: motionQuery.matches ? "auto" : "smooth",
+		            });
+		          }, 80);
+		        } else {
+		          window.setTimeout(() => {
+		            requestAnimationFrame(() => {
+		              const bottomOverflow = details.getBoundingClientRect().bottom - (window.innerHeight - 42);
+		              if (bottomOverflow <= 0) return;
+		              window.scrollBy({
+		                top: bottomOverflow,
+		                behavior: "auto",
+		              });
+		            });
+		          }, 140);
 		        }
 		      });
 		    });
