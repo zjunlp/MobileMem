@@ -2631,9 +2631,9 @@
     .application-accordion {
       display: grid;
       align-content: start;
-      gap: 10px;
+      gap: 8px;
       min-width: 0;
-      max-height: clamp(520px, calc(100vh - var(--nav-h) - 214px), 640px);
+      max-height: clamp(470px, calc(100vh - var(--nav-h) - 248px), 590px);
       overflow-y: auto;
       padding-right: 4px;
       overscroll-behavior: contain;
@@ -2668,12 +2668,12 @@
     }
 
     .application-item summary {
-      min-height: 66px;
+      min-height: 58px;
       display: grid;
-      grid-template-columns: 36px minmax(0, 1fr) 24px;
+      grid-template-columns: 32px minmax(0, 1fr) 22px;
       align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
+      gap: 10px;
+      padding: 10px 12px;
       cursor: pointer;
       list-style: none;
     }
@@ -2683,8 +2683,8 @@
 	    }
 
     .application-index {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -2703,21 +2703,21 @@
 
 	    .application-summary-copy strong {
 	      color: #12231b;
-	      font-size: 17px;
+	      font-size: 16px;
 	      line-height: 1.08;
 	      font-weight: 950;
 	    }
 
 	    .application-summary-copy small {
 	      color: var(--muted);
-	      font-size: 12px;
+	      font-size: 11px;
 	      line-height: 1.25;
 	      font-weight: 820;
 	    }
 
 	    .application-chevron {
-	      width: 24px;
-	      height: 24px;
+	      width: 22px;
+	      height: 22px;
 	      position: relative;
 	      border-radius: 999px;
 	      background: rgba(15, 123, 79, 0.08);
@@ -2757,12 +2757,14 @@
 	    }
 
     .application-body {
-      max-height: clamp(188px, calc(100vh - var(--nav-h) - 452px), 276px);
-      overflow: auto;
-      padding: 0 16px 16px 62px;
+      height: clamp(140px, calc(100vh - var(--nav-h) - 540px), 188px);
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: 0 12px 14px 54px;
       overscroll-behavior: contain;
       scrollbar-gutter: stable;
       scrollbar-color: rgba(15, 123, 79, 0.36) transparent;
+      -webkit-overflow-scrolling: touch;
     }
 
     .application-body p {
@@ -2775,6 +2777,24 @@
 
     .application-body p + p {
       margin-top: 12px;
+    }
+
+    .application-body::-webkit-scrollbar,
+    .application-accordion::-webkit-scrollbar {
+      width: 7px;
+    }
+
+    .application-body::-webkit-scrollbar-track,
+    .application-accordion::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .application-body::-webkit-scrollbar-thumb,
+    .application-accordion::-webkit-scrollbar-thumb {
+      border: 2px solid transparent;
+      border-radius: 999px;
+      background: rgba(15, 123, 79, 0.34);
+      background-clip: padding-box;
     }
 
 	    .application-source {
@@ -3337,13 +3357,17 @@
 		      }
 
 		      .application {
-		        padding-bottom: 96px;
+		        padding-bottom: 220px;
 		      }
 
 		      .application-accordion {
 		        max-height: none;
 		        overflow-y: visible;
 		        padding-right: 0;
+		      }
+
+		      .application-body {
+		        height: clamp(138px, 20vh, 158px);
 		      }
 
 		      .application-visual {
@@ -3463,7 +3487,7 @@
 		      }
 
 		      .application {
-		        padding-bottom: 190px;
+		        padding-bottom: 390px;
 		      }
 
 		      .application-layout {
@@ -3471,15 +3495,15 @@
 		      }
 
 		      .application-item summary {
-		        grid-template-columns: 34px minmax(0, 1fr) 22px;
-		        gap: 10px;
-		        min-height: 66px;
-		        padding: 12px;
+		        grid-template-columns: 30px minmax(0, 1fr) 22px;
+		        gap: 9px;
+		        min-height: 56px;
+		        padding: 9px 10px;
 		      }
 
 		      .application-index {
-		        width: 34px;
-		        height: 34px;
+		        width: 30px;
+		        height: 30px;
 		        font-size: 11px;
 		      }
 
@@ -3492,8 +3516,8 @@
 		      }
 
 		      .application-body {
-		        max-height: 360px;
-		        padding: 0 14px 15px 56px;
+		        height: 188px;
+		        padding: 0 12px 14px 50px;
 		      }
 
 		      .application-body p {
