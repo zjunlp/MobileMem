@@ -125,6 +125,25 @@ MobileMem-Omni evaluates **7 types** of memory reasoning tasks:
 
 ---
 
+#### Event Structure
+
+During data construction, each persona contains an `Events` list. Each event in the list contains:
+
+| Field | Description |
+|:------|:------------|
+| `event_id` | Sequential event identifier starting from `0` |
+| `event_name` | Concise title of the event |
+| `event_start_time` | Start time in `YYYY-MM-DD HH:MM:SS` format |
+| `event_end_time` | End time in `YYYY-MM-DD HH:MM:SS` format; must be later than `event_start_time` |
+| `duration_type` | Duration category, one of `short-term`, `mid-term`, or `long-term` |
+| `participants` | List of people involved in the event, excluding the persona; contains at most two people |
+| `description` | First-person description of the event, including its context, actions, emotions, and potential need for assistance |
+| `importance` | Significance level of the event, one of `low`, `medium`, or `high` |
+| `additional_info` | Single-element list indicating the associated mobile content type: `food`, `friend`, `money`, `ticket`, or `wechat` |
+| `*_info` | Optional type-specific metadata corresponding to the value of `additional_info` |
+
+---
+
 #### Each `session` contains:
 
 | Field | Description |
