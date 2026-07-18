@@ -49,29 +49,107 @@ Notes:
 
 ## Step 2. Build and Retrieve Memories
 
-This submission does not include full construction/retrieval implementations for every memory method. Use the original [zjunlp/MemBase](https://github.com/zjunlp/MemBase) three-stage workflow, or follow each method's upstream repository.
+The experiments include both textual and multimodal memory methods. Most textual baselines can be run through the unified [zjunlp/MemBase](https://github.com/zjunlp/MemBase) construction, retrieval, and evaluation pipeline. Methods with their own evaluation stack can instead be run from their official repositories.
 
-Text-only methods and references:
+### Textual Memory Methods
 
-| Method | Reference |
-|---|---|
-| Long-Context | Built-in long-context baseline in the original MemBase examples |
-| NaiveRAG | Built-in naive-rag baseline in the original MemBase examples |
-| A-MEM | <https://github.com/agiresearch/A-mem> |
-| LangMem | <https://github.com/langchain-ai/langmem> |
-| Mem0 | <https://github.com/mem0ai/mem0> |
-| MemOS | <https://github.com/MemTensor/MemOS> |
-| EverMemOS | <https://github.com/EverMind-AI/EverOS> |
-| HippoRAG2 | <https://github.com/OSU-NLP-Group/HippoRAG> |
+| Method | Repository | Brief Description | Recommended Experiment Entry |
+|:-------|:-----------|:------------------|:-----------------------------|
+| Long Context | [zjunlp/MemBase](https://github.com/zjunlp/MemBase) | Places the complete conversation history in the model context without building an external memory index | MemBase `long-context` baseline |
+| NaiveRAG | [zjunlp/MemBase](https://github.com/zjunlp/MemBase) | Embeds conversation chunks and retrieves the top-k chunks for question answering | MemBase `naive-rag` baseline |
+| LangMem | [langchain-ai/langmem](https://github.com/langchain-ai/langmem) | Extracts and updates long-term semantic memories for LangGraph agents | Use the LangMem adapter and LoCoMo examples in MemBase |
+| Mem0 | [mem0ai/mem0](https://github.com/mem0ai/mem0) | Maintains extracted user memories with vector or graph-backed retrieval | Use the Mem0 LoCoMo example in MemBase |
+| LightMem | [zjunlp/LightMem](https://github.com/zjunlp/LightMem) | A lightweight memory framework with compression, topic segmentation, summarization, and configurable retrieval | Follow LightMem's LoCoMo reproduction scripts under `experiments/` |
+| EverMemOS | [EverMind-AI/EverOS](https://github.com/EverMind-AI/EverOS) | A persistent memory system that extracts, organizes, updates, and retrieves long-term user memories | Use the EverMemOS environment and adapter provided by MemBase |
+| M²A (w/ Caption) | [Little-Fridge/M2A](https://github.com/Little-Fridge/M2A) | Caption-only M²A setting: visual content is represented by captions and evaluated through the textual memory path | Use the M²A evaluation wrapper with image-caption memories enabled and raw-image retrieval disabled |
 
-For each method:
+### Multimodal Memory Methods
 
-1. Read `data/Locomo/locomo_u{uid}.json`.
-2. Build user memory with the method's own code.
-3. Retrieve memories for each question.
-4. Format question, gold answer, retrieved memories, and model answer for `evaluator.py`.
+| Method | Repository | Brief Description | Recommended Experiment Entry |
+|:-------|:-----------|:------------------|:-----------------------------|
+| Multimodal Long Context | [Little-Fridge/M2A](https://github.com/Little-Fridge/M2A) | Sends the complete text-and-image conversation history directly to a multimodal model | Use a no-retrieval wrapper with the same multimodal QA model used by the other methods |
+| SigLIP + NaiveRAG | [google-research/big_vision](https://github.com/google-research/big_vision) + [zjunlp/MemBase](https://github.com/zjunlp/MemBase) | Extends NaiveRAG with SigLIP embeddings for text-to-image retrieval | Build separate text and image indexes, retrieve top-k candidates, and pass both to the multimodal QA model |
+| UniversalRAG | [wgcyeo/UniversalRAG](https://github.com/wgcyeo/UniversalRAG) | Routes each question to modality- and granularity-specific corpora before retrieval | Adapt the converted MobileMem-Omni corpus to UniversalRAG and run its preprocessing, routing, and evaluation scripts |
+| M²A | [Little-Fridge/M2A](https://github.com/Little-Fridge/M2A) | Uses dual-layer raw and semantic memory with text, sparse, and cross-modal retrieval paths | Configure `config.toml` and run the official `M2AEvaluationWrapper` with this evaluator |
 
-If using the original MemBase project, refer to its `examples/evaluate_*_on_locomo/` construction/search instructions. Those scripts are not duplicated in this submission.
+### Run Textual Baselines with MemBase
+
+Clone MemBase and create a separate environment for each memory method because their dependencies may conflict:
+
+```bash
+git clone https://github.com/zjunlp/MemBase.git
+cd MemBase
+conda create -n <METHOD>_env python=3.12 -y
+conda activate <METHOD>_env
+pip install -r envs/<METHOD>_requirements.txt
+```
+
+Then run the common three-stage pipeline. Replace `<METHOD>`, `<CONFIG>`, and the generated result paths with the values documented in the corresponding MemBase example:
+
+```bash
+# 1. Construct memories from the converted MobileMem-Omni conversations
+python memory_construction.py \
+  --memory-type <METHOD> \
+  --dataset-type locomo \
+  --dataset-path /path/to/data/Locomo \
+  --config-path <CONFIG>
+
+# 2. Retrieve memories for every evaluation question
+python memory_search.py \
+  --memory-type <METHOD> \
+  --dataset-type locomo \
+  --dataset-path /path/to/data/Locomo \
+  --config-path <CONFIG> \
+  --top-k 10
+
+# 3. Generate answers and calculate the evaluation metrics
+python memory_evaluation.py \
+  --search-results-path <SEARCH_RESULTS> \
+  --dataset-type locomo \
+  --qa-model <QA_MODEL> \
+  --judge-model <JUDGE_MODEL> \
+  --api-config-path <API_CONFIG>
+```
+
+Use `python memory_construction.py --help` and `python memory_search.py --help` to list the registered method and dataset names in the checked-out MemBase version.
+
+### Run Methods with Native Repositories
+
+LightMem provides dedicated LoCoMo reproduction scripts:
+
+```bash
+git clone https://github.com/zjunlp/LightMem.git
+cd LightMem
+conda create -n lightmem python=3.11 -y
+conda activate lightmem
+pip install -e .
+cd experiments
+python run_lightmem_qwen.py
+```
+
+For M²A, install the official repository, configure the language, text-embedding, and multimodal-embedding endpoints, and use its evaluation wrapper:
+
+```bash
+git clone https://github.com/Little-Fridge/M2A.git
+cd M2A
+uv sync
+source .venv/bin/activate
+# Edit config.toml, then run an evaluation driver based on eval_wrapper.py.
+```
+
+For UniversalRAG, follow its native preprocessing → routing → evaluation workflow after adapting MobileMem-Omni's sessions, images, and questions to its corpus format:
+
+```bash
+git clone https://github.com/wgcyeo/UniversalRAG.git
+cd UniversalRAG
+uv sync
+source .venv/bin/activate
+bash script/1_preprocess.sh
+bash script/3_route.sh <ROUTER_MODEL>
+bash script/4_eval.sh --model-path <MODEL> --router-model <ROUTER_MODEL> --target <TARGET>
+```
+
+The native commands above describe each repository's execution entry. Reproducing the reported MobileMem-Omni numbers additionally requires using the converted MobileMem-Omni data, the same QA backbone and judge model, and the same retrieval settings. Repository-native scripts may therefore require a small dataset adapter rather than running unchanged.
 
 ## Step 3. Evaluate
 
