@@ -67,8 +67,7 @@ The experiments include both textual and multimodal memory methods. Most textual
 
 | Method | Repository | Brief Description | Recommended Experiment Entry |
 |:-------|:-----------|:------------------|:-----------------------------|
-| Multimodal Long Context | [Little-Fridge/M2A](https://github.com/Little-Fridge/M2A) | Sends the complete text-and-image conversation history directly to a multimodal model | Use a no-retrieval wrapper with the same multimodal QA model used by the other methods |
-| SigLIP + NaiveRAG | [google-research/big_vision](https://github.com/google-research/big_vision) + [zjunlp/MemBase](https://github.com/zjunlp/MemBase) | Extends NaiveRAG with SigLIP embeddings for text-to-image retrieval | Build separate text and image indexes, retrieve top-k candidates, and pass both to the multimodal QA model |
+| SigLIP + NaiveRAG | [google-research/big_vision](https://github.com/google-research/big_vision) | Extends NaiveRAG with SigLIP embeddings for text-to-image retrieval | Build separate text and image indexes, retrieve top-k candidates, and pass both to the multimodal QA model |
 | UniversalRAG | [wgcyeo/UniversalRAG](https://github.com/wgcyeo/UniversalRAG) | Routes each question to modality- and granularity-specific corpora before retrieval | Adapt the converted MobileMem-Omni corpus to UniversalRAG and run its preprocessing, routing, and evaluation scripts |
 | M²A | [Little-Fridge/M2A](https://github.com/Little-Fridge/M2A) | Uses dual-layer raw and semantic memory with text, sparse, and cross-modal retrieval paths | Configure `config.toml` and run the official `M2AEvaluationWrapper` with this evaluator |
 
