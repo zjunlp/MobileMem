@@ -6,9 +6,11 @@ parsing, truncated-JSON repair, and sub-event expansion for imaging.
 
 from __future__ import annotations
 
+import importlib
 import itertools
 import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -28,7 +30,6 @@ from generation.name_pools import (  # noqa: E402
     SURNAME_POOL,
     make_unique_name,
 )
-from generation.annual_events.names import _merge_and_sort_events  # noqa: E402
 from generation.social_name_fix import apply_fixes, classify_name  # noqa: E402
 
 
@@ -262,6 +263,121 @@ class ExpandEventsForImagingTest(unittest.TestCase):
             ("1_2", real_child),   # mid-term replaced by children, intro skipped
             (2, long_event),       # no children in index -> original kept
         ])
+
+
+class MergeAllImagesCaptionJoinTest(unittest.TestCase):
+    """Phase 2 joins Phase 1 captions and includes scenery from manifest."""
+
+    def test_captions_and_scenery_land_in_merged_outputs(self) -> None:
+        memory_summary = importlib.import_module("generation.memory_summary")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            data_dir = root / "output" / "data"
+            image_dir = root / "output" / "image"
+            data_dir.mkdir(parents=True)
+            scenery_dir = image_dir / "uid1" / "others"
+            scenery_dir.mkdir(parents=True)
+            event_dir = image_dir / "uid1" / "camera_photos"
+            event_dir.mkdir(parents=True)
+
+            event_png = event_dir / "1_event_0.png"
+            scenery_png = scenery_dir / "food_0.png"
+            event_png.write_bytes(b"png")
+            scenery_png.write_bytes(b"png")
+
+            (image_dir / "manifest.json").write_text(
+                json.dumps({"1": {"food": ["food_0.png"]}}), encoding="utf-8")
+
+            # Minimal upstream manifests (paths absolute so _manifest_image_exists works).
+            (data_dir / "sub_events.jsonl").write_text(
+                json.dumps({
+                    "uuid": 1,
+                    "sub_events": [{
+                        "parent_event_id": 0,
+                        "children": [{
+                            "sub_event_id": "0_1",
+                            "event_name": "demo",
+                            "event_start_time": "2025-01-01 10:00:00",
+                            "participants": [],
+                            "importance": "low",
+                        }],
+                    }],
+                }, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+            (data_dir / "annual_events.jsonl").write_text(
+                json.dumps({"uuid": 1, "Events": []}, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+            (data_dir / "event_images.jsonl").write_text(
+                json.dumps({
+                    "uuid": 1,
+                    "sub_event_id": "0_1",
+                    "image_path": str(event_png),
+                    "success": True,
+                    "participants": [],
+                    "scene_prompt": "",
+                }, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+            for name in ("app_screenshots.jsonl", "tickets.jsonl", "group_chats.jsonl"):
+                (data_dir / name).write_text("", encoding="utf-8")
+
+            (data_dir / "image_summaries.jsonl").write_text(
+                json.dumps({
+                    "image_path": str(event_png),
+                    "uuid": 1,
+                    "success": True,
+                    "summary_zh": "事件图摘要",
+                    "summary_en": "",
+                }, ensure_ascii=False) + "\n"
+                + json.dumps({
+                    "image_path": str(scenery_png),
+                    "uuid": 1,
+                    "success": True,
+                    "summary_zh": "风景图摘要",
+                    "summary_en": "",
+                }, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+
+            merged_out = data_dir / "merged_memories.jsonl"
+            memory_summary.merge_all_images(
+                data_dir=str(data_dir),
+                summaries_file=str(data_dir / "image_summaries.jsonl"),
+                merged_output=str(merged_out),
+                sub_events_file=str(data_dir / "sub_events.jsonl"),
+                events_file=str(data_dir / "annual_events.jsonl"),
+                image_dir=str(image_dir),
+            )
+
+            rows = [
+                json.loads(line)
+                for line in merged_out.read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
+            by_seid = {r["sub_event_id"]: r for r in rows}
+            self.assertIn("0_1", by_seid)
+            self.assertIn("scenery", by_seid)
+
+            event_imgs = by_seid["0_1"]["images"]
+            self.assertEqual(len(event_imgs), 1)
+            self.assertIsInstance(event_imgs[0], dict)
+            self.assertEqual(event_imgs[0]["summary_zh"], "事件图摘要")
+            self.assertTrue(event_imgs[0]["image_path"].endswith("1_event_0.png"))
+
+            scenery_imgs = by_seid["scenery"]["images"]
+            self.assertEqual(len(scenery_imgs), 1)
+            self.assertEqual(scenery_imgs[0]["summary_zh"], "风景图摘要")
+
+            total = [
+                json.loads(line)
+                for line in (data_dir / "total_images.jsonl").read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
+            self.assertEqual(len(total), 2)
+            self.assertTrue(any(t.get("summary_zh") == "事件图摘要" for t in total))
+            self.assertTrue(any(t.get("summary_zh") == "风景图摘要" for t in total))
 
 
 if __name__ == "__main__":

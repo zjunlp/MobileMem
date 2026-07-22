@@ -4,7 +4,9 @@
 Two phases: Phase 1 captions every generated image with a vision LLM (emitting
 :class:`core.ImageSummary` rows), and Phase 2 (:func:`merge_all_images`) merges
 all per-stage image JSONLs into a unified per-sub-event view plus a per-image
-``total_images`` index (:class:`core.ImageRecord` rows).
+``total_images`` index (:class:`core.ImageRecord` rows), joining Phase 1
+captions onto each image and including persona scenery under
+``sub_event_id="scenery"``.
 """
 
 import os
@@ -405,18 +407,87 @@ def _normalize_image_path(path_str):
     return p
 
 
+def _load_summary_index(summaries_file: str) -> Dict[str, Dict[str, str]]:
+    """Index Phase 1 captions by normalized path and basename for join."""
+    index: Dict[str, Dict[str, str]] = {}
+    for rec in _read_jsonl(summaries_file, required=False):
+        if rec.get('success') is False:
+            continue
+        entry = {
+            'summary_zh': rec.get('summary_zh') or '',
+            'summary_en': rec.get('summary_en') or '',
+        }
+        raw = rec.get('image_path', '') or ''
+        norm = _normalize_image_path(raw)
+        for key in (norm, os.path.basename(norm) if norm else '',
+                    os.path.basename(raw) if raw else ''):
+            if key:
+                index[key] = entry
+    return index
+
+
+def _lookup_summary(index: Dict[str, Dict[str, str]], image_path: str) -> Dict[str, str]:
+    """Return summary_zh/summary_en for an image path, or empty strings."""
+    empty = {'summary_zh': '', 'summary_en': ''}
+    if not image_path:
+        return empty
+    norm = _normalize_image_path(image_path)
+    hit = index.get(norm) or index.get(os.path.basename(norm or image_path))
+    return dict(hit) if hit else empty
+
+
+def _load_scenery_into_grouped(grouped: dict, data_dir: str, image_dir: Optional[str]) -> int:
+    """Append scenery PNGs from image/manifest.json under synthetic sub_event_id ``scenery``.
+
+    Scenery is persona-level (not tied to a calendar event), so it lands in its
+    own merged_memories row per uuid rather than being duplicated onto every
+    real sub-event.
+    """
+    if not image_dir:
+        image_dir = os.path.join(os.path.dirname(os.path.abspath(data_dir)), 'image')
+    manifest_path = os.path.join(image_dir, 'manifest.json')
+    if not os.path.exists(manifest_path):
+        logger.info("scenery: no manifest.json, skip")
+        return 0
+
+    with open(manifest_path, 'r', encoding='utf-8') as f:
+        manifest = json.load(f)
+
+    scenery_folder = DIR_NAME['scenery']
+    count = 0
+    for uid_str, categories in (manifest or {}).items():
+        try:
+            uid = int(uid_str)
+        except (TypeError, ValueError):
+            continue
+        if not isinstance(categories, dict):
+            continue
+        for category, files in categories.items():
+            for filename in files or []:
+                abs_path = os.path.join(image_dir, f'uid{uid}', scenery_folder, filename)
+                if not os.path.exists(abs_path):
+                    continue
+                grouped[(uid, 'scenery')].append({
+                    'type': 'scenery',
+                    'category': category,
+                    'image_path': abs_path,
+                })
+                count += 1
+    logger.info(f"scenery: {count} images loaded from {manifest_path}")
+    return count
+
+
 def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
-                     sub_events_file: str, events_file: str):
-    # TODO(owner): summaries_file (Phase 1 vision captions) is only logged below
-    # and never read — the merged output carries no caption text, so downstream
-    # consumers cannot see the summaries via merged_memories/total_images.
-    # Wiring captions into the merge is a design decision left to the owner.
+                     sub_events_file: str, events_file: str,
+                     image_dir: Optional[str] = None):
     """Merge all stage image JSONL files into a unified per-sub-event format.
 
     Output files:
-    1. merged_memories.jsonl: one sub-event per line, with images containing only image paths.
+    1. merged_memories.jsonl: one sub-event per line; each ``images`` entry is
+       ``{image_path, summary_zh, summary_en}`` (Phase 1 captions joined in).
+       Persona scenery lives under synthetic ``sub_event_id="scenery"``.
     2. total_images.jsonl: one image per line, keyed by path and carrying
-       type-specific structured information.
+       type-specific structured information plus the same caption fields.
     """
     logger.info("=" * 70)
     logger.info("Phase 2: Merge all image JSONL files")
@@ -425,7 +496,9 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
     logger.info(f"Output: {merged_output}")
     logger.info("=" * 70)
 
-    # -- 1. Description mapping removed; use structured fields instead.
+    # -- 1. Phase 1 captions (joined onto every image row below).
+    summary_index = _load_summary_index(summaries_file)
+    logger.info(f"Loaded {len(summary_index)} caption index keys from {summaries_file}")
 
     # -- 2. Load event metadata.
     # sub_events: (uuid, sub_event_id) -> {event_name, event_time, participants, importance, parent_event_id}
@@ -456,6 +529,8 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
     # 2b. Load short-term event metadata from annual_events.jsonl.
     events_records = _read_jsonl(events_file, required=True)
     for rec in events_records:
+        if 'uuid' not in rec:
+            continue
         uid = rec['uuid']
         for ev in rec.get('Events', []):
             if ev.get('duration_type') == 'short-term':
@@ -636,18 +711,31 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
                 gc_image_count += 1
     logger.info(f"conversation: {gc_image_count} group_chat images loaded")
 
-    # TODO(owner): scenery images (image/uid{N}/others/, produced by the scenery
-    # stage) have no manifest read here, so they never enter this Phase 2 merge —
-    # they are captioned in Phase 1 but absent from merged_memories/total_images.
-    # Whether to include them is a design decision left to the owner.
+    # 3e. scenery images (persona-level; synthetic sub_event_id="scenery").
+    _load_scenery_into_grouped(grouped, data_dir, image_dir)
 
     # -- 4. Assemble final merged records.
     merged_records = []
     total_images_records = []
-    for (uid, seid) in sorted(grouped.keys(), key=lambda x: (x[0], x[1])):
+    caption_hits = 0
+    caption_misses = 0
+    for (uid, seid) in sorted(grouped.keys(), key=lambda x: (x[0], str(x[1]))):
         meta = event_metadata.get((uid, seid), {})
-        parent_eid = meta.get('event_id', _get_parent_event_id(seid))
+        parent_eid = meta.get('event_id', _get_parent_event_id(seid) if seid != 'scenery' else None)
         images_list = grouped[(uid, seid)]
+        merged_images = []
+        for img in images_list:
+            norm_path = _normalize_image_path(img.get('image_path', ''))
+            caps = _lookup_summary(summary_index, norm_path or img.get('image_path', ''))
+            if caps['summary_zh'] or caps['summary_en']:
+                caption_hits += 1
+            else:
+                caption_misses += 1
+            merged_images.append({
+                'image_path': norm_path,
+                'summary_zh': caps['summary_zh'],
+                'summary_en': caps['summary_en'],
+            })
         record = {
             'uuid': uid,
             'sub_event_id': seid,
@@ -656,7 +744,7 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
             'event_time': meta.get('event_time', ''),
             'participants': meta.get('participants', []),
             'importance': meta.get('importance', ''),
-            'images': [_normalize_image_path(img['image_path']) for img in images_list],
+            'images': merged_images,
         }
         merged_records.append(record)
         for img in images_list:
@@ -664,7 +752,9 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
             # ImageRecord declares the common keys (uuid / sub_event_id / type /
             # image_path) and carries the type-specific fields in 'extra'.
             # from_dict (not kwargs) avoids inventing absent keys.
-            img = {**img, 'image_path': _normalize_image_path(img.get('image_path', ''))}
+            norm_path = _normalize_image_path(img.get('image_path', ''))
+            caps = _lookup_summary(summary_index, norm_path or img.get('image_path', ''))
+            img = {**img, 'image_path': norm_path, **caps}
             img_record = ImageRecord.from_dict(
                 {'uuid': uid, 'sub_event_id': seid, **img}
             ).to_dict()
@@ -675,6 +765,7 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
     write_jsonl_atomic(total_images_records, total_images_output)
     logger.info(f"Merged {len(merged_records)} sub-events with "
                 f"{sum(len(r['images']) for r in merged_records)} total images")
+    logger.info(f"Caption join: hit={caption_hits}, miss={caption_misses}")
     logger.info(f"Output: {merged_output}")
     logger.info(f"Total images index: {total_images_output} ({len(total_images_records)} records)")
 
@@ -778,6 +869,7 @@ def main():
             merged_output=args.merged_output,
             sub_events_file=args.sub_events_file,
             events_file=args.events_file,
+            image_dir=args.image_base_dir,
         )
         return
     
@@ -919,6 +1011,7 @@ def main():
             merged_output=args.merged_output,
             sub_events_file=args.sub_events_file,
             events_file=args.events_file,
+            image_dir=args.image_base_dir,
         )
 
 if __name__ == '__main__':
