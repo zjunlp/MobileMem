@@ -10,7 +10,7 @@ from core.base import JsonlModel, _ABSENT
 
 @dataclass
 class GroupChat(JsonlModel):
-    """A stage7 group-chat document: all chats generated for one protagonist.
+    """A conversation group-chat document: all chats generated for one protagonist.
 
     ``_errors`` and any other keys round-trip via ``extra``.
     """
@@ -26,7 +26,7 @@ class GroupChat(JsonlModel):
 
 @dataclass
 class ImageRecord(JsonlModel):
-    """A stage10 ``total_images`` row.
+    """A memory_summary ``total_images`` row.
 
     Only the four keys shared by every row are declared; the type-specific
     payload (book -> title/author; video -> uploader/duration; group_chat ->

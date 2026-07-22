@@ -5,7 +5,7 @@
     python -m pipeline.cli run --only annual_events  # one node
     python -m pipeline.cli run --from social_world   # node + everything downstream
 
-Run from the ``src/`` directory so that ``config`` / ``common`` / ``generation``
+Run from the ``src/`` directory so that ``config`` / ``infra`` / ``generation``
 are importable.
 """
 from __future__ import annotations
@@ -20,7 +20,8 @@ import config
 from pipeline import dag
 from pipeline.spec import RunContext
 
-# Map the legacy ``--start-stage`` float to its node (backward compatibility).
+# Legacy CLI compat: maps historical stage floats to node names; the floats
+# are frozen API, do not extend.
 START_STAGE_TO_NODE = {
     1: "profile",
     2: "life_state",
@@ -30,7 +31,9 @@ START_STAGE_TO_NODE = {
     4: "annual_events",
 }
 
-# The record sub-graph that main.py historically runs, with its stage float.
+# The record sub-graph run by ``run_main``, with each node's legacy stage
+# float. Legacy CLI compat: maps historical stage floats to node names; the
+# floats are frozen API, do not extend.
 RECORD_STAGES = [
     ("profile", 1.0),
     ("life_state", 2.0),
@@ -58,16 +61,16 @@ def _add_context_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--info-dir", default=_default_info_dir(),
                         help="Directory containing person subfolders")
     parser.add_argument("--output-dir", default=_default_output_dir(),
-                        help="Output directory for stage JSONL files")
+                        help="Output directory for the record JSONL files")
     parser.add_argument("--image-dir", default=None,
                         help="Output directory for rendered images "
                              "(default: sibling 'image' directory next to --output-dir)")
     parser.add_argument("--prompts-dir", default=config.PROMPTS_DIR,
                         help="Path to prompts/ directory")
     parser.add_argument("--max-events", type=int, default=10,
-                        help="Total events per person (stage4 / social graph sizing)")
+                        help="Total events per person (annual_events / social graph sizing)")
     parser.add_argument("--max-workers", type=int, default=3,
-                        help="Parallel workers for stage3.9 / stage4")
+                        help="Parallel workers for social_world / annual_events")
     parser.add_argument("--uuid", type=int, action="append", default=None,
                         help="Restrict to these uuid(s); repeatable (media nodes)")
     parser.add_argument("--model", default=None, help="Override text model (optional)")

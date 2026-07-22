@@ -67,6 +67,28 @@ def _get_bool(key: str, default: bool) -> bool:
     return val.strip().lower() in ('1', 'true', 'yes', 'on')
 
 
+def _get_opt_int(key: str):
+    """Optional int: returns None when the variable is unset/empty/invalid."""
+    val = os.getenv(key)
+    if val in (None, ''):
+        return None
+    try:
+        return int(val)
+    except (TypeError, ValueError):
+        return None
+
+
+def _get_opt_float(key: str):
+    """Optional float: returns None when the variable is unset/empty/invalid."""
+    val = os.getenv(key)
+    if val in (None, ''):
+        return None
+    try:
+        return float(val)
+    except (TypeError, ValueError):
+        return None
+
+
 # Project paths
 PROMPTS_DIR = os.path.join(PROJECT_ROOT, 'prompts')
 TEMPLATE_DIR = os.path.join(PROJECT_ROOT, 'templates')
@@ -78,7 +100,7 @@ LOG_DIR = os.path.join(OUTPUT_DIR, 'logs')
 OPENAI_API_KEY = _get_str('OPENAI_API_KEY', '')
 OPENAI_BASE_URL = _get_str('OPENAI_BASE_URL', 'https://api.openai.com/v1')
 # Fallback model used by llm_request() when a caller does not pass an explicit
-# model (e.g. the legacy stage4 CLI path).
+# model (e.g. the legacy annual_events CLI path).
 OPENAI_MODEL = _get_str('OPENAI_MODEL', 'gpt-4o')
 OPENAI_MODEL_CN = _get_str('OPENAI_MODEL_CN', 'deepseek-chat')
 # Text model returned by get_text_llm_model() — selected per persona language and
@@ -87,9 +109,12 @@ OPENAI_MODEL_CN = _get_str('OPENAI_MODEL_CN', 'deepseek-chat')
 # is unchanged out of the box; override either via the environment.
 TEXT_LLM_MODEL = _get_str('TEXT_LLM_MODEL', 'gpt-5.1')
 TEXT_LLM_MODEL_CN = _get_str('TEXT_LLM_MODEL_CN', TEXT_LLM_MODEL)
-OPENAI_MAX_TOKENS = _get_int('OPENAI_MAX_TOKENS', 16384)
-OPENAI_TEMPERATURE = _get_float('OPENAI_TEMPERATURE', 0.5)
-OPENAI_TIMEOUT = _get_int('OPENAI_TIMEOUT', 180)
+# None means "do not send the parameter" (matches the historical behavior of
+# only forwarding max_tokens/temperature when the env var was present).
+OPENAI_MAX_TOKENS = _get_opt_int('OPENAI_MAX_TOKENS')
+OPENAI_TEMPERATURE = _get_opt_float('OPENAI_TEMPERATURE')
+# Default matches the historical hardcoded llm_request(timeout=300).
+OPENAI_TIMEOUT = _get_int('OPENAI_TIMEOUT', 300)
 
 # Retry policy for transient API errors
 RETRY_TIMES = _get_int('RETRY_TIMES', 30)
@@ -113,7 +138,11 @@ DMX_CHINESE_EDIT_PROMPT_MAX = _get_int('DMX_CHINESE_EDIT_PROMPT_MAX', 1000)
 # (not /images/generations), so the backend uses a dedicated code path. Set
 # IMAGE_PROVIDER=dmx to use the legacy DMX endpoints above instead.
 IMAGE_PROVIDER = _get_str('IMAGE_PROVIDER', 'openrouter').strip().lower()
-OPENROUTER_API_KEY = _get_str('OPENROUTER_API_KEY', OPENAI_API_KEY)
+# No cross-provider fallback: OPENAI_API_KEY may point at a private proxy, and
+# silently reusing it here would send that credential to openrouter.ai. The key
+# must be set explicitly; the OpenRouter backend fails loudly at the call site
+# when it is missing (config must stay import-safe, so no raise here).
+OPENROUTER_API_KEY = _get_str('OPENROUTER_API_KEY', '')
 OPENROUTER_BASE_URL = _get_str('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1')
 OPENROUTER_IMAGE_MODEL = _get_str('OPENROUTER_IMAGE_MODEL', 'google/gemini-2.5-flash-image')
 # Optional HTTP/HTTPS proxy for image API calls; configure via the environment.

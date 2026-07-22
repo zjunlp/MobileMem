@@ -1,8 +1,7 @@
 """Document generator package (ticket / money / social-feed screenshots).
 
-Folded domain module (old ``stage7_3_tickets`` + ``stage7_3_llm_info`` +
-``stage7_3_templates``) re-split into a sub-package. ``generation.document`` keeps
-its full public surface via these re-exports, so the ``stage7_3_*`` shims and the
+Folded domain module re-split into a sub-package. ``generation.document`` keeps
+its full public surface via these re-exports, so existing importers and the
 pipeline DAG (which delegates to ``generation.document.main``) are unaffected.
 """
 from .templates import (

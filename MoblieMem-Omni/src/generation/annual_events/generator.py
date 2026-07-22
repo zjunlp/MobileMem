@@ -1,6 +1,6 @@
 """Annual-events generator (Life / Timeline AnnualEvents): parallel runner + entry.
 
-Holds the thread-safe ``_Stage4Runner`` (iterative top-up via the LLM with a
+Holds the thread-safe ``_AnnualEventsRunner`` (iterative top-up via the LLM with a
 Social-Graph-driven name strategy), the ``AnnualEventsGenerator`` and the
 ``generate_annual_events`` entry. Per-record parse/validate lives in ``.parse``; the name
 strategy + prompt building in ``.names``.
@@ -14,6 +14,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, List, Optional
 
 from backends.llm import get_text_llm_model, set_log_context
+from core.lang import is_chinese_persona
 from infra.base_generator import Generator
 
 from .parse import (
@@ -37,9 +38,9 @@ logger = logging.getLogger("generation.annual_events")
 DEFAULT_WORKERS = 3
 
 
-class _Stage4Runner:
+class _AnnualEventsRunner:
     """
-    Thread-safe parallel Stage 4 runner.
+    Thread-safe parallel annual-events runner.
 
     Core mechanism:
     - self.records: Dict[uuid -> record], the current state of all personas
@@ -82,7 +83,7 @@ class _Stage4Runner:
         Runs inside the thread pool; saves a checkpoint via the lock after each LLM call.
         """
         uid = persona.get('uuid')
-        set_log_context(uuid=uid, stage="stage4_events")
+        set_log_context(uuid=uid, stage="annual_events")
 
         # The actual target event count per uuid = a random value in [0.8*max_events, max_events]
         # Seeded by uuid so the target stays consistent across checkpoint/resume
@@ -92,7 +93,7 @@ class _Stage4Runner:
 
         # Select the prompt based on nationality
         nationality = persona.get('Basic_Profile', {}).get('nationality', '')
-        is_chinese = '中国' in nationality or 'China' in nationality or 'Chinese' in nationality
+        is_chinese = is_chinese_persona(nationality)
         active_prompt = self.system_prompt_cn if is_chinese else self.system_prompt
         active_model = get_text_llm_model(is_chinese)
 
@@ -184,7 +185,7 @@ class _Stage4Runner:
         print(f"  [uid={uid}] COMPLETE: {len(current_events)} events "
               f"(+{total_added} new)")
 
-    def run(self, stage3_records: List[Dict], max_workers: int = DEFAULT_WORKERS):
+    def run(self, upstream_records: List[Dict], max_workers: int = DEFAULT_WORKERS):
         """
         Process all personas in parallel.
 
@@ -192,20 +193,30 @@ class _Stage4Runner:
         """
         # Classify: skip / needs processing
         to_process = []
-        for persona in stage3_records:
+        for persona in upstream_records:
             uid = persona.get('uuid')
             ex = self.records.get(uid)
             n = len(ex.get('Events', [])) if ex else 0
 
             if n >= self.max_events:
-                # Truncate to max_events (if there are too many)
+                # Truncate to max_events by dropping the highest (most recently
+                # allocated) event_ids; surviving events keep their ids because
+                # event_id is a foreign key for downstream artifacts.
                 if n > self.max_events:
                     record = ex.copy()
-                    record['Events'] = ex['Events'][:self.max_events]
-                    for idx, evt in enumerate(record['Events']):
-                        evt['event_id'] = idx
+                    drop_ids = set(sorted(
+                        (evt['event_id'] for evt in ex['Events']),
+                        reverse=True)[:n - self.max_events])
+                    record['Events'] = [evt for evt in ex['Events']
+                                        if evt['event_id'] not in drop_ids]
                     self.records[uid] = record
-                print(f"[Stage4] uid={uid}: SKIP ({n} events >= {self.max_events})")
+                    print(f"[annual_events] uid={uid}: WARN truncated {n} -> "
+                          f"{self.max_events} events by dropping event_ids "
+                          f"{sorted(drop_ids)}; surviving ids are unchanged. "
+                          f"Downstream artifacts that already reference the "
+                          f"dropped ids are now dangling -- re-run downstream "
+                          f"stages with --force.")
+                print(f"[annual_events] uid={uid}: SKIP ({n} events >= {self.max_events})")
             else:
                 to_process.append(persona)
                 # Ensure this persona has an initial record in records
@@ -213,20 +224,22 @@ class _Stage4Runner:
                     self.records[uid] = persona.copy()
                     self.records[uid]['Events'] = []
                 if n > 0:
-                    print(f"[Stage4] uid={uid}: INCREMENTAL "
+                    print(f"[annual_events] uid={uid}: INCREMENTAL "
                           f"({n} existing, need {self.max_events - n} more)")
                 else:
-                    print(f"[Stage4] uid={uid}: FULL ({self.max_events} events)")
+                    print(f"[annual_events] uid={uid}: FULL ({self.max_events} events)")
 
         if not to_process:
-            print("[Stage4] All personas already complete!")
+            print("[annual_events] All personas already complete!")
             return self._get_ordered_records()
 
         actual_workers = min(max_workers, len(to_process))
-        print(f"\n[Stage4] Processing {len(to_process)} personas "
+        print(f"\n[annual_events] Processing {len(to_process)} personas "
               f"with {actual_workers} parallel workers...\n")
 
-        # Run in parallel
+        # Run in parallel; collect worker failures instead of dropping them
+        # (batch policy: successes are checkpointed, failures raise at the end).
+        failures = []
         with ThreadPoolExecutor(max_workers=actual_workers) as executor:
             futures = {}
             for p in to_process:
@@ -239,8 +252,9 @@ class _Stage4Runner:
                 try:
                     future.result()
                 except Exception as e:
-                    print(f"[Stage4] ERROR uid={uid}: {e}")
+                    print(f"[annual_events] ERROR uid={uid}: {e}")
                     traceback.print_exc()
+                    failures.append((uid, f"{type(e).__name__}: {e}"))
 
         # Final save
         with self.lock:
@@ -251,7 +265,12 @@ class _Stage4Runner:
             if uid in self.records and not self.records[uid].get('Events')
         ]
         if empty_uids:
-            raise RuntimeError(f"Stage4 produced no events for uuid(s): {empty_uids}")
+            raise RuntimeError(f"annual_events produced no events for uuid(s): {empty_uids}")
+        if failures:
+            summary = "; ".join(f"uid={u}: {msg}" for u, msg in failures)
+            raise RuntimeError(
+                f"[annual_events] {len(failures)} persona(s) failed "
+                f"(successful work was checkpointed): {summary}")
 
         return self._get_ordered_records()
 
@@ -260,17 +279,15 @@ class _Stage4Runner:
 class AnnualEventsGenerator(Generator):
     """Generate each persona's 2025 annual events (iterative top-up to a target).
 
-    Domain generator for the old stage 4. The standalone batch run uses
-    :func:`generate_annual_events` (a parallel :class:`_Stage4Runner` with per-persona
-    iterative top-up + a Social-Graph name strategy). This class is a thin
-    uniform per-persona entry point for the future pipeline DAG, delegating to
-    the single-shot :func:`process_single_persona`.
+    The standalone batch run uses :func:`generate_annual_events` (a parallel
+    :class:`_AnnualEventsRunner` with per-persona iterative top-up + a
+    Social-Graph name strategy). This class is a thin uniform per-persona entry
+    point for the future pipeline DAG, delegating to the single-shot
+    :func:`process_single_persona`.
     """
 
-    stage_label = "Stage4"
-    stage_num = 4
+    label = "annual_events"
     index_key = "uuid"
-    produces = "annual_events"
 
     def __init__(self, prompt: str, max_events: int = 100) -> None:
         self.prompt = prompt
@@ -280,7 +297,7 @@ class AnnualEventsGenerator(Generator):
         return process_single_persona(record, self.prompt, self.max_events)
 
 
-def generate_annual_events(stage3_records: List[Dict], prompts_dir: str,
+def generate_annual_events(upstream_records: List[Dict], prompts_dir: str,
                     max_events: int = 10,
                     existing: Optional[Dict[str, Dict]] = None,
                     save_callback=None,
@@ -289,10 +306,11 @@ def generate_annual_events(stage3_records: List[Dict], prompts_dir: str,
     Generate annual events in parallel, with checkpoint/resume and iterative top-up support.
 
     Args:
-        stage3_records: list of stage3 output records
+        upstream_records: list of upstream records (social_world output, or
+            timeline_dates output on the legacy fallback path)
         prompts_dir: path to the prompts/ directory
         max_events: final target total events per persona
-        existing: uuid -> existing stage4 record (checkpoint data)
+        existing: uuid -> existing annual_events record (checkpoint data)
         save_callback: save callback fn(records_list), triggered after each LLM call
         max_workers: number of parallel workers
 
@@ -307,12 +325,12 @@ def generate_annual_events(stage3_records: List[Dict], prompts_dir: str,
     prompt_path_cn = os.path.join(prompts_dir, 'annual_events_zh.txt')
     system_prompt_cn = load_prompt(prompt_path_cn)
 
-    print(f"[Stage4] Target: {max_events} events/person, "
+    print(f"[annual_events] Target: {max_events} events/person, "
           f"Workers: {max_workers}")
 
-    ordered_uuids = [p.get('uuid') for p in stage3_records]
+    ordered_uuids = [p.get('uuid') for p in upstream_records]
 
-    runner = _Stage4Runner(
+    runner = _AnnualEventsRunner(
         system_prompt=system_prompt,
         system_prompt_cn=system_prompt_cn,
         max_events=max_events,
@@ -321,4 +339,4 @@ def generate_annual_events(stage3_records: List[Dict], prompts_dir: str,
         save_callback=save_callback
     )
 
-    return runner.run(stage3_records, max_workers=max_workers)
+    return runner.run(upstream_records, max_workers=max_workers)

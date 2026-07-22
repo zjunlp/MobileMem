@@ -4,7 +4,9 @@ import logging
 import re
 from typing import Dict, List
 
-logger = logging.getLogger('stage7')
+from core.lang import is_chinese_persona
+
+logger = logging.getLogger('conversation')
 
 
 def _collect_all_social_members(persona: Dict) -> List[Dict]:
@@ -24,7 +26,7 @@ def _collect_all_social_members(persona: Dict) -> List[Dict]:
     
     members_by_name: Dict[str, Dict] = {}
     
-    # Extract from Stage2 social_relationships.
+    # Extract from life_state social_relationships.
     for rel_key, rel_info in social.items():
         if isinstance(rel_info, dict):
             rel_name = rel_info.get('name', '') or rel_key
@@ -48,7 +50,7 @@ def _collect_all_social_members(persona: Dict) -> List[Dict]:
                 'category': 'inner_circle',
             }
     
-    # Extract from Stage3.9 Social_Graph as supplements or overrides.
+    # Extract from social_world Social_Graph as supplements or overrides.
     for category in ['inner_circle', 'extended_contacts', 'professional_network', 'online_contacts', 'weak_ties']:
         items = social_graph.get(category, [])
         for item in items:
@@ -177,7 +179,7 @@ def select_group_members_by_llm(
     bp = persona.get('Basic_Profile', {})
     name = bp.get('name', 'Unknown')
     nationality = bp.get('nationality', 'Chinese')
-    is_cn = (nationality == 'Chinese')
+    is_cn = is_chinese_persona(nationality)
     
     # Detect events that involve parents when no definite parent relationship exists.
     _PARENT_KEYWORDS_CN = r'(?:父[亲母]|爸[爸妈]|妈[妈爸]|母亲|爹|娘|父母|爸妈|双亲)'
@@ -385,7 +387,7 @@ def generate_group_chat_content(
     bp = persona.get('Basic_Profile', {})
     name = bp.get('name', 'Unknown')
     nationality = bp.get('nationality', 'Chinese')
-    is_cn = (nationality == 'Chinese')
+    is_cn = is_chinese_persona(nationality)
 
     spec = group_specs[0]
     all_social_members = spec.get('all_social_members', [])
@@ -436,8 +438,15 @@ def generate_group_chat_content(
         json_markers=["```json", "```"]
     )
 
-    if isinstance(response, dict):
+    if isinstance(response, dict) and response.get('messages'):
         response['group_name'] = selected_spec['group_name']
         return response, selected_spec
-    
-    return {"group_name": selected_spec['group_name'], "messages": []}, selected_spec
+
+    # Structural failure: the LLM response is not a dict or has no messages.
+    # Raise instead of returning a truthy {"messages": []} placeholder, which
+    # the caller would otherwise persist and render as a successful (but empty)
+    # group chat. The caller's per-group try/except records this in '_errors'.
+    raise RuntimeError(
+        f"generate_group_chat_content: LLM response has no messages "
+        f"(type={type(response).__name__}) for group '{selected_spec['group_name']}'"
+    )

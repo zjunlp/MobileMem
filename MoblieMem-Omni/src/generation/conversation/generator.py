@@ -1,6 +1,6 @@
 """Conversation generator (Memories / Conversation): group-chat screenshot orchestration.
 
-Holds the ``setup_logging`` factory + module 'stage7' logger, the per-persona
+Holds the ``setup_logging`` factory + module 'conversation' logger, the per-persona
 orchestration (``process_persona`` / ``main``) and the thin
 ``ConversationGenerator``. Chat templates, Chrome screenshotting, chat-UI HTML
 rendering, LLM content and avatar generation live in sibling modules.
@@ -16,15 +16,11 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, Optional
 
 import config
-from common import (
-    LOG_DIR,
-    PROMPTS_DIR,
-    read_jsonl,
-    write_jsonl,
-    load_sub_events_index,
-    expand_events_for_imaging,
-)
+from config import LOG_DIR, PROMPTS_DIR
+from infra.store import read_jsonl, write_jsonl_atomic
+from generation.event_expansion import load_sub_events_index, expand_events_for_imaging
 from core import GroupChat, DIR_NAME
+from core.lang import is_chinese_persona
 from backends.llm import set_log_context
 from generation.event_photo.data import load_init_state_map
 from generation.event_photo.generator import ensure_person_portrait
@@ -44,16 +40,16 @@ from .avatars import (
 
 
 def setup_logging():
-    summary_handler = logging.FileHandler(os.path.join(LOG_DIR, 'stage7_summary.log'), encoding='utf-8')
+    summary_handler = logging.FileHandler(os.path.join(LOG_DIR, 'conversation_summary.log'), encoding='utf-8')
     summary_handler.setLevel(logging.INFO)
-    detail_handler = logging.FileHandler(os.path.join(LOG_DIR, 'stage7_detail.log'), encoding='utf-8')
+    detail_handler = logging.FileHandler(os.path.join(LOG_DIR, 'conversation_detail.log'), encoding='utf-8')
     detail_handler.setLevel(logging.DEBUG)
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
     fmt = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
     for h in [summary_handler, detail_handler, console_handler]:
         h.setFormatter(fmt)
-    logger = logging.getLogger('stage7')
+    logger = logging.getLogger('conversation')
     logger.setLevel(logging.DEBUG)
     for h in [summary_handler, detail_handler, console_handler]:
         logger.addHandler(h)
@@ -76,12 +72,12 @@ def process_persona(
                       group chat is generated and rendered.
     """
     uuid = persona.get('uuid')
-    set_log_context(uuid=uuid, stage="stage7_group_chats")
+    set_log_context(uuid=uuid, stage="conversation")
     bp = persona.get('Basic_Profile', {})
     name = bp.get('name', 'Unknown')
     nationality = bp.get('nationality', 'Chinese')
-    effective_language = 'zh' if nationality == 'Chinese' else 'en'
-    is_chinese = (nationality == 'Chinese')
+    is_chinese = is_chinese_persona(nationality, bp.get('language'))
+    effective_language = 'zh' if is_chinese else 'en'
     source_signature = build_persona_source_signature(persona)
     active_model = None
     events = persona.get('Events', [])
@@ -113,23 +109,23 @@ def process_persona(
     social_relationships = persona.get('Init_State', {}).get('social_relationships', {})
     social_graph = persona.get('Social_Graph', {})
     
-    # Merge Stage2 and Stage3.9 social relationship data for avatar generation.
+    # Merge life_state and social_world relationship data for avatar generation.
     all_social_data = {}
     
-    # Add Stage2 data.
+    # Add life_state social_relationships.
     for rel_key, info in social_relationships.items():
         if isinstance(info, dict):
             all_social_data[rel_key] = info
         else:
             all_social_data[rel_key] = {'description': str(info)}
     
-    # Add Stage3.9 data.
+    # Add social_world Social_Graph.
     for category in ['inner_circle', 'extended_contacts', 'service_people', 'professional_network', 'online_contacts', 'weak_ties']:
         items = social_graph.get(category, [])
         for item in items:
             item_name = item.get('name', '')
             if item_name:
-                # Convert Stage3.9 format to the compatible format.
+                # Convert Social_Graph format to the compatible format.
                 converted_info = {
                     'relationship_type': item.get('relationship_to_protagonist', ''),
                     'description': item.get('brief', ''),
@@ -150,8 +146,11 @@ def process_persona(
     # Precollect all social members for LLM group-member selection.
     all_social_members = _collect_all_social_members(persona)
 
-    # Generate AI avatars only for Stage2 social members; Stage3.9 members use text placeholders.
-    stage2_member_names = []
+    # Collect members eligible for AI avatars: life_state social_relationships
+    # members normally, but when social_relationships is empty the fallback
+    # below fills the list with Social_Graph members instead — so social_world
+    # members can also receive AI avatars. Everyone else gets a text placeholder.
+    relationship_member_names = []
     for rel_key, rel_info in social_relationships.items():
         if isinstance(rel_info, dict):
             rel_name = rel_info.get('name', '') or rel_key
@@ -160,23 +159,23 @@ def process_persona(
         else:
             continue
         if rel_name and rel_name != name:
-            stage2_member_names.append(rel_name)
+            relationship_member_names.append(rel_name)
 
-    if not stage2_member_names:
-        stage2_member_names = [
+    if not relationship_member_names:
+        relationship_member_names = [
             member.get('name', '')
             for member in all_social_members
             if member.get('name') and member.get('name') != name
         ]
-        if stage2_member_names:
+        if relationship_member_names:
             logger.info(
-                f"[uuid={uuid}] social_relationships missing; fallback to Social_Graph members ({len(stage2_member_names)})"
+                f"[uuid={uuid}] social_relationships missing; fallback to Social_Graph members ({len(relationship_member_names)})"
             )
 
-    stage2_names_set = set(stage2_member_names)
+    relationship_names_set = set(relationship_member_names)
 
-    # Prefer AI avatars for Stage2 members; fall back to Social_Graph members if missing.
-    avatar_spec = [{"members": [name] + stage2_member_names}]
+    # Prefer AI avatars for life_state members; fall back to Social_Graph if missing.
+    avatar_spec = [{"members": [name] + relationship_member_names}]
     ensure_member_avatars(uuid, avatar_spec, all_social_data, member_avatar_dir, name, nationality)
 
     for gc_idx, event in enumerate(events):
@@ -197,7 +196,7 @@ def process_persona(
 
         if existing_gc_record:
             action = 'Re-rendering' if rerender_existing else 'Restoring'
-            logger.info(f"[uuid={uuid}] {group_id}: {action} assets from existing stage7 record")
+            logger.info(f"[uuid={uuid}] {group_id}: {action} assets from existing conversation record")
             try:
                 os.makedirs(uuid_output_dir, exist_ok=True)
 
@@ -255,7 +254,7 @@ def process_persona(
                 active_model = get_text_llm_model(is_chinese)
             if prompt_template is None:
                 # Chinese personas use the Chinese prompt; others use the _en one.
-                prompt_file = 'group_chat_zh.txt' if nationality == 'Chinese' else 'group_chat_en.txt'
+                prompt_file = 'group_chat_zh.txt' if is_chinese else 'group_chat_en.txt'
                 prompt_template = load_prompt(os.path.join(prompts_dir, prompt_file))
 
             # Generate content via LLM — LLM chooses the best group
@@ -268,11 +267,12 @@ def process_persona(
                 name,
             )
 
-            # Generate missing avatars only for Stage2 members chosen by the LLM;
-            # non-Stage2 members use text placeholders.
-            selected_stage2 = [m for m in group_spec.get('members', []) if m in stage2_names_set or m == name]
-            if selected_stage2:
-                selected_avatar_spec = [{"members": selected_stage2}]
+            # Generate missing avatars for LLM-chosen members in relationship_names_set
+            # (life_state members, or Social_Graph fallback when life_state data was
+            # missing — see above); members outside the set use text placeholders.
+            selected_rel_members = [m for m in group_spec.get('members', []) if m in relationship_names_set or m == name]
+            if selected_rel_members:
+                selected_avatar_spec = [{"members": selected_rel_members}]
                 ensure_member_avatars(uuid, selected_avatar_spec, all_social_data,
                                       member_avatar_dir, name, nationality)
 
@@ -330,9 +330,8 @@ def process_persona(
             logger.debug(traceback.format_exc())
             errors.append({"group_id": group_id, "error": str(e)})
 
-    # Emit through the GroupChat contract (P1-2). The declared fields keep their
-    # order and the stage-specific '_errors' rides in extra as the trailing key,
-    # so the serialized record stays stable.
+    # Declared field order on GroupChat is the serialized field order; the
+    # stage-specific '_errors' rides in extra as the trailing key.
     result = GroupChat(
         uuid=uuid,
         source_signature=source_signature,
@@ -350,13 +349,13 @@ def process_persona(
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Stage 7: Generate group chats + screenshots')
+    parser = argparse.ArgumentParser(description='conversation: Generate group chats + screenshots')
     parser.add_argument('--input-file', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'data', 'annual_events.jsonl'),
-                        help='Input stage4 JSONL file')
+                        help='Input annual_events JSONL file')
     parser.add_argument('--output-file', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'data', 'group_chats.jsonl'),
-                        help='Output stage7 JSONL file')
+                        help='Output conversation JSONL file')
     parser.add_argument('--prompts-dir', type=str,
                         default=config.PROMPTS_DIR,
                         help='Prompts directory')
@@ -364,7 +363,7 @@ def main():
                         default=os.path.join(config.OUTPUT_DIR, 'image'),
                         help='Image base directory')
     parser.add_argument('--max-workers', type=int, default=5,
-                        help='Number of parallel workers (default: 3)')
+                        help='Number of parallel workers (default: 5)')
     parser.add_argument('--uuid-filter', type=int, nargs='+', default=None,
                         help='Only process these UUIDs')
     parser.add_argument('--template', type=str,
@@ -372,20 +371,20 @@ def main():
                         default='auto',
                         help='Chat UI template to use')
     parser.add_argument('--rerender-existing', action='store_true',
-                        help='Rebuild HTML/PNG for existing stage7 records using current avatar assets')
+                        help='Rebuild HTML/PNG for existing conversation records using current avatar assets')
     parser.add_argument('--keep-html', action='store_true',
                         help='Keep HTML files after PNG generation (default: delete HTML)')
     parser.add_argument('--force-regenerate', '--force', dest='force_regenerate', action='store_true',
                         help='Delete cache for each uid and regenerate all group chats from scratch')
     parser.add_argument('--sub-events-file', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'data', 'sub_events.jsonl'),
-                        help='stage4.5 sub-events JSONL for expanding mid/long-term events')
+                        help='sub_events JSONL for expanding mid/long-term events')
     args = parser.parse_args()
 
     os.makedirs(os.path.dirname(args.output_file), exist_ok=True)
 
     logger.info(f"{'=' * 70}")
-    logger.info("STAGE 7: Group Chat Generation")
+    logger.info("conversation: group chat generation")
     logger.info(f"Input:  {args.input_file}")
     logger.info(f"Output: {args.output_file}")
     logger.info(f"Image dir: {args.image_dir}")
@@ -421,9 +420,9 @@ def main():
             merged_init_state.update(init_state)
         merged_init_state['social_relationships'] = fallback_relationships
         persona['Init_State'] = merged_init_state
-        logger.info(f"[uuid={uid}] Restored missing social_relationships from stage2_init_states")
+        logger.info(f"[uuid={uid}] Restored missing social_relationships from init_states")
 
-    # Sub-event expansion: replace mid/long-term events with stage4.5 sub-events.
+    # Sub-event expansion: replace mid/long-term events with sub_events.
     sub_index = load_sub_events_index(args.sub_events_file)
     logger.info(f"Sub-events index: {len(sub_index)} parent events loaded")
     for persona in personas:
@@ -453,7 +452,7 @@ def main():
             existing[uid] = r
             continue
         logger.info(
-            f"[uuid={uid}] Ignoring stale stage7 cache: "
+            f"[uuid={uid}] Ignoring stale conversation cache: "
             f"cached signature {'missing' if not cached_signature else 'mismatch'}"
         )
 
@@ -498,7 +497,7 @@ def main():
                 logger.info(f"[uuid={uid}] Force-regenerate: no cache to delete")
         # Immediately write cleaned JSONL after removing records for cleared uids.
         ordered = [existing[p.get('uuid')] for p in personas if p.get('uuid') in existing]
-        write_jsonl(ordered, args.output_file)
+        write_jsonl_atomic(ordered, args.output_file)
         logger.info(f"Force-regenerate: cleared cache for {len(uids_to_clear)} uid(s), JSONL updated")
 
     to_process = []
@@ -533,7 +532,7 @@ def main():
                         "uuid": uuid,
                         "source_signature": build_persona_source_signature(persona),
                         "nationality": persona.get('Basic_Profile', {}).get('nationality', 'Chinese'),
-                        "language": 'zh' if persona.get('Basic_Profile', {}).get('nationality') == 'Chinese' else 'en',
+                        "language": 'zh' if is_chinese_persona(persona.get('Basic_Profile', {}).get('nationality', 'Chinese')) else 'en',
                         "template": args.template,
                         "group_chats": [],
                         "_errors": [],
@@ -545,7 +544,9 @@ def main():
                 results[uuid]['group_chats'] = list(existing_gcs.values())
                 results[uuid]['_partial'] = True
                 ordered = [results[p.get('uuid')] for p in personas if p.get('uuid') in results]
-                write_jsonl(ordered, args.output_file)
+                # Atomic write: worker threads checkpoint the whole file (under
+                # `lock`); a crash mid-write must not truncate prior progress.
+                write_jsonl_atomic(ordered, args.output_file)
                 total_now = len(results[uuid]['group_chats'])
                 logger.info(f"[uuid={uuid}] Saved {new_group_id} ({total_now} total)")
 
@@ -565,7 +566,8 @@ def main():
                 record.pop('_partial', None)
                 results[uuid] = record
                 ordered = [results[p.get('uuid')] for p in personas if p.get('uuid') in results]
-                write_jsonl(ordered, args.output_file)
+                # Atomic write for the same reason as in gc_save_callback above.
+                write_jsonl_atomic(ordered, args.output_file)
                 logger.info(f"[uuid={uuid}] Saved checkpoint ({len(record.get('group_chats', []))} chats)")
             return record
         except Exception as e:
@@ -586,13 +588,13 @@ def main():
                 failed_uids.append(uuid)
 
     if failed_uids:
-        raise RuntimeError(f"Stage7 failed for uuid(s): {sorted(set(failed_uids))}")
+        raise RuntimeError(f"conversation failed for uuid(s): {sorted(set(failed_uids))}")
 
     ordered = [results[p.get('uuid')] for p in personas if p.get('uuid') in results]
-    write_jsonl(ordered, args.output_file)
+    write_jsonl_atomic(ordered, args.output_file)
 
     logger.info(f"{'=' * 70}")
-    logger.info(f"STAGE 7 COMPLETE: {len(results)} records saved")
+    logger.info(f"conversation COMPLETE: {len(results)} records saved")
     logger.info(f"{'=' * 70}")
 
 
@@ -609,10 +611,8 @@ class ConversationGenerator(Generator):
     :func:`process_persona`). Behavior of the underlying functions is unchanged.
     """
 
-    stage_label = "Stage7"
-    stage_num = "7"
+    label = "conversation"
     index_key = "uuid"
-    produces = "conversation"
 
     def __init__(self, template_name="auto", image_base_dir=None):
         self.template_name = template_name

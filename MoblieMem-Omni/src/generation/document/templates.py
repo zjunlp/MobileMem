@@ -11,8 +11,9 @@ import os
 import random
 import re
 from datetime import datetime
+from typing import Optional
 
-from common import TEMPLATE_DIR
+from config import TEMPLATE_DIR
 from core import DIR_NAME
 
 TEMPLATES_CN = {
@@ -28,7 +29,9 @@ TEMPLATES_EN = {
 
 
 def _esc(s):
-    return html_module.escape(str(s)) if s else ''
+    # Only None maps to '' — falsy-but-valid values like 0 must still render
+    # (the old `if s` version turned amounts/counts of 0 into empty strings).
+    return '' if s is None else html_module.escape(str(s))
 
 
 def fill_ticket_template(template, info, passenger_name="", is_cn=True, id_last4=None):
@@ -149,7 +152,7 @@ def _generate_avatar_data_uri(name: str) -> str:
     b64 = base64.b64encode(svg.encode('utf-8')).decode()
     return f"data:image/svg+xml;base64,{b64}"
 
-def _load_person_avatar_uri(uid: int, image_base_dir: str) -> str:
+def _load_person_avatar_uri(uid: int, image_base_dir: str) -> Optional[str]:
     """Load the protagonist avatar and convert it to a data URI; returns None if not found."""
     for person_dir in [
         os.path.join(image_base_dir, f"uid{uid}", DIR_NAME["person"]),
@@ -163,8 +166,8 @@ def _load_person_avatar_uri(uid: int, image_base_dir: str) -> str:
                     with open(fpath, 'rb') as f:
                         b64 = base64.b64encode(f.read()).decode()
                     return f"data:image/png;base64,{b64}"
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(f"[WARN] failed to read avatar {fpath}: {e}")
     return None
 
 def find_event_images(uid, event_id, image_base_dir):
@@ -174,15 +177,21 @@ def find_event_images(uid, event_id, image_base_dir):
         return []
 
     images = []
-    # Only match files of the form {uid}_{type}_{event_id}.png
+    # Event photos are named {uid}_event_{image_id}.png where image_id is an
+    # event id ('3') or a sub-event id ('4_1'). The middle segment must be the
+    # literal 'event' (not \w+): a greedy \w+ would swallow 'event_4' and make
+    # event_id=1 match 10_event_4_1.png (sub-event 4_1's photo, wrong event).
+    # event_id is escaped because sub-event ids contain '_' and come from data.
     import re
-    pattern = re.compile(rf"^\d+_\w+_{event_id}\.png$")
+    pattern = re.compile(rf"^\d+_event_{re.escape(str(event_id))}\.png$")
     for sub in os.listdir(uid_dir):
         sub_path = os.path.join(uid_dir, sub)
         if not os.path.isdir(sub_path):
             continue
-        # Only use event images; other types (tickets, transfers, etc.) are not suitable for the social feed
-        if sub != "event":
+        # Only use event images; other types (tickets, transfers, etc.) are not suitable for the social feed.
+        # Event photos live in the published folder from core.image_dirs.DIR_NAME
+        # ('camera_photos'), not a literal 'event' directory.
+        if sub != DIR_NAME["event"]:
             continue
         for fname in os.listdir(sub_path):
             if pattern.match(fname):
@@ -191,8 +200,8 @@ def find_event_images(uid, event_id, image_base_dir):
                     with open(fpath, "rb") as f:
                         b64 = base64.b64encode(f.read()).decode()
                     images.append(f"data:image/png;base64,{b64}")
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(f"[WARN] failed to read event image {fpath}: {e}")
     return images[:9]  # social feed shows at most 9 images
 
 def fill_wechat_friend_template(template, friend_info, poster_name, image_data_uris=None, avatar_data_uri=None):

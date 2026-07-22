@@ -3,8 +3,8 @@
 Generates AI scenery images for each persona across six categories (food,
 landscape, indoor, weather_calendar, map_location, news_notification), with
 prompts tied to the persona's nationality / location / preferences / events, and
-writes ``image/uid{uuid}/scenery/*.png`` plus a ``manifest.json`` (resume-aware,
-skipping already-generated images).
+writes ``image/uid{uuid}/others/*.png`` (folder name from ``DIR_NAME['scenery']``)
+plus a ``manifest.json`` (resume-aware, skipping already-generated images).
 
 :class:`SceneryGenerator` is a thin uniform entry point over
 :func:`generate_image_for_persona`; the standalone run uses :func:`main` with its
@@ -22,6 +22,7 @@ import jsonlines
 
 import config
 from core import DIR_NAME
+from core.lang import is_chinese_persona
 from backends.images import generate_person_images  # doubao image generation
 from backends.llm import set_log_context
 from infra.base_generator import Generator
@@ -32,14 +33,14 @@ os.makedirs(LOG_DIR, exist_ok=True)
 # Logging
 
 def setup_logging():
-    summary_handler = logging.FileHandler(os.path.join(LOG_DIR, 'stage8_summary.log'), encoding='utf-8')
+    summary_handler = logging.FileHandler(os.path.join(LOG_DIR, 'scenery_summary.log'), encoding='utf-8')
     summary_handler.setLevel(logging.INFO)
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
     fmt = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
     for h in [summary_handler, console_handler]:
         h.setFormatter(fmt)
-    logger = logging.getLogger('stage8')
+    logger = logging.getLogger('scenery')
     logger.setLevel(logging.INFO)
     for h in [summary_handler, console_handler]:
         logger.addHandler(h)
@@ -62,7 +63,7 @@ def build_image_prompt(category: str, persona: Dict, event: Optional[Dict] = Non
     location = init.get('location', 'China')
     prefs = init.get('preferences', {})
 
-    is_chinese = (nationality == 'Chinese')
+    is_chinese = is_chinese_persona(nationality)
     lang_suffix = (
         '。图片中所有可见文字（包括界面标签、招牌、菜单、标题等）必须使用简体中文，禁止出现英文。'
         if is_chinese else
@@ -178,10 +179,11 @@ def generate_image_for_persona(
     logger.debug(f"[uuid={uuid}] Generating {filename}: {prompt[:80]}...")
 
     try:
-        # Use generate_person_images from utils.py (same API)
+        # Uses backends.images.generate_person_images (generic image API despite the name)
         temp_dir = os.path.join(uuid_scenery_dir, '_temp')
         os.makedirs(temp_dir, exist_ok=True)
-        filepaths = generate_person_images(prompt, output_dir=temp_dir, nationality=persona.get('nationality', 'Chinese'))
+        filepaths = generate_person_images(prompt, output_dir=temp_dir,
+                                           nationality=persona.get('Basic_Profile', {}).get('nationality', 'Chinese'))
 
         if filepaths:
             # Rename to our naming convention
@@ -208,10 +210,8 @@ class SceneryGenerator(Generator):
     fragment (``{category: [filename, ...]}``).
     """
 
-    stage_label = "Stage8"
-    stage_num = "8"
+    label = "scenery"
     index_key = "uuid"
-    produces = "scenery"
 
     def __init__(self, output_dir: str, categories: Optional[List[str]] = None,
                  images_per_category: int = IMAGES_PER_CATEGORY) -> None:
@@ -231,13 +231,25 @@ class SceneryGenerator(Generator):
         return generated
 
 
+def _save_manifest(manifest_path: str, manifest: Dict) -> None:
+    """Write the manifest atomically (tmp + os.replace).
+
+    The manifest is the only resume record for this stage; a crash during a
+    plain overwrite would corrupt it and force regenerating every image.
+    """
+    tmp_path = manifest_path + '.tmp'
+    with open(tmp_path, 'w', encoding='utf-8') as f:
+        json.dump(manifest, f, ensure_ascii=False, indent=2)
+    os.replace(tmp_path, manifest_path)
+
+
 # Main
 
 def main():
-    parser = argparse.ArgumentParser(description='Stage 8: Generate scenery images')
+    parser = argparse.ArgumentParser(description='scenery: Generate scenery images')
     parser.add_argument('--input-file', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'data', 'annual_events.jsonl'),
-                        help='Input stage4 JSONL file')
+                        help='Input annual_events JSONL file')
     parser.add_argument('--output-dir', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'image'),
                         help='Output directory for scenery images')
@@ -256,7 +268,7 @@ def main():
     manifest_path = os.path.join(args.output_dir, 'manifest.json')
 
     logger.info(f"{'=' * 70}")
-    logger.info("STAGE 8: Scenery Image Generation")
+    logger.info("scenery: scenery image generation")
     logger.info(f"Output: {args.output_dir}")
     logger.info(f"Categories: {args.categories}")
     logger.info(f"Images per category: {args.images_per_category}")
@@ -286,7 +298,7 @@ def main():
         if args.uuid_filter and uuid not in args.uuid_filter:
             continue
 
-        set_log_context(uuid=uuid, stage="stage8_scenery")
+        set_log_context(uuid=uuid, stage="scenery")
         bp = persona.get('Basic_Profile', {})
         name = bp.get('name', 'Unknown')
         logger.info(f"[uuid={uuid}] Processing {name}")
@@ -310,8 +322,7 @@ def main():
                     manifest[str(uuid)][category].append(filename)
                     total_generated += 1
                     # Save manifest after each image
-                    with open(manifest_path, 'w', encoding='utf-8') as f:
-                        json.dump(manifest, f, ensure_ascii=False, indent=2)
+                    _save_manifest(manifest_path, manifest)
                 else:
                     total_errors += 1
 
@@ -319,11 +330,10 @@ def main():
                 time.sleep(1)
 
     # Final manifest save
-    with open(manifest_path, 'w', encoding='utf-8') as f:
-        json.dump(manifest, f, ensure_ascii=False, indent=2)
+    _save_manifest(manifest_path, manifest)
 
     logger.info(f"{'=' * 70}")
-    logger.info("STAGE 8 COMPLETE")
+    logger.info("scenery COMPLETE")
     logger.info(f"  Generated: {total_generated} images")
     logger.info(f"  Errors: {total_errors}")
     logger.info(f"  Manifest: {manifest_path}")

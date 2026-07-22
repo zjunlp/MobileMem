@@ -1,7 +1,7 @@
 """Social-world generator (Life / SocialWorld).
 
-:class:`SocialWorldGenerator` plans each persona's 2025 social graph — converting
-stage-2 ``social_relationships`` into an ``inner_circle`` and asking the LLM (in
+:func:`generate_social_graph` plans each persona's 2025 social graph — converting
+the life_state node's ``social_relationships`` into an ``inner_circle`` and asking the LLM (in
 category batches) for extended_contacts / service_people / professional_network
 / online_contacts / weak_ties / organizations — with a global cross-persona name
 registry so no name is reused. It attaches ``Social_Graph`` to the persona record.
@@ -11,15 +11,14 @@ compatibility (the body runs serially with global name de-dup).
 """
 
 import os
-import re
 import json
 import traceback
 import threading
-import jsonlines
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional
 
 from backends.llm import llm_request, calculate_cumulative_cost, get_text_llm_model, set_log_context
-from infra.base_generator import Generator
+from core.lang import is_chinese_persona
+from generation.name_pools import make_unique_name as _make_unique_name
 
 # Default number of parallel workers
 DEFAULT_WORKERS = 3
@@ -78,23 +77,6 @@ _RELATION_WORDS = {
     'brother', 'sister', 'grandfather', 'grandmother',
 }
 
-_SURNAME_POOL = [
-    '宋', '徐', '韩', '冯', '曹', '魏', '程', '苏', '叶', '卢',
-    '贺', '龚', '潘', '顾', '史', '方', '邓', '武', '钱', '唐',
-]
-_GIVEN_POOL = [
-    '昊', '晨', '睿', '泽', '皓', '帆', '峰', '洋', '凯', '博',
-    '婷', '颖', '琳', '燕', '霞', '洁', '娜', '雯', '莹', '璐',
-]
-_EN_FIRST_POOL = [
-    'James', 'Robert', 'Michael', 'David', 'Richard', 'Joseph', 'Thomas', 'William',
-    'Sarah', 'Emily', 'Jessica', 'Hannah', 'Rachel', 'Lauren', 'Megan', 'Olivia',
-]
-_EN_LAST_POOL = [
-    'Smith', 'Johnson', 'Brown', 'Davis', 'Wilson', 'Anderson', 'Taylor', 'Thomas',
-    'Harris', 'Clark', 'Lewis', 'Walker', 'Hall', 'Young', 'King', 'Wright',
-]
-
 # Relationship words that share the protagonist's surname (immediate blood relatives)
 _SAME_SURNAME_RELATIONS = {
     '父亲', '爸爸', '母亲', '妈妈', '哥哥', '姐姐', '弟弟', '妹妹',
@@ -103,58 +85,28 @@ _SAME_SURNAME_RELATIONS = {
     'grandfather', 'grandmother',
 }
 
-def _make_unique_name(existing: set, surname: str = '', is_chinese: bool = True) -> str:
-    """Generate a name not in `existing`, optionally with a given surname. Supports Chinese and English."""
-    import itertools
-    if is_chinese:
-        # If a surname is specified, prefer combinations with that surname
-        if surname:
-            for g in _GIVEN_POOL:
-                candidate = surname + g
-                if candidate not in existing:
-                    return candidate
-        # Otherwise iterate over the name pool
-        for s, g in itertools.product(_SURNAME_POOL, _GIVEN_POOL):
-            candidate = s + g
-            if candidate not in existing:
-                return candidate
-        base = _SURNAME_POOL[0] + _GIVEN_POOL[0]
-        i = 2
-        while f"{base}{i}" in existing:
-            i += 1
-        return f"{base}{i}"
-    else:
-        # English name
-        if surname:
-            for f in _EN_FIRST_POOL:
-                candidate = f"{f} {surname}"
-                if candidate not in existing:
-                    return candidate
-        for f, last in itertools.product(_EN_FIRST_POOL, _EN_LAST_POOL):
-            candidate = f"{f} {last}"
-            if candidate not in existing:
-                return candidate
-        base = f"{_EN_FIRST_POOL[0]} {_EN_LAST_POOL[0]}"
-        i = 2
-        while f"{base} {i}" in existing:
-            i += 1
-        return f"{base} {i}"
-
 def _build_inner_circle(social_relationships: Dict,
                         protagonist_name: str = '',
                         global_occupied: set = None,
                         is_chinese: bool = True) -> List[Dict]:
-    """Convert Stage 2's social_relationships into a list of inner_circle nodes."""
+    """Convert the life_state node's social_relationships into a list of inner_circle nodes."""
     inner = []
     # Merge the globally occupied names as the de-duplication baseline
     used_names: set = set(global_occupied) if global_occupied is not None else set()
     if protagonist_name:
         used_names.add(protagonist_name)
-    # Protagonist's surname (first character)
-    protagonist_surname = protagonist_name[0] if protagonist_name else ''
+    # Protagonist's surname: Chinese names lead with the surname character;
+    # Western names put the family name in the last whitespace token, which is
+    # what name_pools.make_unique_name's English branch expects ("{first} {surname}").
+    if not protagonist_name:
+        protagonist_surname = ''
+    elif is_chinese:
+        protagonist_surname = protagonist_name[0]
+    else:
+        protagonist_surname = protagonist_name.split()[-1]
 
     for key, info in social_relationships.items():
-        rel_type = info.get('relationship_type', '朋友')
+        rel_type = info.get('relationship_type', '朋友' if is_chinese else 'friend')
         description = info.get('description', '')
 
         # If the key is a relationship word rather than a real name, auto-generate a valid name
@@ -223,6 +175,8 @@ def _build_user_prompt(persona_record: Dict, targets: Dict[str, int],
         global_occupied: the global set of names already taken across all personas.
         global_lock: the lock protecting global_occupied.
     """
+    if global_lock is None:
+        global_lock = threading.Lock()
     basic = persona_record.get('Basic_Profile', {})
     init = persona_record.get('Init_State', {})
     social = init.get('social_relationships', {}) or {}
@@ -240,7 +194,7 @@ def _build_user_prompt(persona_record: Dict, targets: Dict[str, int],
         forbidden += [p.get('name', '') for p in already_generated if p.get('name')]
     # Add names already taken globally across personas
     if global_occupied is not None:
-        with (global_lock or threading.Lock()):
+        with global_lock:
             global_names = list(global_occupied)
         forbidden += [n for n in global_names if n not in set(forbidden)]
 
@@ -345,6 +299,8 @@ def _validate_social_graph(graph: Dict, inner_circle: List[Dict],
                            global_occupied: set = None,
                            global_lock: threading.Lock = None) -> Dict:
     """Validate and normalize the social graph returned by the LLM."""
+    if global_lock is None:
+        global_lock = threading.Lock()
     if 'Social_Graph' in graph:
         graph = graph['Social_Graph']
 
@@ -353,7 +309,7 @@ def _validate_social_graph(graph: Dict, inner_circle: List[Dict],
     for person in inner_circle:
         occupied.add(person.get('name', ''))
     if global_occupied is not None:
-        with (global_lock or threading.Lock()):
+        with global_lock:
             occupied |= set(global_occupied)
 
     validated = {}
@@ -400,7 +356,7 @@ def _validate_social_graph(graph: Dict, inner_circle: List[Dict],
     # Register the people added this round into the global set
     if global_occupied is not None:
         new_names = occupied - {protagonist_name} - {p.get('name', '') for p in inner_circle}
-        with (global_lock or threading.Lock()):
+        with global_lock:
             global_occupied.update(new_names)
 
     return validated
@@ -410,7 +366,14 @@ def _call_llm_for_graph(system_prompt: str, user_content: str,
                         protagonist_name: str,
                         global_occupied: set = None,
                         global_lock: threading.Lock = None) -> Dict:
-    """Single LLM call to obtain (part of) the social graph."""
+    """Single LLM call to obtain (part of) the social graph.
+
+    Raises:
+        RuntimeError: if all MAX_RETRIES attempts fail — a silently empty
+            category batch would leave a hole in the graph, so failure must
+            surface to the per-persona failure collection instead.
+    """
+    last_error = 'response was not a JSON object'
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             response, cost_info = llm_request(
@@ -419,7 +382,6 @@ def _call_llm_for_graph(system_prompt: str, user_content: str,
                 model=model,
                 return_parsed_json=True,
                 extract_json=True,
-                json_markers=[]
             )
             cost_info = calculate_cumulative_cost(None, cost_info)
             if cost_info and 'cumulative' in cost_info:
@@ -433,8 +395,11 @@ def _call_llm_for_graph(system_prompt: str, user_content: str,
                     response, inner_circle, protagonist_name,
                     global_occupied, global_lock)
         except Exception as e:
+            last_error = f"{type(e).__name__}: {e}"
             print(f"    [Attempt {attempt}/{MAX_RETRIES}] LLM call failed: {e}")
-    return {}
+    raise RuntimeError(
+        f"social graph LLM call failed after {MAX_RETRIES} attempts "
+        f"for protagonist '{protagonist_name}': {last_error}")
 
 def _plan_batches(targets: Dict[str, int]) -> List[Dict[str, int]]:
     """Split the targets into multiple batches according to MAX_PEOPLE_PER_CALL.
@@ -471,13 +436,20 @@ def _process_single_persona(persona_record: Dict, system_prompt: str,
                             system_prompt_cn: str, max_events: int,
                             global_occupied: set = None,
                             global_lock: threading.Lock = None) -> Dict:
-    """Generate the social graph for a single persona in batches."""
+    """Generate the social graph for a single persona in batches.
+
+    Raises:
+        RuntimeError: when an LLM batch exhausts its retries (propagated from
+            :func:`_call_llm_for_graph`); the caller collects it per persona.
+    """
+    if global_lock is None:
+        global_lock = threading.Lock()
     basic = persona_record.get('Basic_Profile', {})
     init = persona_record.get('Init_State', {})
     social = init.get('social_relationships', {}) or {}
     nationality = basic.get('nationality', '')
 
-    is_chinese = any(w in nationality for w in ['中国', 'China', 'Chinese'])
+    is_chinese = is_chinese_persona(nationality)
     active_prompt = system_prompt_cn if is_chinese else system_prompt
     active_model = get_text_llm_model(is_chinese)
 
@@ -487,7 +459,7 @@ def _process_single_persona(persona_record: Dict, system_prompt: str,
 
     # Register the protagonist name + inner_circle names into the global de-dup pool
     if global_occupied is not None:
-        with (global_lock or threading.Lock()):
+        with global_lock:
             global_occupied.add(protagonist_name)
             for p in inner_circle:
                 n = p.get('name', '').strip()
@@ -549,51 +521,30 @@ def _process_single_persona(persona_record: Dict, system_prompt: str,
     record['Social_Graph'] = social_graph
     return record
 
-class SocialWorldGenerator(Generator):
-    """Plan each persona's 2025 social graph (inner_circle + extended categories).
-
-    Domain generator for the old stage 3.9. The batch run uses
-    :func:`generate_social_graph` (serial, with a cross-persona global name registry);
-    this class is a thin uniform per-persona entry point for the future pipeline
-    DAG, holding the prompts / ``max_events`` / shared global de-dup state.
-    """
-
-    stage_label = "Stage3.9"
-    stage_num = "3.9"
-    index_key = "uuid"
-    produces = "social_world"
-
-    def __init__(self, system_prompt: str, system_prompt_cn: str, max_events: int,
-                 global_occupied: set = None, global_lock: threading.Lock = None) -> None:
-        self.system_prompt = system_prompt
-        self.system_prompt_cn = system_prompt_cn
-        self.max_events = max_events
-        self.global_occupied = global_occupied if global_occupied is not None else set()
-        self.global_lock = global_lock or threading.Lock()
-
-    def produce(self, record: Dict, ctx=None) -> Dict:
-        return _process_single_persona(
-            record, self.system_prompt, self.system_prompt_cn, self.max_events,
-            global_occupied=self.global_occupied, global_lock=self.global_lock)
-
-def generate_social_graph(stage3_records: List[Dict], prompts_dir: str,
+def generate_social_graph(dates_records: List[Dict], prompts_dir: str,
                       max_events: int = 100,
                       existing: Optional[Dict[str, Dict]] = None,
                       save_callback=None,
                       max_workers: int = DEFAULT_WORKERS) -> List[Dict]:
     """
-    Generate social graphs in parallel, with checkpoint/resume support.
+    Generate social graphs serially (global cross-persona name de-dup requires
+    processing one persona at a time), with checkpoint/resume support.
 
     Args:
-        stage3_records: list of Stage 3 output records
+        dates_records: list of timeline_dates node output records
         prompts_dir: path to the prompts/ directory
         max_events: target total events per persona (used to size the graph)
-        existing: uuid -> existing stage3.9 record (checkpoint data)
+        existing: uuid -> existing social_world record (checkpoint data)
         save_callback: save callback fn(records_list)
-        max_workers: number of parallel workers
+        max_workers: unused; kept only for signature compatibility
 
     Returns:
-        The complete records list (in the original persona order)
+        The complete records list (in the original persona order); personas
+        that failed are absent so a rerun retries them from the checkpoint.
+
+    Raises:
+        RuntimeError: after the final save, if any persona failed — lists the
+            failed uuids and reasons (successful records were already saved).
     """
     existing = existing or {}
 
@@ -606,24 +557,24 @@ def generate_social_graph(stage3_records: List[Dict], prompts_dir: str,
     with open(cn_prompt_path, 'r', encoding='utf-8') as f:
         system_prompt_cn = f.read()
 
-    print(f"[Stage3.9] Target graph size based on max_events={max_events}")
+    print(f"[social_world] Target graph size based on max_events={max_events}")
 
     # Classify: skip / needs processing
-    ordered_uuids = [p.get('uuid') for p in stage3_records]
+    ordered_uuids = [p.get('uuid') for p in dates_records]
     to_process = []
     records_by_uuid = {}
 
-    for persona in stage3_records:
+    for persona in dates_records:
         uid = persona.get('uuid')
         if uid in existing and existing[uid].get('Social_Graph'):
             records_by_uuid[uid] = existing[uid]
-            print(f"[Stage3.9] uid={uid}: SKIP (checkpoint)")
+            print(f"[social_world] uid={uid}: SKIP (checkpoint)")
         else:
             to_process.append(persona)
-            print(f"[Stage3.9] uid={uid}: PENDING")
+            print(f"[social_world] uid={uid}: PENDING")
 
     if not to_process:
-        print("[Stage3.9] All personas already have social graphs!")
+        print("[social_world] All personas already have social graphs!")
         return [records_by_uuid[u] for u in ordered_uuids if u in records_by_uuid]
 
     # Global name registry (de-dup across protagonists)
@@ -642,7 +593,7 @@ def generate_social_graph(stage3_records: List[Dict], prompts_dir: str,
                 if name:
                     global_occupied.add(name)
 
-    # ★ Key: also pre-register the inner_circle (from Stage 2) of the personas to be processed into the global set
+    # ★ Key: also pre-register the inner_circle (from the life_state node) of the personas to be processed into the global set
     #   otherwise, during serial processing, an earlier persona would not know the inner_circle names of later personas
     for persona in to_process:
         proto_name = persona.get('Basic_Profile', {}).get('name', '').strip()
@@ -656,12 +607,13 @@ def generate_social_graph(stage3_records: List[Dict], prompts_dir: str,
     def _get_ordered():
         return [records_by_uuid[u] for u in ordered_uuids if u in records_by_uuid]
 
-    print(f"\n[Stage3.9] Processing {len(to_process)} personas serially "
+    print(f"\n[social_world] Processing {len(to_process)} personas serially "
           f"(global name dedup enabled)...\n")
 
+    failures: List[tuple] = []
     for persona in to_process:
         uid = persona.get('uuid')
-        set_log_context(uuid=uid, stage="stage3_9_social_graph")
+        set_log_context(uuid=uid, stage="social_world")
         print(f"\n  [uid={uid}] Generating social graph...")
         try:
             record = _process_single_persona(
@@ -672,314 +624,20 @@ def generate_social_graph(stage3_records: List[Dict], prompts_dir: str,
             if save_callback:
                 save_callback(_get_ordered())
             print(f"  [uid={uid}] COMPLETE  (global pool: {len(global_occupied)} names)")
-        except Exception as e:
+        except Exception as e:  # keep processing; reported after the loop
             print(f"  [uid={uid}] ERROR: {e}")
             traceback.print_exc()
-            records_by_uuid[uid] = persona.copy()
+            failures.append((uid, f"{type(e).__name__}: {e}"))
 
-    # Final save
+    # Final save (failed personas are absent, so a rerun retries them)
     result = _get_ordered()
     if save_callback:
         save_callback(result)
 
+    if failures:
+        summary = "; ".join(f"uid={uid}: {msg}" for uid, msg in failures)
+        raise RuntimeError(
+            f"[social_world] {len(failures)}/{len(to_process)} personas failed "
+            f"(successful records were saved): {summary}")
+
     return result
-
-
-# Social-name normalizer (folded from the old stage2_fix_names / Stage 2.1)
-# Detects and fixes problematic keys in stage2 social_relationships (pure
-# relationship words, surname+title, prefixed nicknames, etc.). Reuses the
-# ``_make_unique_name`` / name-pool helpers above for fallback de-duplication.
-
-RELATION_KEYWORDS = {
-    '母亲', '父亲', '妈妈', '爸爸', '岳母', '岳父', '婆婆', '公公',
-    '丈夫', '妻子', '老公', '老婆', '配偶',
-    '儿子', '女儿', '大儿子', '小儿子', '大女儿', '小女儿',
-    '哥哥', '弟弟', '姐姐', '妹妹',
-    '爷爷', '奶奶', '外公', '外婆', '姑姑', '叔叔', '舅舅', '阿姨',
-    '侄子', '侄女', '外甥', '外甥女',
-}
-
-# Surname + relationship abbreviation pattern, for example surname plus mother/father/sister.
-_SURNAME_REL_PATTERN = re.compile(
-    r'^[\u4e00-\u9fff]{1,2}(母|父|姐|哥|弟|妹|叔|姑|舅|婆|公|嫂)$'
-)
-
-# Title / form-of-address suffixes
-TITLE_SUFFIXES = ['老师', '医生', '律师', '教练', '经理', '编辑', '师傅', '阿姨', '美容师', '团长']
-
-# Prefix word list (used by B3 to extract the real name)
-NAME_PREFIXES = sorted([
-    '辅导员', '室友', '表哥', '表姐', '表弟', '表妹',
-    '高中好友', '大学同学', '社团学姐', '社团学长',
-    '外卖店老板', '考研自习室邻座', '图书馆管理员',
-    '游戏队友', '小红书美妆博主', '拼多多客服',
-], key=len, reverse=True)
-
-
-def classify_name(name: str, rel_type: str) -> str:
-    """Classify a social_relationships key and return its category label."""
-    # A1: pure relationship word
-    if name in RELATION_KEYWORDS:
-        return 'A1'
-    # A2: surname + relationship abbreviation
-    if _SURNAME_REL_PATTERN.match(name):
-        return 'A2'
-    # A3: key == relationship_type
-    if name == rel_type:
-        return 'A3'
-    # B4: nickname(real name), for example a nickname followed by a real name in parentheses.
-    if '（' in name or '(' in name:
-        return 'B4'
-    # B5: online name in quotes, for example a game teammate nickname.
-    if '"' in name or '\u201c' in name or '\u201d' in name:
-        return 'B5'
-    # B1: surname + title, short forms such as surname plus lawyer/doctor.
-    for suffix in TITLE_SUFFIXES:
-        if name.endswith(suffix) and len(name) <= len(suffix) + 2:
-            return 'B1'
-    # B2: prefix + surname + title, such as counselor plus surname plus teacher.
-    if len(name) > 4 and any(name.endswith(s) for s in TITLE_SUFFIXES):
-        return 'B2'
-    # B3: prefix + real name, such as roommate plus a full name.
-    for prefix in NAME_PREFIXES:
-        if name.startswith(prefix) and len(name) > len(prefix):
-            return 'B3'
-    # B6: hyphenated nickname
-    if '-' in name or '—' in name:
-        return 'B6'
-    # Normal Chinese name, 2-4 characters
-    if re.match(r'^[\u4e00-\u9fff]{2,4}$', name):
-        return 'OK'
-    # Normal English name (e.g. "James Carter", "Emily Grace Thompson")
-    if re.match(r'^[A-Za-z][A-Za-z\s.\'-]{1,40}$', name) and any(c.isalpha() for c in name):
-        return 'OK'
-    # A long string may contain a real name.
-    return 'UNKNOWN'
-
-def is_problematic_name(name: str, rel_type: str) -> bool:
-    """Decide whether a social_relationships key needs fixing."""
-    return classify_name(name, rel_type) != 'OK'
-
-# Regex extraction (disabled; everything is handled by the LLM)
-def extract_name_from_key(key: str, category: str) -> Optional[str]:
-    return None
-
-def collect_problems(social_rel: dict) -> Dict[str, Tuple[str, str]]:
-    """Collect all problematic names in a single persona.
-
-    Returns:
-        {old_key: (relationship_type, category)}
-    """
-    problems = {}
-    for name, info in social_rel.items():
-        rel_type = info.get('relationship_type', '') if isinstance(info, dict) else ''
-        cat = classify_name(name, rel_type)
-        if cat != 'OK':
-            problems[name] = (rel_type, cat)
-    return problems
-
-def _load_prompt(prompts_dir: str, is_chinese: bool = True) -> str:
-    # Chinese personas use the _zh prompt; others use the _en one.
-    filename = 'fix_relationship_names_zh.txt' if is_chinese else 'fix_relationship_names_en.txt'
-    path = os.path.join(prompts_dir, filename)
-    with open(path, 'r', encoding='utf-8') as f:
-        return f.read()
-
-def fix_names_with_llm(
-    main_name: str,
-    main_gender: str,
-    problems: Dict[str, str],
-    forbidden_names: Set[str],
-    prompts_dir: str,
-    is_chinese: bool = True,
-) -> Dict[str, str]:
-    """Call the LLM to generate replacement names in bulk.
-
-    Returns:
-        {old_key: new_name}
-    """
-    # Build the problem list text
-    problem_lines = []
-    for old_key, rel_type in problems.items():
-        problem_lines.append(f'- "{old_key}"（关系：{rel_type}）')
-    problem_list = '\n'.join(problem_lines)
-
-    forbidden_str = '、'.join(sorted(forbidden_names)) if forbidden_names else '（无）'
-
-    prompt_template = _load_prompt(prompts_dir, is_chinese=is_chinese)
-    user_prompt = prompt_template.format(
-        main_name=main_name,
-        main_gender=main_gender,
-        problem_list=problem_list,
-        forbidden_names=forbidden_str,
-    )
-
-    response, cost_info = llm_request(
-        system_prompt='',
-        user_prompt=user_prompt,
-        model=get_text_llm_model(is_chinese),
-        return_parsed_json=False,
-        extract_json=False,
-    )
-
-    if cost_info:
-        print(f"  [Cost] Input: {cost_info.get('input_tokens', 'N/A')}, "
-              f"Output: {cost_info.get('output_tokens', 'N/A')}, "
-              f"Cost: ${cost_info.get('total_cost_usd', 'N/A')}")
-
-    # Parse manually: strip // comments, then json.loads
-    import json as _json
-    # When llm_request uses return_parsed_json=True it may return a dict (success) or the raw string (failure)
-    if isinstance(response, dict):
-        return response
-    if not isinstance(response, str):
-        print(f"  [WARN] LLM returned unexpected type: {type(response)}: {str(response)[:200]}")
-        return {}
-    # Extract the JSON block
-    raw = response
-    m = re.search(r'\{[^{}]*\}', raw, re.DOTALL)
-    if m:
-        raw = m.group(0)
-    # Remove inline // comments
-    raw = re.sub(r'//[^\n]*', '', raw)
-    # Remove trailing commas
-    raw = re.sub(r',\s*}', '}', raw)
-    try:
-        result = _json.loads(raw)
-        if isinstance(result, dict):
-            return result
-        print(f"  [WARN] LLM JSON not a dict: {str(result)[:200]}")
-        return {}
-    except Exception as e:
-        print(f"  [WARN] LLM JSON parse error: {e}\nRaw: {raw[:300]}")
-        return {}
-
-def apply_fixes(
-    social_rel: dict,
-    fixes: Dict[str, str],
-    global_names: Set[str],
-) -> Tuple[dict, List[str]]:
-    """Apply the fixes and return (fixed_rel, changes_log)."""
-    fixed = {}
-    changes = []
-    # Include all original keys (including problematic ones) to prevent new names from colliding with not-yet-processed original keys
-    original_keys = set(social_rel.keys())
-
-    for name, info in social_rel.items():
-        if name in fixes:
-            new_name = fixes[name]
-            # De-duplication check: global name pool + already-written new keys + all original keys
-            taken = global_names | set(fixed.keys()) | original_keys
-            if new_name in taken:
-                fallback = _make_unique_name(taken)
-                changes.append(f'"{name}" -> "{new_name}" (conflict) -> "{fallback}"')
-                new_name = fallback
-            else:
-                changes.append(f'"{name}" -> "{new_name}"')
-            global_names.add(new_name)
-            fixed[new_name] = info
-        else:
-            fixed[name] = info
-
-    return fixed, changes
-
-# Main process
-
-def fix_social_names(stage2_path: str, prompts_dir: str) -> int:
-    """Read stage2 output -> detect -> regex extraction + LLM fix -> overwrite. Returns the total number of fixes."""
-
-    if not os.path.exists(stage2_path):
-        print(f"[Stage2.1] File not found: {stage2_path}")
-        return 0
-
-    with jsonlines.open(stage2_path, 'r') as reader:
-        records = list(reader)
-
-    # Build the global name set (main persona name + all valid social_relationships names)
-    global_names: Set[str] = set()
-    for rec in records:
-        main_name = rec.get('Basic_Profile', {}).get('name', '')
-        if main_name:
-            global_names.add(main_name)
-        social_rel = rec.get('Init_State', {}).get('social_relationships', {}) or {}
-        for name, info in social_rel.items():
-            rel_type = info.get('relationship_type', '') if isinstance(info, dict) else ''
-            if not is_problematic_name(name, rel_type):
-                global_names.add(name)
-
-    total_fixes = 0
-    modified = False
-
-    for rec in records:
-        uuid = rec.get('uuid', '?')
-        set_log_context(uuid=uuid, stage="stage2_1_fix_names")
-        bp = rec.get('Basic_Profile', {})
-        main_name = bp.get('name', '')
-        main_gender = bp.get('gender', '')
-        nationality = bp.get('nationality', '')
-        is_chinese = '中国' in nationality or 'China' in nationality or 'Chinese' in nationality
-        init_state = rec.get('Init_State', {})
-        social_rel = init_state.get('social_relationships', {}) or {}
-
-        problems = collect_problems(social_rel)
-        if not problems:
-            continue
-
-        print(f"\n[Stage2.1] uuid={uuid} ({main_name}): found {len(problems)} problematic names: "
-              f"{list(problems.keys())}")
-
-        # Phase 1: send all problematic names to the LLM
-        llm_problems: Dict[str, str] = {old_key: rel_type for old_key, (rel_type, cat) in problems.items()}
-
-        # Phase 2: LLM fix
-        if llm_problems:
-            try:
-                fixes = fix_names_with_llm(
-                    main_name, main_gender, llm_problems,
-                    global_names | set(social_rel.keys()), prompts_dir,
-                    is_chinese=is_chinese,
-                )
-
-                if fixes:
-                    fixed_rel, changes = apply_fixes(social_rel, fixes, global_names)
-                    init_state['social_relationships'] = fixed_rel
-                    for c in changes:
-                        print(f"  [LLM] {c}")
-                    total_fixes += len(changes)
-                    modified = True
-                else:
-                    print(f"  [WARN] LLM returned no fixes for uuid={uuid}")
-
-                # Record the unfixed ones
-                unfixed = set(llm_problems.keys()) - set(fixes.keys()) if fixes else set(llm_problems.keys())
-                for key in unfixed:
-                    print(f"  [UNFIXED] '{key}' (rel_type='{llm_problems[key]}')")
-
-            except Exception as e:
-                print(f"  [ERROR] uuid={uuid}: {e}")
-                traceback.print_exc()
-
-    if modified:
-        os.makedirs(os.path.dirname(stage2_path), exist_ok=True)
-        with jsonlines.open(stage2_path, 'w') as writer:
-            for rec in records:
-                writer.write(rec)
-        print(f"\n[Stage2.1] Saved {len(records)} records to {stage2_path}")
-
-    return total_fixes
-
-
-class SocialNameNormalizer(Generator):
-    """Fix problematic social_relationships keys produced by stage 2 (was Stage 2.1).
-
-    Not a per-record :meth:`produce` generator: it rewrites the stage2 file
-    in place via :func:`fix_social_names`. Exposed as a domain class for the
-    pipeline DAG; the batch entry is :meth:`run_file`.
-    """
-
-    stage_label = "Stage2.1"
-    stage_num = "2.1"
-    produces = "social_name_fix"
-
-    def run_file(self, stage2_path: str, prompts_dir: str) -> int:
-        return fix_social_names(stage2_path, prompts_dir)

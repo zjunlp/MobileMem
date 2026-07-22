@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 
 from .templates import format_member_count
 
-logger = logging.getLogger('stage7')
+logger = logging.getLogger('conversation')
 
 
 WINDOWS_FILENAME_FORBIDDEN = re.compile(r'[<>:"/\\|?*\x00-\x1f]')

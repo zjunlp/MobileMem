@@ -18,6 +18,8 @@ heavy dependencies are not pulled in.
 | `life_state.py` | Per-persona life state |
 | `timeline_dates.py` | Important dates on the persona's timeline |
 | `social_world.py` | Social graph (relationships and contacts) |
+| `social_name_fix.py` | Stage 2.1 normalizer for problematic `social_relationships` keys (split out of `social_world.py`) |
+| `name_pools.py` | Shared CN/EN name pools + `make_unique_name` fallback (used by `life_state` / `social_world` / `social_name_fix`) |
 | `annual_events/` | A year of life events |
 | `sub_events.py` | Sub-events expanded from the annual events |
 | `memory_summary.py` | Per-image memory summaries and the merged memory index |

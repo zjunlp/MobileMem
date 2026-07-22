@@ -1,7 +1,7 @@
 """App-trace generator (Memories / AppTrace): orchestration + Playwright render.
 
-Holds the APP_TYPES constants, the shared 'fix_app_screenshots' logger, the
-Playwright render (sync + async), the per-persona orchestration (process_persona
+Holds the APP_TYPES constants, the shared 'app_trace' logger, the
+Playwright render, the per-persona orchestration (process_persona
 / main) and the thin AppTraceGenerator. Template filling, checkpoint, event
 selection, covers and *_info LLM generation live in sibling modules.
 """
@@ -15,13 +15,11 @@ import sys
 from pathlib import Path
 
 import config
-from common import (
-    LOG_DIR,
-    read_jsonl,
-    write_jsonl,
-    load_sub_events_index,
-    expand_events_for_imaging,
-)
+from config import LOG_DIR
+# write_jsonl is re-exported via generation.app_trace.__init__ for compat;
+# this module itself writes through write_jsonl_atomic only.
+from infra.store import read_jsonl, write_jsonl, write_jsonl_atomic
+from generation.event_expansion import load_sub_events_index, expand_events_for_imaging
 from core import DIR_NAME
 from backends.llm import set_log_context
 from infra.base_generator import Generator
@@ -31,6 +29,8 @@ from .content import _call_llm_generate_info_single
 from .covers import generate_video_cover_b64
 from .events import assign_all_events_to_types, select_events_for_type
 from .templates import _load_template, fill_template
+from core.lang import is_chinese_persona
+from infra.html_screenshot import render_html_to_png
 
 
 # stdout/stderr UTF-8 + Windows asyncio policy, preserved from the standalone script.
@@ -42,9 +42,9 @@ if hasattr(sys.stderr, 'reconfigure'):
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
-logger = logging.getLogger('fix_app_screenshots')
+logger = logging.getLogger('app_trace')
 logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler(os.path.join(LOG_DIR, 'fix_app_screenshots.log'), encoding='utf-8')
+fh = logging.FileHandler(os.path.join(LOG_DIR, 'app_trace.log'), encoding='utf-8')
 fh.setLevel(logging.DEBUG)
 fh.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
 sh = logging.StreamHandler()
@@ -73,90 +73,6 @@ APP_TYPE_EN = {
 }
 
 
-async def render_screenshots(render_tasks, output_dir, resume=True):
-    """
-    render_tasks: [{"uuid": int, "event_id": int, "app_type": str,
-                    "info": dict, "persona_name": str, "location": str,
-                    "nationality": str}]
-    """
-    from playwright.async_api import async_playwright
-
-    os.makedirs(output_dir, exist_ok=True)
-    stats = {"done": 0, "skipped": 0, "failed": 0, "files": []}
-
-    # Load templates by app_type and language.
-    templates = {}
-    for lang in ("cn", "en"):
-        for app_type in APP_TYPES:
-            try:
-                templates[(app_type, lang)] = _load_template(app_type, "Chinese" if lang == "cn" else "English")
-            except FileNotFoundError as e:
-                logger.error(f"Template load failed: {e}")
-
-    async with async_playwright() as p:
-        browser = await p.chromium.launch()
-        page = await browser.new_page(viewport={"width": 450, "height": 900})
-
-        for task in render_tasks:
-            uid = task["uuid"]
-            eid = task["event_id"]
-            app_type = task["app_type"]
-            info = task["info"]
-
-            # Output under uid{N}/app_type subdirectories.
-            type_dir = os.path.join(output_dir, f'uid{uid}', DIR_NAME[app_type])
-            os.makedirs(type_dir, exist_ok=True)
-
-            png_name = f"{uid}_{app_type}_{eid}.png"
-            png_path = os.path.join(type_dir, png_name)
-            html_path = os.path.join(type_dir, f"{uid}_{app_type}_{eid}.html")
-
-            if resume and os.path.exists(png_path):
-                stats["skipped"] += 1
-                stats["files"].append(png_name)
-                logger.debug(f"SKIP: {png_name}")
-                continue
-
-            nationality = task.get("nationality", "Chinese")
-            lang_key = "cn" if nationality == "Chinese" else "en"
-            template = templates.get((app_type, lang_key))
-            if not template:
-                stats["failed"] += 1
-                continue
-
-            try:
-                kwargs = {
-                    "persona_name": task.get("persona_name", "用户"),
-                    "location": task.get("location", ""),
-                    "nationality": nationality,
-                    "uuid": task.get("uuid", 0),
-                }
-                # Video cover.
-                if app_type == "video":
-                    cover_b64 = generate_video_cover_b64(
-                        info, task.get("nationality", "Chinese"))
-                    kwargs["cover_b64"] = cover_b64
-
-                filled = fill_template(app_type, template, info, **kwargs)
-                with open(html_path, 'w', encoding='utf-8') as f:
-                    f.write(filled)
-
-                url = Path(html_path).resolve().as_uri()
-                await page.goto(url, wait_until="networkidle", timeout=15000)
-                await page.wait_for_timeout(300)
-                await page.screenshot(path=png_path, full_page=True)
-
-                stats["done"] += 1
-                stats["files"].append(png_name)
-                logger.info(f"OK: {type_dir}/{png_name}")
-            except Exception as e:
-                stats["failed"] += 1
-                logger.error(f"FAIL: {png_name}: {e}")
-
-        await browser.close()
-
-    return stats
-
 def render_single_sync(page, task, output_dir, templates, resume=True, keep_html=False):
     """Synchronously render one screenshot for per-item mode; return done/skipped/failed."""
     uid = task["uuid"]
@@ -176,7 +92,7 @@ def render_single_sync(page, task, output_dir, templates, resume=True, keep_html
         return "skipped"
 
     nationality = task.get("nationality", "Chinese")
-    lang_key = "cn" if nationality == "Chinese" else "en"
+    lang_key = "cn" if is_chinese_persona(nationality) else "en"
     template = templates.get((app_type, lang_key))
     if not template:
         logger.error(f"FAIL: {png_name}: template not loaded")
@@ -189,22 +105,14 @@ def render_single_sync(page, task, output_dir, templates, resume=True, keep_html
             "nationality": nationality,
             "uuid": task.get("uuid", 0),
         }
-        if app_type == "video":
+        # Cover generation is opt-out (--no-covers); the template renders an
+        # empty cover slot when cover_b64 is absent.
+        if app_type == "video" and task.get("generate_covers", True):
             cover_b64 = generate_video_cover_b64(info, task.get("nationality", "Chinese"))
             kwargs["cover_b64"] = cover_b64
 
         filled = fill_template(app_type, template, info, **kwargs)
-        with open(html_path, 'w', encoding='utf-8') as f:
-            f.write(filled)
-
-        url = Path(html_path).resolve().as_uri()
-        page.goto(url, wait_until="networkidle", timeout=15000)
-        page.wait_for_timeout(300)
-        page.screenshot(path=png_path, full_page=True)
-
-        # Delete HTML if PNG succeeded and keep_html is False
-        if not keep_html and os.path.exists(html_path):
-            os.remove(html_path)
+        render_html_to_png(page, filled, png_path, html_path=html_path, keep_html=keep_html)
 
         logger.info(f"OK: {png_name}")
         return "done"
@@ -219,6 +127,8 @@ def process_persona(persona_record, events_per_type, skip_llm, generate_covers,
                     on_item_done=None, output_dir=None):
     """Process one persona: select events, generate info, then save and render each item.
 
+    generate_covers: Whether video covers should be generated; forwarded to the
+                     render task consumed by :func:`render_single_sync`.
     checkpoint_done: Set of completed keys such as '3_book_42'. Newly completed
                      keys are also added to this set; the caller persists it.
     on_item_done:    callback(event_dict, app_type, render_task)
@@ -261,7 +171,7 @@ def process_persona(persona_record, events_per_type, skip_llm, generate_covers,
 
             # Prefer checking whether the PNG exists; it is more reliable than the checkpoint.
             # Do not skip the callback path: resume still needs to recover the
-            # standalone manifest record for downstream stage10.
+            # standalone manifest record for downstream memory_summary.
             if output_dir:
                 png_path = os.path.join(output_dir, f'uid{uuid}', DIR_NAME[app_type],
                                         f'{uuid}_{app_type}_{eid}.png')
@@ -303,6 +213,7 @@ def process_persona(persona_record, events_per_type, skip_llm, generate_covers,
                     "persona_name": persona_name,
                     "location": location,
                     "nationality": nationality,
+                    "generate_covers": generate_covers,
                 }
                 render_status = on_item_done(ev, app_type, render_task)
             elif png_exists:
@@ -317,11 +228,11 @@ def process_persona(persona_record, events_per_type, skip_llm, generate_covers,
 
 def main():
     parser = argparse.ArgumentParser(
-        description='App-trace screenshots: render the 4 app types from stage4 events')
+        description='App-trace screenshots: render the 4 app types from annual_events')
     parser.add_argument('--events-file', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'data',
                                              'annual_events.jsonl'),
-                        help='Path to the stage4 events JSONL file')
+                        help='Path to the annual_events JSONL file')
     parser.add_argument('--output-dir', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'image'),
                         help='Screenshot output directory')
@@ -340,9 +251,9 @@ def main():
     parser.add_argument('--dry-run', action='store_true',
                         help='Count only, do not generate')
     parser.add_argument('--save-events', action='store_true', default=True,
-                        help='Write generated *_info back to the stage4 JSONL (default: on)')
+                        help='Write generated *_info back to the annual_events JSONL (default: on)')
     parser.add_argument('--no-save-events', dest='save_events', action='store_false',
-                        help='Do not write back to the stage4 JSONL')
+                        help='Do not write back to the annual_events JSONL')
     parser.add_argument('--reset-checkpoint', action='store_true',
                         help='Clear the checkpoint and start from scratch')
     parser.add_argument('--all-events', action='store_true',
@@ -355,7 +266,7 @@ def main():
                         help='Ignore caches and force-regenerate the *_info, checkpoint and screenshots for the given types')
     parser.add_argument('--sub-events-file', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'data', 'sub_events.jsonl'),
-                        help='stage4.5 sub-events JSONL for expanding mid/long-term events')
+                        help='sub_events JSONL for expanding mid/long-term events')
     args = parser.parse_args()
 
     if args.types:
@@ -368,7 +279,7 @@ def main():
         APP_TYPES[:] = allowed
 
     logger.info("=" * 70)
-    logger.info("fix_app_screenshots: Start")
+    logger.info("app_trace: Start")
     logger.info(f"Events file  : {args.events_file}")
     logger.info(f"Output dir   : {args.output_dir}")
     logger.info(f"All events   : {args.all_events}")
@@ -389,15 +300,15 @@ def main():
         logger.info(f"[Checkpoint] {len(checkpoint_done)} items done, resumable")
 
     # Read event data.
-    stage4_records = read_jsonl(args.events_file)
-    if not stage4_records:
+    event_records = read_jsonl(args.events_file)
+    if not event_records:
         logger.error(f"No records found in {args.events_file}")
         return
 
     # Load the sub-events index and expand mid/long-term events.
     sub_index = load_sub_events_index(args.sub_events_file)
     logger.info(f"Sub-events index: {len(sub_index)} parent events loaded")
-    for persona in stage4_records:
+    for persona in event_records:
         uid = persona.get('uuid', 0)
         if args.uuid_filter is not None and uid not in args.uuid_filter:
             continue
@@ -414,7 +325,7 @@ def main():
     # --all-events: clear all old *_info fields and regenerate from scratch.
     if args.all_events:
         logger.info("[all-events] Clearing old *_info fields and removing existing screenshot dirs...")
-        for persona in stage4_records:
+        for persona in event_records:
             if args.uuid_filter is not None and persona.get('uuid') not in args.uuid_filter:
                 continue
             for ev in persona.get('Events', []):
@@ -438,13 +349,13 @@ def main():
     if args.force_regen:
         logger.info(f"[force-regen] Clearing *_info, checkpoint and PNG for types {APP_TYPES} ...")
         # 1. Clear *_info fields in JSONL.
-        for persona in stage4_records:
+        for persona in event_records:
             if args.uuid_filter is not None and persona.get('uuid') not in args.uuid_filter:
                 continue
             for ev in persona.get('Events', []):
                 for t in APP_TYPES:
                     ev.pop(f"{t}_info", None)
-        write_jsonl(stage4_records, args.events_file)
+        write_jsonl_atomic(event_records, args.events_file)
         logger.info("  *_info fields cleared and written back to JSONL")
         # 2. Clear checkpoint entries for this type.
         before = len(checkpoint_done)
@@ -494,11 +405,11 @@ def main():
         page = browser.new_page(viewport={"width": 450, "height": 900})
 
     try:
-        for persona in stage4_records:
+        for persona in event_records:
             uid = persona.get('uuid', 0)
             if args.uuid_filter is not None and uid not in args.uuid_filter:
                 continue
-            set_log_context(uuid=uid, stage="fix_app_screenshots")
+            set_log_context(uuid=uid, stage="app_trace")
 
             def on_item_done(event, app_type, render_task):
                 """Save JSONL and render a screenshot immediately for each LLM item."""
@@ -529,13 +440,16 @@ def main():
                     'event_name': event.get('event_name', event.get('event', event.get('title', ''))),
                     'participants': participant_names,
                     'app_type': app_type,
-                    'image_path': image_path,
+                    # Never record a path for a render that failed: downstream
+                    # (memory_summary._manifest_image_exists) filters on
+                    # success/empty path, and a ghost path would defeat that.
+                    'image_path': image_path if success else '',
                     'info': event.get(f'{app_type}_info', {}),
                     'success': success,
                     'status': status,
                 })
                 if args.save_events:
-                    write_jsonl(stage4_records, args.events_file)
+                    write_jsonl_atomic(event_records, args.events_file)
                     logger.info(f"  [uuid={uid}] event_{event['event_id']}: {app_type}_info saved")
                 return status
 
@@ -564,11 +478,11 @@ def main():
     # "ran and selected no app screenshots" from "node never produced a manifest".
     jsonl_output_path = os.path.join(os.path.dirname(args.events_file),
                                      'app_screenshots.jsonl')
-    write_jsonl(jsonl_records, jsonl_output_path)
+    write_jsonl_atomic(jsonl_records, jsonl_output_path)
     logger.info(f"Saved {len(jsonl_records)} records to {jsonl_output_path}")
 
     logger.info("\n" + "=" * 70)
-    logger.info("fix_app_screenshots: Complete")
+    logger.info("app_trace: Complete")
     logger.info("=" * 70)
 
 
@@ -586,10 +500,8 @@ class AppTraceGenerator(Generator):
     functions is unchanged.
     """
 
-    stage_label = "Stage7.2"
-    stage_num = "7.2"
+    label = "app_trace"
     index_key = "uuid"
-    produces = "app_trace"
 
     def __init__(self, types=None, events_per_type=30):
         self.types = list(types) if types else list(APP_TYPES)

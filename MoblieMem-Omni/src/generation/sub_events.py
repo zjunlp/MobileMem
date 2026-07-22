@@ -5,9 +5,8 @@ ordered short-term sub-event arcs, inserting "reminiscence" intro sub-events the
 first time a social person appears, and emits one ``{uuid, sub_events,
 cost_info}`` record per persona (the :class:`core.SubEvent` contract).
 
-:class:`SubEventsGenerator` is a thin uniform entry point over
-:func:`process_one_uuid`; the standalone run uses :func:`main` with its own
-parallel orchestration.
+The standalone run uses :func:`main` with its own parallel orchestration
+around :func:`process_one_uuid`.
 """
 
 import os
@@ -16,13 +15,14 @@ import json
 import argparse
 import threading
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from common import read_jsonl, write_jsonl, load_existing_by_uuid, OUTPUT_DIR
+from config import OUTPUT_DIR
+from infra.store import read_jsonl, write_jsonl_atomic, load_existing_by_uuid
 from backends.llm import llm_request, calculate_cumulative_cost, get_text_llm_model, set_log_context
 from core import SubEvent
-from infra.base_generator import Generator
+from core.lang import is_chinese_persona
 
 DEFAULT_WORKERS = 3
 
@@ -100,9 +100,6 @@ Important:
 - Do not mention "chatbot" in descriptions
 """
 
-# Kept for backward compatibility
-SYSTEM_PROMPT = SYSTEM_PROMPT_CN
-
 
 def build_user_prompt(protagonist_name: str,
                       protagonist_brief: str,
@@ -165,8 +162,13 @@ def split_one_event(protagonist_name: str,
                     event: Dict,
                     available_people: List[str],
                     model: str,
-                    is_chinese: bool = True) -> Optional[Dict]:
-    """Call the LLM to split a single event into sub-events."""
+                    is_chinese: bool = True) -> Tuple[Optional[List[Dict]], Dict]:
+    """Call the LLM to split a single event into sub-events.
+
+    Returns:
+        (children, cost_info); children is None when the call failed or the
+        response had an unexpected shape.
+    """
     system_prompt = SYSTEM_PROMPT_CN if is_chinese else SYSTEM_PROMPT_EN
     user_prompt = build_user_prompt(
         protagonist_name=protagonist_name,
@@ -183,7 +185,6 @@ def split_one_event(protagonist_name: str,
             model=model,
             return_parsed_json=True,
             extract_json=True,
-            json_markers=[],
         )
         if isinstance(result, dict) and 'children' in result:
             return result['children'], cost
@@ -243,9 +244,6 @@ Output JSON format:
 ```
 """
 
-# Kept for backward compatibility
-INTRO_SYSTEM_PROMPT = INTRO_SYSTEM_PROMPT_CN
-
 
 def generate_introduction_sub_event(
     protagonist_name: str,
@@ -255,8 +253,13 @@ def generate_introduction_sub_event(
     person_description: str,
     model: str,
     is_chinese: bool = True,
-) -> Optional[Dict]:
-    """Generate a "reminiscence/inner monologue" sub-event for a not-yet-introduced person."""
+) -> Tuple[Optional[Dict], Dict]:
+    """Generate a "reminiscence/inner monologue" sub-event for a not-yet-introduced person.
+
+    Returns:
+        (intro_result, cost_info); intro_result is None when the call failed
+        or the response had an unexpected shape.
+    """
     intro_system = INTRO_SYSTEM_PROMPT_CN if is_chinese else INTRO_SYSTEM_PROMPT_EN
 
     if is_chinese:
@@ -289,7 +292,6 @@ Write an inner monologue/reminiscence about "{person_name}" from the protagonist
             model=model,
             return_parsed_json=True,
             extract_json=True,
-            json_markers=[],
         )
         if isinstance(result, dict):
             return result, cost
@@ -345,6 +347,21 @@ def insert_introduction_sub_events(
         except ValueError:
             earliest_time = datetime(2025, 1, 1, 12, 0, 0)
 
+    # Anchor for the intro chain (3 minutes per person). Preferred placement is
+    # right before the earliest child, but the chain must never start before the
+    # parent event's start_time: sub-event times outside the parent window break
+    # the data contract. If pinning at parent_start makes intros overlap the
+    # first child, that is an accepted trade-off — a reminiscence can co-occur
+    # with the scene, whereas leaving the parent window cannot.
+    try:
+        parent_start = datetime.strptime(parent_event.get('event_start_time', ''), '%Y-%m-%d %H:%M:%S')
+    except ValueError:
+        parent_start = None  # unparsable parent start: keep legacy placement
+    total_intro = timedelta(minutes=3 * len(new_people))
+    chain_start = earliest_time - total_intro
+    if parent_start is not None and chain_start < parent_start:
+        chain_start = parent_start
+
     parent_event_id = parent_event.get('event_id')
     intro_events = []
     cumulative_cost = None
@@ -364,10 +381,10 @@ def insert_introduction_sub_events(
         cumulative_cost = calculate_cumulative_cost(cumulative_cost, cost)
 
         if intro_result:
-            # Time: place them before earliest_time, 3 minutes apart each
-            offset = len(new_people) - i  # the first person comes earliest
-            end_time = earliest_time - timedelta(minutes=3 * (offset - 1))
-            start_time = end_time - timedelta(minutes=3)
+            # Time: the i-th intro occupies [chain_start + 3i, chain_start + 3(i+1)]
+            # minutes (the first person comes earliest); see chain_start above.
+            start_time = chain_start + timedelta(minutes=3 * i)
+            end_time = start_time + timedelta(minutes=3)
 
             default_name = f'回忆：关于{person_info["name"]}' if is_chinese else f'Reminiscence: About {person_info["name"]}'
             intro_event = {
@@ -397,12 +414,12 @@ def process_one_uuid(record: Dict, existing_result: Optional[Dict],
                      model: str) -> Optional[Dict]:
     """Process all long-term/mid-term events for a single uuid."""
     uuid = record['uuid']
-    set_log_context(uuid=uuid, stage="stage4_5_sub_events")
+    set_log_context(uuid=uuid, stage="sub_events")
 
     basic = record.get('Basic_Profile', {})
     protagonist_name = basic.get('name', f'uid{uuid}')
     nationality = basic.get('nationality', 'Chinese')
-    is_chinese = (nationality == 'Chinese')
+    is_chinese = is_chinese_persona(nationality)
     init_state = record.get('Init_State', {})
     protagonist_brief = (
         f"{basic.get('gender', '')}，{basic.get('birth_date', '')}，"
@@ -490,7 +507,7 @@ def process_one_uuid(record: Dict, existing_result: Optional[Dict],
                     rel_info = social_rels[name]
                     new_people.append({
                         'name': name,
-                        'relationship_type': rel_info.get('relationship_type', '认识的人'),
+                        'relationship_type': rel_info.get('relationship_type', '认识的人' if is_chinese else 'acquaintance'),
                         'description': rel_info.get('description', ''),
                     })
 
@@ -524,8 +541,7 @@ def process_one_uuid(record: Dict, existing_result: Optional[Dict],
         else:
             print(f"    [FAIL] event_{eid}: no sub-events generated")
 
-    # Emit through the SubEvent contract (P1-2): the declared field order matches
-    # the prior literal dict, so the serialized record stays stable.
+    # Declared field order on SubEvent is the serialized field order.
     output_record = SubEvent(
         uuid=uuid,
         sub_events=sub_events,
@@ -534,79 +550,85 @@ def process_one_uuid(record: Dict, existing_result: Optional[Dict],
     return output_record
 
 
-class SubEventsGenerator(Generator):
-    """Split each persona's long/mid-term events into chronological sub-event arcs.
-
-    Domain generator for the old stage 4.5. The resume model here is per *event*
-    (not per record), and the standalone run uses its own parallel orchestration
-    in :func:`main`, so this class is a thin uniform entry point over
-    :func:`process_one_uuid` for the future pipeline DAG: ``ctx`` carries the
-    existing per-uuid result (for resume).
-    """
-
-    stage_label = "Stage4.5"
-    stage_num = "4.5"
-    index_key = "uuid"
-    produces = "sub_events"
-
-    def __init__(self, model: str) -> None:
-        self.model = model
-
-    def produce(self, record: Dict, ctx=None) -> Optional[Dict]:
-        return process_one_uuid(record, ctx, self.model)
-
-
 # Main
 
+def load_existing_for_run(output_path: str,
+                          uuid_scope: Optional[set],
+                          force: bool) -> Dict:
+    """Load prior output indexed by uuid, honoring ``--force`` scoped to the run.
+
+    ``force`` means "regenerate the uuids in scope", not "wipe the file": records
+    outside ``uuid_scope`` (None = every uuid is in scope) are always kept so an
+    atomic rewrite never drops other personas' results.
+    """
+    existing = load_existing_by_uuid(output_path)
+    if not force:
+        return existing
+    if uuid_scope is None:
+        return {}
+    return {uid: rec for uid, rec in existing.items() if uid not in uuid_scope}
+
+
+def _upsert_and_save(all_results: List[Dict], result: Dict, output_path: str) -> None:
+    """Upsert *result* into *all_results* by uuid and write the file atomically."""
+    for i, r in enumerate(all_results):
+        if r['uuid'] == result['uuid']:
+            all_results[i] = result
+            break
+    else:
+        all_results.append(result)
+    write_jsonl_atomic(all_results, output_path)
+    print(f"  [Save] {len(all_results)} records saved")
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Stage 4.5: Split long/mid-term events into sub-events")
+    parser = argparse.ArgumentParser(description="sub_events: split long/mid-term events into sub-events")
     parser.add_argument('--input', type=str,
                         default=os.path.join(OUTPUT_DIR, 'data', 'annual_events.jsonl'),
-                        help='Input file (stage4 output)')
+                        help='Input file (annual_events output)')
     parser.add_argument('--output', type=str,
                         default=os.path.join(OUTPUT_DIR, 'data', 'sub_events.jsonl'),
                         help='Output file')
     parser.add_argument('--max-workers', type=int, default=DEFAULT_WORKERS)
-    parser.add_argument('--uuid-filter', type=int, default=None)
+    parser.add_argument('--uuid-filter', type=int, nargs='+', default=None)
     parser.add_argument('--model', type=str, default=None)
     parser.add_argument('--force', action='store_true',
-                        help='Ignore existing output and regenerate from scratch')
+                        help='Regenerate the uuids in scope, ignoring their existing '
+                             'output (records outside the scope are preserved)')
     args = parser.parse_args()
 
-    print(f"[Stage 4.5] Loading input from {args.input}")
+    print(f"[sub_events] Loading input from {args.input}")
     records = read_jsonl(args.input)
     if not records:
         print("[ERROR] No records found")
         sys.exit(1)
     print(f"  Loaded {len(records)} records")
 
+    uuid_scope = None
     if args.uuid_filter is not None:
-        records = [r for r in records if r.get('uuid') == args.uuid_filter]
+        uuid_scope = set(args.uuid_filter)
+        records = [r for r in records if r.get('uuid') in uuid_scope]
         if not records:
-            print(f"[ERROR] No record for uuid={args.uuid_filter}")
+            print(f"[ERROR] No record for uuid(s)={sorted(uuid_scope)}")
             sys.exit(1)
 
-    existing = {} if args.force else load_existing_by_uuid(args.output)
+    existing = load_existing_for_run(args.output, uuid_scope, args.force)
     model = args.model or get_text_llm_model(is_chinese=True)
     print(f"  Using model: {model}")
 
     all_results = list(existing.values())
+    failures = []
 
     if args.max_workers <= 1:
         for record in records:
             uuid = record.get('uuid')
-            result = process_one_uuid(record, existing.get(uuid), model)
-            if result:
-                found = False
-                for i, r in enumerate(all_results):
-                    if r['uuid'] == uuid:
-                        all_results[i] = result
-                        found = True
-                        break
-                if not found:
-                    all_results.append(result)
-                write_jsonl(all_results, args.output)
-                print(f"  [Save] {len(all_results)} records saved")
+            try:
+                result = process_one_uuid(record, existing.get(uuid), model)
+                if result:
+                    _upsert_and_save(all_results, result, args.output)
+            except Exception as e:
+                print(f"  [ERROR] uuid={uuid}: {e}")
+                failures.append((uuid, f"{type(e).__name__}: {e}"))
     else:
         lock = threading.Lock()
 
@@ -617,23 +639,22 @@ def main():
         with ThreadPoolExecutor(max_workers=args.max_workers) as executor:
             futures = {executor.submit(_worker, r): r for r in records}
             for future in as_completed(futures):
+                uuid = futures[future].get('uuid')
                 try:
                     result = future.result()
                     if result:
                         with lock:
-                            found = False
-                            for i, r in enumerate(all_results):
-                                if r['uuid'] == result['uuid']:
-                                    all_results[i] = result
-                                    found = True
-                                    break
-                            if not found:
-                                all_results.append(result)
-                            write_jsonl(all_results, args.output)
-                            print(f"  [Save] {len(all_results)} records saved")
+                            _upsert_and_save(all_results, result, args.output)
                 except Exception as e:
-                    record = futures[future]
-                    print(f"  [ERROR] uuid={record.get('uuid')}: {e}")
+                    print(f"  [ERROR] uuid={uuid}: {e}")
+                    failures.append((uuid, f"{type(e).__name__}: {e}"))
+
+    if failures:
+        # Successful results were saved incrementally, so a rerun resumes them.
+        summary = "; ".join(f"uuid={uid}: {msg}" for uid, msg in failures)
+        raise RuntimeError(
+            f"[sub_events] sub-event split failed for {len(failures)} persona(s) "
+            f"(successful results were saved): {summary}")
 
     total_subs = sum(
         len(se.get('children', []))
@@ -641,7 +662,7 @@ def main():
         for se in r.get('sub_events', [])
     )
     total_parents = sum(len(r.get('sub_events', [])) for r in all_results)
-    print(f"\n[Stage 4.5] Done! {len(all_results)} uuids, "
+    print(f"\n[sub_events] Done! {len(all_results)} uuids, "
           f"{total_parents} parent events -> {total_subs} sub-events")
     print(f"  Output: {args.output}")
 

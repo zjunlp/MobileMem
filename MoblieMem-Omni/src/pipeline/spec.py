@@ -15,8 +15,8 @@ from typing import Callable, List, Optional, Tuple
 class RunContext:
     """Resolved paths + knobs every node adapter needs.
 
-    Mirrors the ``main.py`` flags so adapters can call the generator entry points
-    with identical arguments.
+    Each field corresponds to a CLI flag; adapters thread these into the
+    generator entry points.
     """
 
     info_dir: str

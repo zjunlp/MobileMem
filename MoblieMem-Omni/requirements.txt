@@ -1,0 +1,21 @@
+# Core (text pipeline: profile / life_state / dates / social / events)
+python-dotenv>=1.0
+openai>=1.30
+tenacity>=8.2
+requests>=2.31
+jsonlines>=4.0
+tqdm>=4.66
+
+# Media rendering (conversation / app_trace / document screenshots)
+playwright>=1.44        # run `playwright install chromium` after install
+html2image>=2.0
+beautifulsoup4>=4.12
+Pillow>=10.0
+qrcode>=7.4
+numpy>=1.26
+
+# Face pipeline (event_photo / avatars) -- heavy, optional for text-only stages
+insightface>=0.7.3
+onnxruntime>=1.17       # required by insightface
+opencv-python>=4.9
+scipy>=1.11             # optimal face pairing (linear_sum_assignment)

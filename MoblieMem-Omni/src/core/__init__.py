@@ -8,12 +8,14 @@ from core.base import JsonlModel, _ABSENT
 from core.persona import Persona, BasicProfile
 from core.life import Event, SocialGraph, SubEvent
 from core.memories import GroupChat, ImageRecord
-from core.recall import Stage10Summary
+from core.recall import ImageSummary
 from core.image_dirs import DIR_NAME, CATEGORY_BY_DIR
+from core.lang import is_chinese_persona
 
 __all__ = [
     "JsonlModel",
     "_ABSENT",
+    "is_chinese_persona",
     "Persona",
     "BasicProfile",
     "Event",
@@ -21,7 +23,7 @@ __all__ = [
     "SubEvent",
     "GroupChat",
     "ImageRecord",
-    "Stage10Summary",
+    "ImageSummary",
     "DIR_NAME",
     "CATEGORY_BY_DIR",
 ]

@@ -2,10 +2,11 @@
 import json
 import logging
 import traceback
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Tuple
 
 import config
+from infra.prompts import load_prompt
 from backends.llm import (
     calculate_cumulative_cost,
     llm_request,
@@ -21,8 +22,11 @@ from tenacity import (
 logger = logging.getLogger("generation.annual_events")
 
 
-# Retry configuration (centralized in config)
-RETRY_TIMES = config.RETRY_TIMES
+# Retry configuration
+# The outer @retry only covers structural failures (e.g. the parsed event list
+# is empty); network/API errors are already retried config.RETRY_TIMES times
+# inside llm_request, so a big budget here would multiply the two.
+STAGE_RETRY_TIMES = 3
 WAIT_TIME_LOWER = config.WAIT_TIME_LOWER
 WAIT_TIME_UPPER = config.WAIT_TIME_UPPER
 
@@ -32,19 +36,10 @@ MAX_EMPTY_RETRIES = 5
 MAX_EVENTS_PER_CALL = 15
 
 
-def load_prompt(prompt_path: str) -> str:
-    """Load prompt file from specified path"""
-    try:
-        with open(prompt_path, 'r', encoding='utf-8') as f:
-            return f.read()
-    except Exception as e:
-        raise FileNotFoundError(f"Failed to load prompt file {prompt_path}: {e}:{traceback.format_exc()}")
-
-
 @retry(
     retry=retry_if_exception_type(Exception),
     wait=wait_random_exponential(min=WAIT_TIME_LOWER, max=WAIT_TIME_UPPER),
-    stop=stop_after_attempt(RETRY_TIMES),
+    stop=stop_after_attempt(STAGE_RETRY_TIMES),
     reraise=True,
     before_sleep=before_sleep_log(logger, logging.WARNING),
 )
@@ -53,7 +48,8 @@ def generate_events_with_llm(persona_record: Dict, prompt: str, max_events: int 
     Generate annual events for a persona using LLM
 
     Args:
-        persona_record: Complete persona record from stage3 (with Basic_Profile, Init_State and Important_Dates)
+        persona_record: Complete upstream persona record (with Basic_Profile,
+            Init_State and Important_Dates)
         prompt: The system prompt to use
         max_events: Maximum number of events to generate (default: 100)
 
@@ -125,7 +121,6 @@ Do NOT generate events that are missing their corresponding info fields!
             user_content,
             return_parsed_json=True,
             extract_json=True,
-            json_markers=[]
         )
 
         cost_info = calculate_cumulative_cost(None, cost_info)
@@ -220,7 +215,7 @@ def extract_events_from_response(parsed_data) -> List[Dict]:
 
 def validate_and_normalize_events(events_list: List[Dict], persona_uuid: int) -> List[Dict]:
     """
-    Validate and normalize events based on stage4 requirements
+    Validate and normalize events based on the annual_events requirements
 
     Args:
         events_list: List of event dictionaries to validate
@@ -266,8 +261,10 @@ def validate_and_normalize_events(events_list: List[Dict], persona_uuid: int) ->
 
             if end_time <= start_time:
                 print(f"[WARNING] Persona {persona_uuid}: Event {i} end_time must be later than start_time, adjusting")
-                # Add 1 hour to end_time as default
-                event['event_end_time'] = (start_time.replace(hour=start_time.hour + 1)).strftime('%Y-%m-%d %H:%M:%S')
+                # Add 1 hour to end_time as default. timedelta, not
+                # .replace(hour=+1): at 23:xx replace() raises ValueError and
+                # the outer handler would silently drop the whole event.
+                event['event_end_time'] = (start_time + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
 
             # Ensure dates are in 2025
             if start_time.year != 2025 or end_time.year != 2025:
@@ -439,7 +436,7 @@ def process_single_persona(persona_record: Dict, prompt: str, max_events: int = 
     """Process single persona to generate annual events
     
     Args:
-        persona_record: Complete persona record from stage3
+        persona_record: Complete upstream persona record
         prompt: The system prompt to use
         max_events: Maximum number of events to generate per persona
         

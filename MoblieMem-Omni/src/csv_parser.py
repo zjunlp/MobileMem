@@ -37,6 +37,7 @@ def extract_gender(profile: Dict[str, str]) -> str:
 
     Checks for explicit female indicators, including mother-related terms.
     Also checks for explicit male indicators.
+    When no indicator is found, defaults to 'Male' and prints a warning.
     """
     info = profile.get('basic_info', '') or profile.get('baiscInfo', '')
 
@@ -47,12 +48,24 @@ def extract_gender(profile: Dict[str, str]) -> str:
         if kw in info:
             return 'Female'
 
-    # Check the single-character female marker, but avoid compound words
-    # that do not indicate the subject's gender.
+    # Explicit male indicators must outrank the weak single-character '女'
+    # heuristic below: "单身男，和女友同住" contains '女' (in 女友) but the
+    # subject is male.
+    male_keywords = ['男性', '男大学生', '已婚男', '离异男', '单身男',
+                     '爸爸', '父亲', '宝爸']
+    for kw in male_keywords:
+        if kw in info:
+            return 'Male'
+
+    # Weak fallback: the single-character female marker, avoiding compound
+    # words that do not indicate the subject's gender.
     if '女' in info and '女儿' not in info:
         return 'Female'
 
-    # Default to Male if a male marker is found or no clear indicator exists.
+    # No indicator at all: keep the historical Male default, but make the
+    # fabrication visible so data quality issues are traceable.
+    print(f"[WARN][csv_parser] no gender indicator found in basic_info, "
+          f"defaulting to Male: {info[:50]}")
     return 'Male'
 
 
@@ -69,11 +82,15 @@ def extract_birth_date(profile: Dict[str, str], reference_year: int = 2025) -> s
     """
     Calculate approximate birth date from age in basic_info.
     Uses June 15 as approximate birthday.
+    When no age is found, defaults to '1990-01-01' and prints a warning.
     """
     age = extract_age(profile)
     if age:
         birth_year = reference_year - age
         return f"{birth_year}-06-15"
+    info = profile.get('basic_info', '') or profile.get('baiscInfo', '')
+    print(f"[WARN][csv_parser] no age found in basic_info, "
+          f"defaulting birth_date=1990-01-01: {info[:50]}")
     return "1990-01-01"
 
 

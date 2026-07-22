@@ -7,8 +7,14 @@ import time
 from datetime import datetime, timedelta
 
 from backends.llm import get_text_llm_model, llm_request
+from core.lang import is_chinese_persona
 
-logger = logging.getLogger('fix_app_screenshots')
+logger = logging.getLogger('app_trace')
+
+# The outer stage-level retry only covers structural failures (e.g. the LLM
+# response has no JSON array); network/API errors are already retried inside
+# llm_request, so a big budget here would multiply the two.
+STAGE_RETRY_TIMES = 3
 
 
 INFO_SCHEMAS = {
@@ -104,8 +110,8 @@ def _compute_publish_date(event_start_time_str):
                 return (event_dt - timedelta(days=days_before)).strftime("%Y-%m-%d")
             except ValueError:
                 continue
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"[WARN] Failed to parse event time {event_start_time_str!r}: {e}")
     return "2025-06-01"
 
 def _call_llm_generate_info(persona_record, events, app_type, nationality="Chinese"):
@@ -127,7 +133,7 @@ def _call_llm_generate_info_single(persona_record, events, app_type, nationality
     personality = bp.get('personality_traits', '')
 
     schema = INFO_SCHEMAS[app_type]
-    is_cn = (nationality == "Chinese")
+    is_cn = (is_chinese_persona(nationality))
     hint = schema["hint_cn"] if is_cn else schema["hint_en"]
     fields = schema["fields_cn"] if is_cn else schema["fields_en"]
     example = schema["example_cn"] if is_cn else schema["example_en"]
@@ -221,11 +227,11 @@ IMPORTANT:
 - Do NOT include publish_date in your output — it will be computed automatically.
 """
     
-    is_cn = (nationality == "Chinese")
+    is_cn = (is_chinese_persona(nationality))
     llm_model = get_text_llm_model(is_cn)
     system_prompt = "你是一个专业的结构化JSON数据生成器，用于应用截图渲染。" if is_cn else "You generate structured JSON data for app screenshot rendering."
 
-    for attempt in range(5):
+    for attempt in range(STAGE_RETRY_TIMES):
         try:
             content, cost_info = llm_request(
                 system_prompt=system_prompt,
@@ -242,20 +248,31 @@ IMPORTANT:
                 # Fix unquoted sub-event IDs like 76_2 -> "76_2"
                 raw_json = re.sub(r'"event_id"\s*:\s*(\d+_\d+)', r'"event_id": "\1"', raw_json)
                 result = json.loads(raw_json)
-                # For videos, compute publish_date from the event time without relying on the LLM.
-                if app_type == "video":
-                    for item in result:
-                        eid = item.get("event_id")
-                        ev_match = next((e for e in events if e.get("event_id") == eid), None)
-                        if ev_match and "video_info" in item:
-                            item["video_info"]["publish_date"] = _compute_publish_date(
-                                ev_match.get("event_start_time", ""))
-                return result
-            logger.warning(f"[LLM] No JSON array found in response for {app_type}")
+                # Keep only structurally valid items: a dict carrying event_id and a
+                # non-empty *_info dict. Otherwise the caller would write a default
+                # {} into the event record and the item could never be regenerated.
+                valid = [
+                    item for item in result
+                    if isinstance(item, dict) and "event_id" in item
+                    and isinstance(item.get(f"{app_type}_info"), dict) and item[f"{app_type}_info"]
+                ]
+                if valid:
+                    # For videos, compute publish_date from the event time without relying on the LLM.
+                    if app_type == "video":
+                        for item in valid:
+                            eid = item.get("event_id")
+                            ev_match = next((e for e in events if e.get("event_id") == eid), None)
+                            if ev_match:
+                                item["video_info"]["publish_date"] = _compute_publish_date(
+                                    ev_match.get("event_start_time", ""))
+                    return valid
+                logger.warning(f"[LLM] Parsed array has no valid {app_type}_info items")
+            else:
+                logger.warning(f"[LLM] No JSON array found in response for {app_type}")
         except Exception as e:
-            wait = min(3 * (2 ** attempt), 60)  # 3s, 6s, 12s, 24s, 48s
-            logger.warning(f"[LLM] Attempt {attempt+1}/5 failed for {app_type}: {e}")
-            if attempt < 4:
+            wait = min(3 * (2 ** attempt), 60)  # 3s, 6s (last attempt does not sleep)
+            logger.warning(f"[LLM] Attempt {attempt+1}/{STAGE_RETRY_TIMES} failed for {app_type}: {e}")
+            if attempt < STAGE_RETRY_TIMES - 1:
                 logger.info(f"[LLM] Waiting {wait}s before retry...")
                 time.sleep(wait)
     return []

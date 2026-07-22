@@ -5,13 +5,13 @@ The single home for the pipeline's JSONL I/O and checkpointing:
 - ``read_jsonl`` / ``write_jsonl`` (jsonlines-based I/O)
 - ``load_existing_by_role`` / ``load_existing_by_uuid`` (indexing)
 - ``make_save_callback`` (incremental, resume-safe saving)
-- ``stage1_save_callback`` (high-uuid preserve merge)
+- ``make_preserving_save_callback`` (high-uuid preserve merge)
 
 Records are dumped with ``json.dumps(..., ensure_ascii=False)``, one record per
 line.
 
 The module depends on the standard library only, has no import-time side
-effects, and never imports stages, domain logic or models — it sits at the
+effects, and never imports generators, domain logic or models — it sits at the
 bottom of the dependency stack (L1 infrastructure).
 """
 
@@ -31,7 +31,7 @@ def read_jsonl(path: str) -> List[Record]:
     """Read a JSONL file and return its records.
 
     Returns an empty list when the file does not exist, and silently skips
-    blank lines. Matches the previous ``common.read_jsonl`` behavior.
+    blank lines.
     """
     if not os.path.exists(path):
         return []
@@ -47,8 +47,7 @@ def read_jsonl(path: str) -> List[Record]:
 def write_jsonl(records: Iterable[Record], path: str) -> None:
     """Overwrite ``path`` with ``records``, one JSON object per line.
 
-    Parent directories are created as needed. The output is byte-for-byte
-    identical to the previous ``jsonlines``-based writer.
+    Parent directories are created as needed.
     """
     parent = os.path.dirname(path)
     if parent:
@@ -61,8 +60,7 @@ def write_jsonl(records: Iterable[Record], path: str) -> None:
 def write_jsonl_atomic(records: Iterable[Record], path: str) -> None:
     """Like :func:`write_jsonl` but crash-safe: write a ``.tmp`` then replace.
 
-    The final file content is identical to :func:`write_jsonl`; only the write
-    mechanism differs (a partially written file can never clobber a good one).
+    A partially written file can never clobber a good one.
     """
     parent = os.path.dirname(path)
     if parent:
@@ -109,69 +107,74 @@ def index_by(records: Sequence[Record], key: str) -> Dict[Any, Record]:
 def load_existing_by_role(jsonl_path: str) -> Dict[str, Record]:
     """Load a JSONL file and index it by ``role_identity`` for resume.
 
-    Preserves the original console message and best-effort error handling.
+    Raises ``RuntimeError`` when the file exists but cannot be read/parsed:
+    silently returning an empty index would rerun every record (and re-spend
+    the LLM budget) instead of surfacing the corruption.
     """
     existing: Dict[str, Record] = {}
     if os.path.exists(jsonl_path):
         try:
             records = read_jsonl(jsonl_path)
-            for r in records:
-                role = r.get('role_identity', '')
-                if role:
-                    existing[role] = r
-            if existing:
-                print(f"[Checkpoint] Loaded {len(existing)} existing records from {jsonl_path}")
         except Exception as e:
-            print(f"[Checkpoint] WARNING: Could not read {jsonl_path}: {e}")
+            raise RuntimeError(f"Corrupt checkpoint file {jsonl_path}: {e}") from e
+        for r in records:
+            role = r.get('role_identity', '')
+            if role:
+                existing[role] = r
+        if existing:
+            print(f"[Checkpoint] Loaded {len(existing)} existing records from {jsonl_path}")
     return existing
 
 
 def load_existing_by_uuid(jsonl_path: str) -> Dict[Any, Record]:
     """Load a JSONL file and index it by ``uuid`` for resume.
 
-    Preserves the original console message and best-effort error handling.
+    Raises ``RuntimeError`` when the file exists but cannot be read/parsed:
+    silently returning an empty index would rerun every record (and re-spend
+    the LLM budget) instead of surfacing the corruption.
     """
     existing: Dict[Any, Record] = {}
     if os.path.exists(jsonl_path):
         try:
             records = read_jsonl(jsonl_path)
-            for r in records:
-                uid = r.get('uuid')
-                if uid is not None:
-                    existing[uid] = r
-            if existing:
-                print(f"[Checkpoint] Loaded {len(existing)} existing records from {jsonl_path}")
         except Exception as e:
-            print(f"[Checkpoint] WARNING: Could not read {jsonl_path}: {e}")
+            raise RuntimeError(f"Corrupt checkpoint file {jsonl_path}: {e}") from e
+        for r in records:
+            uid = r.get('uuid')
+            if uid is not None:
+                existing[uid] = r
+        if existing:
+            print(f"[Checkpoint] Loaded {len(existing)} existing records from {jsonl_path}")
     return existing
 
 
-# Incremental save callbacks (used by stage generators)
+# Incremental save callbacks (used by the record generators)
 
-def make_save_callback(output_path: str, stage_num: Any) -> Callable[[Sequence[Record]], None]:
+def make_save_callback(output_path: str, label: Any) -> Callable[[Sequence[Record]], None]:
     """Build a callback that rewrites ``output_path`` after each batch.
 
-    Equivalent to the previous ``common.make_save_callback``: the caller owns
-    the growing record list and we persist the whole list (resume-safe).
+    ``label`` is the pipeline node name shown in the save message. The caller
+    owns the growing record list and we persist the whole list atomically, so a
+    crash mid-write never corrupts the checkpoint.
     """
     def _save(records: Sequence[Record]) -> None:
-        write_jsonl(records, output_path)
-        print(f"  [Save] Stage{stage_num}: {len(records)} records saved (checkpoint)")
+        write_jsonl_atomic(records, output_path)
+        print(f"  [{label}] {len(records)} records saved (checkpoint)")
     return _save
 
 
 def make_preserving_save_callback(
     output_path: str,
     preserved_records: Sequence[Record],
-    stage_num: Any = 1,
+    label: Any = 'profile',
     key: str = 'role_identity',
 ) -> Callable[[Sequence[Record]], None]:
     """Build a save callback that keeps pre-existing out-of-scope records.
 
-    Implements the stage1 "high-uuid preserve" merge: new records are merged with
-    previously generated records that are *not* in the current processing scope
-    (e.g. high-uuid personas seeded by stage0), de-duplicated by ``key``, sorted
-    by ``uuid``, then written.
+    Implements the profile node's "high-uuid preserve" merge: new records are
+    merged with previously generated records that are *not* in the current
+    processing scope (e.g. high-uuid personas seeded by persona_seeds),
+    de-duplicated by ``key``, sorted by ``uuid``, then written.
     """
     preserved = list(preserved_records)
 
@@ -185,57 +188,7 @@ def make_preserving_save_callback(
                 final.append(record)
                 seen.add(rid)
         final.sort(key=lambda x: x.get('uuid', 0))
-        write_jsonl(final, output_path)
-        print(f"  [Save] Stage{stage_num}: {len(final)} records saved (checkpoint)")
+        write_jsonl_atomic(final, output_path)
+        print(f"  [{label}] {len(final)} records saved (checkpoint)")
 
     return _save
-
-
-# Object-oriented facade
-
-class JsonlStore:
-    """A keyed view over one JSONL file: read, index, append, upsert, save.
-
-    One store instance maps to one file. ``key`` is the field used for indexing
-    and upserts (``uuid`` by default; stage1 uses ``role_identity``). This is
-    the single abstraction that the upcoming ``Stage`` base class builds on.
-    """
-
-    def __init__(self, path: str, key: str = 'uuid') -> None:
-        self.path = path
-        self.key = key
-
-    def read(self) -> List[Record]:
-        """Return all records (``[]`` if the file does not exist)."""
-        return read_jsonl(self.path)
-
-    def index(self) -> Dict[Any, Record]:
-        """Return ``{key_value: record}`` for checkpoint/resume."""
-        return index_by(self.read(), self.key)
-
-    def save_all(self, records: Iterable[Record]) -> None:
-        """Overwrite the file with ``records``."""
-        write_jsonl(records, self.path)
-
-    def save_all_atomic(self, records: Iterable[Record]) -> None:
-        """Overwrite the file atomically (``.tmp`` then replace)."""
-        write_jsonl_atomic(records, self.path)
-
-    def append(self, record: Record) -> None:
-        """Append a single record (thread-safe)."""
-        append_jsonl(self.path, record)
-
-    def upsert(self, record: Record) -> None:
-        """Insert or replace ``record`` by ``key`` and rewrite atomically.
-
-        Resume-safe: the on-disk file is always a complete, valid snapshot.
-        """
-        records = self.read()
-        target = record.get(self.key)
-        for i, existing in enumerate(records):
-            if existing.get(self.key) == target:
-                records[i] = record
-                break
-        else:
-            records.append(record)
-        write_jsonl_atomic(records, self.path)

@@ -12,6 +12,7 @@ same persona keeps a stable look across runs without baking in a fixed table.
 """
 
 import random
+from core.lang import is_chinese_persona
 
 # en values are self-contained prompt words (already include "eyes"/"nose"/...).
 FACE = {
@@ -121,13 +122,13 @@ ETHNICITY_SKIN_MAP = {
 
 def _group(nationality: str) -> str:
     """Map a nationality to a sampling-pool group."""
-    return "Chinese" if nationality == "Chinese" else "western"
+    return "Chinese" if is_chinese_persona(nationality) else "western"
 
 
 def localize(feature: str, key: str, lang: str) -> str:
     """Render a canonical feature key into a display word for ``lang`` (zh/en).
 
-    Unknown keys pass through unchanged, so externally supplied (stage0) English
+    Unknown keys pass through unchanged, so externally supplied (persona_seeds) English
     values are never mangled.
     """
     entry = LOCALIZE.get(feature, {}).get(key)
@@ -140,23 +141,23 @@ def get_appearance(uuid, nationality="Chinese", ethnicity_hint="", profile_recor
     """Return appearance features as display words in the persona's language.
 
     Deterministic per ``uuid`` (seeded). Chinese personas get Chinese words,
-    others get English words. Non-Chinese personas that carry a richer stage0
-    ``appearance`` (hair/ethnicity) have it passed through in English.
+    others get English words. Non-Chinese personas that carry a richer
+    persona_seeds ``appearance`` (hair/ethnicity) have it passed through in English.
 
     Args:
         uuid: the persona's uuid (seeds the deterministic sampling)
         nationality: "Chinese" -> Chinese words + East-Asian pool; otherwise English
         ethnicity_hint: e.g. "African American", biases skin tone for non-Chinese
-        profile_record: stage1 record; may carry a stage0 'appearance' sub-object
+        profile_record: profile record; may carry an 'appearance' sub-object
 
     Returns:
-        dict with face/eyes/nose/body/skin (non-Chinese stage0 personas also get
-        hair_color/hair_style/facial_hair/ethnicity/eye_color, in English).
+        dict with face/eyes/nose/body/skin (non-Chinese personas with appearance
+        also get hair_color/hair_style/facial_hair/ethnicity/eye_color, in English).
     """
-    lang = "zh" if nationality == "Chinese" else "en"
+    lang = "zh" if is_chinese_persona(nationality) else "en"
 
-    # Non-Chinese persona with a structured stage0 appearance: pass through (English).
-    if nationality != "Chinese" and profile_record and "appearance" in profile_record:
+    # Non-Chinese persona with a structured appearance: pass through (English).
+    if not is_chinese_persona(nationality) and profile_record and "appearance" in profile_record:
         app = profile_record["appearance"]
         return {
             "face": app.get("face_shape", "oval face"),
@@ -194,6 +195,6 @@ def get_appearance(uuid, nationality="Chinese", ethnicity_hint="", profile_recor
 
 def format_appearance_description(appearance, nationality="Chinese"):
     """Format an appearance dict into a natural-language description."""
-    if nationality == "Chinese":
+    if is_chinese_persona(nationality):
         return f"{appearance['face']}，{appearance['eyes']}，{appearance['nose']}，{appearance['body']}身材，{appearance['skin']}"
     return f"{appearance['face']}, {appearance['eyes']}, {appearance['nose']}, {appearance['body']}, {appearance['skin']}"

@@ -1,6 +1,6 @@
 """Event-photo generator (Memories / EventPhoto): portraits + per-event scene images.
 
-Holds the 'fix_event_images' logger + dirs, persona appearance maps, the
+Holds the 'event_photo' logger + dirs, persona appearance maps, the
 identity-anchored portrait build, the per-event face-verified scene image
 generation, and ``main`` / ``EventPhotoGenerator``. Data loaders live in
 ``.data``; prompt building in ``.prompts``; face recognition in ``backends.faces``.
@@ -15,8 +15,11 @@ from typing import Dict, List, Optional
 
 
 import config
-from common import read_jsonl, write_jsonl, load_sub_events_index, expand_events_for_imaging
+# write_jsonl stays imported: the package __init__ re-exports it.
+from infra.store import read_jsonl, write_jsonl, write_jsonl_atomic
+from generation.event_expansion import load_sub_events_index, expand_events_for_imaging
 from core import DIR_NAME
+from core.lang import is_chinese_persona
 from backends.images import generate_event_images, generate_person_images
 from backends.llm import set_log_context
 from backends.faces import (
@@ -41,7 +44,7 @@ from .prompts import (
 )
 
 try:
-    from fix_face_orientation import auto_orient_face as _auto_orient_portrait
+    from backends.faces import auto_orient_face as _auto_orient_portrait
 except ImportError:
     _auto_orient_portrait = None
 
@@ -52,11 +55,11 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(message)s',
     handlers=[
-        logging.FileHandler(os.path.join(LOG_DIR, 'fix_event_images_summary.log'), encoding='utf-8'),
+        logging.FileHandler(os.path.join(LOG_DIR, 'event_photo_summary.log'), encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
-logger = logging.getLogger('fix_event_images')
+logger = logging.getLogger('event_photo')
 
 # Person portrait / prompt directories.
 PROMPTS_DIR = config.PROMPTS_DIR
@@ -69,7 +72,7 @@ except ImportError:
     logger.warning("appearance_features.py not found, using a neutral fallback")
 
     def get_appearance(uuid, nationality="Chinese", ethnicity_hint="", profile_record=None):
-        if nationality == "Chinese":
+        if is_chinese_persona(nationality):
             return {"face": "鹅蛋脸", "eyes": "双眼皮", "nose": "端正鼻梁", "body": "匀称", "skin": "健康肤色"}
         return {"face": "oval face", "eyes": "almond eyes", "nose": "straight nose", "body": "average build", "skin": "light skin"}
 
@@ -115,7 +118,7 @@ def build_person_portrait_prompt(uuid: int, profile_record: Optional[Dict],
     description = str(init_state.get('description', '')).strip()
 
     # Appearance features - pick the right feature pool based on nationality
-    ethnicity_hint = extract_ethnicity_from_description(description, nationality) if nationality != 'Chinese' else ''
+    ethnicity_hint = extract_ethnicity_from_description(description, nationality) if not is_chinese_persona(nationality) else ''
     app = get_appearance(uuid, nationality=nationality, ethnicity_hint=ethnicity_hint, profile_record=basic)
     face = app.get('face', '')
     eyes = app.get('eyes', '')
@@ -126,10 +129,10 @@ def build_person_portrait_prompt(uuid: int, profile_record: Optional[Dict],
         face_parts.append(eyes)
     face_detail = ', '.join(face_parts) + '.' if face_parts else ''
 
-    # Extra appearance details (from the stage0 appearance field, for non-Chinese personas only)
+    # Extra appearance details (from persona_seeds appearance, for non-Chinese personas only)
     hair_detail = ''
     skin_emphasis = ''
-    if nationality != 'Chinese' and 'appearance' in basic:
+    if not is_chinese_persona(nationality) and 'appearance' in basic:
         hair_color = app.get('hair_color', '')
         hair_style = app.get('hair_style', '')
         facial_hair = app.get('facial_hair', '')
@@ -149,7 +152,7 @@ def build_person_portrait_prompt(uuid: int, profile_record: Optional[Dict],
             skin_emphasis = f'This person is {ethnicity_from_app} with {skin_color}.'
 
     # Portrait prompt template: Chinese (_zh) for Chinese personas, else English (_en).
-    if nationality == 'Chinese':
+    if is_chinese_persona(nationality):
         template_file = os.path.join(prompts_dir, 'image_person_portrait_zh.txt')
         gender_word = '男性' if gender_raw in ('male', '男') else '女性' if gender_raw in ('female', '女') else '人'
         ethnicity = '中国人'
@@ -157,7 +160,7 @@ def build_person_portrait_prompt(uuid: int, profile_record: Optional[Dict],
     else:
         template_file = os.path.join(prompts_dir, 'image_person_portrait_en.txt')
         gender_word = 'man' if gender_raw in ('male', '男') else 'woman' if gender_raw in ('female', '女') else 'person'
-        # Prefer stage0's appearance.ethnicity, otherwise extract from the description
+        # Prefer appearance.ethnicity from the profile, otherwise extract from the description
         if 'appearance' in basic and basic['appearance'].get('ethnicity'):
             ethnicity = basic['appearance']['ethnicity'] + ' ' + nationality + ' person'
         else:
@@ -182,7 +185,7 @@ def build_person_portrait_prompt(uuid: int, profile_record: Optional[Dict],
         )
     except (FileNotFoundError, KeyError) as e:
         logger.warning(f"[uuid={uuid}] Failed to load prompt template {template_file}: {e}, using fallback")
-        if nationality == 'Chinese':
+        if is_chinese_persona(nationality):
             prompt = (
                 f"一张{age_str}岁{gender_word}{ethnicity}的真实人像照片。"
                 f"{description} {face_detail} "
@@ -250,8 +253,10 @@ def ensure_person_portrait(uuid: int, person_dir: str,
                 try:
                     if os.path.exists(p):
                         os.remove(p)
-                except OSError:
-                    pass
+                except OSError as e:
+                    # Not silently ignorable: a leftover extra image in the
+                    # persona reference dir would be captioned by memory_summary.
+                    logger.warning(f"[WARN] [uuid={uuid}] Could not delete extra portrait image {p}: {e}")
         logger.info(f"[uuid={uuid}] Person portrait generated: {target_path}")
         return target_path
     else:
@@ -334,7 +339,7 @@ def generate_event_image_for_uuid(uuid: int, event_idx: int, event: Dict,
                                    social_relationships: Optional[Dict] = None,
                                    force: bool = False) -> Dict:
     """Generate one event scene image for a specific uuid and event index."""
-    set_log_context(uuid=uuid, stage="fix_event_images", event_idx=event_idx)
+    set_log_context(uuid=uuid, stage="event_photo", event_idx=event_idx)
     target_name = f"{uuid}_event_{event_idx}.png"
     target_path = os.path.join(output_dir, target_name)
     result = {
@@ -543,14 +548,14 @@ def generate_event_image_for_uuid(uuid: int, event_idx: int, event: Dict,
     return result
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate all event scene images per uuid (100 events × 10 persons)')
+    parser = argparse.ArgumentParser(description='Generate all event scene images per uuid (one image per expanded event)')
     parser.add_argument('--max-workers', type=int, default=2,
                         help='Parallel API calls (default: 2)')
     parser.add_argument('--events-file', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'data', 'annual_events.jsonl'))
     parser.add_argument('--sessions-file', type=str,
                         default=None,
-                        help='Deprecated compatibility flag; stage7.1 no longer reads or rewrites stage5 sessions')
+                        help='Deprecated compatibility flag; event_photo no longer reads or rewrites conversation sessions')
     parser.add_argument('--image-base-dir', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'image'),
                         help='Base image directory (uid subfolders will be created automatically)')
@@ -562,7 +567,7 @@ def main():
                         help='Cosine similarity threshold for face verification')
     parser.add_argument('--sub-events-file', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'data', 'sub_events.jsonl'),
-                        help='stage4.5 sub-events JSONL for expanding mid/long-term events')
+                        help='sub_events JSONL for expanding mid/long-term events')
     parser.add_argument('--force', action='store_true',
                         help='Ignore existing images and regenerate from scratch')
     args = parser.parse_args()
@@ -620,7 +625,7 @@ def main():
 
     # Build task list: (uuid, image_id, event)
     tasks = []
-    expanded_events_map = {}  # (uuid, image_id) -> event, for the stage7_1 manifest
+    expanded_events_map = {}  # (uuid, image_id) -> event, for the event_photo manifest
     for uuid in sorted(events_by_uuid.keys()):
         if args.uuid_filter and uuid not in args.uuid_filter:
             continue
@@ -713,11 +718,11 @@ def main():
             logger.warning(f"  [uuid={uuid}] event_{event_idx}: FAILED{similarity_str}, attempts={attempts_str}, reason={reason}")
 
     if args.sessions_file:
-        logger.info("--sessions-file is deprecated and ignored; stage7.1 writes only its event-image manifest")
+        logger.info("--sessions-file is deprecated and ignored; event_photo writes only its event-image manifest")
 
     # The DAG declares this node's output as ``event_images.jsonl`` and
-    # ``memory_summary``'s merge consumes it to fold event images into the stage10
-    # index. Emit it next to the events file (honors the DAG data directory).
+    # ``memory_summary``'s merge consumes it to fold event images into the
+    # memory_summary index. Emit it next to the events file (honors the DAG data directory).
     jsonl_records = []
     for (uuid_key, event_idx_key), info in sorted(results.items(), key=lambda kv: (kv[0][0], str(kv[0][1]))):
         event_data = expanded_events_map.get((uuid_key, event_idx_key), {})
@@ -730,7 +735,12 @@ def main():
         eid_str = str(event_idx_key)
         parent_eid = int(eid_str.split('_')[0]) if '_' in eid_str else event_idx_key
         filename = info.get('filename', '') if info else ''
-        image_path = os.path.join(event_dir_for(uuid_key), filename) if filename else ''
+        success = bool(info.get('success')) if info else False
+        # Failed generations must not advertise an image path (it would be empty
+        # or point at a file that was never created); memory_summary's merge
+        # filters rows via _manifest_image_exists, which safely drops both
+        # success=False rows and empty image_path values.
+        image_path = os.path.join(event_dir_for(uuid_key), filename) if (success and filename) else ''
         jsonl_records.append({
             'uuid': uuid_key,
             'sub_event_id': eid_str,
@@ -739,12 +749,14 @@ def main():
             'participants': participant_names,
             'filename': filename,
             'image_path': image_path,
-            'success': bool(info.get('success')) if info else False,
+            'success': success,
             'best_similarity': info.get('best_similarity') if info else None,
             'scene_prompt': info.get('scene_prompt', '') if info else '',
         })
     jsonl_output_path = os.path.join(os.path.dirname(args.events_file), 'event_images.jsonl')
-    write_jsonl(jsonl_records, jsonl_output_path)
+    # Atomic write: this manifest is a DAG output consumed by memory_summary's
+    # merge; a crash mid-write must not leave a truncated file behind.
+    write_jsonl_atomic(jsonl_records, jsonl_output_path)
     logger.info(f"Saved {len(jsonl_records)} records to {jsonl_output_path}")
 
     # Summary
@@ -787,10 +799,8 @@ class EventPhotoGenerator(Generator):
     the per-event result dicts. Behavior of the underlying functions is unchanged.
     """
 
-    stage_label = "Stage7.1"
-    stage_num = "7.1"
+    label = "event_photo"
     index_key = "uuid"
-    produces = "event_photo"
 
     def __init__(self, image_base_dir=None, verify_face=True):
         self.image_base_dir = image_base_dir or PORTRAITS_DIR

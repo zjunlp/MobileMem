@@ -5,8 +5,9 @@ import logging
 import requests
 
 import config
+from core.lang import is_chinese_persona
 
-logger = logging.getLogger('fix_app_screenshots')
+logger = logging.getLogger('app_trace')
 
 
 COVER_API_URL = config.DMX_GENERATION_URL
@@ -52,7 +53,7 @@ def generate_video_cover_b64(info, nationality="Chinese"):
     tags = info.get("tags", [])
     tags_str = "、".join(tags[:5]) if tags else ""
 
-    if nationality == "Chinese":
+    if is_chinese_persona(nationality):
         prompt = (
             f"为B站视频生成一张高质量封面图，视频标题：'{title}'。"
             + (f"标签：{tags_str}。" if tags_str else "")
@@ -65,13 +66,30 @@ def generate_video_cover_b64(info, nationality="Chinese"):
             + " Eye-catching style, vibrant colors, suitable as a video thumbnail, no text or watermarks."
         )
 
-    # Always use doubao for cover generation.
+    # Respect IMAGE_PROVIDER: with the default "openrouter" config the DMX
+    # endpoint below is unreachable, and every cover used to burn a 120s
+    # timeout before falling back to the gradient image.
+    if config.IMAGE_PROVIDER == "openrouter":
+        try:
+            from backends.images import _openrouter_image_call
+            images = _openrouter_image_call(prompt)
+            if images:
+                return "data:image/png;base64," + base64.b64encode(images[0]).decode()
+            logger.warning(f"[cover] OpenRouter returned no image (title={title!r})")
+        except Exception as e:
+            logger.warning(f"[cover] OpenRouter cover failed (title={title!r}): {e}")
+        logger.info(f"[cover] Using PIL gradient fallback cover: {title!r}")
+        return _make_fallback_cover_b64(title, tags)
+
+    # Use the configured generation model (was hardcoded to doubao, which
+    # 400s on gateways that don't serve that model).
+    model = config.DMX_CHINESE_GENERATION_MODEL
     headers = {"Authorization": f"Bearer {config.DMX_API_KEY}", "Content-Type": "application/json"}
     payload = {
-        "model": "doubao-seedream-4-5-251128",
+        "model": model,
         "prompt": prompt,
         "n": 1,
-        "size": "2K",
+        "size": "2K" if model.startswith("doubao-seed") else "1024x1024",
     }
 
     try:

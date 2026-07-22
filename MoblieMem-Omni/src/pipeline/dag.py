@@ -1,7 +1,7 @@
 """The pipeline DAG: node registry + topological ordering + selection.
 
-The record sub-graph (``profile`` .. ``annual_events``) mirrors ``main.py``.
-Media/index nodes delegate to each generator's ``main()`` entry, with
+The record sub-graph (``profile`` .. ``annual_events``) writes the record JSONL
+files. Media/index nodes delegate to each generator's ``main()`` entry, with
 ``RunContext`` threading both data JSONL and image-output paths through the
 argparse adapters.
 
@@ -18,15 +18,18 @@ from typing import Dict, Iterable, List, Optional
 
 from pipeline.spec import Node, RunContext
 
-# Stage output filenames (mirror main.py)
-STAGE1_FILE = "basic_profiles.jsonl"
-STAGE2_FILE = "init_states.jsonl"
-STAGE3_FILE = "important_dates.jsonl"
-STAGE3_9_FILE = "social_graph.jsonl"
-STAGE4_FILE = "annual_events.jsonl"
+# Record-node output filenames
+BASIC_PROFILES_FILE = "basic_profiles.jsonl"
+INIT_STATES_FILE = "init_states.jsonl"
+IMPORTANT_DATES_FILE = "important_dates.jsonl"
+SOCIAL_GRAPH_FILE = "social_graph.jsonl"
+ANNUAL_EVENTS_FILE = "annual_events.jsonl"
+
+STAGE1_FILE = BASIC_PROFILES_FILE  # legacy alias, used by tests
+STAGE2_FILE = INIT_STATES_FILE  # legacy alias, used by tests
 
 
-# Gender fix (applied after the annual_events record stage)
+# Gender fix (applied after the annual_events record node)
 def fix_gender(value: str) -> str:
     v = value.strip()
     if v in ("Female", "\u5973"):
@@ -34,12 +37,12 @@ def fix_gender(value: str) -> str:
     return "Male"
 
 
-def fix_gender_in_stage4(stage4_path: str) -> None:
-    """Normalize ``Basic_Profile.gender`` in the stage-4 file to Female/Male.
+def fix_gender_in_annual_events(events_path: str) -> None:
+    """Normalize ``Basic_Profile.gender`` in the annual_events file to Female/Male.
 
     Writes to a temp file first, then atomically replaces the original.
     """
-    INPUT_FILE = Path(stage4_path)
+    INPUT_FILE = Path(events_path)
     TMP_FILE = INPUT_FILE.with_suffix(".jsonl.tmp")
 
     changed = 0
@@ -57,6 +60,9 @@ def fix_gender_in_stage4(stage4_path: str) -> None:
             bp = person.get("Basic_Profile", {})
             old = bp.get("gender", "")
             new = fix_gender(old)
+            if old.strip() not in ("Female", "\u5973", "Male", "\u7537"):
+                print(f"[WARN] uuid={person.get('uuid')}: unrecognized gender "
+                      f"{old!r} forced to Male")
             if old != new:
                 bp["gender"] = new
                 changed += 1
@@ -66,29 +72,30 @@ def fix_gender_in_stage4(stage4_path: str) -> None:
     print(f"Done: {total} records total, {changed} gender fields modified.")
 
 
-# Record adapters — mirror main.py's per-stage logic exactly (byte-faithful I/O)
+# Record adapters
 def _uuid_keep_set(ctx: RunContext):
-    """Record-stage uuid filter as a set (None = all personas).
+    """Record-node uuid filter as a set (None = all personas).
 
-    Lets ``--uuid`` restrict the record stages too, not just media nodes. A
+    Lets ``--uuid`` restrict the record nodes too, not just media nodes. A
     persona's uuid is its 0-based index in the sorted info-dir folder list.
     """
     return set(ctx.uuid_filter) if ctx.uuid_filter else None
 
 
-def _select_by_uuid(records, keep):
-    """Keep only records whose uuid is in ``keep`` (no-op when ``keep`` is None)."""
-    if keep is None:
+def _select_by_uuid(records, uuid_keep):
+    """Keep only records whose uuid is in ``uuid_keep`` (no-op when it is None)."""
+    if uuid_keep is None:
         return records
-    return [r for r in records if r.get("uuid") in keep]
+    return [r for r in records if r.get("uuid") in uuid_keep]
 
 
-def _kept_records(out_path, keep):
-    """Records already on disk whose uuid is outside ``keep`` (to be preserved)."""
-    from common import load_existing_by_uuid
-    if keep is None:
+def _kept_records(out_path, uuid_keep):
+    """Records already on disk whose uuid is outside ``uuid_keep`` (to be preserved)."""
+    from infra.store import load_existing_by_uuid
+    if uuid_keep is None:
         return []
-    return [rec for uid, rec in load_existing_by_uuid(out_path).items() if uid not in keep]
+    return [rec for uid, rec in load_existing_by_uuid(out_path).items()
+            if uid not in uuid_keep]
 
 
 def _finalize(new_records, kept):
@@ -99,156 +106,168 @@ def _finalize(new_records, kept):
 
 
 def _run_profile(ctx: RunContext) -> None:
-    from common import load_existing_by_role, read_jsonl
     from csv_parser import get_all_person_folders
-    from generation.profile import generate_stage1
-    from infra.store import make_preserving_save_callback
+    from generation.profile import generate_profiles
+    from infra.store import (load_existing_by_role, make_preserving_save_callback,
+                             read_jsonl)
 
-    stage1_path = ctx.data_path(STAGE1_FILE)
-    person_folders = get_all_person_folders(ctx.info_dir)
-    keep = _uuid_keep_set(ctx)
+    profiles_path = ctx.data_path(BASIC_PROFILES_FILE)
+    # The CSV path is legacy (Chinese personas, uuid 0-9). Without an info dir
+    # the node is a no-op and personas come solely from persona_seeds.
+    if os.path.isdir(ctx.info_dir):
+        person_folders = get_all_person_folders(ctx.info_dir)
+    else:
+        person_folders = []
+        print(f"[profile] info dir not found ({ctx.info_dir}); "
+              "skipping CSV personas (persona_seeds is the primary source)")
+    uuid_keep = _uuid_keep_set(ctx)
 
-    all_existing_records = read_jsonl(stage1_path)
-    existing_by_role = {} if ctx.force else load_existing_by_role(stage1_path)
+    all_existing_records = read_jsonl(profiles_path)
+    existing_by_role = {} if ctx.force else load_existing_by_role(profiles_path)
     roles_to_process = {
-        f for i, f in enumerate(person_folders) if keep is None or i in keep
+        f for i, f in enumerate(person_folders) if uuid_keep is None or i in uuid_keep
     }
     preserved_records = [
         r for r in all_existing_records
         if r.get("role_identity") and r.get("role_identity") not in roles_to_process
     ]
     save_callback = make_preserving_save_callback(
-        stage1_path, preserved_records, stage_num=1)
-    new_records = generate_stage1(
-        person_folders, ctx.info_dir, ctx.prompts_dir,
-        existing_by_role, save_callback=save_callback, uuid_filter=keep)
+        profiles_path, preserved_records, label="profile")
+    new_records = generate_profiles(
+        person_folders, ctx.info_dir,
+        existing_by_role, save_callback=save_callback, uuid_filter=uuid_keep)
     save_callback(new_records)
-    print(f"[profile] {len(new_records) + len(preserved_records)} records -> {stage1_path}")
+    print(f"[profile] {len(new_records) + len(preserved_records)} records -> {profiles_path}")
 
 
 def _run_persona_seeds(ctx: RunContext) -> None:
-    """Append LLM-seeded personas (no CSV source, e.g. foreign) to the stage1 file.
+    """Append LLM-seeded personas (no CSV source, e.g. foreign) to the profiles file.
 
     Runs after ``profile`` has written the CSV-derived rows (uuid 0-9) and adds
     the spec-driven seeds (uuid 10-19) carrying their own ``appearance`` block,
-    so downstream stages see the full persona set.
+    so downstream nodes see the full persona set.
     """
-    from common import read_jsonl, write_jsonl
     from generation.persona_seeds import generate_persona_seeds
+    from infra.store import read_jsonl, write_jsonl_atomic
 
-    stage1_path = ctx.data_path(STAGE1_FILE)
-    existing = read_jsonl(stage1_path) if os.path.exists(stage1_path) else []
+    profiles_path = ctx.data_path(BASIC_PROFILES_FILE)
+    existing = read_jsonl(profiles_path) if os.path.exists(profiles_path) else []
     existing_uuids = {r.get("uuid") for r in existing if isinstance(r, dict)}
-    keep = _uuid_keep_set(ctx)
-    new_records = generate_persona_seeds(existing_uuids, keep=keep, force=ctx.force)
-    if new_records:
-        new_uuids = {r.get("uuid") for r in new_records}
-        merged = [r for r in existing if r.get("uuid") not in new_uuids] + new_records
+    uuid_keep = _uuid_keep_set(ctx)
+
+    def _save(records):
+        """Merge the seeds generated so far into the profiles file (checkpoint)."""
+        new_uuids = {r.get("uuid") for r in records}
+        merged = [r for r in existing if r.get("uuid") not in new_uuids] + list(records)
         merged.sort(key=lambda r: r.get("uuid", 0))
-        write_jsonl(merged, stage1_path)
-    print(f"[persona_seeds] +{len(new_records)} seeded personas -> {stage1_path}")
+        write_jsonl_atomic(merged, profiles_path)
+
+    new_records = generate_persona_seeds(
+        existing_uuids, keep=uuid_keep, force=ctx.force, save_callback=_save)
+    print(f"[persona_seeds] +{len(new_records)} seeded personas -> {profiles_path}")
 
 
 def _run_life_state(ctx: RunContext) -> None:
-    from common import load_existing_by_uuid, make_save_callback, read_jsonl, write_jsonl
-    from infra.store import make_preserving_save_callback
     from generation.life_state import generate_life_states
+    from infra.store import (load_existing_by_uuid, make_preserving_save_callback,
+                             make_save_callback, read_jsonl, write_jsonl_atomic)
 
-    stage1_path = ctx.data_path(STAGE1_FILE)
-    stage2_path = ctx.data_path(STAGE2_FILE)
-    keep = _uuid_keep_set(ctx)
-    stage1_records = _select_by_uuid(read_jsonl(stage1_path), keep)
-    existing = {} if ctx.force else load_existing_by_uuid(stage2_path)
-    kept = _kept_records(stage2_path, keep)
-    save_callback = (make_preserving_save_callback(stage2_path, kept, 2, key="uuid")
-                     if keep is not None else make_save_callback(stage2_path, 2))
+    profiles_path = ctx.data_path(BASIC_PROFILES_FILE)
+    init_states_path = ctx.data_path(INIT_STATES_FILE)
+    uuid_keep = _uuid_keep_set(ctx)
+    profile_records = _select_by_uuid(read_jsonl(profiles_path), uuid_keep)
+    existing = {} if ctx.force else load_existing_by_uuid(init_states_path)
+    kept = _kept_records(init_states_path, uuid_keep)
+    save_callback = (make_preserving_save_callback(init_states_path, kept, "life_state", key="uuid")
+                     if uuid_keep is not None else make_save_callback(init_states_path, "life_state"))
     records = generate_life_states(
-        stage1_records, ctx.info_dir, ctx.prompts_dir,
+        profile_records, ctx.info_dir, ctx.prompts_dir,
         existing, save_callback=save_callback)
-    write_jsonl(_finalize(records, kept) if keep is not None else records, stage2_path)
-    print(f"[life_state] {len(records)} records -> {stage2_path}")
+    write_jsonl_atomic(_finalize(records, kept) if uuid_keep is not None else records, init_states_path)
+    print(f"[life_state] {len(records)} records -> {init_states_path}")
 
 
 def _run_social_name_fix(ctx: RunContext) -> None:
-    from generation.social_world import fix_social_names
+    from generation.social_name_fix import fix_social_names
 
-    stage2_path = ctx.data_path(STAGE2_FILE)
-    fixes_count = fix_social_names(stage2_path, ctx.prompts_dir)
-    print(f"[social_name_fix] {fixes_count} names fixed (rewrote {stage2_path})")
+    init_states_path = ctx.data_path(INIT_STATES_FILE)
+    fixes_count = fix_social_names(init_states_path, ctx.prompts_dir)
+    print(f"[social_name_fix] {fixes_count} names fixed (rewrote {init_states_path})")
 
 
 def _run_timeline_dates(ctx: RunContext) -> None:
-    from common import load_existing_by_uuid, make_save_callback, read_jsonl, write_jsonl
-    from infra.store import make_preserving_save_callback
     from generation.timeline_dates import generate_important_dates
+    from infra.store import (load_existing_by_uuid, make_preserving_save_callback,
+                             make_save_callback, read_jsonl, write_jsonl_atomic)
 
-    stage2_path = ctx.data_path(STAGE2_FILE)
-    stage3_path = ctx.data_path(STAGE3_FILE)
-    keep = _uuid_keep_set(ctx)
-    stage2_records = _select_by_uuid(read_jsonl(stage2_path), keep)
-    existing = {} if ctx.force else load_existing_by_uuid(stage3_path)
-    kept = _kept_records(stage3_path, keep)
-    save_callback = (make_preserving_save_callback(stage3_path, kept, 3, key="uuid")
-                     if keep is not None else make_save_callback(stage3_path, 3))
+    init_states_path = ctx.data_path(INIT_STATES_FILE)
+    dates_path = ctx.data_path(IMPORTANT_DATES_FILE)
+    uuid_keep = _uuid_keep_set(ctx)
+    init_state_records = _select_by_uuid(read_jsonl(init_states_path), uuid_keep)
+    existing = {} if ctx.force else load_existing_by_uuid(dates_path)
+    kept = _kept_records(dates_path, uuid_keep)
+    save_callback = (make_preserving_save_callback(dates_path, kept, "timeline_dates", key="uuid")
+                     if uuid_keep is not None else make_save_callback(dates_path, "timeline_dates"))
     records = generate_important_dates(
-        stage2_records, ctx.prompts_dir,
+        init_state_records, ctx.prompts_dir,
         existing, save_callback=save_callback)
-    write_jsonl(_finalize(records, kept) if keep is not None else records, stage3_path)
-    print(f"[timeline_dates] {len(records)} records -> {stage3_path}")
+    write_jsonl_atomic(_finalize(records, kept) if uuid_keep is not None else records, dates_path)
+    print(f"[timeline_dates] {len(records)} records -> {dates_path}")
 
 
 def _run_social_world(ctx: RunContext) -> None:
-    from common import load_existing_by_uuid, make_save_callback, read_jsonl, write_jsonl
-    from infra.store import make_preserving_save_callback
     from generation.social_world import generate_social_graph
+    from infra.store import (load_existing_by_uuid, make_preserving_save_callback,
+                             make_save_callback, read_jsonl, write_jsonl_atomic)
 
-    stage3_path = ctx.data_path(STAGE3_FILE)
-    stage3_9_path = ctx.data_path(STAGE3_9_FILE)
-    keep = _uuid_keep_set(ctx)
-    stage3_records = _select_by_uuid(read_jsonl(stage3_path), keep)
-    existing = {} if ctx.force else load_existing_by_uuid(stage3_9_path)
-    kept = _kept_records(stage3_9_path, keep)
-    save_callback = (make_preserving_save_callback(stage3_9_path, kept, "3.9", key="uuid")
-                     if keep is not None else make_save_callback(stage3_9_path, "3.9"))
+    dates_path = ctx.data_path(IMPORTANT_DATES_FILE)
+    social_graph_path = ctx.data_path(SOCIAL_GRAPH_FILE)
+    uuid_keep = _uuid_keep_set(ctx)
+    dates_records = _select_by_uuid(read_jsonl(dates_path), uuid_keep)
+    existing = {} if ctx.force else load_existing_by_uuid(social_graph_path)
+    kept = _kept_records(social_graph_path, uuid_keep)
+    save_callback = (make_preserving_save_callback(social_graph_path, kept, "social_world", key="uuid")
+                     if uuid_keep is not None else make_save_callback(social_graph_path, "social_world"))
     records = generate_social_graph(
-        stage3_records, ctx.prompts_dir, ctx.max_events,
+        dates_records, ctx.prompts_dir, ctx.max_events,
         existing, save_callback=save_callback,
         max_workers=ctx.max_workers)
-    write_jsonl(_finalize(records, kept) if keep is not None else records, stage3_9_path)
-    print(f"[social_world] {len(records)} records -> {stage3_9_path}")
+    write_jsonl_atomic(_finalize(records, kept) if uuid_keep is not None else records, social_graph_path)
+    print(f"[social_world] {len(records)} records -> {social_graph_path}")
 
 
 def _run_annual_events(ctx: RunContext) -> None:
-    from common import load_existing_by_uuid, make_save_callback, read_jsonl, write_jsonl
     from generation.annual_events import generate_annual_events
-    from infra.store import make_preserving_save_callback
+    from infra.store import (load_existing_by_uuid, make_preserving_save_callback,
+                             make_save_callback, read_jsonl, write_jsonl_atomic)
 
-    stage3_path = ctx.data_path(STAGE3_FILE)
-    stage3_9_path = ctx.data_path(STAGE3_9_FILE)
-    stage4_path = ctx.data_path(STAGE4_FILE)
-    keep = _uuid_keep_set(ctx)
+    dates_path = ctx.data_path(IMPORTANT_DATES_FILE)
+    social_graph_path = ctx.data_path(SOCIAL_GRAPH_FILE)
+    events_path = ctx.data_path(ANNUAL_EVENTS_FILE)
+    uuid_keep = _uuid_keep_set(ctx)
 
-    # Prefer stage3.9 output (with Social_Graph); fall back to stage3 (legacy).
-    if os.path.exists(stage3_9_path):
-        stage3_records = read_jsonl(stage3_9_path)
+    # Prefer the social_world output (with Social_Graph); fall back to the
+    # timeline_dates output (legacy).
+    if os.path.exists(social_graph_path):
+        upstream_records = read_jsonl(social_graph_path)
     else:
-        stage3_records = read_jsonl(stage3_path)
-    stage3_records = _select_by_uuid(stage3_records, keep)
+        upstream_records = read_jsonl(dates_path)
+    upstream_records = _select_by_uuid(upstream_records, uuid_keep)
 
-    existing = {} if ctx.force else load_existing_by_uuid(stage4_path)
-    kept = _kept_records(stage4_path, keep)
-    save_callback = (make_preserving_save_callback(stage4_path, kept, 4, key="uuid")
-                     if keep is not None else make_save_callback(stage4_path, 4))
+    existing = {} if ctx.force else load_existing_by_uuid(events_path)
+    kept = _kept_records(events_path, uuid_keep)
+    save_callback = (make_preserving_save_callback(events_path, kept, "annual_events", key="uuid")
+                     if uuid_keep is not None else make_save_callback(events_path, "annual_events"))
     records = generate_annual_events(
-        stage3_records, ctx.prompts_dir, ctx.max_events,
+        upstream_records, ctx.prompts_dir, ctx.max_events,
         existing, save_callback=save_callback,
         max_workers=ctx.max_workers)
-    write_jsonl(_finalize(records, kept) if keep is not None else records, stage4_path)
+    write_jsonl_atomic(_finalize(records, kept) if uuid_keep is not None else records, events_path)
 
-    # Always run the post-stage gender fix (kept inside this node, per design).
-    if os.path.exists(stage4_path):
-        fix_gender_in_stage4(stage4_path)
-    print(f"[annual_events] {len(records)} records -> {stage4_path}")
+    # Always run the post-node gender fix (kept inside this node, per design).
+    if os.path.exists(events_path):
+        fix_gender_in_annual_events(events_path)
+    print(f"[annual_events] {len(records)} records -> {events_path}")
 
 
 def _delegate(module_name: str, argv_builder=None):
@@ -286,8 +305,8 @@ def _delegate(module_name: str, argv_builder=None):
     return run
 
 
-# Data-file names under output_dir (mirror each generator's argparse defaults,
-# which are OUTPUT_DIR/data/<name>; these map cleanly to RunContext.output_dir).
+# Data-file names under output_dir. Each generator's argparse default is
+# OUTPUT_DIR/data/<name>, so these map cleanly to RunContext.output_dir.
 SUB_EVENTS_FILE = "sub_events.jsonl"
 GROUP_CHATS_FILE = "group_chats.jsonl"
 S10_SUMMARY_FILE = "image_summaries.jsonl"
@@ -320,7 +339,24 @@ def _data(ctx: RunContext, name: str) -> str:
     return os.path.join(ctx.output_dir, name)
 
 
-_ALLOW_EMPTY_JSONL_NODES = {"sub_events", "app_trace", "document"}
+# "profile" may legitimately write an empty file on a seeds-only run (no CSV
+# info dir); persona_seeds then fills the profiles file.
+_ALLOW_EMPTY_JSONL_NODES = {"profile", "sub_events", "app_trace", "document"}
+
+
+# Record nodes whose output must cover every uuid present in their input file
+# (a missing uuid means a persona failed mid-node and downstream nodes would
+# silently run on incomplete data). "annual_events" reads the social_world
+# output when it exists and falls back to the timeline_dates output, matching
+# _run_annual_events. Not applied to profile (row count set by the CSV dir),
+# persona_seeds (set by built-in specs), sub_events (may be empty), or media
+# nodes.
+_RECORD_INPUT_FILE = {
+    "life_state": BASIC_PROFILES_FILE,
+    "timeline_dates": INIT_STATES_FILE,
+    "social_world": IMPORTANT_DATES_FILE,
+    "annual_events": SOCIAL_GRAPH_FILE,
+}
 
 
 def _count_jsonl(path: str) -> int:
@@ -338,12 +374,42 @@ def _count_jsonl(path: str) -> int:
     return count
 
 
+def _jsonl_uuid_set(path: str) -> set:
+    """The set of uuids present in a JSONL file (empty when the file is absent)."""
+    if not os.path.exists(path):
+        return set()
+    with open(path, "r", encoding="utf-8") as f:
+        return {
+            record["uuid"]
+            for record in (json.loads(line) for line in f if line.strip())
+            if isinstance(record, dict) and record.get("uuid") is not None
+        }
+
+
+def _verify_uuid_coverage(ctx: RunContext, node: Node) -> None:
+    """Fail when a record node's output misses uuids its input file provides."""
+    input_path = _data(ctx, _RECORD_INPUT_FILE[node.name])
+    if node.name == "annual_events" and not os.path.exists(input_path):
+        input_path = _data(ctx, IMPORTANT_DATES_FILE)
+
+    expected = _jsonl_uuid_set(input_path)
+    if ctx.uuid_filter:
+        expected &= set(ctx.uuid_filter)
+    actual = _jsonl_uuid_set(_data(ctx, node.outputs[0]))
+    missing = expected - actual
+    if missing:
+        raise RuntimeError(
+            f"Node {node.name!r} output is missing uuid(s) {sorted(missing)}: "
+            f"{_data(ctx, node.outputs[0])} does not cover the personas in {input_path}")
+
+
 def verify_node_outputs(ctx: RunContext, node: Node) -> None:
     """Enforce the DAG-level output contract for a completed node.
 
     Delegated generator mains may log and return after per-record failures. The
-    DAG treats a node as successful only after its declared artifacts exist and
-    non-optional JSONL outputs contain records.
+    DAG treats a node as successful only after its declared artifacts exist,
+    non-optional JSONL outputs contain records, and (for record nodes with a
+    per-persona input) every expected uuid is covered.
     """
     if node.verify is not None:
         node.verify(ctx, node)
@@ -358,6 +424,9 @@ def verify_node_outputs(ctx: RunContext, node: Node) -> None:
             if records == 0 and node.name not in _ALLOW_EMPTY_JSONL_NODES:
                 raise RuntimeError(f"Node {node.name!r} wrote no records to required output: {path}")
 
+    if node.name in _RECORD_INPUT_FILE:
+        _verify_uuid_coverage(ctx, node)
+
 
 def _verify_scenery(ctx: RunContext, node: Node) -> None:
     manifest_path = os.path.join(ctx.image_dir, "manifest.json")
@@ -371,7 +440,7 @@ def _verify_scenery(ctx: RunContext, node: Node) -> None:
     if not isinstance(manifest, dict):
         raise RuntimeError(f"Invalid scenery manifest shape: {manifest_path}")
 
-    expected_input = _data(ctx, STAGE4_FILE)
+    expected_input = _data(ctx, ANNUAL_EVENTS_FILE)
     upstream_records = _count_jsonl(expected_input) if os.path.exists(expected_input) else 0
     generated_files = [
         filename
@@ -386,19 +455,18 @@ def _verify_scenery(ctx: RunContext, node: Node) -> None:
 
 
 def _argv_sub_events(ctx: RunContext):
-    argv = ["--input", _data(ctx, STAGE4_FILE),
+    argv = ["--input", _data(ctx, ANNUAL_EVENTS_FILE),
             "--output", _data(ctx, SUB_EVENTS_FILE),
             "--max-workers", str(ctx.max_workers)]
     if ctx.model:
         argv += ["--model", ctx.model]
-    if ctx.uuid_filter and len(ctx.uuid_filter) == 1:  # this flag is single-int
-        argv += ["--uuid-filter", str(ctx.uuid_filter[0])]
+    argv += _uuid_multi(ctx)
     argv += _force(ctx)
     return argv
 
 
 def _argv_conversation(ctx: RunContext):
-    return ["--input-file", _data(ctx, STAGE4_FILE),
+    return ["--input-file", _data(ctx, ANNUAL_EVENTS_FILE),
             "--output-file", _data(ctx, GROUP_CHATS_FILE),
             "--sub-events-file", _data(ctx, SUB_EVENTS_FILE),
             "--prompts-dir", ctx.prompts_dir,
@@ -409,7 +477,7 @@ def _argv_conversation(ctx: RunContext):
 
 
 def _argv_app_trace(ctx: RunContext):
-    return ["--events-file", _data(ctx, STAGE4_FILE),
+    return ["--events-file", _data(ctx, ANNUAL_EVENTS_FILE),
             "--output-dir", ctx.image_dir,
             "--sub-events-file", _data(ctx, SUB_EVENTS_FILE),
             *_uuid_multi(ctx),
@@ -417,7 +485,7 @@ def _argv_app_trace(ctx: RunContext):
 
 
 def _argv_event_photo(ctx: RunContext):
-    return ["--events-file", _data(ctx, STAGE4_FILE),
+    return ["--events-file", _data(ctx, ANNUAL_EVENTS_FILE),
             "--sub-events-file", _data(ctx, SUB_EVENTS_FILE),
             "--image-base-dir", ctx.image_dir,
             "--max-workers", str(ctx.max_workers),
@@ -426,7 +494,7 @@ def _argv_event_photo(ctx: RunContext):
 
 
 def _argv_document(ctx: RunContext):
-    return ["--events-file", _data(ctx, STAGE4_FILE),
+    return ["--events-file", _data(ctx, ANNUAL_EVENTS_FILE),
             "--output-dir", ctx.image_dir,
             "--image-dir", ctx.image_dir,
             "--sub-events-file", _data(ctx, SUB_EVENTS_FILE),
@@ -435,7 +503,7 @@ def _argv_document(ctx: RunContext):
 
 
 def _argv_scenery(ctx: RunContext):
-    return ["--input-file", _data(ctx, STAGE4_FILE),
+    return ["--input-file", _data(ctx, ANNUAL_EVENTS_FILE),
             "--output-dir", ctx.image_dir,
             *_uuid_multi(ctx),
             *_force(ctx)]
@@ -446,8 +514,8 @@ def _argv_memory_summary(ctx: RunContext):
     return ["--image-base-dir", ctx.image_dir,
             "--output-file", _data(ctx, S10_SUMMARY_FILE),
             "--merged-output", _data(ctx, S10_MERGED_FILE),
-            "--profiles-file", _data(ctx, STAGE1_FILE),
-            "--events-file", _data(ctx, STAGE4_FILE),
+            "--profiles-file", _data(ctx, BASIC_PROFILES_FILE),
+            "--events-file", _data(ctx, ANNUAL_EVENTS_FILE),
             "--sub-events-file", _data(ctx, SUB_EVENTS_FILE),
             "--workers", str(ctx.max_workers),
             *_uuid_multi(ctx),
@@ -457,60 +525,60 @@ def _argv_memory_summary(ctx: RunContext):
 # Node registry (see the Quickstart node table in README.md)
 NODES: Dict[str, Node] = {
     "profile": Node(
-        "profile", (), (STAGE1_FILE,), _run_profile,
-        "record", "Basic profiles (CSV + LLM) [stage1]"),
+        "profile", (), (BASIC_PROFILES_FILE,), _run_profile,
+        "record", "Basic profiles from CSV (legacy path, uuid 0-9)"),
     "persona_seeds": Node(
-        "persona_seeds", ("profile",), (STAGE1_FILE,), _run_persona_seeds,
-        "record", "Seed extra (foreign) personas via LLM [stage0]"),
+        "persona_seeds", ("profile",), (BASIC_PROFILES_FILE,), _run_persona_seeds,
+        "record", "Seed personas from specs via LLM (primary path)"),
     "life_state": Node(
-        "life_state", ("persona_seeds",), (STAGE2_FILE,), _run_life_state,
-        "record", "Init states (CSV + LLM) [stage2]"),
+        "life_state", ("persona_seeds",), (INIT_STATES_FILE,), _run_life_state,
+        "record", "Init states (CSV + LLM)"),
     "social_name_fix": Node(
-        "social_name_fix", ("life_state",), (STAGE2_FILE,), _run_social_name_fix,
-        "normalizer", "Fix social relationship names; rewrites stage2 [stage2.1]"),
+        "social_name_fix", ("life_state",), (INIT_STATES_FILE,), _run_social_name_fix,
+        "normalizer", "Fix social relationship names; rewrites the init-states file"),
     "timeline_dates": Node(
-        "timeline_dates", ("social_name_fix",), (STAGE3_FILE,), _run_timeline_dates,
-        "record", "Important dates (LLM) [stage3]"),
+        "timeline_dates", ("social_name_fix",), (IMPORTANT_DATES_FILE,), _run_timeline_dates,
+        "record", "Important dates (LLM)"),
     "social_world": Node(
-        "social_world", ("timeline_dates",), (STAGE3_9_FILE,), _run_social_world,
-        "record", "Social graph (LLM) [stage3.9]"),
+        "social_world", ("timeline_dates",), (SOCIAL_GRAPH_FILE,), _run_social_world,
+        "record", "Social graph (LLM)"),
     "annual_events": Node(
-        "annual_events", ("social_world",), (STAGE4_FILE,), _run_annual_events,
-        "record", "Annual events (LLM) + gender fix [stage4]"),
+        "annual_events", ("social_world",), (ANNUAL_EVENTS_FILE,), _run_annual_events,
+        "record", "Annual events (LLM) + gender fix"),
     "sub_events": Node(
         "sub_events", ("annual_events",), ("sub_events.jsonl",),
         _delegate("generation.sub_events", _argv_sub_events),
-        "record", "Sub-events (LLM) [stage4.5]"),
+        "record", "Sub-events (LLM)"),
     "conversation": Node(
         "conversation", ("annual_events", "social_world", "sub_events"),
         ("group_chats.jsonl",),
         _delegate("generation.conversation", _argv_conversation),
-        "media", "Group chats + images [stage7]"),
+        "media", "Group chats + images"),
     "app_trace": Node(
         "app_trace", ("annual_events", "sub_events"),
         (APP_TRACE_FILE,),
         _delegate("generation.app_trace", _argv_app_trace),
-        "media", "App screenshots + images [stage7.2]"),
+        "media", "App screenshots + images"),
     "event_photo": Node(
         "event_photo", ("conversation", "annual_events", "sub_events"),
         (EVENT_PHOTO_FILE,),
         _delegate("generation.event_photo", _argv_event_photo),
-        "media", "Event images + images [stage7.1]"),
+        "media", "Event images + images"),
     "document": Node(
         "document", ("event_photo", "annual_events"),
         (DOCUMENT_FILE,),
         _delegate("generation.document", _argv_document),
-        "media", "Tickets / transfers / moments + images [stage7.3]"),
+        "media", "Tickets / transfers / moments + images"),
     "scenery": Node(
         "scenery", ("annual_events",), (),
         _delegate("generation.scenery", _argv_scenery),
-        "media", "Scenery images [stage8]", verify=_verify_scenery),
+        "media", "Scenery images", verify=_verify_scenery),
     "memory_summary": Node(
         "memory_summary",
         ("conversation", "app_trace", "document", "event_photo", "scenery", "sub_events"),
         ("total_images.jsonl",),
         _delegate("generation.memory_summary", _argv_memory_summary),
-        "index", "Image summaries + merge [stage10]"),
+        "index", "Image summaries + merge"),
 }
 
 

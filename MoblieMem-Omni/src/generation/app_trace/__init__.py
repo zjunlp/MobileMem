@@ -1,8 +1,8 @@
 """App-trace generator package (book / music / video / shopping app screenshots).
 
 Folded domain module re-split into a sub-package. ``generation.app_trace`` keeps
-its full public surface via these re-exports, so existing importers and the old
-``stage7_2_*`` shims are unaffected.
+its full public surface via these re-exports, so existing importers are
+unaffected.
 """
 from .templates import (
     TEMPLATES_CN, TEMPLATES_EN, _esc, _load_template, _persona_phones,
@@ -20,7 +20,7 @@ from .content import (
 )
 from .generator import (
     APP_TYPE_CN, APP_TYPE_EN, APP_TYPES, AppTraceGenerator, logger,
-    main, process_persona, read_jsonl, render_screenshots, render_single_sync,
+    main, process_persona, read_jsonl, render_single_sync,
     set_log_context, write_jsonl,
 )
 
@@ -34,6 +34,6 @@ __all__ = [
     "INFO_SCHEMAS", "_call_llm_generate_info", "_call_llm_generate_info_single",
     "_compute_publish_date",
     "APP_TYPE_CN", "APP_TYPE_EN", "APP_TYPES", "AppTraceGenerator", "logger",
-    "main", "process_persona", "render_screenshots", "render_single_sync",
+    "main", "process_persona", "render_single_sync",
     "read_jsonl", "write_jsonl", "set_log_context",
 ]

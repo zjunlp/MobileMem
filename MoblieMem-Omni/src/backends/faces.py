@@ -4,9 +4,9 @@ Two groups of helpers:
 
 * recognition / consistency verification: lazily loads insightface, caches
   reference embeddings per uuid, and verifies that a generated event image
-  contains the reference person — logs under the ``fix_event_images`` logger.
+  contains the reference person — logs under the ``event_photo`` logger.
 * avatar image processing: face detection, auto-orientation, and face-centered
-  cropping of generated member avatars — logs under the ``stage7`` logger.
+  cropping of generated member avatars — logs under the ``conversation`` logger.
 
 ``FaceEngine`` is a thin facade for generators. The heavy native deps
 (cv2 / numpy / insightface) stay lazily imported inside the functions, so
@@ -19,20 +19,24 @@ import logging
 import threading
 from typing import Dict, List, Optional, Tuple
 
+# core.lang is a pure, stdlib-only helper (not the domain model), so importing
+# it here does not violate the "backends never import generators/models" rule.
+from core.lang import is_chinese_persona
+
 # Avatar-processing logger.
-logger = logging.getLogger('stage7')
+logger = logging.getLogger('conversation')
 # Recognition logger.
-_REC_LOGGER = logging.getLogger('fix_event_images')
+_REC_LOGGER = logging.getLogger('event_photo')
 
 
-# Recognition / consistency verification  (origin: stage7_1_faces)       #
+# Recognition / consistency verification                                 #
 
 FACE_SIMILARITY_THRESHOLD = 0.35
 FACE_SIMILARITY_THRESHOLD_INTL = 0.22  # non-Chinese nationalities: generated faces vary more, so the threshold is relaxed
 
 def get_face_threshold(nationality: str) -> float:
     """Return an appropriate face similarity threshold based on nationality."""
-    return FACE_SIMILARITY_THRESHOLD if nationality == "Chinese" else FACE_SIMILARITY_THRESHOLD_INTL
+    return FACE_SIMILARITY_THRESHOLD if is_chinese_persona(nationality) else FACE_SIMILARITY_THRESHOLD_INTL
 
 _THREAD_LOCAL = threading.local()
 _REFERENCE_EMBEDDINGS_CACHE: Dict[int, List] = {}
@@ -184,18 +188,24 @@ def verify_named_identities(image_path: str, named_embeddings: Dict[str, List],
     return results
 
 
-# Avatar image processing  (origin: stage7_gc_faces)                     #
+# Avatar image processing                                                #
 
-# Lazily-initialized InsightFace detector shared across avatar crops. Was a
-# module-level global in the original stage7_group_chats.
+# Lazily-initialized InsightFace detector shared across avatar crops.
 _FACE_ANALYSIS_APP = None
 
 
 def _get_face_analysis_app():
-    """Lazy-load the face detector used for avatar cropping."""
+    """Lazy-load the face detector used for avatar cropping.
+
+    Returns the shared FaceAnalysis instance, or None when it is unavailable
+    (insightface not installed or initialization failed). A failed attempt is
+    remembered via the ``False`` sentinel — every subsequent call returns None
+    without re-trying initialization.
+    """
     global _FACE_ANALYSIS_APP
     if _FACE_ANALYSIS_APP is not None:
-        return _FACE_ANALYSIS_APP
+        # Loaded app, or the False "tried and failed" sentinel (mapped to None).
+        return _FACE_ANALYSIS_APP or None
 
     try:
         os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -210,22 +220,124 @@ def _get_face_analysis_app():
         return None
 
 
-def _orient_face_from_kps(kps):
-    """Return rotation degrees CW (0/90/180/270) to make face upright from 5-point kps."""
+# Face-orientation helpers. This is the single implementation (the previous
+# duplicate in the root-level fix_face_orientation.py now delegates here).
+# Uses the tolerance-based snap logic: near-upright faces with a slight head
+# tilt are kept as-is instead of being force-rotated.
+
+ORIENTATION_SNAP_TOLERANCE_DEGREES = 20.0
+
+
+def _face_angle_from_kps(kps):
+    """Return the eye-center to mouth-center angle in degrees."""
     import math
     eye_center = (kps[0] + kps[1]) / 2.0
     mouth_center = (kps[3] + kps[4]) / 2.0
     dx = eye_center[0] - mouth_center[0]
     dy = eye_center[1] - mouth_center[1]
-    angle = math.degrees(math.atan2(-dy, dx))
-    if 45 <= angle <= 135:
-        return 0
-    elif -45 <= angle < 45:
-        return 270
-    elif -135 <= angle < -45:
-        return 180
-    else:
-        return 90
+    return math.degrees(math.atan2(-dy, dx))
+
+
+def _eye_line_horizontal_delta_from_kps(kps):
+    """Return how far the eye line is from horizontal in degrees."""
+    import math
+    dx = kps[1][0] - kps[0][0]
+    dy = kps[1][1] - kps[0][1]
+    angle = math.degrees(math.atan2(dy, dx))
+    return min(abs(angle), abs(angle - 180.0), abs(angle + 180.0))
+
+
+def _upright_face_score_from_kps(kps):
+    """Lower score means the face looks more upright."""
+    face_angle = _face_angle_from_kps(kps)
+    upright_delta = abs(face_angle - 90.0)
+    eye_horizontal_delta = _eye_line_horizontal_delta_from_kps(kps)
+    return upright_delta + eye_horizontal_delta, face_angle, eye_horizontal_delta
+
+
+def _orient_face_from_kps(kps):
+    """Return the clockwise rotation needed to make a face upright: 0/90/180/270."""
+    angle = _face_angle_from_kps(kps)
+    right_delta = abs(angle - 0.0)
+    upside_down_delta = abs(angle + 90.0)
+    left_delta = min(abs(angle - 180.0), abs(angle + 180.0))
+    upright_delta = abs(angle - 90.0)
+
+    if upright_delta <= ORIENTATION_SNAP_TOLERANCE_DEGREES:
+        return 0      # Close to upright; keep a slight head tilt.
+    if right_delta <= ORIENTATION_SNAP_TOLERANCE_DEGREES:
+        return 270    # Close to lying sideways to the right.
+    if upside_down_delta <= ORIENTATION_SNAP_TOLERANCE_DEGREES:
+        return 180    # Close to upside down.
+    if left_delta <= ORIENTATION_SNAP_TOLERANCE_DEGREES:
+        return 90     # Close to lying sideways to the left.
+    return 0
+
+
+def auto_orient_face(image_path: str) -> tuple:
+    """Detect face orientation in an image and rotate it in place if needed.
+
+    Tries all four orientations, scores each detected face for uprightness,
+    and rewrites the file only when a clearly better orientation exists.
+
+    Returns:
+        (rotation_degrees, success):
+            rotation_degrees: actual clockwise rotation applied (0/90/180/270).
+            success: whether processing succeeded.
+    """
+    import cv2
+
+    app = _get_face_analysis_app()
+    if app is None:
+        return 0, False
+
+    img = _imread_safe(image_path)
+    if img is None:
+        logger.warning(f"Cannot read image: {image_path}")
+        return 0, False
+
+    rotations = {
+        0: None,
+        90: cv2.ROTATE_90_CLOCKWISE,
+        180: cv2.ROTATE_180,
+        270: cv2.ROTATE_90_COUNTERCLOCKWISE,
+    }
+
+    best = None
+    for try_rot, cv_code in rotations.items():
+        candidate = img if cv_code is None else cv2.rotate(img, cv_code)
+        faces = app.get(candidate)
+        if not faces:
+            continue
+
+        face = max(faces, key=lambda f: (f.bbox[2] - f.bbox[0]) * (f.bbox[3] - f.bbox[1]))
+        face_area = (face.bbox[2] - face.bbox[0]) * (face.bbox[3] - face.bbox[1])
+        upright_score, face_angle, eye_horizontal_delta = _upright_face_score_from_kps(face.kps)
+        det_score = float(getattr(face, 'det_score', 0.0))
+        candidate_score = (upright_score, -det_score, -face_area, try_rot, face_angle, eye_horizontal_delta)
+        if best is None or candidate_score < best:
+            best = candidate_score
+
+    if best is None:
+        logger.warning(f"No face detected in any orientation: {os.path.basename(image_path)}")
+        return 0, False
+
+    best_upright_score, _neg_det_score, _neg_face_area, best_rot, best_face_angle, best_eye_delta = best
+    if best_rot == 0:
+        return 0, True
+
+    if best_upright_score > ORIENTATION_SNAP_TOLERANCE_DEGREES * 2:
+        logger.warning(
+            f"Face orientation ambiguous for {os.path.basename(image_path)}: "
+            f"score={best_upright_score:.1f}, angle={best_face_angle:.1f}, eye_delta={best_eye_delta:.1f}"
+        )
+        return 0, True
+
+    rotated = cv2.rotate(img, rotations[best_rot])
+    if _imwrite_safe(image_path, rotated):
+        logger.info(f"Auto-oriented {best_rot} deg CW: {os.path.basename(image_path)}")
+        return best_rot, True
+    return best_rot, False
 
 
 def _imread_safe(path: str):
@@ -237,8 +349,8 @@ def _imread_safe(path: str):
         img = cv2.imdecode(data, cv2.IMREAD_COLOR)
         if img is not None:
             return img
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[WARN][faces] imdecode read failed for {path}, falling back to cv2.imread: {e}")
     return cv2.imread(path)
 
 
@@ -252,8 +364,8 @@ def _imwrite_safe(path: str, img) -> bool:
             with open(path, 'wb') as wf:
                 wf.write(buf.tobytes())
             return True
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[WARN][faces] imencode write failed for {path}, falling back to cv2.imwrite: {e}")
     ok = cv2.imwrite(path, img)
     if ok:
         return True
@@ -275,13 +387,26 @@ def _normalize_avatar_file(path: str) -> bool:
     try:
         if not _imwrite_safe(tmp_path, img):
             return False
-        os.replace(tmp_path, path)
-        return True
+        # On Windows the freshly written target can be transiently locked by
+        # AV/indexing scanners; retry briefly and degrade to "not normalized"
+        # instead of raising (normalization is best-effort).
+        import time
+        for attempt in range(3):
+            try:
+                os.replace(tmp_path, path)
+                return True
+            except PermissionError:
+                if attempt < 2:
+                    time.sleep(0.5 * (attempt + 1))
+        logger.warning(f"Avatar normalization skipped (file locked): {path}")
+        return False
     finally:
         if os.path.exists(tmp_path):
             try:
                 os.remove(tmp_path)
             except OSError:
+                # Temp-file cleanup only; a leftover __avatar_normalized_tmp
+                # file is harmless and must not mask the real outcome.
                 pass
 
 
@@ -385,6 +510,8 @@ def _save_generated_avatar_with_crop(generated_path: str, target_path: str) -> b
         try:
             os.remove(cropped_path)
         except OSError:
+            # Best-effort removal of a stale temp crop; _crop_avatar_to_face
+            # overwrites the path anyway, so failure here is safe to ignore.
             pass
 
     cropped_ok = _crop_avatar_to_face(generated_path, cropped_path)
@@ -393,6 +520,8 @@ def _save_generated_avatar_with_crop(generated_path: str, target_path: str) -> b
             try:
                 os.remove(target_path)
             except OSError:
+                # Pre-delete of the old target is best-effort; os.replace
+                # below overwrites it atomically and raises on real failure.
                 pass
         os.replace(cropped_path, target_path)
         return True
@@ -401,6 +530,8 @@ def _save_generated_avatar_with_crop(generated_path: str, target_path: str) -> b
         try:
             os.remove(cropped_path)
         except OSError:
+            # Temp-file cleanup on the failure path; a leftover .cropped.png
+            # is harmless and must not mask the False return.
             pass
     return False
 
@@ -409,12 +540,6 @@ def maybe_auto_orient_avatar(target_path: str, uuid: int, member_name: str) -> b
     """Try to auto-orient an avatar in place and log the outcome."""
     if not _normalize_avatar_file(target_path):
         logger.warning(f"[uuid={uuid}] Avatar normalization failed for '{member_name}'")
-
-    try:
-        from fix_face_orientation import auto_orient_face
-    except ImportError as exc:
-        logger.warning(f"[uuid={uuid}] Avatar orientation helper unavailable for '{member_name}': {exc}")
-        return False
 
     try:
         rot, ok = auto_orient_face(target_path)

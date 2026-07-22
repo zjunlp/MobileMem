@@ -9,8 +9,8 @@ from core.base import JsonlModel, _ABSENT
 
 
 @dataclass
-class Stage10Summary(JsonlModel):
-    """A stage10 image-summary row (bilingual summary + success flag).
+class ImageSummary(JsonlModel):
+    """A memory_summary image-summary row (bilingual summary + success flag).
 
     ``error`` (present only on failure) round-trips via ``extra``.
     """

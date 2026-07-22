@@ -1,6 +1,6 @@
 """Document generator (Memories / Document): orchestration + Playwright render.
 
-Holds the APP_TYPES constant, the shared 'fix_app2' logger, the HTML->PNG
+Holds the APP_TYPES constant, the shared 'document' logger, the HTML->PNG
 screenshot, the per-persona orchestration (``main``) and the thin
 ``DocumentGenerator`` (data half) for the pipeline DAG. Template filling and the
 *_info LLM layer live in sibling modules.
@@ -14,19 +14,15 @@ import logging
 import os
 import random
 import sys
-from pathlib import Path
-
 import config
-from common import (
-    LOG_DIR,
-    load_sub_events_index,
-    expand_events_for_imaging,
-    read_jsonl,
-    write_jsonl,
-)
+from config import LOG_DIR
+from infra.store import read_jsonl, write_jsonl_atomic
+from generation.event_expansion import load_sub_events_index, expand_events_for_imaging
 from core import DIR_NAME
+from core.lang import is_chinese_persona
 from backends.llm import set_log_context
 from infra.base_generator import Generator
+from infra.html_screenshot import render_html_to_png
 
 from .content import call_llm_generate_info, llm_select_events
 from .templates import (
@@ -50,9 +46,10 @@ if hasattr(sys.stderr, 'reconfigure'):
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
-logger = logging.getLogger('fix_app2')
+logger = logging.getLogger('document')
 logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler(os.path.join(LOG_DIR, 'fix_app2.log'), encoding='utf-8')
+os.makedirs(LOG_DIR, exist_ok=True)
+fh = logging.FileHandler(os.path.join(LOG_DIR, 'document.log'), encoding='utf-8')
 fh.setLevel(logging.DEBUG)
 fh.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
 sh = logging.StreamHandler()
@@ -66,28 +63,8 @@ APP_TYPES = ["ticket", "money", "friend"]
 
 def render_screenshot(page, html_content, png_path, html_path=None, keep_html=False):
     """Render HTML to a PNG screenshot, cropped to content height (to avoid bottom whitespace)."""
-    if html_path is None:
-        html_path = png_path.replace('.png', '.html')
-
-    with open(html_path, 'w', encoding='utf-8') as f:
-        f.write(html_content)
-
-    url = Path(html_path).resolve().as_uri()
-    page.goto(url, wait_until="networkidle", timeout=15000)
-    page.wait_for_timeout(300)
-
-    # Crop to the actual content height to avoid large bottom whitespace for short posts
-    bbox = page.locator('body').bounding_box()
-    if bbox and bbox['height'] > 0:
-        clip_height = min(int(bbox['height']) + 2, 4000)
-        page.screenshot(path=png_path, clip={"x": 0, "y": 0, "width": 450, "height": clip_height})
-    else:
-        page.screenshot(path=png_path, full_page=True)
-
-    if not keep_html and os.path.exists(html_path):
-        os.remove(html_path)
-
-    return True
+    return render_html_to_png(page, html_content, png_path, html_path=html_path,
+                              keep_html=keep_html, clip_to_body=True)
 
 # Main process
 
@@ -110,13 +87,13 @@ def main():
                         help='Base directory for event images (uid0/book, uid0/video, etc.)')
     parser.add_argument('--sub-events-file', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'data', 'sub_events.jsonl'),
-                        help='stage4.5 sub-events JSONL for expanding mid/long-term events')
+                        help='sub_events JSONL for expanding mid/long-term events')
     parser.add_argument('--force', action='store_true',
                         help='Ignore existing screenshots and regenerate from scratch')
     args = parser.parse_args()
 
     logger.info("=" * 60)
-    logger.info("fix_app2: ticket / money / friend screenshot generator")
+    logger.info("document: ticket / money / friend screenshot generator")
     logger.info(f"Types: {args.types}")
     logger.info(f"UUID filter: {args.uuid_filter or 'ALL'}")
     logger.info(f"Events per type: {args.events_per_type}")
@@ -125,12 +102,12 @@ def main():
     logger.info("=" * 60)
 
     # Read data
-    stage4_records = read_jsonl(args.events_file)
+    event_records = read_jsonl(args.events_file)
 
     # Load the sub-events index and expand mid/long-term events
     sub_index = load_sub_events_index(args.sub_events_file)
     logger.info(f"Sub-events index: {len(sub_index)} parent events loaded")
-    for persona in stage4_records:
+    for persona in event_records:
         _uid = persona.get('uuid', 0)
         if args.uuid_filter is not None and _uid not in args.uuid_filter:
             continue
@@ -187,6 +164,7 @@ def main():
         eid = ev.get('event_id', '')
         eid_str = str(eid)
         parent_eid = int(eid_str.split('_')[0]) if '_' in eid_str else eid
+        success = status in {'done', 'skipped'} and os.path.exists(png_path)
         jsonl_records.append({
             'uuid': uid,
             'sub_event_id': eid_str,
@@ -194,19 +172,22 @@ def main():
             'event_name': ev.get('event_name', ev.get('event_title', ev.get('title', ''))),
             'participants': participants,
             'type': app_type,
-            'image_path': png_path,
+            # Never record a path for a render that failed: downstream
+            # (memory_summary._manifest_image_exists) filters on
+            # success/empty path, and a ghost path would defeat that.
+            'image_path': png_path if success else '',
             f'{app_type}_info': info,
-            'success': status in {'done', 'skipped'} and os.path.exists(png_path),
+            'success': success,
             'status': status,
         })
 
     try:
-        for persona in stage4_records:
+        for persona in event_records:
             uid = persona.get('uuid', 0)
             if args.uuid_filter is not None and uid not in args.uuid_filter:
                 continue
 
-            set_log_context(uuid=uid, stage="fix_app2")
+            set_log_context(uuid=uid, stage="document")
             events = persona.get('Events', [])
 
             # Get persona info
@@ -219,7 +200,7 @@ def main():
             location = ist.get('location', bp.get('location', ''))
             personality = bp.get('personality_traits', '')
             nationality = bp.get('nationality', '') or profile.get('nationality', '') or 'Chinese'
-            is_cn = (nationality == "Chinese")
+            is_cn = (is_chinese_persona(nationality))
             lang_key = "cn" if is_cn else "en"
 
             logger.info(f"[uid={uid}] {persona_name} ({nationality})")
@@ -329,12 +310,12 @@ def main():
 
     # Save the updated JSONL
     if not args.dry_run:
-        write_jsonl(stage4_records, args.events_file)
+        write_jsonl_atomic(event_records, args.events_file)
         logger.info(f"Updated {args.events_file}")
 
     # Save the standalone JSONL, even when empty.
     jsonl_path = os.path.join(os.path.dirname(args.events_file), 'tickets.jsonl')
-    write_jsonl(jsonl_records, jsonl_path)
+    write_jsonl_atomic(jsonl_records, jsonl_path)
     logger.info(f"Saved standalone JSONL: {jsonl_path} ({len(jsonl_records)} records)")
 
     logger.info("=" * 60)
@@ -356,10 +337,8 @@ class DocumentGenerator(Generator):
     unchanged.
     """
 
-    stage_label = "Stage7.3"
-    stage_num = "7.3"
+    label = "document"
     index_key = "uuid"
-    produces = "document"
 
     def __init__(self, types=None, events_per_type=20):
         self.types = list(types) if types else list(APP_TYPES)

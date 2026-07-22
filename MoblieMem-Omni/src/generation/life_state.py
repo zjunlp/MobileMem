@@ -5,7 +5,7 @@ state as of 2025-01-01: education / location / career / preferences / health /
 emotion / finance + a set of social relationships) from the persona's CSV data
 and the LLM, repackaging the record as ``{uuid, Basic_Profile, Init_State}``.
 It inherits the resume-safe lifecycle from
-:class:`infra.base_generator.Generator`; the stage-specific parts are the running
+:class:`infra.base_generator.Generator`; the node-specific parts are the running
 ``global_names`` registry (forbidden social names) and the post-generation
 social-name de-duplication, expressed via the base-class hooks.
 """
@@ -21,48 +21,26 @@ from backends.llm import (
 )
 from csv_parser import parse_csv, build_csv_context, build_preferences_summary
 from core import BasicProfile
+from core.lang import is_chinese_persona
+from generation.name_pools import make_unique_name as _make_unique_name
 from infra.base_generator import Generator
-
-
-def load_prompt(prompt_path: str) -> str:
-    with open(prompt_path, 'r', encoding='utf-8') as f:
-        return f.read()
-
-
-_SURNAME_POOL = [
-    '宋', '徐', '韩', '冯', '曹', '魏', '程', '苏', '叶', '卢',
-    '贺', '龚', '潘', '顾', '史', '方', '邓', '武', '钱', '唐',
-]
-_GIVEN_POOL = [
-    '昊', '晨', '睿', '泽', '皓', '帆', '峰', '洋', '凯', '博',
-    '婷', '颖', '琳', '燕', '霞', '洁', '娜', '雯', '莹', '璐',
-]
-
-
-def _make_unique_name(existing: set) -> str:
-    """Generate a unique Chinese name not in existing."""
-    import itertools
-    for s, g in itertools.product(_SURNAME_POOL, _GIVEN_POOL):
-        candidate = s + g
-        if candidate not in existing:
-            return candidate
-    base = _SURNAME_POOL[0] + _GIVEN_POOL[0]
-    i = 2
-    while f"{base}{i}" in existing:
-        i += 1
-    return f"{base}{i}"
+from infra.prompts import load_prompt
 
 
 def _deduplicate_social_relationships(
-        social_rel: dict, global_names: set
+        social_rel: dict, global_names: set, is_chinese: bool = True
 ) -> tuple:
-    """Check for name conflicts with global_names, rename if needed."""
+    """Check for name conflicts with global_names, rename if needed.
+
+    ``is_chinese`` picks the replacement-name language so an English persona
+    never gets a Chinese fallback name (and vice versa).
+    """
     fixed = {}
     renamed = []
     local_seen = set(global_names)
     for name, info in social_rel.items():
         if name in local_seen:
-            new_name = _make_unique_name(local_seen)
+            new_name = _make_unique_name(local_seen, is_chinese=is_chinese)
             renamed.append(f"{name} -> {new_name}")
             local_seen.add(new_name)
             fixed[new_name] = info
@@ -85,7 +63,7 @@ def _build_life_state_user_content(basic_profile: Dict, role_identity: str,
     """Build the user message for the init-state request (pure, no I/O).
 
     Chinese personas get the all-Chinese template, everyone else gets the
-    English template (with the appearance-constraint block when stage0
+    English template (with the appearance-constraint block when persona_seeds
     appearance features are present).
     """
     if is_chinese:
@@ -107,7 +85,7 @@ def _build_life_state_user_content(basic_profile: Dict, role_identity: str,
 {forbidden_str}
 social_relationships中的所有人名不得与以上名字重复。"""
 
-    # Build appearance constraint block from stage0 data if available
+    # Build appearance constraint block from persona_seeds data if available
     if appearance:
         appearance_block = f"""
 - Appearance (MUST use these exact features in the description field):
@@ -159,9 +137,8 @@ def generate_life_state_for_person(
         csv_context = '（无CSV数据，请根据人物背景合理生成）'
         preferences_summary = '（无CSV数据，请根据人物背景合理生成）'
 
-    # Build the profile sub-object through the BasicProfile contract (P1-2). The
-    # declared field order matches the previous literal dict, and the optional
-    # 'appearance' is still appended afterward, so the record stays stable.
+    # BasicProfile.to_dict() writes the declared fields in declared order, which
+    # is the on-disk field order of the sub-object.
     basic_profile = BasicProfile(
         name=persona.get("name", ""),
         uuid=persona.get("uuid", 0),
@@ -172,12 +149,13 @@ def generate_life_state_for_person(
         personality_traits=persona.get("personality_traits", ""),
         life_experiences=persona.get("life_experiences", ""),
     ).to_dict()
-    # Keep the appearance field from stage0/stage1 (appearance features for foreign personas)
+    # Keep the appearance field from the profile row (appearance features for
+    # foreign personas, seeded by persona_seeds)
     if persona.get("appearance"):
         basic_profile["appearance"] = persona["appearance"]
 
     nationality = basic_profile.get('nationality', '')
-    is_chinese = '中国' in nationality or 'China' in nationality or 'Chinese' in nationality
+    is_chinese = is_chinese_persona(nationality, basic_profile.get('language'))
 
     forbidden_str = '、'.join(forbidden_names) if forbidden_names else '（无）'
 
@@ -208,7 +186,6 @@ def generate_life_state_for_person(
         user_content,
         model=get_text_llm_model(is_chinese),
         return_parsed_json=True,
-        json_markers=[]
     )
 
     cost_info = calculate_cumulative_cost(None, cost_info)
@@ -235,16 +212,14 @@ class LifeStateGenerator(Generator):
 
     The resume-safe iterate / skip-done / save-incrementally / isolate-errors
     lifecycle is inherited from :class:`infra.base_generator.Generator`. The
-    stage-specific parts are the running ``global_names`` registry (forbidden
+    node-specific parts are the running ``global_names`` registry (forbidden
     names shown in the log line, passed into generation, and grown after each
     record) and the post-generation de-duplication — all expressed via the
     base-class hooks.
     """
 
-    stage_label = "Stage2"
-    stage_num = 2
+    label = "life_state"
     index_key = "uuid"
-    produces = "life_state"
 
     def __init__(self, info_dir: str, base_prompt: str, cn_system_prompt: str,
                  extra_instruction_en: str, extra_instruction_cn: str) -> None:
@@ -257,15 +232,15 @@ class LifeStateGenerator(Generator):
 
     def set_context(self, record: Dict, index: int) -> None:
         uid = record.get('uuid')
-        set_log_context(uuid=uid if uid is not None else index, stage="stage2_init_states")
+        set_log_context(uuid=uid if uid is not None else index, stage="life_state")
 
     def format_skip_line(self, record: Dict, key, index: int, total: int) -> str:
         role = record.get('role_identity', 'unknown')
-        return f"[Stage2] [{index + 1}/{total}] uid={key} ({role}): SKIP (checkpoint)"
+        return f"[life_state] [{index + 1}/{total}] uid={key} ({role}): SKIP (checkpoint)"
 
     def format_generating_line(self, record: Dict, key, index: int, total: int) -> str:
         role = record.get('role_identity', 'unknown')
-        return (f"\n[Stage2] [{index + 1}/{total}] uid={key} ({role}): generating... "
+        return (f"\n[life_state] [{index + 1}/{total}] uid={key} ({role}): generating... "
                 f"(forbidden: {len(self.global_names)} names)")
 
     def produce(self, record: Dict, ctx=None) -> Dict:
@@ -278,9 +253,12 @@ class LifeStateGenerator(Generator):
         role = record.get('role_identity', 'unknown')
         init_state = result.get('Init_State', {})
         social_rel = init_state.get('social_relationships', {}) or {}
-        fixed_rel, renamed = _deduplicate_social_relationships(social_rel, self.global_names)
+        bp = result.get('Basic_Profile', {})
+        is_chinese = is_chinese_persona(bp.get('nationality'), bp.get('language'))
+        fixed_rel, renamed = _deduplicate_social_relationships(
+            social_rel, self.global_names, is_chinese=is_chinese)
         if renamed:
-            print(f"[Stage2] DEDUP {role}: renamed {renamed}")
+            print(f"[life_state] DEDUP {role}: renamed {renamed}")
             init_state['social_relationships'] = fixed_rel
         for name in (init_state.get('social_relationships', {}) or {}).keys():
             if name:
@@ -289,19 +267,15 @@ class LifeStateGenerator(Generator):
     def describe_result(self, record: Dict, result: Dict) -> str:
         role = record.get('role_identity', 'unknown')
         init_state = result.get('Init_State', {})
-        return (f"[Stage2] OK: {role} -> edu={init_state.get('education', 'N/A')}, "
+        return (f"[life_state] OK: {role} -> edu={init_state.get('education', 'N/A')}, "
                 f"career={init_state.get('career', 'N/A')}")
 
 
-# Backward-compatible alias for the old class name in ``stage2_init_states``.
-Stage2InitStates = LifeStateGenerator
-
-
-def generate_life_states(stage1_records: List[Dict], info_dir: str, prompts_dir: str,
+def generate_life_states(profile_records: List[Dict], info_dir: str, prompts_dir: str,
                     existing: Optional[Dict[str, Dict]] = None,
                     save_callback=None) -> List[Dict]:
     """
-    Generate stage2 Init_States for all persons, with checkpoint support.
+    Generate Init_State records for all persons, with checkpoint support.
 
     Thin adapter over :class:`LifeStateGenerator`: load prompts, seed the
     social-name registry from already-done records, then run the shared
@@ -327,4 +301,4 @@ def generate_life_states(stage1_records: List[Dict], info_dir: str, prompts_dir:
             if name:
                 generator.global_names.add(name)
 
-    return generator.process_all(stage1_records, existing=existing, save_callback=save_callback)
+    return generator.process_all(profile_records, existing=existing, save_callback=save_callback)

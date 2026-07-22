@@ -1,18 +1,18 @@
 """Text-LLM capability (L1 backend) — stable import surface for generators.
 
-This is the package generators should import the LLM from: ``from backends.llm import
-llm_request, get_text_llm_model, ...``. For now it re-exports the existing
-``llm_request`` implementation unchanged (facade-first: establish the layered import
-path with zero behavior risk); a later step moves the implementation into
-``backends/llm/{client,request,json_repair,cost,logging,models}.py`` and turns
-``llm_request.py`` into the shim. Behavior is identical either way.
+This is the package generators should import the LLM from: ``from backends.llm
+import llm_request, get_text_llm_model, ...``. The implementation lives in
+``backends/llm/request.py``.
 """
 
-from llm_request import (  # noqa: F401  (re-exported public surface)
+from backends.llm.request import (  # noqa: F401  (re-exported public surface)
     llm_request,
     calculate_cumulative_cost,
     get_text_llm_model,
     set_log_context,
+    clear_log_context,
+    update_log_context,
+    setup_llm_logging,
     log_llm_call,
     get_client,
     log_image_api_call,
@@ -24,6 +24,9 @@ __all__ = [
     "calculate_cumulative_cost",
     "get_text_llm_model",
     "set_log_context",
+    "clear_log_context",
+    "update_log_context",
+    "setup_llm_logging",
     "log_llm_call",
     "get_client",
     "log_image_api_call",

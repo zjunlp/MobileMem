@@ -6,8 +6,9 @@ side effects.
 | Module | Responsibility |
 |--------|----------------|
 | `base.py` | `JsonlModel`: lossless `dict ↔ model` round-trip (`from_dict(x).to_dict() == x`); unknown keys are preserved in `extra` |
-| `persona.py` | Persona / basic-profile model |
-| `life.py` | Life-state model |
-| `memories.py` | Event and memory models |
-| `recall.py` | Recall / question models |
+| `persona.py` | `Persona` (profile top-level record) and `BasicProfile` (life_state+ nested profile) |
+| `life.py` | `Event`, `SocialGraph`, `SubEvent` |
+| `memories.py` | `GroupChat` (chat documents) and `ImageRecord` (image index rows) |
+| `recall.py` | `ImageSummary` (image summary rows) |
+| `lang.py` | `is_chinese_persona` — the single "is this persona Chinese?" check used by every node |
 | `image_dirs.py` | Single source of truth for the image output directory names (rename a category here only) |

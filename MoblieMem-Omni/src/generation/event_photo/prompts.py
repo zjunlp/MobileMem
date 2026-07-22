@@ -1,13 +1,15 @@
 """Event-photo prompt building (identity / scene / event / safety)."""
 import logging
+import re
 from typing import Dict, List, Optional
 
 import config
 from backends.llm import get_text_llm_model, llm_request
+from core.lang import is_chinese_persona
 
 from .data import compute_age
 
-logger = logging.getLogger('fix_event_images')
+logger = logging.getLogger('event_photo')
 
 
 CHINESE_EDIT_PROMPT_MAX = config.DMX_CHINESE_EDIT_PROMPT_MAX
@@ -15,39 +17,56 @@ GPT_PROMPT_MAX = 1000
 
 
 def extract_ethnicity_from_description(description: str, nationality: str) -> str:
-    """Extract specific ethnicity/skin tone from the stage2 description, to avoid generating wrong faces for multi-ethnic countries.
+    """Extract specific ethnicity/skin tone from the life_state description, to avoid generating wrong faces for multi-ethnic countries.
 
-    The stage2 description already contains explicit ethnicity info (e.g. 'White American', 'Black British');
+    The life_state description already contains explicit ethnicity info (e.g. 'White American', 'Black British');
     extract those keywords to build a more precise ethnicity constraint.
     """
     if not description:
         return f'{nationality} person'
-    
+
     desc_lower = description.lower()
-    # Match ethnicity/skin-tone keywords by priority (from more specific to more general)
+
+    # 'white'/'black' are also everyday color words ("white blouse", "black
+    # hair"), so a bare match would rewrite the ethnicity from clothing/hair
+    # mentions. Strategy: require a person/skin context word right after the
+    # color term ("a white man", "Black British", "white skin"). This is more
+    # conservative than a clothing-noun blocklist (which can never be
+    # exhaustive: "white walls", "black coffee", ...) at the cost of missing
+    # unusual phrasings — acceptable, since the fallback is the safe default.
+    person_context_words = ['man', 'woman', 'male', 'female', 'person',
+                            'lady', 'guy', 'boy', 'girl', 'skin']
+    if nationality:
+        # e.g. nationality='American' lets "White American" match.
+        person_context_words.append(re.escape(nationality.lower()))
+    ctx = '|'.join(person_context_words)
+
+    # Match ethnicity keywords by priority (from more specific to more
+    # general). All patterns are word-bounded so e.g. 'arabica' does not
+    # match 'arab'.
     ethnicity_patterns = [
-        ('african american', 'African American'),
-        ('african-american', 'African American'),
-        ('east asian', 'East Asian'),
-        ('southeast asian', 'Southeast Asian'),
-        ('south asian', 'South Asian'),
-        ('middle eastern', 'Middle Eastern'),
-        ('mixed race', 'mixed-race'),
-        ('biracial', 'biracial'),
-        ('hispanic', 'Hispanic'),
-        ('latino', 'Latino'),
-        ('latina', 'Latina'),
-        ('caucasian', 'Caucasian'),
-        ('white', 'White'),
-        ('black', 'Black'),
-        ('arab', 'Arab'),
-        ('european', 'European'),
+        (r'african[\s-]american', 'African American'),
+        (r'east asian', 'East Asian'),
+        (r'southeast asian', 'Southeast Asian'),
+        (r'south asian', 'South Asian'),
+        (r'middle eastern', 'Middle Eastern'),
+        (r'mixed[\s-]race', 'mixed-race'),
+        (r'biracial', 'biracial'),
+        (r'hispanic', 'Hispanic'),
+        (r'latino', 'Latino'),
+        (r'latina', 'Latina'),
+        (r'caucasian', 'Caucasian'),
+        (rf'white\s+(?:{ctx})', 'White'),
+        (rf'black\s+(?:{ctx})', 'Black'),
+        (r'arab', 'Arab'),
+        (r'european', 'European'),
     ]
-    
+
     for pattern, label in ethnicity_patterns:
-        if pattern in desc_lower:
+        if re.search(rf'\b(?:{pattern})\b', desc_lower):
             return f'{label} {nationality} person'
-    
+
+    # Nothing reliably ethnicity-like found: fall back to nationality only.
     return f'{nationality} person'
 
 
@@ -70,7 +89,7 @@ def build_identity_prompt(uuid: int, profile_record: Optional[Dict], init_state_
     # identity line and a brief appearance fallback instead of listing features.
     appearance = shorten_text(init_state.get('description', ''), 60)
 
-    if nationality == "Chinese":
+    if is_chinese_persona(nationality):
         gender_cn = '男性' if gender == 'male' else ('女性' if gender == 'female' else '')
         age_text = f"{age}岁" if age is not None else ''
         demo = '、'.join([p for p in [age_text, gender_cn, role_identity] if p])
@@ -80,9 +99,9 @@ def build_identity_prompt(uuid: int, profile_record: Optional[Dict], init_state_
         if appearance:
             prompt_parts.append(f"参考特征：{appearance}")
     else:
-        stage0_app = basic_profile.get('appearance', {})
-        if stage0_app and stage0_app.get('ethnicity'):
-            ethnicity = stage0_app['ethnicity']
+        appearance = basic_profile.get('appearance', {})
+        if appearance and appearance.get('ethnicity'):
+            ethnicity = appearance['ethnicity']
         else:
             ethnicity = extract_ethnicity_from_description(appearance, nationality)
         gender_en = 'man' if gender == 'male' else ('woman' if gender == 'female' else 'person')
@@ -98,7 +117,7 @@ def build_identity_prompt(uuid: int, profile_record: Optional[Dict], init_state_
 
 def build_event_generation_prompt(scene_prompt: str, identity_prompt: str, nationality: str = "Chinese") -> str:
     """Combine scene description with identity-preservation constraints."""
-    if nationality == "Chinese":
+    if is_chinese_persona(nationality):
         return (
             f"场景：{shorten_text(scene_prompt, 240)} "
             f"{identity_prompt} "
@@ -128,7 +147,7 @@ def format_attempt_logs(attempt_logs: List[Dict]) -> str:
     return '[' + '; '.join(parts) + ']'
 
 def get_prompt_limit(nationality: str) -> int:
-    return CHINESE_EDIT_PROMPT_MAX if nationality == 'Chinese' else GPT_PROMPT_MAX
+    return CHINESE_EDIT_PROMPT_MAX if is_chinese_persona(nationality) else GPT_PROMPT_MAX
 
 def fit_generation_prompt(scene_prompt: str, identity_prompt: str, nationality: str) -> str:
     """Compose the generation prompt within the model limit, scene-first.
@@ -137,8 +156,8 @@ def fit_generation_prompt(scene_prompt: str, identity_prompt: str, nationality: 
     identity stays short because the face is anchored by the reference image.
     """
     limit = get_prompt_limit(nationality)
-    scene_limit = 220 if nationality == 'Chinese' else 420
-    identity_limit = 120 if nationality == 'Chinese' else 200
+    scene_limit = 220 if is_chinese_persona(nationality) else 420
+    identity_limit = 120 if is_chinese_persona(nationality) else 200
     compact_scene = shorten_text(scene_prompt, scene_limit)
     compact_identity = shorten_text(identity_prompt, identity_limit)
     prompt = build_event_generation_prompt(compact_scene, compact_identity, nationality)
@@ -156,7 +175,7 @@ def build_participant_prompt_line(participant_names: List[str],
     """
     if not participant_names:
         return ""
-    is_zh = nationality == 'Chinese'
+    is_zh = is_chinese_persona(nationality)
     start = max(1, protagonist_img_count) + 1
     items = []
     for i, name in enumerate(participant_names):
@@ -193,8 +212,8 @@ def fit_generation_prompt_v2(scene_prompt: str, identity_prompt: str,
         participant_names, nationality, social_relationships,
         protagonist_name, protagonist_img_count)
     limit = get_prompt_limit(nationality)
-    scene_limit = 180 if nationality == 'Chinese' else 360
-    identity_limit = 90 if nationality == 'Chinese' else 160
+    scene_limit = 180 if is_chinese_persona(nationality) else 360
+    identity_limit = 90 if is_chinese_persona(nationality) else 160
     compact_scene = shorten_text(scene_prompt, scene_limit)
     compact_identity = shorten_text(identity_prompt, identity_limit)
     main_prompt = build_event_generation_prompt(compact_scene, compact_identity, nationality)
@@ -207,7 +226,7 @@ def create_safer_prompt(event: Dict, identity_prompt: str = "", nationality: str
     event_name = event.get('event_name', 'daily activity')
     description = str(event.get('description', '')).strip()
 
-    if nationality == "Chinese":
+    if is_chinese_persona(nationality):
         short_desc = description[:120] if description else '人们在平静的日常环境中互动'
         scene_prompt = (
             f"一个真实的、光线充足的日常场景，关于{event_name}，"
@@ -235,7 +254,7 @@ def generate_scene_prompt(event: Dict, nationality: str = "Chinese") -> str:
 
     # Match the persona's language so the open-source English build stays Chinese-free.
     # (The backend is now Gemini, which is multilingual; only legacy doubao-seedream was Chinese-only.)
-    is_chinese = (nationality == "Chinese")
+    is_chinese = (is_chinese_persona(nationality))
 
     names = [p.get('name', 'person') if isinstance(p, dict) else str(p) for p in participants]
     if not names:
@@ -251,6 +270,8 @@ def generate_scene_prompt(event: Dict, nationality: str = "Chinese") -> str:
             dt = datetime.strptime(event_start, "%Y-%m-%d %H:%M:%S")
             time_desc = dt.strftime('%Y年%m月%d日 %H:%M') if is_chinese else dt.strftime('%Y-%m-%d %H:%M')
         except Exception:
+            # Safe fallback: an unparseable timestamp is only cosmetic here —
+            # the raw string still conveys the event time in the LLM prompt.
             time_desc = str(event_start)
 
     if is_chinese:

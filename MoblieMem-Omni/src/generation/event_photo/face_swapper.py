@@ -34,7 +34,7 @@ if TYPE_CHECKING:  # numpy stays an optional runtime dep, imported only where us
 
 # Identity/recognition logger, shared with backends.faces. Loggers here are
 # per-capability channels (not per-module), so all face-consistency logs group.
-logger = logging.getLogger('fix_event_images')
+logger = logging.getLogger('event_photo')
 
 # inswapper model location: insightface cache by default, override via env.
 _DEFAULT_MODEL = os.path.join(os.path.expanduser("~"), ".insightface", "models", "inswapper_128.onnx")

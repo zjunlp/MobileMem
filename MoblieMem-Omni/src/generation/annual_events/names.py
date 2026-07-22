@@ -61,9 +61,6 @@ ENGLISH_ORG_PREFIXES = ["North", "Blue", "Cedar", "Harbor", "Maple", "Bright", "
 ENGLISH_ORG_SUFFIXES = ["Learning Center", "Care Studio", "Community Hub", "Repair Shop", "Health Clinic", "Service Desk"]
 
 
-# Per-record LLM parse / validate (folded from the old stage4_lib)
-
-
 def _stable_seed(*parts: object) -> int:
     raw = "|".join(str(part) for part in parts)
     digest = hashlib.sha256(raw.encode('utf-8')).hexdigest()
@@ -209,7 +206,7 @@ def _names_by_appear(graph_people: List[Dict], tag: str) -> List[str]:
 def _build_event_name_strategy_from_graph(persona_record: Dict,
                                           existing_events: List[Dict],
                                           is_chinese: bool) -> Dict:
-    """Build the name strategy based on Social_Graph (the new Stage 3.9 path)."""
+    """Build the name strategy based on Social_Graph (the social_world path)."""
     basic_profile = persona_record.get('Basic_Profile', {})
     init_state = persona_record.get('Init_State', {})
     social_relationships = init_state.get('social_relationships', {}) or {}
@@ -614,7 +611,6 @@ def _call_llm_for_events(system_prompt: str, user_content: str, persona_uuid, mo
         model=model,
         return_parsed_json=True,
         extract_json=True,
-        json_markers=[]
     )
 
     cost_info = calculate_cumulative_cost(None, cost_info)
@@ -633,8 +629,30 @@ def _call_llm_for_events(system_prompt: str, user_content: str, persona_uuid, mo
 
 def _merge_and_sort_events(existing_events: List[Dict], new_events: List[Dict],
                            total_desired: int) -> List[Dict]:
-    """Merge, sort by time, renumber, and truncate."""
-    merged = list(existing_events) + list(new_events)
+    """Merge existing + new events; an ``event_id``, once assigned, is NEVER renumbered.
+
+    ``event_id`` is the foreign key for every downstream artifact (sub_events'
+    ``parent_event_id``, group-chat ids ``{uuid}_gc_{event_id}``, event-photo
+    filenames ``{uuid}_event_{id}.png``, app screenshots / ticket records), so:
+
+    - events in ``existing_events`` keep their ``event_id`` verbatim;
+    - events in ``new_events`` are new by definition -- whatever ``event_id``
+      the LLM may have invented is discarded, and they get consecutive ids
+      starting at ``max(existing ids) + 1`` (0 when there are no existing
+      events), in their current list order;
+    - the merged list is sorted by ``event_start_time`` for readability only;
+      id and list position are decoupled;
+    - if the result exceeds ``total_desired``, events are dropped highest
+      ``event_id`` first (the most recently allocated), so old ids always
+      survive.
+    """
+    merged = list(existing_events)
+
+    next_id = max((evt['event_id'] for evt in merged), default=-1) + 1
+    for evt in new_events:
+        evt['event_id'] = next_id
+        next_id += 1
+        merged.append(evt)
 
     try:
         merged.sort(key=lambda x: datetime.strptime(
@@ -642,13 +660,11 @@ def _merge_and_sort_events(existing_events: List[Dict], new_events: List[Dict],
     except Exception as e:
         print(f"    [WARNING] Could not sort events by time: {e}")
 
-    for idx, evt in enumerate(merged):
-        evt['event_id'] = idx
-
     if len(merged) > total_desired:
-        merged = merged[:total_desired]
-        for idx, evt in enumerate(merged):
-            evt['event_id'] = idx
+        n_drop = len(merged) - total_desired
+        drop_ids = set(sorted(
+            (evt['event_id'] for evt in merged), reverse=True)[:n_drop])
+        merged = [evt for evt in merged if evt['event_id'] not in drop_ids]
 
     return merged
 

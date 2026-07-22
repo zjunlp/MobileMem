@@ -1,3 +1,9 @@
+"""Text-LLM implementation.
+
+OpenAI-compatible client, retry policy, JSON extraction/repair, per-model cost
+accounting, and the thread-local structured call log. Import via the
+``backends.llm`` package surface.
+"""
 import os
 import json
 import logging
@@ -16,17 +22,33 @@ from openai import OpenAI
 
 import config
 
-# Module logger. Handlers are attached lazily via setup_llm_logging() rather than
-# calling logging.basicConfig() at import time, which would hijack the root logger
-# and truncate a log file merely as a side effect of importing this module.
+# Module logger. We avoid logging.basicConfig() at import time (it would hijack
+# the root logger and truncate a log file merely as a side effect of importing
+# this module), but a bare NullHandler would make retries invisible: tenacity's
+# before_sleep_log() below emits WARNINGs during the up-to-RETRY_TIMES retry
+# loop, and nothing else in the pipeline calls setup_llm_logging(), so without
+# a console handler the user sees zero output while retries run. So we attach a
+# WARNING-level StreamHandler by default — retry warnings are visible, DEBUG
+# noise is not.
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
+_console_handler = logging.StreamHandler()
+_console_handler.setLevel(logging.WARNING)
+_console_handler.setFormatter(logging.Formatter('%(levelname)s %(name)s: %(message)s'))
+logger.addHandler(_console_handler)
+logger.setLevel(logging.WARNING)
+logger.propagate = False
 
 _log_configured = False
 
 
 def setup_llm_logging(log_file: str = 'llm_caller.log', level: int = logging.DEBUG) -> None:
-    """Optionally route this module's debug logs to a file. Safe to call repeatedly."""
+    """Additionally route this module's logs to a file. Safe to call repeatedly.
+
+    Adds a FileHandler on top of the default console WARNING handler (attached
+    at import time) and lowers the logger level so DEBUG records reach the
+    file. The console handler stays at WARNING, so console output is unchanged.
+    """
     global _log_configured
     if _log_configured:
         return
@@ -38,6 +60,10 @@ def setup_llm_logging(log_file: str = 'llm_caller.log', level: int = logging.DEB
     _log_configured = True
 
 
+# USD per 1M tokens. Models absent from this table (including the current
+# defaults gpt-5.1 / deepseek-chat) still get token counts in cost_info, but
+# total_cost_usd stays None and stage logs print "Cost: $N/A" — extend the
+# table when accurate prices are needed.
 MODEL_PRICING = {
     'gpt-4o': {
         'input': 2.50,
@@ -101,15 +127,20 @@ def _repair_json_string(json_str: str) -> str:
     1. Remove JavaScript-style single-line comments (// ...)
     2. Remove multi-line comments (/* ... */)
     3. Remove trailing commas (extra comma before ] or })
-    4. Repair truncated JSON (try to close missing brackets)
+    (Truncated JSON is handled separately by _try_fix_truncated_json.)
     """
     repaired = json_str
 
-    # 1. Remove single-line comments // ... (without affecting URLs inside strings such as http://)
-    #    Strategy: only remove comment lines that start with // or follow a comma/bracket
-    repaired = re.sub(r'(?m)^\s*//.*$', '', repaired)
-    # Remove end-of-line comments (// comments outside of quotes)
-    repaired = re.sub(r'(?<=["\d\]\}\s]),?\s*//[^\n]*', '', repaired)
+    # 1. Remove single-line comments // ... (without affecting URLs inside strings such as http://,
+    #    whose // is never preceded by quote/digit/bracket/whitespace). This is a conservative
+    #    regex approach, not a real tokenizer: a literal " //" inside a string value would still
+    #    be eaten, a tradeoff we accept for simplicity on this best-effort repair path.
+    repaired = re.sub(r'(?m)^\s*//[^\n]*$', '', repaired)
+    # Comment after a comma: keep the comma — it is a structural delimiter, and dropping it
+    # (as an earlier version did) breaks otherwise-repairable JSON like `"a": 1, // x`.
+    repaired = re.sub(r',\s*//[^\n]*', ',', repaired)
+    # Comment after a bare value/bracket (no comma)
+    repaired = re.sub(r'(?<=["\d\]\}\s])\s*//[^\n]*', '', repaired)
 
     # 2. Remove multi-line comments /* ... */
     repaired = re.sub(r'/\*[\s\S]*?\*/', '', repaired)
@@ -118,6 +149,21 @@ def _repair_json_string(json_str: str) -> str:
     repaired = re.sub(r',\s*([\]\}])', r'\1', repaired)
 
     return repaired.strip()
+
+
+def _loads_tolerant(json_str: str) -> Any:
+    """``json.loads`` that tolerates the JSON dialect LLMs occasionally emit.
+
+    Strict parse first; on failure retry once after stripping ``//`` and
+    ``/* ... */`` comments and trailing commas (via
+    :func:`_repair_json_string`) — LLMs intermittently annotate their JSON
+    output with comments. Still raises ``json.JSONDecodeError`` when the
+    cleaned string is invalid, so callers keep the strict failure semantics.
+    """
+    try:
+        return json.loads(json_str)
+    except json.JSONDecodeError:
+        return json.loads(_repair_json_string(json_str))
 
 
 def _try_fix_truncated_json(json_str: str) -> Optional[str]:
@@ -178,11 +224,12 @@ def _try_fix_truncated_json(json_str: str) -> Optional[str]:
     return truncated + closing
 
 
-def _extract_json_from_content(content: str, markers: List[str]) -> Dict:
-    
+def _extract_json_from_content(content: str, markers: Optional[List[str]]) -> Dict:
+
     json_content = content
 
-    for marker in markers:
+    # llm_request's json_markers defaults to None; treat it as "no markers".
+    for marker in (markers or []):
         if marker in json_content:
             parts = json_content.split(marker, 1)
             if len(parts) > 1:
@@ -217,25 +264,17 @@ def _extract_json_from_content(content: str, markers: List[str]) -> Dict:
         start_idx = json_content.find('{')
         json_content = json_content[start_idx:].strip()
 
-    # First attempt: parse directly
+    # First attempt: strict parse, then retry after stripping the LLM JSON
+    # dialect (comments, trailing commas)
     try:
-        parsed_json = json.loads(json_content)
+        parsed_json = _loads_tolerant(json_content)
         logger.debug("Successfully parsed JSON")
         return parsed_json
     except json.JSONDecodeError as e:
-        logger.warning(f"JSON parsing error: {e}, trying repair...")
+        logger.warning(f"JSON still invalid after dialect cleanup: {e}, trying truncation fix...")
 
-    # Second attempt: parse after repairing common issues (comments, trailing commas)
-    repaired = _repair_json_string(json_content)
-    try:
-        parsed_json = json.loads(repaired)
-        logger.info("Successfully parsed JSON after repair (comments/trailing commas)")
-        return parsed_json
-    except json.JSONDecodeError as e:
-        logger.warning(f"JSON still invalid after basic repair: {e}, trying truncation fix...")
-
-    # Third attempt: repair truncated JSON
-    fixed = _try_fix_truncated_json(repaired)
+    # Second attempt: repair truncated JSON
+    fixed = _try_fix_truncated_json(_repair_json_string(json_content))
     if fixed:
         try:
             parsed_json = json.loads(fixed)
@@ -244,14 +283,12 @@ def _extract_json_from_content(content: str, markers: List[str]) -> Dict:
         except json.JSONDecodeError as e:
             logger.warning(f"JSON still invalid after truncation fix: {e}")
 
-    # Fourth attempt: regex extraction (supports both arrays and objects)
+    # Third attempt: regex extraction (supports both arrays and objects)
     for json_pattern in [r'(\[[\s\S]*\])', r'({[\s\S]*})']:
         match = re.search(json_pattern, json_content)
         if match:
             try:
-                potential_json = match.group(1)
-                potential_repaired = _repair_json_string(potential_json)
-                parsed_json = json.loads(potential_repaired)
+                parsed_json = _loads_tolerant(match.group(1))
                 logger.info("Successfully extracted and repaired JSON through regex")
                 return parsed_json
             except json.JSONDecodeError:
@@ -330,7 +367,7 @@ def set_log_context(uuid: int = None, stage: str = None, **kwargs):
     
     Args:
         uuid: uuid of the persona currently being processed
-        stage: name of the current stage (e.g. "stage4_events")
+        stage: name of the current pipeline node (e.g. "annual_events")
         **kwargs: extra key fields (event_id, event_idx, round, group_id, batch, 
                   call_type, app_type, category, member_name, image_path, etc.)
     """
@@ -359,7 +396,9 @@ def _write_log_record(record: dict):
         return
     
     uuid = record.get('uuid')
-    stage = record.get('stage', 'unknown')
+    # `or` (not a .get default): stage is often present-but-None when
+    # set_log_context(stage=None) was used, which would name the file None.jsonl.
+    stage = record.get('stage') or 'unknown'
     
     if uuid is not None:
         log_dir = os.path.join(LLM_CALL_LOGS_DIR, f'uid{uuid}')
@@ -472,6 +511,11 @@ def get_image_client() -> OpenAI:
     return _image_client
 
 
+# Retrying on broad Exception is deliberate: a JSON-parse ValueError from
+# _extract_json_from_content means "the model produced unusable output", and the
+# correct recovery is to regenerate — same as for network/API errors. The cost
+# is that genuine programming errors are also retried RETRY_TIMES times before
+# surfacing; keep that in mind when debugging.
 @retry(
     retry=retry_if_exception_type(Exception),
     wait=wait_random_exponential(min=config.WAIT_TIME_LOWER, max=config.WAIT_TIME_UPPER),
@@ -485,12 +529,39 @@ def llm_request(
     model: str = None,
     max_tokens: int = None,
     temperature: float = None,
-    timeout: int = 300,
+    timeout: int = None,
     return_parsed_json: bool = False,
     extract_json: bool = True,
     json_markers: Optional[List[str]] = None
 ) -> tuple:
-    
+    """Send one chat request and return ``(content_or_parsed, cost_info)``.
+
+    The single LLM entry point for the whole pipeline: applies the retry policy
+    above, records the call in the structured call log (see set_log_context),
+    and computes token/cost accounting.
+
+    Args:
+        system_prompt: system message; empty string sends a user-only request.
+        user_prompt: user message.
+        model: model name; falls back to config.OPENAI_MODEL.
+        max_tokens / temperature / timeout: explicit value wins, else the
+            config value; None means "do not send the parameter".
+        return_parsed_json: if True, the first tuple element is the parsed
+            JSON object instead of the raw content string.
+        extract_json: if True (default), the response is parsed as JSON even
+            when return_parsed_json is False — an unparseable response raises
+            and therefore triggers a regeneration retry. Set False for
+            free-text responses.
+        json_markers: optional leading markers stripped before JSON parsing.
+
+    Returns:
+        (parsed_json | content_str, cost_info_dict). cost_info carries token
+        counts always; USD costs only for models present in MODEL_PRICING.
+
+    Raises:
+        ValueError: no model configured, or JSON unparseable after all
+            repair attempts (post-retry).
+    """
     final_model = model or config.OPENAI_MODEL
     if not final_model:
         raise ValueError("Model name must be provided either as a parameter or in the OPENAI_MODEL environment variable.")
@@ -516,26 +587,23 @@ def llm_request(
         'deepseek-chat': 8192,
     }
 
-    # Add optional parameters only if they exist in environment or are explicitly provided
-    if max_tokens is not None:
-        request_params["max_tokens"] = max_tokens
-    elif os.getenv('OPENAI_MAX_TOKENS'):
-        request_params["max_tokens"] = int(os.getenv('OPENAI_MAX_TOKENS'))
+    # Optional parameters: explicit argument wins, then config (None = don't send).
+    # All env reads go through config so there is a single source of truth.
+    final_max_tokens = max_tokens if max_tokens is not None else config.OPENAI_MAX_TOKENS
+    if final_max_tokens is not None:
+        request_params["max_tokens"] = final_max_tokens
 
     # Cap max_tokens to model limit
     if "max_tokens" in request_params and final_model in _MODEL_MAX_TOKENS:
         request_params["max_tokens"] = min(request_params["max_tokens"], _MODEL_MAX_TOKENS[final_model])
-    
-    if temperature is not None:
-        request_params["temperature"] = temperature
-    elif os.getenv('OPENAI_TEMPERATURE'):
-        request_params["temperature"] = float(os.getenv('OPENAI_TEMPERATURE'))
-    
-    if timeout is not None:
-        request_params["timeout"] = timeout
-    elif os.getenv('OPENAI_TIMEOUT'):
-        request_params["timeout"] = int(os.getenv('OPENAI_TIMEOUT'))
-        
+
+    final_temperature = temperature if temperature is not None else config.OPENAI_TEMPERATURE
+    if final_temperature is not None:
+        request_params["temperature"] = final_temperature
+
+    request_params["timeout"] = timeout if timeout is not None else config.OPENAI_TIMEOUT
+
+
     response = get_client().chat.completions.create(**request_params)
 
     content = response.choices[0].message.content.strip()

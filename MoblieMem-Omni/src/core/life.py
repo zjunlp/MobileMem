@@ -10,16 +10,16 @@ from core.base import JsonlModel, _ABSENT
 
 @dataclass
 class Event(JsonlModel):
-    """One annual event inside the ``Events`` list (stage4).
+    """One annual event inside the ``Events`` list (annual_events).
 
     Declared fields are the ones confirmed in code: the schedule (consumed by
-    stage4.5) plus ``participants`` / ``importance`` (read by stage4's own
-    summary pass). The per-image payloads — ``additional_info`` and the
+    sub_events) plus ``participants`` / ``importance`` (read by annual_events'
+    own summary pass). The per-image payloads — ``additional_info`` and the
     type-specific ``ticket_info`` / ``food_info`` / ``money_info`` /
     ``friend_info`` / ``wechat_info`` — round-trip via ``extra``. The field
     *order* here is inferred from code, not from a frozen sample, so verify the
-    key order on a real stage4 row before adopting this model at stage4's
-    boundary (stage4 is a copy-then-extend stage; see REFACTOR_PLAN P1-2).
+    key order on a real annual_events row before adopting this model at that
+    node's boundary (annual_events is a copy-then-extend node).
     """
 
     event_name: Any = _ABSENT
@@ -33,15 +33,15 @@ class Event(JsonlModel):
 
 @dataclass
 class SocialGraph(JsonlModel):
-    """The ``Social_Graph`` payload added to a Persona at stage3.9.
+    """The ``Social_Graph`` payload added to a Persona at social_world.
 
-    Top-level keys: ``inner_circle`` (carried over from stage2 relationships) and
+    Top-level keys: ``inner_circle`` (carried over from life_state relationships) and
     ``organizations`` are declared; the planned person categories
     (``extended_contacts`` / ``online_contacts`` / ...) round-trip via ``extra``.
     Each person node (e.g. in ``inner_circle``) has the shape ``{name, gender,
     age_range, category, relationship_to_protagonist, brief, can_appear_in}``
     (see ``_build_inner_circle``); a dedicated node model is deferred until a
-    stage actually consumes it.
+    pipeline node actually consumes it.
     """
 
     inner_circle: Any = _ABSENT
@@ -51,7 +51,7 @@ class SocialGraph(JsonlModel):
 
 @dataclass
 class SubEvent(JsonlModel):
-    """A stage4.5 row: a protagonist's long/mid events split into sub-events."""
+    """A sub_events row: a protagonist's long/mid events split into sub-events."""
 
     uuid: Any = _ABSENT
     sub_events: Any = _ABSENT

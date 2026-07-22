@@ -7,9 +7,10 @@ import random
 from datetime import datetime, timedelta
 
 from backends.llm import get_text_llm_model, llm_request
-from common import TEMPLATE_DIR
+from config import TEMPLATE_DIR
+from core.lang import is_chinese_persona
 
-logger = logging.getLogger('fix_app_screenshots')
+logger = logging.getLogger('app_trace')
 
 
 # Per-uuid phone cache (generated once per uuid, then reused within a run).
@@ -72,7 +73,7 @@ def _ensure_english(text):
     return result
 
 def _load_template(app_type, nationality="Chinese"):
-    tmap = TEMPLATES_CN if nationality == "Chinese" else TEMPLATES_EN
+    tmap = TEMPLATES_CN if is_chinese_persona(nationality) else TEMPLATES_EN
     path = tmap.get(app_type)
     if not path or not os.path.exists(path):
         raise FileNotFoundError(f"Template not found: {path}")
@@ -302,7 +303,7 @@ def fill_shopping_template(template, info, persona_name="用户", location="", i
     return result
 
 def fill_template(app_type, template, info, **kwargs):
-    is_cn = kwargs.get("nationality", "Chinese") == "Chinese"
+    is_cn = is_chinese_persona(kwargs.get("nationality", "Chinese"))
     if app_type == "book":
         return fill_book_template(template, info, is_cn=is_cn)
     elif app_type == "music":

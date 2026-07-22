@@ -3,10 +3,11 @@
 Every generation step in this pipeline used to re-implement the same lifecycle by
 hand: iterate the upstream records in order, reuse the ones already produced
 (resume), generate the missing ones, save incrementally after each success so a
-crash never loses progress, isolate per-record failures, and finally write the file.
+crash never loses progress, keep processing the batch when a single record fails,
+and report every failure to the caller at the end.
 
 :class:`Generator` captures that lifecycle once. A concrete generator only declares
-its identity (``stage_label`` / ``index_key`` / I/O paths) and implements the single
+its identity (``label`` / ``index_key`` / I/O paths) and implements the single
 :meth:`Generator.produce` method; everything else is inherited and therefore behaves
 identically across generators.
 
@@ -23,7 +24,7 @@ from __future__ import annotations
 import traceback
 from typing import Any, Callable, Dict, List, Optional, Sequence
 
-from infra.store import index_by, make_save_callback, read_jsonl, write_jsonl
+from infra.store import index_by, make_save_callback, read_jsonl, write_jsonl_atomic
 
 Record = Dict[str, Any]
 SaveCallback = Callable[[Sequence[Record]], None]
@@ -36,13 +37,12 @@ class Generator:
     (legacy subclasses may implement :meth:`process_one` instead). They may
     optionally override :meth:`set_context`, :meth:`describe_result`,
     :meth:`format_skip_line`, :meth:`format_generating_line`, and
-    :meth:`after_success` to reproduce stage-specific logging / post-processing.
+    :meth:`after_success` to reproduce node-specific logging / post-processing.
     """
 
-    #: Human-readable tag used in log lines, e.g. ``"Stage3"``.
-    stage_label: str = "Stage"
-    #: Identifier shown in the incremental-save message (see store.make_save_callback).
-    stage_num: Any = ""
+    #: Pipeline node name, used both as the log-line tag and as the label in
+    #: the incremental-save message (see store.make_save_callback).
+    label: str = "generator"
     #: Record field used to index / skip already-completed records.
     index_key: str = "uuid"
     #: Upstream and output JSONL paths. Only required when using :meth:`run`;
@@ -61,7 +61,7 @@ class Generator:
         return self.process_one(record, ctx)
 
     def process_one(self, record: Record, ctx: Any = None) -> Record:
-        """Legacy alias for :meth:`produce`; older stages override this."""
+        """Legacy alias for :meth:`produce`; older generators override this."""
         raise NotImplementedError("override produce() (or the legacy process_one())")
 
     # Optional hooks (sensible defaults; override to match legacy logging).
@@ -73,12 +73,12 @@ class Generator:
         return ""
 
     def format_skip_line(self, record: Record, key: Any, index: int, total: int) -> str:
-        """Log line for a checkpoint-skipped record. Override to add stage detail."""
-        return f"[{self.stage_label}] [{index + 1}/{total}] uid={key}: SKIP (checkpoint)"
+        """Log line for a checkpoint-skipped record. Override to add node detail."""
+        return f"[{self.label}] [{index + 1}/{total}] uid={key}: SKIP (checkpoint)"
 
     def format_generating_line(self, record: Record, key: Any, index: int, total: int) -> str:
-        """Log line printed before generating a record. Override to add stage detail."""
-        return f"\n[{self.stage_label}] [{index + 1}/{total}] uid={key}: generating..."
+        """Log line printed before generating a record. Override to add node detail."""
+        return f"\n[{self.label}] [{index + 1}/{total}] uid={key}: generating..."
 
     def after_success(self, record: Record, result: Record) -> None:
         """Post-process hook run after a successful :meth:`produce`, before the
@@ -97,15 +97,19 @@ class Generator:
 
         Returns the output records in upstream order. Already-done records are
         reused in place; newly generated ones trigger ``save_callback`` after
-        each success; per-record exceptions are logged and skipped so one bad
-        record never aborts the batch.
+        each success. A per-record exception does not abort the batch, but the
+        failures are collected and reported at the end via ``RuntimeError``
+        listing every failed key. Successful records were already persisted
+        incrementally through ``save_callback`` before the raise, so rerunning
+        the node resumes from the checkpoint instead of regenerating them.
         """
         existing = existing or {}
         total = len(inputs)
+        failures: List[tuple] = []
 
         skipped = sum(1 for r in inputs if r.get(self.index_key) in existing)
         if skipped > 0:
-            print(f"[{self.stage_label}] Checkpoint: {skipped} already done, "
+            print(f"[{self.label}] Checkpoint: {skipped} already done, "
                   f"{total - skipped} remaining")
 
         records: List[Record] = []
@@ -128,17 +132,23 @@ class Generator:
                     print(detail)
                 if save_callback:
                     save_callback(records)
-            except Exception as e:  # isolate per-record failures
-                print(f"[{self.stage_label}] ERROR processing uid={key}: {e}")
+            except Exception as e:  # keep processing; reported after the loop
+                print(f"[{self.label}] ERROR processing uid={key}: {e}")
                 traceback.print_exc()
+                failures.append((key, f"{type(e).__name__}: {e}"))
 
+        if failures:
+            summary = "; ".join(f"uid={key}: {msg}" for key, msg in failures)
+            raise RuntimeError(
+                f"[{self.label}] {len(failures)}/{total} records failed: {summary}"
+            )
         return records
 
     # Full self-contained lifecycle (used by the future single-CLI / DAG).
     def run(self, ctx: Any = None) -> List[Record]:
         """Read ``input_file``, resume from ``output_file``, process, write.
 
-        Equivalent to the per-stage block in ``main.py`` (load upstream, load
+        Equivalent to the per-node block in ``main.py`` (load upstream, load
         existing by key, process incrementally, final overwrite), but expressed
         once. Requires ``input_file`` and ``output_file`` to be set.
         """
@@ -148,7 +158,7 @@ class Generator:
             )
         inputs = read_jsonl(self.input_file)
         existing = index_by(read_jsonl(self.output_file), self.index_key)
-        save = make_save_callback(self.output_file, self.stage_num)
+        save = make_save_callback(self.output_file, self.label)
         records = self.process_all(inputs, existing=existing, save_callback=save, ctx=ctx)
-        write_jsonl(records, self.output_file)
+        write_jsonl_atomic(records, self.output_file)
         return records

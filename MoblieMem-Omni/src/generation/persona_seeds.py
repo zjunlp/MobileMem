@@ -1,26 +1,27 @@
-"""Persona seed generator (Stage 0): synthesize brand-new personas via LLM.
+"""Persona seed generator: synthesize brand-new personas via LLM.
 
-The CSV pipeline (the ``profile`` node) only covers the personas that have a
-folder in ``infotest`` (uuid 0-9, all Chinese). This module seeds additional
-personas that have **no CSV source** — by default foreign ones (uuid 10-19) — by
-asking the LLM to expand a short spec (nationality, ethnicity, occupation hint)
-into a record compatible with ``basic_profiles.jsonl``.
+This is the **primary** persona-generation path: new personas are added by
+appending a spec (nationality, ethnicity, occupation hint) to
+:data:`PERSONA_SPECS` and letting the LLM expand it into a record compatible
+with ``basic_profiles.jsonl``. The CSV pipeline (the ``profile`` node) is the
+legacy path, retained only for the personas that have a folder in ``infotest``
+(uuid 0-9, all Chinese).
 
 For non-Chinese specs the generated record carries a structured ``appearance``
 block (ethnicity / skin / hair / eyes / face / build) that downstream image
 stages consume to keep foreign personas visually consistent; Chinese personas
 omit it and fall back to the predefined appearance pool instead.
 
-The records are appended after the CSV-derived rows, so the stage1 file ends up
-holding both the Chinese (0-9) and the seeded (10-19) personas.
+The records are appended after the CSV-derived rows, so the basic-profiles file
+ends up holding both the Chinese (0-9) and the seeded (10-19) personas.
 """
 from __future__ import annotations
 
-import time
 import traceback
 from typing import Dict, List, Optional, Set
 
 from backends.llm import get_text_llm_model, llm_request, set_log_context
+from core.lang import is_chinese_persona
 
 # Persona specs — personas without a CSV source, seeded straight from the LLM.
 PERSONA_SPECS: List[Dict] = [
@@ -56,10 +57,9 @@ PERSONA_SPECS: List[Dict] = [
      "ethnicity": "White British",
      "hint": "A British retired librarian in her mid-60s living in a village in the Cotswolds, female"},
 
-    # Extra Chinese personas (uuid 20-24) are available but commented out by
-    # default; uncomment to seed more Chinese personas beyond the CSV folders.
-    # {"uuid": 20, "nationality": "Chinese", "language": "zh",
-    #  "hint": "Chinese female nurse in her late 20s working in a city hospital"},
+    # Extra Chinese personas (uuid 20-24) beyond the CSV folders.
+    {"uuid": 20, "nationality": "Chinese", "language": "zh",
+     "hint": "Chinese female nurse in her late 20s working in a city hospital"},
 ]
 
 # Chinese prompt (kept in Chinese on purpose: the model writes the persona's
@@ -136,9 +136,9 @@ Requirements:
 
 
 def generate_persona(spec: Dict) -> Dict:
-    """Expand a single persona spec into a stage1-compatible record via the LLM."""
+    """Expand a single persona spec into a profile-compatible record via the LLM."""
     uuid = spec["uuid"]
-    is_chinese = spec["nationality"] == "Chinese"
+    is_chinese = is_chinese_persona(spec["nationality"], spec.get("language"))
     system_prompt = SYSTEM_PROMPT_ZH if spec["language"] == "zh" else SYSTEM_PROMPT_EN
     user_template = USER_PROMPT_TEMPLATE_ZH if spec["language"] == "zh" else USER_PROMPT_TEMPLATE_EN
 
@@ -156,7 +156,6 @@ def generate_persona(spec: Dict) -> Dict:
         model=get_text_llm_model(is_chinese),
         return_parsed_json=True,
         extract_json=True,
-        json_markers=[],
     )
 
     if not isinstance(response, dict):
@@ -176,10 +175,11 @@ def generate_persona_seeds(
     end_uuid: int = 24,
     save_callback=None,
 ) -> List[Dict]:
-    """Generate the seed personas missing from the stage1 file.
+    """Generate the seed personas missing from the basic-profiles file.
 
     Args:
-        existing_uuids: uuids already present in stage1 (skipped unless ``force``).
+        existing_uuids: uuids already present in the profiles file (skipped
+            unless ``force``).
         keep: optional uuid filter (``None`` = every spec in the range).
         force: regenerate even if the uuid already exists.
         start_uuid / end_uuid: inclusive uuid range of specs to consider.
@@ -187,6 +187,11 @@ def generate_persona_seeds(
             growing record list after each persona (checkpointing).
 
     Returns the newly generated records (one per processed spec).
+
+    Raises:
+        RuntimeError: if any spec failed, after the whole batch was attempted.
+            Successful records were already persisted via ``save_callback``, so
+            rerunning resumes from the checkpoint.
     """
     specs = [
         s for s in PERSONA_SPECS
@@ -195,6 +200,7 @@ def generate_persona_seeds(
         and (force or s["uuid"] not in existing_uuids)
     ]
     new_records: List[Dict] = []
+    failures: List[tuple] = []
     for i, spec in enumerate(specs):
         uuid = spec["uuid"]
         set_log_context(uuid=uuid, stage="persona_seeds")
@@ -205,22 +211,28 @@ def generate_persona_seeds(
             if save_callback is not None:
                 save_callback(list(new_records))
             print(f"  -> name={record.get('name')}, role={record.get('role_identity')}")
-        except Exception as exc:  # one bad persona must not abort the batch
+        except Exception as exc:  # keep processing; reported after the loop
             print(f"  -> ERROR uuid={uuid}: {exc}")
             traceback.print_exc()
-            time.sleep(2)
+            failures.append((uuid, f"{type(exc).__name__}: {exc}"))
+
+    if failures:
+        summary = "; ".join(f"uuid={uid}: {msg}" for uid, msg in failures)
+        raise RuntimeError(
+            f"[persona_seeds] {len(failures)}/{len(specs)} personas failed: {summary}"
+        )
     return new_records
 
 
 def main() -> None:
-    """Stand-alone entry: append seed personas to a stage1 JSONL file."""
+    """Stand-alone entry: append seed personas to a basic-profiles JSONL file."""
     import argparse
     import os
 
-    from common import read_jsonl, write_jsonl
+    from infra.store import read_jsonl, write_jsonl_atomic
 
     project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    parser = argparse.ArgumentParser(description="Stage 0: generate persona seeds via LLM")
+    parser = argparse.ArgumentParser(description="persona_seeds: generate persona seeds via LLM")
     parser.add_argument("--output-dir", default=os.path.join(project_root, "output", "data"),
                         help="Directory holding basic_profiles.jsonl")
     parser.add_argument("--start-uuid", type=int, default=10)
@@ -242,7 +254,7 @@ def main() -> None:
     new_uuids = {r.get("uuid") for r in new_records}
     merged = [r for r in existing if r.get("uuid") not in new_uuids] + new_records
     merged.sort(key=lambda r: r.get("uuid", 0))
-    write_jsonl(merged, out_path)
+    write_jsonl_atomic(merged, out_path)
     print(f"[persona_seeds] +{len(new_records)} personas -> {out_path}")
 
 

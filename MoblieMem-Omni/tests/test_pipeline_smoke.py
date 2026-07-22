@@ -93,6 +93,30 @@ class PipelineDagSmokeTest(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "wrote no records"):
                 dag.verify_node_outputs(ctx, node)
 
+    def test_dag_output_verification_rejects_missing_uuids(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            ctx = RunContext(
+                info_dir=str(Path(tmp) / "info"),
+                output_dir=str(Path(tmp) / "data"),
+                image_dir=str(Path(tmp) / "image"),
+                prompts_dir=str(Path(tmp) / "prompts"),
+            )
+            Path(ctx.output_dir).mkdir(parents=True)
+
+            stage1 = Path(ctx.data_path(dag.STAGE1_FILE))
+            stage2 = Path(ctx.data_path(dag.STAGE2_FILE))
+            stage1.write_text(
+                '{"uuid": 0}\n{"uuid": 1}\n{"uuid": 2}\n', encoding="utf-8")
+            stage2.write_text('{"uuid": 0}\n{"uuid": 1}\n', encoding="utf-8")
+
+            node = dag.NODES["life_state"]
+            with self.assertRaisesRegex(RuntimeError, r"\b2\b"):
+                dag.verify_node_outputs(ctx, node)
+
+            stage2.write_text(
+                '{"uuid": 0}\n{"uuid": 1}\n{"uuid": 2}\n', encoding="utf-8")
+            dag.verify_node_outputs(ctx, node)
+
     def test_dag_output_verification_allows_empty_optional_manifests(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             ctx = RunContext(

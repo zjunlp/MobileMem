@@ -5,18 +5,19 @@ import logging
 import os
 from typing import Dict, List
 
-from common import PROMPTS_DIR
+from config import PROMPTS_DIR
 from backends.faces import _imread_safe, _imwrite_safe, maybe_auto_orient_avatar
 from backends.images import generate_person_images
+from core.lang import is_chinese_persona
 from .render import (
     sanitize_filename_component,
 )
 
-logger = logging.getLogger('stage7')
+logger = logging.getLogger('conversation')
 
 
 def build_persona_source_signature(persona: Dict) -> str:
-    """Build a stable signature for the stage4 persona content used by stage7."""
+    """Build a stable signature for the annual_events persona content used by conversation."""
     bp = persona.get('Basic_Profile', {}) or {}
     events = persona.get('Events', []) or []
     payload = {
@@ -71,6 +72,9 @@ def _cleanup_member_avatar_dir(member_avatar_dir: str, uuid: int) -> int:
                 os.remove(path)
                 removed += 1
             except OSError:
+                # Best-effort cleanup: a leftover malformed file is harmless —
+                # avatar lookups only match '*_avatar.png' names, and memory_summary
+                # skips this directory entirely (SKIP_DIRS).
                 pass
     return removed
 
@@ -95,7 +99,10 @@ def build_member_avatar_prompt(description: str, nationality: str, gender: str =
         'Indian': 'This is an Indian person, must have South Asian facial features and skin tone.',
     }
     
-    if nationality in nationality_appearance_map:
+    is_cn = is_chinese_persona(nationality)
+    if is_cn:
+        nationality_constraint = nationality_appearance_map['Chinese']
+    elif nationality in nationality_appearance_map:
         nationality_constraint = nationality_appearance_map[nationality]
     elif extracted_ethnicity != f'{nationality} person':
         # A concrete ethnicity was extracted from description; use precise constraints.
@@ -112,12 +119,12 @@ def build_member_avatar_prompt(description: str, nationality: str, gender: str =
     # Build mandatory gender constraints; this is the most important fix.
     gender_constraint = ''
     if gender.lower() in ('male', '男', 'm'):
-        if nationality == 'Chinese':
+        if is_cn:
             gender_constraint = '【性别强制约束】这个人是男性，必须生成男性外貌，禁止生成女性形象。'
         else:
             gender_constraint = '[GENDER CONSTRAINT] This person is MALE. You MUST generate a male appearance. Do NOT generate a female.'
     elif gender.lower() in ('female', '女', 'f'):
-        if nationality == 'Chinese':
+        if is_cn:
             gender_constraint = '【性别强制约束】这个人是女性，必须生成女性外貌，禁止生成男性形象。'
         else:
             gender_constraint = '[GENDER CONSTRAINT] This person is FEMALE. You MUST generate a female appearance. Do NOT generate a male.'
@@ -129,7 +136,7 @@ def build_member_avatar_prompt(description: str, nationality: str, gender: str =
         description = f"{nationality_constraint} {description}"
 
     # Avatar prompt template: Chinese (_zh) for Chinese personas, else English (_en).
-    if nationality == 'Chinese':
+    if is_cn:
         template_file = os.path.join(PROMPTS_DIR, 'image_member_avatar_zh.txt')
     else:
         template_file = os.path.join(PROMPTS_DIR, 'image_member_avatar_en.txt')
@@ -139,7 +146,7 @@ def build_member_avatar_prompt(description: str, nationality: str, gender: str =
             template = f.read()
         prompt = template.format(description=description)
     except (FileNotFoundError, KeyError):
-        if nationality == 'Chinese':
+        if is_cn:
             prompt = (
                 f"{description} "
                 f"构图要求：肩部以上的近距离头像照，类似证件照或社交媒体头像。"
@@ -204,7 +211,7 @@ def ensure_member_avatars(uuid: int, group_specs: List[Dict], social_relationshi
             continue
 
         # Get appearance descriptions from social relationships; support both
-        # Stage2 (description) and Stage3.9 (brief) formats.
+        # life_state (description) and social_world (brief) formats.
         rel_info = social_relationships.get(member_name, {})
         if isinstance(rel_info, dict):
             # Check both description and brief fields.
@@ -236,7 +243,7 @@ def ensure_member_avatars(uuid: int, group_specs: List[Dict], social_relationshi
                 if not gender:
                     gender = rel_info.get('gender', '')
                 relationship = rel_info.get('relationship_type', '') or rel_info.get('relationship', '')  # noqa: F841
-            if nationality == 'Chinese':
+            if is_chinese_persona(nationality):
                 gender_desc = '男性' if gender.lower() in ('male', '男') else ('女性' if gender.lower() in ('female', '女') else '成年人')
                 description = f"一位中国{gender_desc}，面部清晰，自然表情。"
             else:
@@ -260,6 +267,9 @@ def ensure_member_avatars(uuid: int, group_specs: List[Dict], social_relationshi
                             if os.path.exists(p):
                                 os.remove(p)
                         except OSError:
+                            # Best-effort temp cleanup: leftovers here are never
+                            # consumed (avatar lookups only match '*_avatar.png',
+                            # and memory_summary skips this directory).
                             pass
                     continue
                 # Clean up extra generated files.
@@ -268,6 +278,8 @@ def ensure_member_avatars(uuid: int, group_specs: List[Dict], social_relationshi
                         if os.path.exists(p) and os.path.abspath(p) != os.path.abspath(target_path):
                             os.remove(p)
                     except OSError:
+                        # Best-effort temp cleanup: same rationale as above —
+                        # leftover extra files in this directory are inert.
                         pass
                 # Automatically correct portrait orientation when upside down or sideways.
                 maybe_auto_orient_avatar(target_path, uuid, member_name)

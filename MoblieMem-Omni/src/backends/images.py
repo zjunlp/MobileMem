@@ -12,7 +12,7 @@ from datetime import datetime
 import os
 import json
 import config
-from llm_request import get_text_llm_model, log_image_api_call, get_image_client
+from backends.llm import log_image_api_call
 
 API_KEY = config.DMX_API_KEY  # DMXAPI API key
 Generation_API_URL = config.DMX_GENERATION_URL  # DMXAPI image generation endpoint
@@ -79,6 +79,12 @@ def _openrouter_image_call(prompt, input_image_paths=None, model=None, timeout=1
     downscaled data URIs); otherwise it is plain text-to-image. Transient
     SSL/connection errors (the proxy occasionally drops TLS) are retried.
     """
+    if not config.OPENROUTER_API_KEY:
+        raise RuntimeError(
+            "OPENROUTER_API_KEY is not set; refusing to call OpenRouter "
+            "(set it explicitly — cross-provider key fallback was removed "
+            "to prevent credential leakage)"
+        )
     model = model or config.OPENROUTER_IMAGE_MODEL
     url = config.OPENROUTER_BASE_URL.rstrip("/") + "/chat/completions"
     headers = {
@@ -154,29 +160,13 @@ def _save_image_bytes(images, output_dir, prefix):
     return paths
 
 
-'''Please imagine a photo of this person based on the information above, such as body shape,
-face shape (emphasis), gender, race, etc. for the text image model, and output it in one sentence 
-in English (reflecting a real frontal photo).'''
-
-def ask_llm(text):
-    client = get_image_client()
-
-    response = client.chat.completions.create(
-        model=get_text_llm_model(False),
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant"},
-            {"role": "user", "content": text},
-        ],
-        stream=False
-    )
-
-    response = response.choices[0].message.content
-    return response
-
-
 def get_generation_model_and_limit(nationality):
-    # Always use the doubao-seedream-4-5-251128 model
-    return "doubao-seedream-4-5-251128", DOUBAO_MAX
+    # Model comes from config (DMX_CHINESE_GENERATION_MODEL); previously the
+    # doubao model name was hardcoded here, which blocked pointing the DMX
+    # path at other OpenAI-compatible image gateways (e.g. gpt-image-2).
+    model = CHINESE_GENERATION_MODEL
+    limit = DOUBAO_MAX if model.startswith("doubao-seed") else GPT_MAX
+    return model, limit
 
 
 def get_edit_model_candidates(nationality):
@@ -233,12 +223,11 @@ def generate_person_images(prompt, output_dir="output", nationality="Chinese"):
         prompt = prompt[:max_len]
         print(f"[WARN] prompt truncated: {original_len} -> {len(prompt)} chars")
 
-    # Always use the doubao-seedream-4-5-251128 model
     payload = {
         "prompt": prompt,
         "n": 1,
-        "model": "doubao-seedream-4-5-251128",
-        "size": "2K",
+        "model": model_name,
+        "size": get_default_image_size(model_name),
     }
 
     headers = build_generation_headers(model_name)
@@ -283,11 +272,12 @@ def generate_person_images(prompt, output_dir="output", nationality="Chinese"):
                     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                     filename = f"generated_image_{timestamp}_{i + 1}.png"
                     filepath = os.path.join(output_dir, filename)
-                    filepath_lst.append(filepath)
 
-                    # Save the image locally
+                    # Save the image locally; only record the path once the
+                    # file actually exists on disk
                     with open(filepath, 'wb') as f:
                         f.write(image_bytes)
+                    filepath_lst.append(filepath)
 
                     # Get the file size
                     file_size = os.path.getsize(filepath) / 1024  # convert to KB
@@ -303,13 +293,14 @@ def generate_person_images(prompt, output_dir="output", nationality="Chinese"):
                         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                         filename = f"generated_image_{timestamp}_{i + 1}_url.png"
                         filepath = os.path.join(output_dir, filename)
-                        filepath_lst.append(filepath)
 
-                        # Download the image
+                        # Download the image; only record the path once the
+                        # file actually exists on disk
                         img_resp = requests.get(image_data['url'], timeout=60)
                         img_resp.raise_for_status()
                         with open(filepath, 'wb') as f:
                             f.write(img_resp.content)
+                        filepath_lst.append(filepath)
 
                         # Get the file size
                         file_size = os.path.getsize(filepath) / 1024  # convert to KB
@@ -330,8 +321,9 @@ def generate_person_images(prompt, output_dir="output", nationality="Chinese"):
         print(f"{'=' * 50}")
         print(f"Error: {e}")
 
-        # Print the detailed error response
-        if e.response:
+        # Print the detailed error response. `is not None`, not truthiness:
+        # a 4xx/5xx Response is falsy, which used to hide the error body.
+        if e.response is not None:
             print(f"HTTP status: {e.response.status_code}")
             print(f"Response: {e.response.text}")
 
@@ -362,6 +354,9 @@ def generate_event_images(prompt, image_paths, output_dir="output", nationality=
         return paths
 
     filepath_lst = []
+    # Defined up front so the final log call is safe even when no input file
+    # could be loaded (previously a NameError on the empty-`files` path).
+    payload = {}
 
     # Truncate the prompt to avoid API length errors (qwen-image-edit has a stricter limit)
     model_candidates = get_edit_model_candidates(nationality)
@@ -372,8 +367,9 @@ def generate_event_images(prompt, image_paths, output_dir="output", nationality=
     # Iterate over the configured image paths and prepare the upload files
     for img_path in image_paths:
         try:
-            # Extract the filename from the full path
-            file_name = img_path.split("/")[-1]
+            # basename, not split('/'): Windows paths use '\' and would leak
+            # the full absolute path as the multipart filename.
+            file_name = os.path.basename(img_path)
 
             # Infer the MIME type automatically from the file extension
             mime_type = "image/png" if img_path.lower().endswith(".png") else "image/jpeg"
@@ -395,127 +391,134 @@ def generate_event_images(prompt, image_paths, output_dir="output", nationality=
             print(f"[WARN] Error processing file - {img_path}: {str(e)}")
 
 
-    if not files:
-        # If no image file was successfully loaded
-        print("[FAIL] No image files available")
+    # try/finally so upload handles are closed even when requests.post raises
+    # or the moderation check raises RuntimeError mid-loop.
+    try:
+        if not files:
+            # If no image file was successfully loaded
+            print("[FAIL] No image files available")
 
-    else:
-        for model_name in model_candidates:
-            candidate_prompt = prompt
-            candidate_limit = get_edit_prompt_limit(model_name)
-            if len(candidate_prompt) > candidate_limit:
-                original_len = len(candidate_prompt)
-                candidate_prompt = candidate_prompt[:candidate_limit]
-                print(f"[WARN] prompt truncated: {original_len} -> {len(candidate_prompt)} chars")
+        else:
+            for model_name in model_candidates:
+                candidate_prompt = prompt
+                candidate_limit = get_edit_prompt_limit(model_name)
+                if len(candidate_prompt) > candidate_limit:
+                    original_len = len(candidate_prompt)
+                    candidate_prompt = candidate_prompt[:candidate_limit]
+                    print(f"[WARN] prompt truncated: {original_len} -> {len(candidate_prompt)} chars")
 
-            payload = {
-                "model": model_name,
-                "prompt": candidate_prompt,
-                "size": get_default_image_size(model_name),
-            }
-            if not model_name.startswith("doubao-seed"):
-                payload["background"] = "auto"
-                payload["output_compression"] = 100
-                payload["output_format"] = "png"
-                payload["quality"] = "high"
-            headers = build_edit_headers(model_name)
+                payload = {
+                    "model": model_name,
+                    "prompt": candidate_prompt,
+                    "size": get_default_image_size(model_name),
+                }
+                if not model_name.startswith("doubao-seed"):
+                    payload["background"] = "auto"
+                    payload["output_compression"] = 100
+                    payload["output_format"] = "png"
+                    payload["quality"] = "high"
+                headers = build_edit_headers(model_name)
 
-            # Same-model retry: for transient errors (e.g. 451/500/502/503/504), retry the same model first, then consider fallback
-            SAME_MODEL_RETRIES = 3
-            RETRY_DELAY = 5
-            response = None
-            for retry_idx in range(SAME_MODEL_RETRIES):
-                for _, file_tuple in files:
-                    file_tuple[1].seek(0)
+                # Same-model retry: for transient errors (e.g. 451/500/502/503/504), retry the same model first, then consider fallback
+                SAME_MODEL_RETRIES = 3
+                RETRY_DELAY = 5
+                response = None
+                for retry_idx in range(SAME_MODEL_RETRIES):
+                    for _, file_tuple in files:
+                        file_tuple[1].seek(0)
 
-                print("=" * 50)
-                print(f"[*] Generating event image... (attempt {retry_idx+1}/{SAME_MODEL_RETRIES})")
-                print(f"   Nationality: {nationality}")
-                print(f"   Model: {payload['model']}")
-                print("=" * 50)
+                    print("=" * 50)
+                    print(f"[*] Generating event image... (attempt {retry_idx+1}/{SAME_MODEL_RETRIES})")
+                    print(f"   Nationality: {nationality}")
+                    print(f"   Model: {payload['model']}")
+                    print("=" * 50)
 
-                response = requests.post(
-                    Edit_API_URL,
-                    headers=headers,
-                    data=payload,
-                    files=files,
-                    timeout=180
-                )
+                    response = requests.post(
+                        Edit_API_URL,
+                        headers=headers,
+                        data=payload,
+                        files=files,
+                        timeout=180
+                    )
 
-                if response.status_code == 200:
+                    if response.status_code == 200:
+                        break
+
+                    print(f"[FAIL] Request error: HTTP {response.status_code}")
+                    print(f"Response: {response.text}")
+                    # Content moderation blocks are not retried; raise immediately
+                    try:
+                        err_code = response.json().get("error", {}).get("code", "")
+                    except Exception:
+                        err_code = ""
+                    if err_code == "moderation_blocked" or "safety system" in response.text:
+                        raise RuntimeError(f"moderation_blocked: {response.text[:200]}")
+                    # Retry the same model on transient errors
+                    if retry_idx < SAME_MODEL_RETRIES - 1:
+                        print(f"[->] Retrying same model ({model_name}) in {RETRY_DELAY}s...")
+                        time.sleep(RETRY_DELAY)
+
+                if response.status_code != 200:
+                    if model_name != model_candidates[-1]:
+                        print(f"[->] Fallback to next edit model: {model_candidates[model_candidates.index(model_name) + 1]}")
+                        continue
                     break
 
-                print(f"[FAIL] Request error: HTTP {response.status_code}")
-                print(f"Response: {response.text}")
-                # Content moderation blocks are not retried; raise immediately
                 try:
-                    err_code = response.json().get("error", {}).get("code", "")
-                except Exception:
-                    err_code = ""
-                if err_code == "moderation_blocked" or "safety system" in response.text:
-                    raise RuntimeError(f"moderation_blocked: {response.text[:200]}")
-                # Retry the same model on transient errors
-                if retry_idx < SAME_MODEL_RETRIES - 1:
-                    print(f"[->] Retrying same model ({model_name}) in {RETRY_DELAY}s...")
-                    time.sleep(RETRY_DELAY)
+                    data = response.json()
+                    os.makedirs(output_dir, exist_ok=True)
 
-            if response.status_code != 200:
-                if model_name != model_candidates[-1]:
-                    print(f"[->] Fallback to next edit model: {model_candidates[model_candidates.index(model_name) + 1]}")
-                    continue
-                break
+                    if data.get("data") and isinstance(data["data"], list):
+                        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                        for idx, item in enumerate(data["data"]):
+                            image_b64 = item.get("b64_json")
+                            image_url = item.get("url")
 
-            try:
-                data = response.json()
-                os.makedirs(output_dir, exist_ok=True)
-
-                if data.get("data") and isinstance(data["data"], list):
-                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                    for idx, item in enumerate(data["data"]):
-                        image_b64 = item.get("b64_json")
-                        image_url = item.get("url")
-
-                        if image_b64:
-                            filename = f"edited_{timestamp}_{idx + 1}.png" if len(data["data"]) > 1 else f"edited_{timestamp}.png"
-                            output_path = os.path.join(output_dir, filename)
-                            filepath_lst.append(output_path)
-                            with open(output_path, "wb") as f:
-                                f.write(base64.b64decode(image_b64))
-                            print(f"[OK] Image saved (base64): {output_path}")
-                        elif image_url:
-                            filename = f"edited_{timestamp}_{idx + 1}.png" if len(data["data"]) > 1 else f"edited_{timestamp}.png"
-                            output_path = os.path.join(output_dir, filename)
-                            filepath_lst.append(output_path)
-                            try:
-                                img_resp = requests.get(image_url, timeout=60)
-                                img_resp.raise_for_status()
+                            if image_b64:
+                                filename = f"edited_{timestamp}_{idx + 1}.png" if len(data["data"]) > 1 else f"edited_{timestamp}.png"
+                                output_path = os.path.join(output_dir, filename)
                                 with open(output_path, "wb") as f:
-                                    f.write(img_resp.content)
-                                print(f"[OK] Image saved (URL): {output_path}")
-                            except Exception as e:
-                                print(f"[FAIL] Download failed: {e}")
-                        else:
-                            print(f"[WARN] No image data for item {idx + 1} (no b64_json or url)")
-                    break
+                                    f.write(base64.b64decode(image_b64))
+                                # Only record the path once the file actually exists on disk
+                                filepath_lst.append(output_path)
+                                print(f"[OK] Image saved (base64): {output_path}")
+                            elif image_url:
+                                filename = f"edited_{timestamp}_{idx + 1}.png" if len(data["data"]) > 1 else f"edited_{timestamp}.png"
+                                output_path = os.path.join(output_dir, filename)
+                                try:
+                                    img_resp = requests.get(image_url, timeout=60)
+                                    img_resp.raise_for_status()
+                                    with open(output_path, "wb") as f:
+                                        f.write(img_resp.content)
+                                    # Only record the path once the file actually exists on disk
+                                    filepath_lst.append(output_path)
+                                    print(f"[OK] Image saved (URL): {output_path}")
+                                except Exception as e:
+                                    print(f"[FAIL] Download failed: {e}")
+                            else:
+                                print(f"[WARN] No image data for item {idx + 1} (no b64_json or url)")
+                        break
 
-                print("[FAIL] Unexpected response structure")
-                print(f"Response: {json.dumps(data, indent=2, ensure_ascii=False)}")
-                if model_name != model_candidates[-1]:
-                    print(f"[->] Fallback to next edit model: {model_candidates[model_candidates.index(model_name) + 1]}")
-                    continue
-            except json.JSONDecodeError:
-                print("[FAIL] JSON parse error")
-                print(f"Response: {response.text}")
-                if model_name != model_candidates[-1]:
-                    print(f"[->] Fallback to next edit model: {model_candidates[model_candidates.index(model_name) + 1]}")
-                    continue
-            break
-
-    for _, file_tuple in files:
-        try:
-            file_tuple[1].close()
-        except Exception:
-            pass
+                    print("[FAIL] Unexpected response structure")
+                    print(f"Response: {json.dumps(data, indent=2, ensure_ascii=False)}")
+                    if model_name != model_candidates[-1]:
+                        print(f"[->] Fallback to next edit model: {model_candidates[model_candidates.index(model_name) + 1]}")
+                        continue
+                except json.JSONDecodeError:
+                    print("[FAIL] JSON parse error")
+                    print(f"Response: {response.text}")
+                    if model_name != model_candidates[-1]:
+                        print(f"[->] Fallback to next edit model: {model_candidates[model_candidates.index(model_name) + 1]}")
+                        continue
+                break
+    finally:
+        for _, file_tuple in files:
+            try:
+                file_tuple[1].close()
+            except Exception:
+                # Best-effort close of upload handles; a leaked handle is freed
+                # at process exit and must not mask the real result.
+                pass
 
     # Log the image edit API call
     log_image_api_call(
@@ -526,32 +529,3 @@ def generate_event_images(prompt, image_paths, output_dir="output", nationality=
     )
 
     return filepath_lst
-
-
-def generate_image_qwen(prompt, output_path, size="1024x1024"):
-    """
-    Generate an image using the Qwen qwen-image model (via DMXAPI).
-
-    Args:
-        prompt: image description (Chinese or English)
-        output_path: save path
-        size: image size, default 1024x1024
-
-    Returns:
-        bool: whether it succeeded
-    """
-    if config.IMAGE_PROVIDER == "openrouter":
-        images = _openrouter_image_call(prompt)
-        if not images:
-            return False
-        os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
-        with open(output_path, "wb") as f:
-            f.write(images[0])
-        print(f"[OK] image saved: {output_path}")
-        return True
-
-    # Only the OpenRouter provider is implemented; the legacy qwen-image
-    # (DMXAPI) branch was never finished (it built a request but never sent it),
-    # so fail explicitly instead of falling through to an implicit None.
-    print(f"[ERROR] generate_image_qwen: unsupported IMAGE_PROVIDER={config.IMAGE_PROVIDER!r}; only 'openrouter' is implemented")
-    return False

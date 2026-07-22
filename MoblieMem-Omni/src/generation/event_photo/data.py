@@ -5,13 +5,13 @@ from typing import Dict, Optional
 
 import jsonlines
 
-from common import read_jsonl
+from infra.store import read_jsonl
 
-logger = logging.getLogger('fix_event_images')
+logger = logging.getLogger('event_photo')
 
 
 def load_profile_map(profiles_file: str) -> Dict[int, Dict]:
-    """Load stage1 basic profiles keyed by uuid."""
+    """Load basic profiles keyed by uuid."""
     records = read_jsonl(profiles_file)
     profile_map = {}
     for record in records:
@@ -21,7 +21,7 @@ def load_profile_map(profiles_file: str) -> Dict[int, Dict]:
     return profile_map
 
 def load_init_state_map(init_states_file: str) -> Dict[int, Dict]:
-    """Load stage2 init states keyed by uuid."""
+    """Load init states keyed by uuid."""
     records = read_jsonl(init_states_file)
     state_map = {}
     for record in records:
@@ -60,5 +60,8 @@ def compute_age(birth_date: str) -> Optional[int]:
         birth = datetime.strptime(birth_date, "%Y-%m-%d")
         today = datetime.now()
         return today.year - birth.year - ((today.month, today.day) < (birth.month, birth.day))
-    except Exception:
+    except Exception as e:
+        # None is the documented "age unknown" value, but a birth_date that is
+        # present yet unparseable points at corrupted profile data — surface it.
+        logger.warning(f"[WARN] Unparseable birth_date {birth_date!r}: {e}")
         return None

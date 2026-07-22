@@ -3,8 +3,8 @@
 :class:`ImportantDatesGenerator` produces the ``Important_Dates`` block
 (festivals / memorial_dates / event_milestones for 2025) for each persona:
 one upstream record in, the same record plus ``Important_Dates`` out. It
-inherits the resume-safe iterate / skip-done / save-incrementally /
-isolate-errors lifecycle from :class:`infra.base_generator.Generator`.
+inherits the resume-safe lifecycle (skip done, save incrementally, report
+failures at the end of the batch) from :class:`infra.base_generator.Generator`.
 """
 
 import json
@@ -21,7 +21,9 @@ from backends.llm import (
     get_text_llm_model,
     set_log_context,
 )
+from core.lang import is_chinese_persona
 from infra.base_generator import Generator
+from infra.prompts import load_prompt
 from tenacity import (
     retry,
     retry_if_exception_type,
@@ -32,21 +34,14 @@ from tenacity import (
 
 logger = logging.getLogger(__name__)
 
-# Retry configuration (centralized in config)
-RETRY_TIMES = config.RETRY_TIMES
+# Outer retry only covers structural failures (e.g. response JSON missing
+# Important_Dates); network/API errors are already retried inside llm_request,
+# so a large outer budget would multiply into hundreds of calls.
+STAGE_RETRY_TIMES = 3
 WAIT_TIME_LOWER = config.WAIT_TIME_LOWER
 WAIT_TIME_UPPER = config.WAIT_TIME_UPPER
 
 # The Chinese system prompt is loaded from an external file (prompts/important_dates_zh.txt)
-
-
-def load_prompt(prompt_path: str) -> str:
-    """Load prompt file from specified path"""
-    try:
-        with open(prompt_path, 'r', encoding='utf-8') as f:
-            return f.read()
-    except Exception as e:
-        raise FileNotFoundError(f"Failed to load prompt file {prompt_path}: {e}:{traceback.format_exc()}")
 
 
 def _build_dates_user_content(basic_profile: Dict, init_state: Dict, is_chinese: bool) -> str:
@@ -116,7 +111,7 @@ Reminder: ALL `day` values must be pure English, no Chinese characters.
 @retry(
     retry=retry_if_exception_type(Exception),
     wait=wait_random_exponential(min=WAIT_TIME_LOWER, max=WAIT_TIME_UPPER),
-    stop=stop_after_attempt(RETRY_TIMES),
+    stop=stop_after_attempt(STAGE_RETRY_TIMES),
     reraise=True,
     before_sleep=before_sleep_log(logger, logging.WARNING),
 )
@@ -125,7 +120,8 @@ def generate_important_dates_with_llm(persona_record: Dict, prompt: str, cn_prom
     Generate important dates for a persona using LLM
 
     Args:
-        persona_record: Complete persona record from stage2 (with Basic_Profile and Init_State)
+        persona_record: Complete persona record from the life_state node (with
+            Basic_Profile and Init_State)
         prompt: The system prompt to use
 
     Returns:
@@ -147,7 +143,7 @@ def generate_important_dates_with_llm(persona_record: Dict, prompt: str, cn_prom
         persona_language = basic_profile.get('language', 'Unknown')
         nationality = basic_profile.get('nationality', 'Unknown')
 
-        is_chinese = (persona_language == 'Chinese' or nationality == 'Chinese')
+        is_chinese = is_chinese_persona(nationality, persona_language)
 
         # Chinese personas use the pure-Chinese system prompt; non-Chinese personas use the English prompt passed in
         system_prompt = cn_prompt if (is_chinese and cn_prompt) else prompt
@@ -162,7 +158,6 @@ def generate_important_dates_with_llm(persona_record: Dict, prompt: str, cn_prom
             model=get_text_llm_model(is_chinese),
             return_parsed_json=True,
             extract_json=True,
-            json_markers=[]
         )
 
         cost_info = calculate_cumulative_cost(None, cost_info)
@@ -227,22 +222,14 @@ def extract_important_dates_from_response(parsed_data) -> Dict:
 
             return important_dates
         else:
+            # Empty dict is falsy, so the caller's `if not important_dates`
+            # check fails the attempt and triggers a regeneration retry.
             print("[WARNING] No 'Important_Dates' found in response")
-            # Return empty structure
-            return {
-                'festivals': [],
-                'memorial_dates': [],
-                'event_milestones': []
-            }
+            return {}
 
     except Exception as e:
         print(f"[WARNING] Error extracting important dates from response: {e}")
-        # Return empty structure
-        return {
-            'festivals': [],
-            'memorial_dates': [],
-            'event_milestones': []
-        }
+        return {}
 
 
 def validate_and_normalize_dates(important_dates: Dict, persona_uuid: int) -> Dict:
@@ -257,56 +244,27 @@ def validate_and_normalize_dates(important_dates: Dict, persona_uuid: int) -> Di
         Validated and normalized important dates dictionary
     """
     try:
-        normalized_dates = {
-            'festivals': [],
-            'memorial_dates': [],
-            'event_milestones': []
+        category_labels = {
+            'festivals': 'Festival',
+            'memorial_dates': 'Memorial date',
+            'event_milestones': 'Event milestone',
         }
+        normalized_dates = {category: [] for category in category_labels}
 
-        # Validate festivals
-        if 'festivals' in important_dates and isinstance(important_dates['festivals'], list):
-            for i, festival in enumerate(important_dates['festivals']):
-                if isinstance(festival, dict) and 'day' in festival and 'date' in festival:
-                    # Validate date format
+        for category, label in category_labels.items():
+            if category not in important_dates or not isinstance(important_dates[category], list):
+                continue
+            for i, entry in enumerate(important_dates[category]):
+                if isinstance(entry, dict) and 'day' in entry and 'date' in entry:
                     try:
-                        datetime.strptime(festival['date'], '%Y-%m-%d')
-                        normalized_dates['festivals'].append(festival)
+                        datetime.strptime(entry['date'], '%Y-%m-%d')
+                        normalized_dates[category].append(entry)
                     except ValueError:
                         print(
-                            f"[WARNING] Persona {persona_uuid}: Festival {i} has invalid date format: {festival.get('date')}")
-                else:
-                    print(f"[WARNING] Persona {persona_uuid}: Festival {i} missing required fields or not a dictionary")
-
-        # Validate memorial_dates
-        if 'memorial_dates' in important_dates and isinstance(important_dates['memorial_dates'], list):
-            for i, memorial in enumerate(important_dates['memorial_dates']):
-                if isinstance(memorial, dict) and 'day' in memorial and 'date' in memorial:
-                    # Validate date format
-                    try:
-                        datetime.strptime(memorial['date'], '%Y-%m-%d')
-                        normalized_dates['memorial_dates'].append(memorial)
-                    except ValueError:
-                        print(
-                            f"[WARNING] Persona {persona_uuid}: Memorial date {i} has invalid date format: {memorial.get('date')}")
+                            f"[WARNING] Persona {persona_uuid}: {label} {i} has invalid date format: {entry.get('date')}")
                 else:
                     print(
-                        f"[WARNING] Persona {persona_uuid}: Memorial date {i} missing required fields or not a dictionary")
-
-        # Validate event_milestones
-        if 'event_milestones' in important_dates and isinstance(important_dates['event_milestones'], list):
-            for i, milestone in enumerate(important_dates['event_milestones']):
-                if isinstance(milestone,
-                              dict) and 'day' in milestone and 'date' in milestone:
-                    # Validate date format
-                    try:
-                        datetime.strptime(milestone['date'], '%Y-%m-%d')
-                        normalized_dates['event_milestones'].append(milestone)
-                    except ValueError:
-                        print(
-                            f"[WARNING] Persona {persona_uuid}: Event milestone {i} has invalid date format: {milestone.get('date')}")
-                else:
-                    print(
-                        f"[WARNING] Persona {persona_uuid}: Event milestone {i} missing required fields or not a dictionary")
+                        f"[WARNING] Persona {persona_uuid}: {label} {i} missing required fields or not a dictionary")
 
         # Log summary
         print(f"[INFO] Persona {persona_uuid}: Validated dates - {len(normalized_dates['festivals'])} festivals, "
@@ -316,13 +274,13 @@ def validate_and_normalize_dates(important_dates: Dict, persona_uuid: int) -> Di
         return normalized_dates
 
     except Exception as e:
+        # Do NOT return an empty {'festivals': [], ...} here: that truthy
+        # structure would slip past the caller's `if not important_dates`
+        # retry guard and get persisted as a silently empty result. A crash
+        # in this validation code is a structural failure of the LLM output,
+        # so re-raise and let the outer @retry regenerate the dates.
         print(f"[ERROR] Persona {persona_uuid}: Validation error for important dates: {e}")
-        # Return empty structure
-        return {
-            'festivals': [],
-            'memorial_dates': [],
-            'event_milestones': []
-        }
+        raise
 
 
 def process_single_persona(persona_record: Dict, prompt: str, cn_prompt: str = "") -> Dict:
@@ -346,10 +304,8 @@ class ImportantDatesGenerator(Generator):
     """Generate ``Important_Dates`` for each persona (one upstream record in,
     one enriched record out)."""
 
-    stage_label = "Stage3"
-    stage_num = 3
+    label = "timeline_dates"
     index_key = "uuid"
-    produces = "important_dates"
 
     def __init__(self, prompt: str, cn_prompt: str = "") -> None:
         self.prompt = prompt
@@ -357,7 +313,7 @@ class ImportantDatesGenerator(Generator):
 
     def set_context(self, record: Dict, index: int) -> None:
         uid = record.get('uuid')
-        set_log_context(uuid=uid if uid is not None else index, stage="stage3_dates")
+        set_log_context(uuid=uid if uid is not None else index, stage="timeline_dates")
 
     def produce(self, record: Dict, ctx: Any = None) -> Dict:
         return process_single_persona(record, self.prompt, self.cn_prompt)
@@ -365,16 +321,11 @@ class ImportantDatesGenerator(Generator):
     def describe_result(self, record: Dict, result: Dict) -> str:
         uid = record.get('uuid')
         dates = result.get('Important_Dates', {})
-        return (f"[Stage3] OK: uid={uid} -> {len(dates.get('festivals', []))} festivals, "
+        return (f"[timeline_dates] OK: uid={uid} -> {len(dates.get('festivals', []))} festivals, "
                 f"{len(dates.get('memorial_dates', []))} memorials, "
                 f"{len(dates.get('event_milestones', []))} milestones")
 
-
-# Backward-compatible alias for the old class name in ``stage3_dates``.
-Stage3Dates = ImportantDatesGenerator
-
-
-def generate_important_dates(stage2_records: List[Dict], prompts_dir: str,
+def generate_important_dates(init_state_records: List[Dict], prompts_dir: str,
                     existing: Optional[Dict[str, Dict]] = None,
                     save_callback=None) -> List[Dict]:
     """
@@ -390,4 +341,4 @@ def generate_important_dates(stage2_records: List[Dict], prompts_dir: str,
     prompt = load_prompt(os.path.join(prompts_dir, 'important_dates_en.txt'))
     cn_prompt = load_prompt(os.path.join(prompts_dir, 'important_dates_zh.txt'))
     generator = ImportantDatesGenerator(prompt, cn_prompt)
-    return generator.process_all(stage2_records, existing=existing, save_callback=save_callback)
+    return generator.process_all(init_state_records, existing=existing, save_callback=save_callback)
