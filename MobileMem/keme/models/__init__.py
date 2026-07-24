@@ -5,13 +5,7 @@ from .persona import (
     TrackedAttribute, 
     AttributeVersion,
 )
-from .app_interactions import (
-    AppInteractionBase,
-    VoiceMemoInteraction,
-    CalendarInteraction,
-    NoteInteraction,
-    TodoInteraction,
-)
+from .app_interactions import AppInteractionBase
 from .graph import (
     Requirement,
     TemporalEventGraph,
@@ -84,27 +78,64 @@ class TrajectorySynthesisState(BaseModel):
                 event_ids.add(event.id)
             self._graph_id_to_event_ids[graph.id] = event_ids
             
-            if graph.parent_id is None: 
-                if self.person.id in self._node_id_to_child_id:
-                    raise ValueError(f"Person with id {self.person.id} already has a child graph.")
-                self._node_id_to_child_id[self.person.id] = graph.id
-            else:
-                if graph.parent_id in self._node_id_to_child_id:
-                    raise ValueError(f"Event with id {graph.parent_id} already has a child graph.")
-                self._node_id_to_child_id[graph.parent_id] = graph.id
+            parent_id = graph.parent_id if graph.parent_id is not None else self.person.id
+            self._set_child(parent_id, graph.id)
         
         for session_id, session in self.sessions.items():
             for message in session.messages:
                 self._message_id_to_message[message.id] = message
                 self._message_id_to_session_id[message.id] = session_id
-            if session.event_id is None:
-                if self.person.id in self._node_id_to_child_id:
-                    raise ValueError(f"Person with id {self.person.id} already has a child.")
-                self._node_id_to_child_id[self.person.id] = session_id
-            else:
-                if session.event_id in self._node_id_to_child_id:
-                    raise ValueError(f"Event with id {session.event_id} already has a child.")
-                self._node_id_to_child_id[session.event_id] = session_id
+            parent_id = session.event_id if session.event_id is not None else self.person.id
+            self._set_child(parent_id, session_id)
+
+    def _remove_subtree(self, node_id: str) -> None:
+        """Recursively remove a node and all of its descendants from the global state.
+        
+        The removal walks down the hierarchy and cleans up every internal index. 
+        
+        Args:
+            node_id (`str`):
+                The identifier of the node (a graph or a session) whose subtree should be removed.
+        """
+        node_type = self.get_node_type(node_id)
+        if node_type == "graph":
+            graph = self.graphs.pop(node_id, None)
+            if graph is None:
+                return
+            for event in graph.events:
+                child_id = self._node_id_to_child_id.pop(event.id, None)
+                if child_id is not None:
+                    self._remove_subtree(child_id)
+                self._event_id_to_event.pop(event.id, None)
+                self._event_id_to_graph_id.pop(event.id, None)
+            self._graph_id_to_event_ids.pop(node_id, None)
+        elif node_type == "session":
+            session = self.sessions.pop(node_id, None)
+            if session is None:
+                return
+            for message in session.messages:
+                self._message_id_to_message.pop(message.id, None)
+                self._message_id_to_session_id.pop(message.id, None)
+
+    def _set_child(self, parent_id: str, child_id: str) -> None:
+        """Assign the given child node ID as the single child of the given parent node ID, 
+        overwriting any stale child.
+        
+        Each node in the hierarchy has at most one child. If the parent node already points to 
+        a different child, that stale child and its entire subtree are recursively removed 
+        before the pointer is overwritten. This keeps the navigable hierarchy consistent with 
+        the flat indices.
+        
+        Args:
+            parent_id (`str`):
+                The identifier of the parent node (a person or an event).
+            child_id (`str`):
+                The identifier of the child node (a graph or a session) to assign.
+        """
+        existing_child_id = self._node_id_to_child_id.get(parent_id)
+        if existing_child_id is not None and existing_child_id != child_id:
+            self._remove_subtree(existing_child_id)
+        self._node_id_to_child_id[parent_id] = child_id
 
     def add_graph(self, graph: TemporalEventGraph) -> None:
         """
@@ -131,14 +162,8 @@ class TrajectorySynthesisState(BaseModel):
             event_ids.add(event.id)
         self._graph_id_to_event_ids[graph.id] = event_ids
         
-        if graph.parent_id is None:
-            if self.person.id in self._node_id_to_child_id:
-                raise ValueError(f"Person with id {self.person.id} already has a child.")
-            self._node_id_to_child_id[self.person.id] = graph.id
-        else:
-            if graph.parent_id in self._node_id_to_child_id:
-                raise ValueError(f"Event with id {graph.parent_id} already has a child.")
-            self._node_id_to_child_id[graph.parent_id] = graph.id
+        parent_id = graph.parent_id if graph.parent_id is not None else self.person.id
+        self._set_child(parent_id, graph.id)
 
     def refresh_graph(self, graph_id: str) -> None:
         """
@@ -187,6 +212,12 @@ class TrajectorySynthesisState(BaseModel):
         
         for previous_event_id in previous_event_ids:
             if previous_event_id not in current_event_ids:
+                # The event no longer exists in the graph (e.g., deleted during refinement).
+                # If it had already produced an output, recursively remove the whole subtree
+                # (sub-graph or session, down to messages) so no dangling output is leaked.
+                child_id = self._node_id_to_child_id.pop(previous_event_id, None)
+                if child_id is not None:
+                    self._remove_subtree(child_id)
                 del self._event_id_to_event[previous_event_id]
                 del self._event_id_to_graph_id[previous_event_id]
 
@@ -214,14 +245,8 @@ class TrajectorySynthesisState(BaseModel):
                 )
             self._message_id_to_message[message.id] = message
             self._message_id_to_session_id[message.id] = session.id
-        if session.event_id is None:
-            if self.person.id in self._node_id_to_child_id:
-                raise ValueError(f"Person with id {self.person.id} already has a child.")
-            self._node_id_to_child_id[self.person.id] = session.id
-        else:
-            if session.event_id in self._node_id_to_child_id:
-                raise ValueError(f"Event with id {session.event_id} already has a child.")
-            self._node_id_to_child_id[session.event_id] = session.id
+        parent_id = session.event_id if session.event_id is not None else self.person.id
+        self._set_child(parent_id, session.id)
 
     def get_sessions(self, start: str | None = None, end: str | None = None) -> list[Session]:
         """
@@ -781,7 +806,7 @@ class TrajectorySynthesisState(BaseModel):
         total_messages = sum(len(sess.messages) for sess in self.sessions.values())
         
         # Count events by state
-        events_by_state: dict[str, int] = {
+        events_by_state = {
             "to_expand": 0,
             "expanding": 0,
             "expanded": 0,
@@ -827,10 +852,6 @@ __all__ = [
     "TrackedAttribute",
     "AttributeVersion",
     "AppInteractionBase",
-    "VoiceMemoInteraction",
-    "CalendarInteraction",
-    "NoteInteraction",
-    "TodoInteraction",
     "QuestionType",
     "QuestionTypeToolbook",
     "QuestionAnswerPair",

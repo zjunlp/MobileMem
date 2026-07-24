@@ -397,12 +397,17 @@ class QANotebookStateSchedulerBase(StateModule):
                 for i, attr_version in enumerate(tracked_attr.history):
                     field_history_str.append(f"#### Version {i + 1}")
                     field_history_str.append(f"- Value: {attr_version['value']}")
-                    if attr_version["connections"]:
+                    connections = sorted(
+                        [
+                            connection
+                            for connection in attr_version["connections"]
+                            if connection in message_map
+                        ],
+                        key=lambda x: datetime.fromisoformat(message_map[x].timestamp),
+                    )
+                    if connections:
                         field_history_str.append(f"- Related Messages")
-                        for connection in sorted(
-                            attr_version["connections"], 
-                            key=lambda x: datetime.fromisoformat(message_map[x].timestamp)
-                        ): 
+                        for connection in connections:
                             msg = message_map[connection]
                             field_history_str.append(msg.to_markdown(include_side_note=True, level=1))
                     else:
@@ -416,18 +421,17 @@ class QANotebookStateSchedulerBase(StateModule):
                     for j, attr_version in enumerate(tracked_attr.history):
                         field_history_str.append(f"##### Version {j + 1}")
                         field_history_str.append(f"- Value: {attr_version['value']}")
-                        if attr_version["connections"]:
-                            field_history_str.append(f"- Related Messages")
-                            # Filter invalid messages. 
-                            connections = [ 
-                                connection 
+                        connections = sorted(
+                            [
+                                connection
                                 for connection in attr_version["connections"]
-                                if connection in message_map 
-                            ] 
-                            for connection in sorted(
-                                connections,
-                                key=lambda x: datetime.fromisoformat(message_map[x].timestamp)
-                            ): 
+                                if connection in message_map
+                            ],
+                            key=lambda x: datetime.fromisoformat(message_map[x].timestamp),
+                        )
+                        if connections:
+                            field_history_str.append(f"- Related Messages")
+                            for connection in connections:
                                 msg = message_map[connection]
                                 field_history_str.append(msg.to_markdown(include_side_note=True, level=1))
                         else:
@@ -440,12 +444,17 @@ class QANotebookStateSchedulerBase(StateModule):
                     for j, attr_version in enumerate(removed_attr.history):
                         field_history_str.append(f"##### Version {j + 1}")
                         field_history_str.append(f"- Value: {attr_version['value']}")
-                        if attr_version["connections"]:
+                        connections = sorted(
+                            [
+                                connection
+                                for connection in attr_version["connections"]
+                                if connection in message_map
+                            ],
+                            key=lambda x: datetime.fromisoformat(message_map[x].timestamp),
+                        )
+                        if connections:
                             field_history_str.append(f"- Related Messages")
-                            for connection in sorted(
-                                attr_version["connections"],
-                                key=lambda x: datetime.fromisoformat(message_map[x].timestamp)
-                            ): 
+                            for connection in connections:
                                 msg = message_map[connection]
                                 field_history_str.append(msg.to_markdown(include_side_note=True, level=1))
                         else:

@@ -27,6 +27,30 @@ def get_timestamp(add_random_suffix: bool = False) -> str:
     return timestamp
 
 
+def format_timestamp_with_weekday(timestamp: str) -> str:
+    """Append the weekday name to an ISO 8601 timestamp for display.
+    
+    If the input cannot be parsed as an ISO 8601 datetime, it is returned 
+    unchanged.
+
+    Args:
+        timestamp (`str`):
+            The timestamp string to format, expected in ISO 8601 format
+            (e.g., ``"2024-09-10 22:46:25"``).
+
+    Returns:
+        `str`:
+            The timestamp with the weekday name appended
+            (e.g., ``"2024-09-10 22:46:25 (Tuesday)"``), or the original string
+            unchanged if it is not a valid ISO 8601 timestamp.
+    """
+    try:
+        parsed = datetime.fromisoformat(timestamp)
+    except (ValueError, TypeError):
+        return timestamp
+    return f"{timestamp} ({parsed.strftime('%A')})"
+
+
 async def is_async_func(func: Callable) -> bool:
     """Check if the given function is an async function, including
     coroutine functions, async generators, and coroutine objects."""

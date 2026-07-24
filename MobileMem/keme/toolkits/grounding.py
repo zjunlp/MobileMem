@@ -7,21 +7,21 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 from .agent import SynthesisAgent
 from ..models import (
-    TemporalEventGraph, 
-    Event, 
+    TemporalEventGraph,
+    Event,
     Edge,
     Session,
 )
 from ..models.persona import PersonBase
 from ..schedulers import (
-    GraphNotebookStateSchedulerBase, 
+    GraphNotebookStateSchedulerBase,
     ConstantGraphNotebookStateScheduler,
 )
 from ._base import NotebookBase
 from ._mixin import EventValidatorMixin
 import shortuuid
 from typing import (
-    Callable, 
+    Callable,
     Coroutine,
     Any,
 )
@@ -33,7 +33,7 @@ _SYSTEM_PROMPT = (
 _TASK_PROMPT = (
     "Please summarize the following compatibility context. "
     "The context consists of multiple entries, each associated with a specific and relatively fine-grained time range. "
-    "When summarizing, you may merge adjacent or contiguous entries into broader time spans, " 
+    "When summarizing, you may merge adjacent or contiguous entries into broader time spans, "
     "thereby coarsening the temporal granularity, as long as no important temporal distinctions are lost. "
     "Focus on preserving key events, decisions, and information that are important for maintaining consistency in the future.\n\n"
     "Compatibility Context:\n{context}"
@@ -78,7 +78,7 @@ def _find_compatible_events(graph: TemporalEventGraph, session: Session) -> list
 
 
 class DefaultSessionGroundingToHint:
-    """The default function to generate the hint message based on the current 
+    """The default function to generate the hint message based on the current
     session grounding state to guide the agent during session distribution."""
     
     hint_prefix: str = "<system-hint>"
@@ -131,8 +131,8 @@ class DefaultSessionGroundingToHint:
         graph_markdown = graph.to_markdown(include_side_note=True, include_output=False)
         
         # Check if the external session has been assigned to an event
-        session_event_id = session.event_id or "" 
-        _, assigned_event = graph.get_event_by_id(session_event_id) 
+        session_event_id = session.event_id or ""
+        _, assigned_event = graph.get_event_by_id(session_event_id)
         
         if assigned_event is not None:
             hint = self.after_assignment.format(
@@ -205,7 +205,7 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
             grounding_to_hint (`Callable[..., str] | None`, optional):
                 The function to generate hint messages based on the current grounding state.
             compatibility_context_max_tokens (`int`, Defaults to `8000`):
-                The maximum number of tokens allowed for compatibility context before 
+                The maximum number of tokens allowed for compatibility context before
                 triggering summarization.
             **kwargs: (`Any`)
                 Additional keyword arguments to pass to the summarization agent. The summarization agent is an instance of `ReActAgent`.
@@ -226,7 +226,7 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
         self.agent_kwargs = kwargs
         
         # Track the grounding progress
-        self._is_completed = False 
+        self._is_completed = False
         
         # Register state for state management
         self.register_state(
@@ -268,7 +268,7 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
                 The response of the tool call, confirming the assignment or reporting errors.
         """
         # First, validate the session has not been assigned to any event yet
-        session_event_id = self.session.event_id or "" 
+        session_event_id = self.session.event_id or ""
         _, assigned_event = self.current_graph.get_event_by_id(session_event_id)
         if assigned_event is not None:
             return ToolResponse(
@@ -297,8 +297,8 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
         
         # Third, validate whether the event is compatible with the session
         candidates = _find_compatible_events(self.current_graph, self.session)
-        is_candidate = False 
-        candidate_strs = [] 
+        is_candidate = False
+        candidate_strs = []
         for candidate in candidates:
             if candidate.id == event_id:
                 is_candidate = True
@@ -358,7 +358,7 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
         Returns:
             `ToolResponse`:
                 The response of the tool call, confirming event addition or reporting errors.
-        """                
+        """
         event = Event.model_validate(event)
         
         # Validate max events constraint
@@ -379,7 +379,7 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
                 ],
             )
         
-        # Validate the event 
+        # Validate the event
         msg = self._validate_events_time_range(event) or self._validate_requirements_source(event)
         if msg is not None:
             return ToolResponse(
@@ -460,9 +460,9 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
                 ],
             )
 
-        if event.started_at != existing_event.started_at or event.ended_at != existing_event.ended_at:        
+        if event.started_at != existing_event.started_at or event.ended_at != existing_event.ended_at:
             for edge in self.current_graph.edges:
-                if edge.from_event == event_id: 
+                if edge.from_event == event_id:
                     _, target_event = self.current_graph.get_event_by_id(edge.to_event)
                     end_time = datetime.fromisoformat(event.ended_at)
                     start_time = datetime.fromisoformat(target_event.started_at)
@@ -472,20 +472,20 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
                                 TextBlock(
                                     type="text",
                                     text=(
-                                        f"Error: Updating the event with ID '{event_id}' to the new time range " 
-                                        f"({event.started_at} to {event.ended_at}) would violate " 
+                                        f"Error: Updating the event with ID '{event_id}' to the new time range "
+                                        f"({event.started_at} to {event.ended_at}) would violate "
                                         f"the dependency edge '{edge.name}' (id: {edge.id}). "
-                                        "In this edge, the current event is the source event and must finish " 
-                                        f"no later than the start time of its target event '{target_event.title}' (id: {edge.to_event}), " 
+                                        "In this edge, the current event is the source event and must finish "
+                                        f"no later than the start time of its target event '{target_event.title}' (id: {edge.to_event}), "
                                         f"which begins at {target_event.started_at}. "
-                                        f"However, the new end time {event.ended_at} exceeds this start time, " 
+                                        f"However, the new end time {event.ended_at} exceeds this start time, "
                                         "which breaks the required temporal order that the source event must complete before the target event begins.\n\n"
                                         "You can try other approaches to modify the graph structure. If you really want to set "
                                         f"the event's time range to ({event.started_at} to {event.ended_at}), you can "
                                         f"delete the dependency edge (id: {edge.id}) first, "
                                         f"or revise the target event (id: {edge.to_event}) to start later than {event.ended_at}, "
                                         "or adjust the current event's end time to be earlier than the target event's start time."
-                                    ), 
+                                    ),
                                 ),
                             ],
                         )
@@ -499,20 +499,20 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
                                 TextBlock(
                                     type="text",
                                     text=(
-                                        f"Error: Updating the event with ID '{event_id}' to the new time range " 
-                                        f"({event.started_at} to {event.ended_at}) would violate " 
+                                        f"Error: Updating the event with ID '{event_id}' to the new time range "
+                                        f"({event.started_at} to {event.ended_at}) would violate "
                                         f"the dependency edge '{edge.name}' (id: {edge.id}). "
-                                        "In this edge, the current event is the target event and must begin " 
-                                        f"later than the end time of its source event '{source_event.title}' (id: {edge.from_event}), " 
+                                        "In this edge, the current event is the target event and must begin "
+                                        f"later than the end time of its source event '{source_event.title}' (id: {edge.from_event}), "
                                         f"which ends at {source_event.ended_at}. "
-                                        f"However, the new start time {event.started_at} occurs before this end time, " 
+                                        f"However, the new start time {event.started_at} occurs before this end time, "
                                         "which breaks the required temporal order that the source event must complete before the target event begins.\n\n"
                                         "You can try other approaches to modify the graph structure. If you really want to set "
                                         f"the event's time range to ({event.started_at} to {event.ended_at}), you can "
                                         f"delete the dependency edge (id: {edge.id}) first, "
                                         f"or revise the source event (id: {edge.from_event}) to end earlier than {event.started_at}, "
                                         "or adjust the current event's start time to be later than the source event's end time."
-                                    ), 
+                                    ),
                                 ),
                             ],
                         )
@@ -566,7 +566,7 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
         Returns:
             `ToolResponse`:
                 The response of the tool call, confirming the deletion or reporting errors.
-        """        
+        """
         # Check minimum events constraint
         min_events = self.scheduler.get_min_events(self.level)
         if len(self.current_graph.events) <= min_events:
@@ -604,7 +604,7 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
                         text=(
                             f"Error: Cannot delete event '{existing_event.title}' (id: {event_id}) "
                             f"because it has {existing_event.num_grounded_sessions} grounded session(s). "
-                            "Events with grounded sessions are protected from deletion. " 
+                            "Events with grounded sessions are protected from deletion. "
                             "You can try other approaches to modify the graph structure."
                         ),
                     ),
@@ -613,7 +613,7 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
         
         # Remove associated edges
         self.current_graph.edges = [
-            e for e in self.current_graph.edges 
+            e for e in self.current_graph.edges
             if e.from_event != event_id and e.to_event != event_id
         ]
         self.current_graph.events = [e for e in self.current_graph.events if e.id != event_id]
@@ -727,7 +727,7 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
                 The ID of the edge to revise.
             edge (`Edge`):
                 The revised edge data. This edge object will completely replace the existing edge,
-                so you must provide all attributes (name, side note, etc.), including those that remain unchanged. 
+                so you must provide all attributes (name, side note, etc.), including those that remain unchanged.
                 The edge ID will be preserved from the `edge_id` parameter and should not be included in the edge object.
         
         Returns:
@@ -879,7 +879,7 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
             `str`:
                 The summarized compatibility context.
         """
-        summarization_agent_kwargs = {**self.agent_kwargs} 
+        summarization_agent_kwargs = {**self.agent_kwargs}
         summarization_agent_kwargs["name"] = f"agent_{shortuuid.uuid()}"
         summarization_agent_kwargs["sys_prompt"] = _SYSTEM_PROMPT
 
@@ -902,14 +902,14 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
             event_id (`str`):
                 The ID of the event to append the content to.
             content (`str | None`, optional):
-                The content to append to the compatibility context of given event. 
+                The content to append to the compatibility context of given event.
                 If not provided, the compatibility context of given event will be unchanged.
         
         Returns:
             `ToolResponse`:
                 The response of the tool call, confirming the compatibility context update.
         """
-        session_event_id = self.session.event_id or "" 
+        session_event_id = self.session.event_id or ""
         _, event = self.current_graph.get_event_by_id(session_event_id)
         if event is None:
             return ToolResponse(
@@ -940,19 +940,19 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
             )
 
         # Append compatibility context to the event this session is assigned to
-        content = content or "" 
+        content = content or ""
         event.append_compatibility_context(content)
 
-        # The token counter is fixed, which means it doesn't depend on the model used. 
+        # The token counter is fixed, which means it doesn't depend on the model used.
         token_counter = OpenAITokenCounter("gpt-4.1")
         token_count = await token_counter.count(
             [
                 {
-                    "role": "user", 
+                    "role": "user",
                     "content": event.compatibility_context
-                } 
+                }
             ]
-        ) 
+        )
         
         # Summarize if token count exceeds threshold
         summarization_performed = False
@@ -961,9 +961,9 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
             event.overwrite_compatibility_context(summarized_context)
             summarization_performed = True
         
-        await self._trigger_hooks() 
+        await self._trigger_hooks()
 
-        if content: 
+        if content:
             if summarization_performed:
                 return ToolResponse(
                     content=[
@@ -1000,8 +1000,8 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
             `ToolResponse`:
                 The response of the tool call, confirming the grounding process completion.
         """
-        session_event_id = self.session.event_id or "" 
-        _, event = self.current_graph.get_event_by_id(session_event_id) 
+        session_event_id = self.session.event_id or ""
+        _, event = self.current_graph.get_event_by_id(session_event_id)
 
         if event is None:
             return ToolResponse(
@@ -1010,21 +1010,21 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
                         type="text",
                         text=(
                             "Error: The session grounding process cannot be finished. "
-                            "The session has not yet been assigned to any event in the current temporal event graph. " 
+                            "The session has not yet been assigned to any event in the current temporal event graph. "
                             "Please assign the session to a compatible event first."
-                        ),  
+                        ),
                     ),
                 ],
             )
 
-        self._is_completed = True 
-        self._trigger_hooks() 
+        self._is_completed = True
+        self._trigger_hooks()
         
         return ToolResponse(
             content=[
                 TextBlock(
                     type="text",
-                    text="The session grounding process is finished successfully."                
+                    text="The session grounding process is finished successfully."
                 ),
             ],
         )
@@ -1065,23 +1065,23 @@ class SessionGroundingNotebook(NotebookBase, EventValidatorMixin):
                         text=(
                             "Error: The session grounding process is not finished yet. "
                             "Please finish the session grounding process first."
-                        ), 
+                        ),
                     ),
                 ],
                 metadata={
                     "success": False,
                     "response_msg": None,
-                }, 
+                },
             )
         return ToolResponse(
             content=[
                 TextBlock(
                     type="text",
-                    text="The state of the session grounding process is the final state.", 
+                    text="The state of the session grounding process is the final state.",
                 ),
             ],
             metadata={
                 "success": True,
                 "response_msg": None,
-            }, 
+            },
         )

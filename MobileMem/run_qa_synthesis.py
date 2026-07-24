@@ -44,7 +44,7 @@ from typing import Any
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
-        description="Run HASTE QA synthesis from pre-synthesized trajectory.",
+        description="Run KEME QA synthesis from pre-synthesized trajectory.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     
@@ -189,8 +189,8 @@ class QASynthesisRunner:
                 description=(
                     "Multi-hop questions require an AI memory system to store multiple relevant pieces of information " 
                     "and integrate them through reasoning to produce an answer. " 
-                    "These pieces of information may be scattered across different messages within the same session or " 
-                    "distributed over multiple sessions." 
+                    "These pieces of information may be scattered across different messages (at least 2 different messages) " 
+                    "within the same session or distributed over multiple sessions." 
                 ),
             ),
             QuestionType(
@@ -910,6 +910,12 @@ class QASynthesisRunner:
                 new_sessions,
                 name=self.trajectory_state.person.name,
                 role="user",
+                in_place=True, 
+            )
+            new_sessions = unify_message_names(
+                new_sessions,
+                name="assistant",
+                role="assistant",
                 in_place=True, 
             )
 

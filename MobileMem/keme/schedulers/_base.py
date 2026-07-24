@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-"""The base class for the graph notebook state scheduler. It provides 
+"""The base class for the graph notebook state scheduler. It provides
 the base functionality for the graph notebook state scheduler."""
 from ..models import (
-    Event, 
-    PersonBase, 
+    Event,
+    PersonBase,
     Session,
-) 
+)
 from agentscope.module import StateModule
 from typing import Literal
 
 
 class GraphNotebookStateSchedulerBase(StateModule):
-    """The base class for the graph notebook state scheduler. It provides 
+    """The base class for the graph notebook state scheduler. It provides
     the base functionality for the graph notebook state scheduler."""
     
     def get_min_events(self, level: int) -> int:
@@ -47,12 +47,12 @@ class GraphNotebookStateSchedulerBase(StateModule):
         )
     
     def get_expansion_strategy(
-        self, 
-        parent: Event | PersonBase, 
+        self,
+        parent: Event | PersonBase,
         level: int | None = None,
     ) -> Literal[
-        "session_only", 
-        "subgraph_only", 
+        "session_only",
+        "subgraph_only",
         "both"
     ]:
         """Get the expansion strategy for a given parent (an event or a person profile).
@@ -62,7 +62,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
                 The parent event or person to get the expansion strategy for.
             level (`int | None`, optional):
                 The hierarchy level (0 = root level, higher = deeper).
-                If it is set to `None`, the expansion strategy is determined only 
+                If it is set to `None`, the expansion strategy is determined only
                 based on the parent (an event or a person profile).
                 
         Returns:
@@ -77,8 +77,8 @@ class GraphNotebookStateSchedulerBase(StateModule):
         )
 
     def _get_temporal_event_graph_task_instruction(
-        self, 
-        person: PersonBase, 
+        self,
+        person: PersonBase,
         parent_event: Event | None = None,
         level: int = 0,
     ) -> str:
@@ -105,7 +105,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
             time_constraint_source = "person's trajectory"
             time_start = person.trajectory_start
             time_end = person.trajectory_end
-            parent = person 
+            parent = person
         else:
             task_description = (
                 f"You are expanding the parent event **'{parent_event.title}'** (id: {parent_event.id}) "
@@ -205,7 +205,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
                         "as-is. The `from_source` may reference higher-level ancestor events, the Person profile, "
                         "predecessor sibling events, or an upstream agent ID NUMBER. Copying requirements "
                         "in this way preserves how upstream constraints propagate through the hierarchy. "
-                        "Be sure to note that `from_source` takes the value of the original requirement's `from_source` field, " 
+                        "Be sure to note that `from_source` takes the value of the original requirement's `from_source` field, "
                         "not the ID of the original requirement. "
                         f"**Please avert from setting `from_source` to the parent event's ID '{parent_event.id}'.**"
                     ),
@@ -227,7 +227,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
             ]
         )
         
-        if parent_event is not None:      
+        if parent_event is not None:
             instruction_parts.extend(
                 [
                     "## Grounded Sessions and Compatibility Context",
@@ -241,7 +241,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
                     ),
                     "",
                     (
-                        "When expanding a parent event, especially through the creation of sub-events or edges, " 
+                        "When expanding a parent event, especially through the creation of sub-events or edges, "
                         "any expansion involving grounded sessions should remain semantically compatible with those sessions. This means:\n"
                         "- **Avoid contradictions**: Do not create sub-events whose content would conflict with what "
                         "happens in the grounded sessions.\n"
@@ -250,7 +250,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
                     ),
                     "",
                 ]
-            ) 
+            )
         
         instruction_parts.extend(
             [
@@ -271,9 +271,9 @@ class GraphNotebookStateSchedulerBase(StateModule):
                     "- **Diversity**: Mix of event types and interaction patterns\n"
                     "- **Memory-Testing**: Help create meaningful and difficult question-answering pairs that challenge memory mechanisms"
                 ),
-                "", 
+                "",
             ]
-        ) 
+        )
 
         instruction_parts.extend(
             [
@@ -283,9 +283,9 @@ class GraphNotebookStateSchedulerBase(StateModule):
                 (
                     "Before creating any events, carefully read and analyze:\n\n"
                     "- **Person Profile**: Understand the person's profile. Think about how these attributes should influence the events you create."
-                ) 
+                )
             ]
-        ) 
+        )
         if parent_event is not None:
             instruction_parts.extend(
                 [
@@ -296,17 +296,17 @@ class GraphNotebookStateSchedulerBase(StateModule):
                         "(copying them as-is)."
                     )
                 ]
-            ) 
+            )
         instruction_parts.extend(
             [
                 (
                     "- **Time Constraints**: Ensure all events fit within the specified time range.\n\n"
                     "Take time to think deeply about how these elements interact and what kind of events would "
                     "form a realistic, coherent narrative that serves the memory evaluation goal."
-                ), 
-                "" 
+                ),
+                ""
             ]
-        ) 
+        )
 
         instruction_parts.extend(
             [
@@ -331,10 +331,10 @@ class GraphNotebookStateSchedulerBase(StateModule):
                 ),
                 "",
             ]
-        ) 
+        )
 
         instruction_parts.extend(
-            [   
+            [
                 "## 3. Expansion and Automatic Graph Refinement",
                 "",
                 (
@@ -359,9 +359,9 @@ class GraphNotebookStateSchedulerBase(StateModule):
                     "as they reflect the current state and guide your next actions.\n\n"
                     "When expanding events:\n"
                     "- Generate events that reflect your planning and the parent event's context.\n"
-                    "- If an event is expanded into a session AND that event has grounded sessions assigned to it " 
-                    "(i.e., `Grounded Sessions Count > 0`), the expansion result will be the grounded session itself (if there is only one) " 
-                    "or the merged result of all grounded sessions (if there are multiple). This constraint is ensured by the system " 
+                    "- If an event is expanded into a session AND that event has grounded sessions assigned to it "
+                    "(i.e., `Grounded Sessions Count > 0`), the expansion result will be the grounded session itself (if there is only one) "
+                    "or the merged result of all grounded sessions (if there are multiple). This constraint is ensured by the system "
                     "which automatically uses the pre-existing grounded session(s) as the expansion output.\n"
                 ),
             ]
@@ -397,7 +397,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
         instruction_parts.extend(
             [
                 (
-                    "Continue this expansion-refinement cycle until all events are expanded." 
+                    "Continue this expansion-refinement cycle until all events are expanded."
                 ),
             ]
         )
@@ -405,8 +405,8 @@ class GraphNotebookStateSchedulerBase(StateModule):
         return "\n".join(instruction_parts)
     
     def _get_session_task_instruction(
-        self, 
-        person: PersonBase, 
+        self,
+        person: PersonBase,
         parent_event: Event | None = None,
     ) -> str:
         """Build instruction template for the agents using `SessionNotebook`.
@@ -509,7 +509,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
                 "",
                 "## Person Profile Structure",
                 (
-                    "The person profile consists of multiple **dimensions**. Each dimension contains multiple **fields** (attributes). " 
+                    "The person profile consists of multiple **dimensions**. Each dimension contains multiple **fields** (attributes). "
                     "Each field can be one of two types:\n"
                     "- **String type**: A single string value\n"
                     "- **List of strings type**: An ordered list of string values\n\n"
@@ -518,7 +518,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
                     "- Index 2 refers to 'C'\n\n"
                     "When linking messages to list attributes or modifying list items, you must use the correct 0-based index."
                 ),
-                "", 
+                "",
             ]
         )
         
@@ -582,17 +582,17 @@ class GraphNotebookStateSchedulerBase(StateModule):
                     "- **Naturalness**: Messages should feel like real human-AI interactions"
                 ),
                 (
-                    "- **Memory Testing**: The session may naturally include indirect references, " 
-                    "fragmented information, topic shifts, or subtle contextual cues, making it realistic but " 
+                    "- **Memory Testing**: The session may naturally include indirect references, "
+                    "fragmented information, topic shifts, or subtle contextual cues, making it realistic but "
                     "more challenging for memory modules to extract key details. "
                     "Specifically, we categorize these challenges into three distinct complexity dimensions:\n"
-                    "  - **Implicit Inference (vs. Explicit Extraction)**: The memory modules must synthesize user attributes from behavioral patterns " 
+                    "  - **Implicit Inference (vs. Explicit Extraction)**: The memory modules must synthesize user attributes from behavioral patterns "
                     "  or indirect speech acts, rather than relying solely on explicit declarations.\n"
                     "  - **Dynamic Refinement (vs. Static Intent)**: The session features underspecified user goals that evolve over time, requiring the memory module to update "
                     "  context and avoid premature commitment to initial ambiguous queries.\n"
-                    "  - **Long-range Synthesis**: Key information pieces are fragmented and dispersed across topic shifts, demanding robust multi-hop reasoning to link non-adjacent details " 
+                    "  - **Long-range Synthesis**: Key information pieces are fragmented and dispersed across topic shifts, demanding robust multi-hop reasoning to link non-adjacent details "
                     "  under noisy context."
-                ), 
+                ),
             ]
         )
         if parent_event is not None:
@@ -620,7 +620,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
                 (
                     "- **Diversity**: Include diverse interaction types (questions, requests, reflections, problem-solving, etc.)"
                 ),
-                "", 
+                "",
             ]
         )
         instruction_parts.extend(
@@ -657,7 +657,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
         # Workflow section
         instruction_parts.extend(
             [
-                "", 
+                "",
                 "# Workflow and Strategy",
                 "",
                 "## High-Level Approach",
@@ -723,13 +723,13 @@ class GraphNotebookStateSchedulerBase(StateModule):
         if parent_event is not None:
             instruction_parts.extend(
                 [
-                    # "3. **Design Session Flow**: Plan a natural session flow that ", 
+                    # "3. **Design Session Flow**: Plan a natural session flow that ",
                     # (
                     #     "addresses the parent event's requirements and reflects the person's characteristics. "
                     #     "Consider what topics, questions, or interactions would be appropriate for this event context. "
                     #     "You may incorporate subtle references, fragmented information, indirect hints, or topic shifts to make "
                     #     "the session realistic while making it more challenging for memory modules to extract explicit details. "
-                    #     "**During the planning, you should consider how to structure a session that supports questions requiring multiple messages to answer, " 
+                    #     "**During the planning, you should consider how to structure a session that supports questions requiring multiple messages to answer, "
                     #     "and carefully examine the three dimensions (Implicit Inference, Dynamic Refinement, Long-range Synthesis) of memory-testing mentioned above.**"
                     # ),
                     (
@@ -748,7 +748,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
                     ),
                     (
                         "**(b) Design the session flow around parent-event and person**: Based on the chosen challenges, plan a coherent interaction "
-                        "sequence that stays grounded in the parent event context while reflecting the person's characteristics. " 
+                        "sequence that stays grounded in the parent event context while reflecting the person's characteristics. "
                         "Ensure the session naturally creates cross-turn dependencies (e.g., earlier constraints, later decisions, "
                         "and follow-up clarifications) so the embedded challenges are integral to the session rather than artificial add-ons."
                     ),
@@ -763,7 +763,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
                     #     "Consider what topics, questions, or interactions would be appropriate. "
                     #     "You may incorporate subtle references, fragmented information, indirect hints, or topic shifts to make "
                     #     "the session realistic while making it more challenging for memory modules to extract explicit details. "
-                    #     "**During the planning, you should consider how to structure a session that supports questions requiring multiple messages to answer, " 
+                    #     "**During the planning, you should consider how to structure a session that supports questions requiring multiple messages to answer, "
                     #     "and carefully examine the three dimensions (Implicit Inference, Dynamic Refinement, Long-range Synthesis) of memory-testing mentioned above.**"
                     # ),
                     (
@@ -826,7 +826,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
                 (
                     "6. **Linking Messages to Attributes**: You can establish connections between session messages and "
                     "person profile attributes. These linkages track which messages reflect specific attribute values in the person profile "
-                    "(e.g., a message mentioning the user's occupation can be linked to the 'occupation' attribute from the dimension model 'career')." 
+                    "(e.g., a message mentioning the user's occupation can be linked to the 'occupation' attribute from the dimension model 'career')."
                     "enabling downstream analysis to trace how the person's profile is manifested in user's interactions."
                 ),
             ]
@@ -955,12 +955,12 @@ class GraphNotebookStateSchedulerBase(StateModule):
                 "",
                 "## Event Deletion Constraints",
                 (
-                    "Events that already have grounded sessions assigned or have been expanded cannot be deleted." 
+                    "Events that already have grounded sessions assigned or have been expanded cannot be deleted."
                     "In particular, an unexpanded event that has grounded sessions assigned can be modified."
                 ),
                 "",
             ]
-        ) 
+        )
 
         if parent_event is not None:
             instruction_parts.extend(
@@ -970,7 +970,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
                         "All modifications (adding, revising, or deleting events/edges) must not conflict with the parent event's content. "
                         "If the current graph already contains events that cover the parent event's main content, "
                         "you can consider adding events that are completely unrelated to the parent event's theme, as long as they do not "
-                        "contradict the parent event's content." 
+                        "contradict the parent event's content."
                     ),
                 ]
             )
@@ -1149,7 +1149,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
                 "",
                 (
                     "Carefully read the expanded event's output (session messages or sub-event graph). Identify key outcomes, "
-                    "state changes, timing patterns, and revealed information." 
+                    "state changes, timing patterns, and revealed information."
                 ),
                 "",
                 "## 2. Review the Current Graph",
@@ -1227,7 +1227,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
         # Determine context
         if parent_event is None:
             task_description = (
-                "You are distributing an **external session** from the person profile to " 
+                "You are distributing an **external session** from the person profile to "
                 "an event in the **top-level temporal event graph**."
             )
             time_constraint_source = "person's trajectory"
@@ -1235,7 +1235,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
             time_end = person.trajectory_end
         else:
             task_description = (
-                f"You are distributing an **external session** from the parent event " 
+                f"You are distributing an **external session** from the parent event "
                 "to an event in the **temporal event graph** "
             )
             time_constraint_source = "parent event's"
@@ -1314,10 +1314,10 @@ class GraphNotebookStateSchedulerBase(StateModule):
                     "- Events connected by an edge have strict temporal ordering: the source event must "
                     "complete before the target event begins with no temporal overlap permitted"
                 ),
-                "", 
+                "",
                 "## Event Deletion Constraints",
                 (
-                    "Events that already have grounded sessions assigned cannot be deleted, " 
+                    "Events that already have grounded sessions assigned cannot be deleted, "
                     "though they can be modified."
                 ),
                 "",
@@ -1386,7 +1386,7 @@ class GraphNotebookStateSchedulerBase(StateModule):
                         "as-is. The `from_source` may reference higher-level ancestor events, the Person profile, "
                         "predecessor sibling events, or an upstream agent ID NUMBER. Copying requirements "
                         "in this way preserves how upstream constraints propagate through the hierarchy. "
-                        "Be sure to note that `from_source` takes the value of the original requirement's `from_source` field, " 
+                        "Be sure to note that `from_source` takes the value of the original requirement's `from_source` field, "
                         "not the ID of the original requirement."
                     ),
                     "",
@@ -1421,9 +1421,9 @@ class GraphNotebookStateSchedulerBase(StateModule):
                 "",
                 "## 4. Update Target Event's Compatibility Context",
                 (
-                    "After assigning the session to a target event, add new context to the target event's compatibility context. " 
+                    "After assigning the session to a target event, add new context to the target event's compatibility context. "
                     "The purpose of this compatibility context is to inform subsequent expansion "
-                    "processes about the grounded session, ensuring that when the event is later expanded into a sub-event graph, " 
+                    "processes about the grounded session, ensuring that when the event is later expanded into a sub-event graph, "
                     "the generated content will be semantically compatible with the already-grounded external session. The new context can be used to describe:\n"
                     "- The main content of the grounded session (when, where, what, why, who)\n"
                     "- Any constraints or considerations for future expansion to avoid conflicts"
@@ -1440,12 +1440,12 @@ class GraphNotebookStateSchedulerBase(StateModule):
         return "\n".join(instruction_parts)
 
     def get_task_instruction(
-        self, 
-        person: PersonBase, 
+        self,
+        person: PersonBase,
         parent_event: Event | None = None,
         level: int = 0,
         instruction_type: Literal[
-            "temporal_event_graph", 
+            "temporal_event_graph",
             "session",
             "graph_refinement",
             "session_grounding",
@@ -1480,13 +1480,13 @@ class GraphNotebookStateSchedulerBase(StateModule):
             )
         if instruction_type == "temporal_event_graph":
             return self._get_temporal_event_graph_task_instruction(
-                person, 
-                parent_event=parent_event, 
+                person,
+                parent_event=parent_event,
                 level=level,
             )
         elif instruction_type == "session":
             return self._get_session_task_instruction(
-                person, 
+                person,
                 parent_event=parent_event,
             )
         elif instruction_type == "session_grounding":

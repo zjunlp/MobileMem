@@ -313,6 +313,12 @@
         let isMessageView = false;  // Track if viewing session messages
         let currentLevel = 0;  // Track current hierarchy level (0 = root)
 
+        // When served behind a path-prefix proxy (e.g. "https://host/proxy/5001/"),
+        // root-absolute URLs like "/api/graph" would drop the prefix and hit the
+        // proxy root. Derive the base path from the current location so every API
+        // call stays under the same prefix. Resolves to "" when served at root.
+        const API_BASE = window.location.pathname.replace(/\/+$/, "");
+
         // Initialize the chart
         function initChart() {
             chart = echarts.init(document.getElementById('graph-container'));
@@ -324,7 +330,7 @@
         // Load graph data from server
         async function loadGraph(nodeId, expandMessages = false) {
             try {
-                let url = nodeId ? `/api/graph?node_id=${nodeId}` : '/api/graph';
+                let url = nodeId ? `${API_BASE}/api/graph?node_id=${nodeId}` : `${API_BASE}/api/graph`;
                 if (expandMessages) {
                     url += '&expand_messages=true';
                 }
@@ -453,7 +459,7 @@
         // Load graph data without changing view (for updating button states)
         async function loadGraphData(nodeId) {
             try {
-                const url = nodeId ? `/api/graph?node_id=${nodeId}` : '/api/graph';
+                const url = nodeId ? `${API_BASE}/api/graph?node_id=${nodeId}` : `${API_BASE}/api/graph`;
                 const response = await fetch(url);
                 graphData = await response.json();
                 
@@ -469,7 +475,7 @@
         // Load node details
         async function loadNodeDetails(nodeId) {
             try {
-                const url = nodeId ? `/api/node_details?node_id=${nodeId}` : '/api/node_details';
+                const url = nodeId ? `${API_BASE}/api/node_details?node_id=${nodeId}` : `${API_BASE}/api/node_details`;
                 const response = await fetch(url);
                 const data = await response.json();
                 
@@ -546,7 +552,7 @@
                     await loadGraph(currentNodeId, true);  // expand_messages=true
                 } else {
                     // Regular expand to child node
-                    const response = await fetch(`/api/navigate?action=expand&node_id=${currentNodeId}`);
+                    const response = await fetch(`${API_BASE}/api/navigate?action=expand&node_id=${currentNodeId}`);
                     const data = await response.json();
                     
                     if (data.success) {
@@ -600,4 +606,3 @@
     </script>
 </body>
 </html>
-

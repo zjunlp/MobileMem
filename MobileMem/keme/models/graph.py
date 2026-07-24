@@ -9,13 +9,18 @@ from pydantic import (
     ValidationInfo,
     PrivateAttr, 
     computed_field, 
+    ModelWrapValidatorHandler,
 )
 from datetime import datetime 
-from ..utils import get_timestamp
+from ..utils import get_timestamp, format_timestamp_with_weekday
 from collections import deque 
 from .session import Session
 from ._constants import NO_SIDE_NOTE
-from typing import Literal, Self
+from typing import (
+    Literal, 
+    Self, 
+    Any,
+)
 
 
 NO_COMPATIBILITY_CONTEXT = "[NO COMPATIBILITY CONTEXT PROVIDED]"
@@ -229,6 +234,51 @@ class Event(BaseModel):
     _grounded_sessions: list[Session] = PrivateAttr(default_factory=list)
     _compatibility_context: str = PrivateAttr(default=NO_COMPATIBILITY_CONTEXT)
 
+    @model_validator(mode="wrap")
+    @classmethod
+    def _restore_private_attrs(
+        cls,
+        values: Any,
+        handler: ModelWrapValidatorHandler[Self],
+    ) -> Self:
+        """Restore private attributes from serialized data during deserialization.
+
+        Args:
+            values (`Any`):
+                The input values to validate.
+            handler (`ModelWrapValidatorHandler[Self]`):
+                The handler that runs the standard validation pipeline and returns
+                the validated instance.
+
+        Returns:
+            `Self`:
+                The validated instance with private attributes restored.
+        """
+        instance = handler(values)
+        if not isinstance(values, dict):
+            return instance
+
+        output = values.get("output")
+        if output is not None:
+            if isinstance(output, (TemporalEventGraph, Session)):
+                instance._output = output
+            elif isinstance(output, dict):
+                if "messages" in output:
+                    instance._output = Session.model_validate(output)
+                else:
+                    instance._output = TemporalEventGraph.model_validate(output)
+
+        for session in values.get("grounded_sessions", []):
+            if not isinstance(session, Session):
+                session = Session.model_validate(session)
+            instance.add_grounded_session(session)
+
+        compatibility_context = values.get("compatibility_context")
+        if compatibility_context is not None:
+            instance._compatibility_context = compatibility_context or NO_COMPATIBILITY_CONTEXT
+
+        return instance
+
     @computed_field
     @property
     def output(self) -> TemporalEventGraph | Session | None:
@@ -412,7 +462,7 @@ class Event(BaseModel):
         }
         markdown_strs = [
             f"{indent}{status_map[self.state]} {self.title} (id: {self.id})", 
-            f"{indent}\t- Temporal Span: {self.started_at} - {self.ended_at}",
+            f"{indent}\t- Temporal Span: {format_timestamp_with_weekday(self.started_at)} - {format_timestamp_with_weekday(self.ended_at)}",
             f"{indent}\t- Summary: {self.summary}",
             f"{indent}\t- Created At In Real-World System Time: {self.created_at}",
         ]
@@ -691,6 +741,7 @@ class TemporalEventGraph(BaseModel):
         """Perform topological sorting of events based on dependencies and return the 
         next event to expand. If there is no next event to expand, return `None`."""
         # Build adjacency list and in-degree map.
+        id_to_event = {event.id: event for event in self.events}
         adj_list = {event.id: [] for event in self.events}
         in_degree = {event.id: 0 for event in self.events}
         depth_table = {}
@@ -714,7 +765,15 @@ class TemporalEventGraph(BaseModel):
             for neighbor in adj_list[current]:
                 in_degree[neighbor] -= 1
                 if in_degree[neighbor] == 0:
-                    queue.append((neighbor, depth + 1))
+                    # There may exist two events where one has an earlier end time but
+                    # a larger depth. For such a case, we still want the event with the
+                    # earlier end time to be expanded first, as long as all of its
+                    # predecessor events have already been expanded. This avoids the
+                    # out-of-order timing problem when updating the persona profile.
+                    if id_to_event[neighbor].state == "expanded":
+                        queue.append((neighbor, depth))
+                    else:
+                        queue.append((neighbor, depth + 1))
 
         if len(depth_table) != len(self.events):
             # Print the cyclic nodes.
@@ -731,7 +790,7 @@ class TemporalEventGraph(BaseModel):
         # Events are sorted by depth and `ended_at` time.
         sorted_events = sorted(self.events, key=lambda e: (depth_table[e.id], e.ended_at))
         for event in sorted_events:
-            if event.state == "to_expand":
+            if event.state in ("to_expand", "expanding"):
                 return event
         return None
     

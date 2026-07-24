@@ -13,6 +13,7 @@ from ..models import (
     Event, 
     Edge,
     Session,
+    Message,
 )
 from ..models.persona import PersonBase
 from ..schedulers import (
@@ -255,6 +256,7 @@ class TemporalEventGraphNotebook(NotebookBase, EventValidatorMixin):
         graph_refinement_to_hint: Callable[[TemporalEventGraph | None], str | None] | None = None,
         session_grounding_to_hint: Callable[[TemporalEventGraph, Session], str | None] | None = None,
         compatibility_context_max_tokens: int = 8000,
+        num_expansion_retries: int = 3,
         **kwargs: Any, 
     ) -> None:
         """Initialize the temporal event graph notebook.
@@ -297,6 +299,11 @@ class TemporalEventGraphNotebook(NotebookBase, EventValidatorMixin):
             compatibility_context_max_tokens (`int`, Defaults to `8000`):
                 The maximum number of tokens allowed for compatibility context before triggering 
                 summarization.
+            num_expansion_retries (`int`, defaults to `3`):
+                The maximum number of times an event may fail to expand before it is
+                force-completed with a placeholder session. This prevents an event
+                that repeatedly fails to expand from leaving the graph permanently
+                unfinished.
             **kwargs: (`Any`)
                 Additional keyword arguments to pass to the child agent. The child agent is an instance of `ReActAgent`.
         """
@@ -318,7 +325,11 @@ class TemporalEventGraphNotebook(NotebookBase, EventValidatorMixin):
         self.graph_refinement_to_hint = graph_refinement_to_hint or DefaultGraphRefinementToHint()
         self.session_grounding_to_hint = session_grounding_to_hint or DefaultSessionGroundingToHint()
         self.compatibility_context_max_tokens = compatibility_context_max_tokens
-        self.current_graph: TemporalEventGraph | None = None
+        self.num_expansion_retries = num_expansion_retries
+
+        # Runtime counter tracking how many times the current target event has failed to expand. 
+        self._fail_count = 0
+        self.current_graph = None
 
         # Each graph is assigned a single refinement agent 
         # Each refinement process for this graph shares the same agent instance
@@ -349,6 +360,7 @@ class TemporalEventGraphNotebook(NotebookBase, EventValidatorMixin):
         self.register_state("refinement_agent_name")
         self.register_state("level")
         self.register_state("compatibility_context_max_tokens")
+        self.register_state("num_expansion_retries")
 
     def _validate_current_graph(self) -> None:
         """Validate the current graph."""
@@ -1007,6 +1019,9 @@ class TemporalEventGraphNotebook(NotebookBase, EventValidatorMixin):
         # The session construction agent will not call the `create_session` tool as the hint messages will guide the agent.
         session_agent_kwargs["notebook"].current_session = new_session
         session_agent = SynthesisAgent(**session_agent_kwargs) 
+        # Snapshot the person profile before this attempt. If the expansion fails, the session is
+        # discarded and the profile updates it produced must be rolled back from this snapshot.
+        person_snapshot = self.person.create_snapshot()
         try:
             response_msg = await session_agent(
                 msg=Msg(
@@ -1035,15 +1050,58 @@ class TemporalEventGraphNotebook(NotebookBase, EventValidatorMixin):
                 )
             await self._trigger_hooks() 
         except Exception as e:
-            next_event.reset()
+            # The session is discarded on failure, so roll back the profile updates it produced.
+            self.person.restore_from_snapshot(person_snapshot)
+            self._fail_count += 1
             blocks.append(
                 TextBlock(
                     type="text",
                     text=f"Error: Failed to expand event '{next_event.title}' (id: {next_event.id}) into a session. {str(e)}",
                 ),
             )
+            if self._fail_count >= self.num_expansion_retries:
+                # The event has failed to expand too many times. Force-complete it with a
+                # placeholder session so the graph can finish instead of being stuck
+                # with a perpetually 'expanding' event.
+                placeholder_message = Message(
+                    name=self.person.name,
+                    content="",
+                    role="user",
+                    timestamp=next_event.started_at,
+                    side_note=(
+                        "[Anomalous Message] This is a placeholder message produced because the "
+                        "event repeatedly failed to expand during trajectory synthesis. It carries no "
+                        "real content and should be ignored."
+                    ),
+                )
+                placeholder_session = Session(
+                    event_id=next_event.id,
+                    messages=[placeholder_message],
+                    side_note=(
+                        "[Anomalous Session] An error occurs while synthesizing the trajectory for this "
+                        "event. This is a no-op session that carries no actual information and should be "
+                        "ignored."
+                    ),
+                )
+                next_event.complete(placeholder_session)
+                self._fail_count = 0
+                blocks.append(
+                    TextBlock(
+                        type="text",
+                        text=(
+                            f"Event '{next_event.title}' (id: {next_event.id}) has failed to expand "
+                            f"{self.num_expansion_retries} time(s). It has been force-completed with a "
+                            "placeholder session and marked as anomalous."
+                        ),
+                    ),
+                )
+                await self._trigger_hooks()
+            else:
+                next_event.reset()
         
         if response_msg is not None:
+            # The expansion succeeds, so reset the failure counter for the next target event.
+            self._fail_count = 0
             # If the next event is expanded successfully, the refinement process is invoked automatically
             refinement_agent_kwargs = {**self.agent_kwargs} 
             refinement_agent_kwargs["name"] = self.refinement_agent_name
@@ -1207,6 +1265,9 @@ class TemporalEventGraphNotebook(NotebookBase, EventValidatorMixin):
         )
         graph_agent = SynthesisAgent(**graph_agent_kwargs)
         response_msg = None 
+        # Snapshot the person profile before this attempt. If the sub-event graph expansion fails, its
+        # sessions are discarded and the profile updates they produced must be rolled back from this snapshot.
+        person_snapshot = self.person.create_snapshot()
         try:
             response_msg = await graph_agent(
                 msg=Msg(
@@ -1228,15 +1289,55 @@ class TemporalEventGraphNotebook(NotebookBase, EventValidatorMixin):
             )
             await self._trigger_hooks() 
         except Exception as e:
-            next_event.reset() 
+            # The sub-event graph is discarded on failure, so roll back the profile updates it produced.
+            self.person.restore_from_snapshot(person_snapshot)
+            self._fail_count += 1
             blocks.append(
                 TextBlock(
                     type="text",
                     text=f"Error: Failed to expand event '{next_event.title}' (id: {next_event.id}) into a sub-event graph. {str(e)}",
                 ),
             ) 
+            if self._fail_count >= self.num_expansion_retries:
+                placeholder_message = Message(
+                    name=self.person.name,
+                    content="",
+                    role="user",
+                    timestamp=next_event.started_at,
+                    side_note=(
+                        "[Anomalous Message] This is a placeholder message produced because the "
+                        "event repeatedly failed to expand during trajectory synthesis. It carries no "
+                        "real content and should be ignored."
+                    ),
+                )
+                placeholder_session = Session(
+                    event_id=next_event.id,
+                    messages=[placeholder_message],
+                    side_note=(
+                        "[Anomalous Session] An error occurs while synthesizing the trajectory for this "
+                        "event. This is a no-op session that carries no actual information and should be "
+                        "ignored."
+                    ),
+                )
+                next_event.complete(placeholder_session)
+                self._fail_count = 0
+                blocks.append(
+                    TextBlock(
+                        type="text",
+                        text=(
+                            f"Event '{next_event.title}' (id: {next_event.id}) has failed to expand "
+                            f"{self.num_expansion_retries} time(s). It has been force-completed with an "
+                            "empty placeholder session and marked as anomalous."
+                        ),
+                    ),
+                )
+                await self._trigger_hooks()
+            else:
+                next_event.reset() 
 
         if response_msg is not None:
+            # The expansion succeeds, so reset the failure counter for the next target event.
+            self._fail_count = 0
             refinement_agent_kwargs = {**self.agent_kwargs} 
             refinement_agent_kwargs["name"] = self.refinement_agent_name
             refinement_agent_kwargs["sys_prompt"] = refinement_agent_kwargs.get(
