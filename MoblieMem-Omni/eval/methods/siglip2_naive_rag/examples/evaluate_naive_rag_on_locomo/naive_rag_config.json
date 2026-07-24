@@ -1,0 +1,8 @@
+{
+    "user_id": "guest",
+    "num_overlap_msgs": 2,
+    "llm_model": "gpt-5.4-mini",
+    "retriever_name_or_path": "huggingface:all-MiniLM-L6-v2",
+    "retriever_dim": 384,
+    "save_dir": "output/rag/shared"
+}
