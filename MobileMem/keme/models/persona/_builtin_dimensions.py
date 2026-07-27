@@ -2,6 +2,7 @@
 from pydantic import Field
 from ._base import PersonDimensionBase, TrackedStr
 from .._constants import EMPTY_LIST_STR_REPR
+from ...utils import format_timestamp_with_weekday
 from typing import Literal, ClassVar
 
 
@@ -930,7 +931,7 @@ class SocialCircle(PersonDimensionBase):
         else:
             markdown_strs.append(f"{indent}\t- Connections (Attribute Name: `connections (list of strings, format: '{{Role}}: {{Name}}')`): {EMPTY_LIST_STR_REPR}")
         
-        markdown_strs.append(f"{indent}\t- Last Modified: {self.last_modified}")
+        markdown_strs.append(f"{indent}\t- Last Modified: {format_timestamp_with_weekday(self.last_modified)}")
         
         if detailed:
             markdown_strs.extend(self.format_operations_markdown(level + 1))

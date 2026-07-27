@@ -13,11 +13,12 @@ from pydantic import (
     ValidationError, 
     ConfigDict,
     ValidationInfo, 
+    ModelWrapValidatorHandler,
 )
 import shortuuid
 import inspect 
 from datetime import datetime
-from ...utils import get_timestamp
+from ...utils import get_timestamp, format_timestamp_with_weekday
 from .._constants import EMPTY_LIST_STR_REPR, NO_SIDE_NOTE 
 from ..session import Session
 from typing import(
@@ -35,7 +36,7 @@ from typing import(
 
 NO_LAST_MODIFIED = "[UNKNOWN]"
 NO_OPERATIONS = "[NO OPERATIONS]"
-DEFAULT_DIMENSION_DESCRIPTION = "The summary of this dimension is not provided."
+DEFAULT_DIMENSION_DESCRIPTION = "The summary of this dimension is currently missing, pending future updates."
 
 
 class AttributeVersion(TypedDict):
@@ -354,7 +355,35 @@ class PersonDimensionBase(BaseModel):
         """Run instance validation after model initialization."""
         self.validate_instance()
         return self
-    
+
+    @model_validator(mode="wrap")
+    @classmethod
+    def _restore_private_attrs(
+        cls,
+        values: Any,
+        handler: ModelWrapValidatorHandler[Self],
+    ) -> Self:
+        """Restore private attributes from serialized data during deserialization.
+
+        Args:
+            values (`Any`):
+                The input values to validate.
+            handler (`ModelWrapValidatorHandler[Self]`):
+                The handler that runs the standard validation pipeline 
+                and returns the validated instance.
+                
+        Returns:
+            `Self`:
+                The validated instance with private attributes restored.
+        """
+        instance = handler(values)
+        if isinstance(values, dict):
+            removed_attributes = values.get("removed_attributes", [])
+            instance._removed_attributes = [
+                _coerce_to_tracked_attribute(item) for item in removed_attributes
+            ]
+        return instance
+
     @classmethod
     def get_string_fields(cls) -> list[str]:
         """Get the list of modifiable string field names."""
@@ -461,7 +490,12 @@ class PersonDimensionBase(BaseModel):
         tracked_attr.update_value(attribute_value)
 
         self.operations.append(f"Timestamp {modified_at}: {operation_description}")
-        self.last_modified = modified_at
+        
+        try:
+            if datetime.fromisoformat(modified_at) > datetime.fromisoformat(self.last_modified):
+                self.last_modified = modified_at
+        except (ValueError, TypeError):
+            self.last_modified = modified_at
 
         return f"Attribute '{attribute_name}' from person profile's aspect '{self._dimension_name}' is updated successfully."
 
@@ -551,7 +585,13 @@ class PersonDimensionBase(BaseModel):
             text = f"The item at index {item_index} in '{attribute_name}' from the person profile's aspect '{self._dimension_name}' is deleted successfully."
         
         self.operations.append(f"Timestamp {modified_at}: {operation_description}")
-        self.last_modified = modified_at
+        
+        try:
+            if datetime.fromisoformat(modified_at) > datetime.fromisoformat(self.last_modified):
+                self.last_modified = modified_at
+        except (ValueError, TypeError):
+            self.last_modified = modified_at
+            
         return text
 
     def link_string_attribute(
@@ -756,7 +796,7 @@ class PersonDimensionBase(BaseModel):
                 f"{self.description}",
             )
 
-        markdown_strs.append(f"{indent}\t- Last Modified: {self.last_modified}")
+        markdown_strs.append(f"{indent}\t- Last Modified: {format_timestamp_with_weekday(self.last_modified)}")
 
         if detailed:
             markdown_strs.extend(self.format_operations_markdown(level + 1))
@@ -907,7 +947,35 @@ class PersonBase(BaseModel):
                 "the trajectory has a valid time range."
             )   
         return v
-    
+
+    @model_validator(mode="wrap")
+    @classmethod
+    def _restore_private_attrs(
+        cls,
+        values: Any,
+        handler: ModelWrapValidatorHandler[Self],
+    ) -> Self:
+        """Restore private attributes from serialized data during deserialization.
+
+        Args:
+            values (`Any`):
+                The input values to validate.
+            handler (`ModelWrapValidatorHandler[Self]`):
+                The handler that runs the standard validation pipeline and returns
+                the validated instance.
+
+        Returns:
+            `Self`:
+                The validated instance with private attributes restored.
+        """
+        instance = handler(values)
+        if isinstance(values, dict):
+            for session in values.get("grounded_sessions", []):
+                if not isinstance(session, Session):
+                    session = Session.model_validate(session)
+                instance.add_grounded_session(session)
+        return instance
+
     def add_grounded_session(self, session: Session) -> None:
         """Add a grounded (pre-existing) session to this person profile.
         
@@ -931,6 +999,28 @@ class PersonBase(BaseModel):
             else:
                 left = mid + 1
         sessions.insert(left, session)
+
+    def create_snapshot(self) -> dict[str, Any]:
+        """Create a deep snapshot of the current person profile state which 
+        can be used to restore the state.
+
+        Returns:
+            `dict[str, Any]`:
+                The serialized snapshot of the current person profile state.
+        """
+        return self.model_dump()
+
+    def restore_from_snapshot(self, snapshot: dict[str, Any]) -> None:
+        """Restore the person profile state in place from a snapshot.
+
+        Args:
+            snapshot (`dict[str, Any]`):
+                The snapshot to restore from.
+        """
+        restored = type(self).model_validate(snapshot)
+        for field_name in type(self).model_fields:
+            setattr(self, field_name, getattr(restored, field_name))
+        self._grounded_sessions = restored._grounded_sessions
 
     @computed_field
     @property
@@ -1208,7 +1298,7 @@ class PersonBase(BaseModel):
                 
         markdown_strs.extend(
             [
-                f"{indent}\t- Trajectory Time Range: {self.trajectory_start} to {self.trajectory_end}",
+                f"{indent}\t- Trajectory Time Range: {format_timestamp_with_weekday(self.trajectory_start)} to {format_timestamp_with_weekday(self.trajectory_end)}",
                 f"{indent}\t- Created At In Real-World System Time: {self.created_at}",
             ]
         )

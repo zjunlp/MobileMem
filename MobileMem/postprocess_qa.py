@@ -6,8 +6,6 @@ import json
 import os
 import random
 import signal
-from typing import Any
-
 import shortuuid
 from pydantic import BaseModel, Field
 from agentscope.formatter import OpenAIChatFormatter
@@ -20,9 +18,9 @@ from agentscope.rag import (
     MilvusLiteStore,
 )
 from agentscope.embedding import OpenAITextEmbedding
-
 from keme.models import QuestionAnswerPair, QuestionTypeToolbook
 from keme.toolkits import SynthesisAgent
+from typing import Any 
 
 
 _REVISION_SYSTEM_PROMPT = (
@@ -122,6 +120,7 @@ class QAPostprocessor:
         self.stats = {
             "total_qa_pairs": 0,
             "revised_qa_pairs": 0,
+            "discarded_qa_pairs": 0,
             "skipped_qa_pairs": 0,
             "failed_qa_pairs": 0,
         }
@@ -217,6 +216,11 @@ class QAPostprocessor:
             `MilvusLiteStore`:
                 The configured vector store.
         """
+        # Milvus Lite does not create the database file's parent directory automatically,
+        # so we ensure it exists to avoid a "dir not exists" connection error.
+        milvus_dir = os.path.dirname(self.args.milvus_uri)
+        os.makedirs(milvus_dir, exist_ok=True)
+
         store = MilvusLiteStore(
             uri=self.args.milvus_uri,
             collection_name=self.args.collection_name,
@@ -344,7 +348,7 @@ class QAPostprocessor:
     async def revise_question_answer_pair(
         self,
         qa_pair: QuestionAnswerPair,
-    ) -> tuple[QuestionAnswerPair, RevisionResult]:
+    ) -> tuple[QuestionAnswerPair | None, RevisionResult]:
         """Revise a question-answer pair based on semantic similarity and answerability.
         
         This method retrieves semantically similar questions from the knowledge base,
@@ -355,9 +359,30 @@ class QAPostprocessor:
                 The question-answer pair to potentially revise.
         
         Returns:
-            `tuple[QuestionAnswerPair, RevisionResult]`:
-                A tuple containing the (potentially revised) question-answer pair and the revision result.
+            `tuple[QuestionAnswerPair | None, RevisionResult]`:
+                A tuple containing the resulting question-answer pair and the
+                revision result. 
         """
+        # Work on a deep copy so the original question-answer pair is left untouched, and
+        # reconcile the declared question type with the actual number of evidence hops:
+        # a "single-hop" pair backed by multiple evidences becomes "multi-hop", while a
+        # "multi-hop" pair backed by a single evidence becomes "single-hop".
+        qa_pair = qa_pair.model_copy(deep=True)
+        if (
+            qa_pair.question_type == "single-hop"
+            and qa_pair.num_hops > 1
+            and self.toolbook is not None
+            and self.toolbook.get_question_type("multi-hop") is not None
+        ):
+            qa_pair.question_type = "multi-hop"
+        elif (
+            qa_pair.question_type == "multi-hop"
+            and qa_pair.num_hops == 1
+            and self.toolbook is not None
+            and self.toolbook.get_question_type("single-hop") is not None
+        ):
+            qa_pair.question_type = "single-hop"
+
         # Retrieve similar QA pairs from the knowledge base
         similar_docs = await self.knowledge.retrieve(
             query=self._format_qa_for_knowledge_base(qa_pair),
@@ -400,18 +425,22 @@ class QAPostprocessor:
         )
         revision_result = RevisionResult.model_validate(response_msg.metadata)
         
-        # Apply revision if needed
-        if revision_result.need_refined:
-            # Create a new QA pair with revised question and answer
-            # Preserve other metadata
-            revised_qa_data = qa_pair.model_dump()
-            revised_qa_data["question"] = revision_result.question
-            revised_qa_data["golden_answers"] = [revision_result.answer]
-            revised_qa_data["id"] = f"qa_{shortuuid.uuid()}"
-            revised_qa_pair = QuestionAnswerPair.model_validate(revised_qa_data)
-            return revised_qa_pair, revision_result
-        
-        return qa_pair, revision_result
+        if not revision_result.need_refined:
+            return qa_pair, revision_result
+
+        # The pair is flagged for refinement. The action depends on the strategy.
+        if self.args.refine_strategy == "discard":
+            # Drop the pair entirely.
+            return None, revision_result
+
+        # "revise" strategy: adopt the LLM revision by creating a new QA pair with
+        # the revised question and answer while preserving the other metadata.
+        revised_qa_data = qa_pair.model_dump()
+        revised_qa_data["question"] = revision_result.question
+        revised_qa_data["golden_answers"] = [revision_result.answer]
+        revised_qa_data["id"] = f"qa_{shortuuid.uuid()}"
+        revised_qa_pair = QuestionAnswerPair.model_validate(revised_qa_data)
+        return revised_qa_pair, revision_result
     
     async def run(self) -> None:
         """Run the post-processing pipeline."""
@@ -438,6 +467,7 @@ class QAPostprocessor:
         self.stats["total_qa_pairs"] = len(qa_pairs)
         
         print(f"\n✅ Found {len(qa_pairs)} QA pairs to process")
+        print(f"✅ Refinement strategy: {self.args.refine_strategy}")
         
         # Shuffle question-answer pairs for randomized processing order
         random.seed(self.args.random_seed)
@@ -464,12 +494,30 @@ class QAPostprocessor:
                     # Revise the QA pair
                     revised_qa, result = await self.revise_question_answer_pair(qa_pair)
                     
+                    # Discard strategy: the pair is flagged for refinement and the
+                    # configured action is to drop it. Skip both the output and the
+                    # knowledge base so it does not affect future comparisons.
+                    if revised_qa is None:
+                        self.stats["discarded_qa_pairs"] += 1
+                        revision_results.append(
+                            {
+                                "original_id": qa_pair.id,
+                                "revised_id": None,
+                                "need_refined": True,
+                                "discarded": True,
+                                "explanation": result.explanation,
+                            }
+                        )
+                        print(f"   ✗ Discarded")
+                        continue
+                    
                     revised_qa_pairs.append(revised_qa)
                     revision_results.append(
                         {
                             "original_id": qa_pair.id,
                             "revised_id": revised_qa.id,
                             "need_refined": result.need_refined,
+                            "discarded": False,
                             "explanation": result.explanation,
                         }
                     )
@@ -496,6 +544,7 @@ class QAPostprocessor:
                             "original_id": qa_pair.id,
                             "revised_id": qa_pair.id,
                             "need_refined": False,
+                            "discarded": False,
                             "explanation": f"Failed to process: {str(e)}",
                         }
                     )
@@ -545,17 +594,18 @@ class QAPostprocessor:
         print("=" * 60)
         print(f"   Total QA pairs: {self.stats['total_qa_pairs']}")
         print(f"   Revised: {self.stats['revised_qa_pairs']}")
+        print(f"   Discarded: {self.stats['discarded_qa_pairs']}")
         print(f"   Failed: {self.stats['failed_qa_pairs']}")
 
 
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
-        description="Post-process QA pairs generated by run_qa_synthesis.py.",
+        description="Post-process QA pairs generated by KEME.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     
-    # Input/Output configuration
+    # Input and output configuration
     parser.add_argument(
         "--input_path",
         type=str,
@@ -573,7 +623,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--model",
         type=str,
-        default="gpt-5.1",
+        default="gpt-5.2",
         help="Model name for revision agent.",
     )
     parser.add_argument(
@@ -599,6 +649,17 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=10,
         help="Maximum iterations for the revision agent.",
+    )
+    parser.add_argument(
+        "--refine_strategy",
+        type=str,
+        default="revise",
+        choices=["revise", "discard"],
+        help=(
+            "Action to take when the LLM determines that a question-answer pair needs revision. "
+            "'revise' means adopt the LLM-revised question-answer pair. "
+            "'discard' means drop the question-answer pair entirely instead of keeping the revision. "
+        ),
     )
     
     # Embedding configuration

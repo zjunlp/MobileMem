@@ -1,5 +1,6 @@
 from .agentscope import (
     get_timestamp, 
+    format_timestamp_with_weekday,
     is_async_func, 
     execute_async_or_sync_func,
     StudioServer,
@@ -16,6 +17,7 @@ from .sys_prompts import (
 
 __all__ = [
     "get_timestamp",
+    "format_timestamp_with_weekday",
     "is_async_func",
     "execute_async_or_sync_func",
     "StudioServer",

@@ -12,7 +12,7 @@ from pydantic import (
     model_validator,
     ModelWrapValidatorHandler, 
 )
-from ..utils import get_timestamp
+from ..utils import get_timestamp, format_timestamp_with_weekday
 from .session import Message
 from .graph import Event, Session 
 from .persona import PersonDimensionBase, PersonBase
@@ -295,8 +295,8 @@ class QuestionAnswerPair(BaseModel):
             f"{indent}\t- Difficulty: {self.difficulty}",
             f"{indent}\t- Golden Answers: {answers_str}",
             f"{indent}\t- Topics: {topics_str}",
-            f"{indent}\t- Effective Timestamp: {self.effective_timestamp}",
-            f"{indent}\t- Expiry Timestamp: {self.expiry_timestamp or NO_EXPIRY_TIMESTAMP}",
+            f"{indent}\t- Effective Timestamp: {format_timestamp_with_weekday(self.effective_timestamp)}",
+            f"{indent}\t- Expiry Timestamp: {format_timestamp_with_weekday(self.expiry_timestamp or NO_EXPIRY_TIMESTAMP)}",
             f"{indent}\t- Total Number of Messages: {self.num_hops}",
             f"{indent}\t- Total Number of Sub-Questions: {self.num_sub_questions}",
             f"{indent}\t- Created At In Real-World System Time: {self.created_at}",

@@ -10,7 +10,7 @@ from pydantic import (
     ModelWrapValidatorHandler, 
     model_validator,
 )
-from ..utils import get_timestamp
+from ..utils import get_timestamp, format_timestamp_with_weekday
 from ._constants import NO_SIDE_NOTE
 from typing import (
     Literal, 
@@ -141,7 +141,7 @@ class Message(BaseModel):
         indent = "\t" * level
         markdown_strs = [
             f"{indent}- Message ID: {self.id}",
-            f"{indent}- {self.name} (timestamp: {self.timestamp})",
+            f"{indent}- {self.name} (timestamp: {format_timestamp_with_weekday(self.timestamp)})",
             f"{indent}\t- Role: {self.role}",
             f"{indent}\t- Content: {self.content}",
             f"{indent}\t- Created At In Real-World System Time: {self.created_at}",
@@ -238,7 +238,7 @@ class Session(BaseModel):
         markdown_strs = [
             f"{indent}- Session ID: {self.id}",
             f"{indent}\t- Parent Event ID: {self.event_id}",
-            f"{indent}\t- Temporal Span: {self.started_at} - {self.ended_at}",
+            f"{indent}\t- Temporal Span: {format_timestamp_with_weekday(self.started_at)} - {format_timestamp_with_weekday(self.ended_at)}",
             f"{indent}\t- Created At In Real-World System Time: {self.created_at}",
         ]
         if include_side_note:

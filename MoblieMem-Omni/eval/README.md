@@ -150,6 +150,57 @@ bash script/4_eval.sh --model-path <MODEL> --router-model <ROUTER_MODEL> --targe
 
 The native commands above describe each repository's execution entry. Reproducing the reported MobileMem-Omni numbers additionally requires using the converted MobileMem-Omni data, the same QA backbone and judge model, and the same retrieval settings. Repository-native scripts may therefore require a small dataset adapter rather than running unchanged.
 
+### Common Experiment Options
+
+When adapting an external method to MobileMem-Omni, keep the following experiment settings explicit and consistent:
+
+| Argument | Purpose |
+|:---------|:--------|
+| `--stage` | Run `construction`, `search`, `evaluation`, or the complete `pipeline` |
+| `--method` | Select the memory baseline |
+| `--user-id` | Select one converted `locomo_u{ID}.json` file |
+| `--top-k` | Set the number of retrieved memories |
+| `--qa-model` | Select the model that answers benchmark questions |
+| `--judge-model` | Select the model used for LLM-as-a-Judge |
+| `--no-image` | Evaluate caption/text memory without sending raw images |
+| `--visual-retriever` | Select a visual retriever such as `siglip`, or disable visual retrieval |
+| `--output-dir` | Keep generated memories, retrieval results, predictions, metrics, and logs outside the source tree |
+| `--resume` | Reuse completed outputs and continue an interrupted run |
+
+The exact flag names depend on the external repository. The table describes the settings that a dataset adapter or experiment launcher should expose; they are not CLI options currently implemented by this directory.
+
+### Output Structure
+
+Keep the artifacts from each method and user separate so that failed stages can be inspected or resumed without repeating the entire experiment:
+
+```text
+output/
+└── <method>/
+    └── <user_id>/
+        ├── construction/
+        │   └── memory_state.*
+        ├── search/
+        │   └── top_<k>.json
+        ├── evaluation/
+        │   ├── predictions.json
+        │   └── metrics.json
+        └── logs/
+```
+
+Construction output is the input to Search, and Search output is the input to Evaluation. When comparing methods, retain the intermediate retrieval results as well as the final scores; this makes it possible to distinguish retrieval failures from answer-generation failures.
+
+### Multimodal Input Modes
+
+Use one of the following input modes consistently across all compared methods:
+
+| Mode | Text Memory | Image Caption | Raw Image |
+|:-----|:------------|:--------------|:----------|
+| Text-only | Yes | No | No |
+| Caption-only | Yes | Yes | No |
+| Multimodal | Yes | Yes | Yes |
+
+For multimodal experiments, report the visual retriever and image top-k separately from the text retriever. Do not commit API keys or service credentials; store them in environment variables or an ignored local configuration file.
+
 ## Step 3. Evaluate
 
 Use:
