@@ -20,6 +20,7 @@ from __future__ import annotations
 import json
 import os
 import threading
+import time
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple
 
 Record = Dict[str, Any]
@@ -61,7 +62,9 @@ def write_jsonl(records: Iterable[Record], path: str) -> None:
 def write_jsonl_atomic(records: Iterable[Record], path: str) -> None:
     """Like :func:`write_jsonl` but crash-safe: write a ``.tmp`` then replace.
 
-    A partially written file can never clobber a good one.
+    A partially written file can never clobber a good one. On Windows, virus
+    scanners and editors can briefly hold the destination without sharing
+    delete access, so retry that transient ``PermissionError`` before failing.
     """
     parent = os.path.dirname(path)
     if parent:
@@ -70,7 +73,14 @@ def write_jsonl_atomic(records: Iterable[Record], path: str) -> None:
     with open(tmp_path, 'w', encoding='utf-8') as f:
         for record in records:
             f.write(json.dumps(record, ensure_ascii=False) + '\n')
-    os.replace(tmp_path, path)
+    for attempt in range(5):
+        try:
+            os.replace(tmp_path, path)
+            return
+        except PermissionError:
+            if attempt == 4:
+                raise
+            time.sleep(0.1 * (2 ** attempt))
 
 
 _APPEND_LOCK = threading.Lock()

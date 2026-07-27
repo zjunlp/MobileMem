@@ -5,8 +5,8 @@ Two phases: Phase 1 captions every generated image with a vision LLM (emitting
 :class:`core.ImageSummary` rows), and Phase 2 (:func:`merge_all_images`) merges
 all per-stage image JSONLs into a unified per-sub-event view plus a per-image
 ``total_images`` index (:class:`core.ImageRecord` rows), joining Phase 1
-captions onto each image and including persona scenery under
-``sub_event_id="scenery"``.
+captions onto each image. Persona scenery is kept only in the per-image index
+because it is not associated with a real sub-event.
 """
 
 import os
@@ -500,9 +500,9 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
     Output files:
     1. merged_memories.jsonl: one sub-event per line; each ``images`` entry is
        ``{image_path, summary_zh, summary_en}`` (Phase 1 captions joined in).
-       Persona scenery lives under synthetic ``sub_event_id="scenery"``.
     2. total_images.jsonl: one image per line, keyed by path and carrying
-       type-specific structured information plus the same caption fields.
+       type-specific structured information plus the same caption fields;
+       persona scenery is included here with ``sub_event_id=null``.
     """
     logger.info("=" * 70)
     logger.info("Phase 2: Merge all image JSONL files")
@@ -751,17 +751,18 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
                 'summary_zh': caps['summary_zh'],
                 'summary_en': caps['summary_en'],
             })
-        record = {
-            'uuid': uid,
-            'sub_event_id': seid,
-            'event_id': parent_eid,
-            'event_name': meta.get('event_name', ''),
-            'event_time': meta.get('event_time', ''),
-            'participants': meta.get('participants', []),
-            'importance': meta.get('importance', ''),
-            'images': merged_images,
-        }
-        merged_records.append(record)
+        if seid != 'scenery':
+            record = {
+                'uuid': uid,
+                'sub_event_id': seid,
+                'event_id': parent_eid,
+                'event_name': meta.get('event_name', ''),
+                'event_time': meta.get('event_time', ''),
+                'participants': meta.get('participants', []),
+                'importance': meta.get('importance', ''),
+                'images': merged_images,
+            }
+            merged_records.append(record)
         for img in images_list:
             # Route the per-image row through the ImageRecord contract.
             # ImageRecord declares the common keys (uuid / sub_event_id / type /
@@ -771,7 +772,11 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
             caps = _lookup_summary(summary_index, norm_path or img.get('image_path', ''))
             img = {**img, 'image_path': norm_path, **caps}
             img_record = ImageRecord.from_dict(
-                {'uuid': uid, 'sub_event_id': seid, **img}
+                {
+                    'uuid': uid,
+                    'sub_event_id': None if seid == 'scenery' else seid,
+                    **img,
+                }
             ).to_dict()
             total_images_records.append(img_record)
 
