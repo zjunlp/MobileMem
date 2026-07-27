@@ -11,6 +11,7 @@ optional deps (insightface / PaddleOCR).
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -313,7 +314,16 @@ S10_SUMMARY_FILE = "image_summaries.jsonl"
 S10_MERGED_FILE = "merged_memories.jsonl"
 APP_TRACE_FILE = "app_screenshots.jsonl"
 EVENT_PHOTO_FILE = "event_images.jsonl"
-DOCUMENT_FILE = "tickets.jsonl"
+DOCUMENT_FILE = "document_records.jsonl"
+
+OUTPUT_OWNERS = {
+    ANNUAL_EVENTS_FILE: "annual_events",
+    SUB_EVENTS_FILE: "sub_events",
+    GROUP_CHATS_FILE: "conversation",
+    APP_TRACE_FILE: "app_trace",
+    DOCUMENT_FILE: "document",
+    EVENT_PHOTO_FILE: "event_photo",
+}
 
 
 # Emit only flags the generator declares. Data-file paths are threaded from
@@ -384,6 +394,38 @@ def _jsonl_uuid_set(path: str) -> set:
             for record in (json.loads(line) for line in f if line.strip())
             if isinstance(record, dict) and record.get("uuid") is not None
         }
+
+
+def _file_fingerprint(path: str):
+    if not os.path.exists(path):
+        return None
+    digest = hashlib.sha256()
+    with open(path, 'rb') as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b''):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def snapshot_non_owned_outputs(ctx: RunContext, node_name: str):
+    """Capture protected output state before a node runs."""
+    return {
+        filename: _file_fingerprint(_data(ctx, filename))
+        for filename, owner in OUTPUT_OWNERS.items()
+        if owner != node_name
+    }
+
+
+def assert_non_owned_outputs_unchanged(ctx: RunContext, node_name: str, before) -> None:
+    """Fail when a node creates, removes, or rewrites another node's output."""
+    changed = [
+        filename for filename, fingerprint in before.items()
+        if _file_fingerprint(_data(ctx, filename)) != fingerprint
+    ]
+    if changed:
+        details = ', '.join(
+            f"{filename} (owner={OUTPUT_OWNERS[filename]})" for filename in changed
+        )
+        raise RuntimeError(f"Node {node_name!r} modified non-owned output(s): {details}")
 
 
 def _verify_uuid_coverage(ctx: RunContext, node: Node) -> None:
@@ -479,6 +521,7 @@ def _argv_conversation(ctx: RunContext):
 def _argv_app_trace(ctx: RunContext):
     return ["--events-file", _data(ctx, ANNUAL_EVENTS_FILE),
             "--output-dir", ctx.image_dir,
+            "--manifest-file", _data(ctx, APP_TRACE_FILE),
             "--sub-events-file", _data(ctx, SUB_EVENTS_FILE),
             *_uuid_multi(ctx),
             *_force(ctx)]
@@ -497,6 +540,7 @@ def _argv_document(ctx: RunContext):
     return ["--events-file", _data(ctx, ANNUAL_EVENTS_FILE),
             "--output-dir", ctx.image_dir,
             "--image-dir", ctx.image_dir,
+            "--manifest-file", _data(ctx, DOCUMENT_FILE),
             "--sub-events-file", _data(ctx, SUB_EVENTS_FILE),
             *_uuid_multi(ctx),
             *_force(ctx)]
@@ -517,6 +561,7 @@ def _argv_memory_summary(ctx: RunContext):
             "--profiles-file", _data(ctx, BASIC_PROFILES_FILE),
             "--events-file", _data(ctx, ANNUAL_EVENTS_FILE),
             "--sub-events-file", _data(ctx, SUB_EVENTS_FILE),
+            "--document-file", _data(ctx, DOCUMENT_FILE),
             "--workers", str(ctx.max_workers),
             *_uuid_multi(ctx),
             *_force(ctx)]

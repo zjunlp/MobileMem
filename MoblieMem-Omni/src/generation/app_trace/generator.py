@@ -16,9 +16,14 @@ from pathlib import Path
 
 import config
 from config import LOG_DIR
-# write_jsonl is re-exported via generation.app_trace.__init__ for compat;
-# this module itself writes through write_jsonl_atomic only.
-from infra.store import read_jsonl, write_jsonl, write_jsonl_atomic
+# write_jsonl is re-exported via generation.app_trace.__init__ for compatibility.
+from infra.store import (
+    load_manifest_index,
+    manifest_record_key,
+    read_jsonl,
+    write_jsonl,
+    write_manifest_index_atomic,
+)
 from generation.event_expansion import load_sub_events_index, expand_events_for_imaging
 from core import DIR_NAME
 from backends.llm import set_log_context
@@ -44,6 +49,7 @@ if sys.platform == "win32":
 
 logger = logging.getLogger('app_trace')
 logger.setLevel(logging.DEBUG)
+os.makedirs(LOG_DIR, exist_ok=True)
 fh = logging.FileHandler(os.path.join(LOG_DIR, 'app_trace.log'), encoding='utf-8')
 fh.setLevel(logging.DEBUG)
 fh.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
@@ -71,6 +77,27 @@ APP_TYPE_EN = {
     "ticket": "Train Ticket",
     "money": "Payment Transfer",
 }
+
+
+def _hydrate_info_from_manifest(personas, manifest, app_types):
+    """Attach cached info to the expanded event view without mutating its source."""
+    for persona in personas:
+        uid = persona.get('uuid')
+        for event in persona.get('Events', []):
+            event_id = str(event.get('event_id'))
+            for app_type in app_types:
+                cached = manifest.get((uid, event_id, app_type))
+                info = cached.get('info') if cached else None
+                if info:
+                    event[f'{app_type}_info'] = info
+
+
+def _record_is_in_scope(record, uuid_filter, app_types):
+    key = manifest_record_key(record, 'app_type')
+    if key is None:
+        return False
+    uid, _, record_type = key
+    return (uuid_filter is None or uid in uuid_filter) and record_type in app_types
 
 
 def render_single_sync(page, task, output_dir, templates, resume=True, keep_html=False):
@@ -236,6 +263,10 @@ def main():
     parser.add_argument('--output-dir', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'image'),
                         help='Screenshot output directory')
+    parser.add_argument('--manifest-file', type=str,
+                        default=os.path.join(config.OUTPUT_DIR, 'data',
+                                             'app_screenshots.jsonl'),
+                        help='Owned app screenshot manifest JSONL')
     parser.add_argument('--uuid-filter', type=int, nargs='+', default=None,
                         help='Only process these uuid(s), e.g. --uuid-filter 0 10')
     parser.add_argument('--events-per-type', type=int, default=30,
@@ -250,10 +281,10 @@ def main():
                         help='Force re-render all screenshots')
     parser.add_argument('--dry-run', action='store_true',
                         help='Count only, do not generate')
-    parser.add_argument('--save-events', action='store_true', default=True,
-                        help='Write generated *_info back to the annual_events JSONL (default: on)')
+    parser.add_argument('--save-events', action='store_true', default=False,
+                        help='Deprecated compatibility flag; annual events are never modified')
     parser.add_argument('--no-save-events', dest='save_events', action='store_false',
-                        help='Do not write back to the annual_events JSONL')
+                        help='Deprecated compatibility flag; annual events are never modified')
     parser.add_argument('--reset-checkpoint', action='store_true',
                         help='Clear the checkpoint and start from scratch')
     parser.add_argument('--all-events', action='store_true',
@@ -282,18 +313,21 @@ def main():
     logger.info("app_trace: Start")
     logger.info(f"Events file  : {args.events_file}")
     logger.info(f"Output dir   : {args.output_dir}")
+    logger.info(f"Manifest     : {args.manifest_file}")
     logger.info(f"All events   : {args.all_events}")
     logger.info(f"Events/type  : {args.events_per_type}")
     logger.info(f"UUID filter  : {args.uuid_filter}")
     logger.info(f"Skip LLM     : {args.skip_llm}")
     logger.info(f"No covers    : {args.no_covers}")
     logger.info(f"Resume       : {args.resume}")
-    logger.info(f"Save events  : {args.save_events}")
     logger.info(f"Reset ckpt   : {args.reset_checkpoint}")
     logger.info("=" * 70)
 
+    if args.save_events:
+        logger.warning("--save-events is deprecated and ignored; annual_events.jsonl is read-only")
+
     # -- Resume support.
-    if args.reset_checkpoint:
+    if args.reset_checkpoint and not args.dry_run:
         clear_checkpoint(args.output_dir)
     checkpoint_done = load_checkpoint(args.output_dir)
     if checkpoint_done:
@@ -322,60 +356,49 @@ def main():
         persona['Events'] = expanded
         logger.info(f"[uuid={uid}] Events expanded: {len(original_events)} -> {len(expanded)}")
 
-    # --all-events: clear all old *_info fields and regenerate from scratch.
-    if args.all_events:
-        logger.info("[all-events] Clearing old *_info fields and removing existing screenshot dirs...")
-        for persona in event_records:
-            if args.uuid_filter is not None and persona.get('uuid') not in args.uuid_filter:
-                continue
-            for ev in persona.get('Events', []):
-                for t in APP_TYPES:
-                    ev.pop(f"{t}_info", None)
-        # Delete old screenshots.
-        import shutil
-        out_root = Path(args.output_dir)
-        if out_root.exists():
-            for uid_dir in out_root.iterdir():
-                if uid_dir.is_dir():
-                    uid_val = uid_dir.name
-                    if args.uuid_filter is None or any(str(u) == uid_val for u in args.uuid_filter):
-                        shutil.rmtree(uid_dir)
-                        logger.info(f"  Removed {uid_dir}")
-        # --all-events implicitly enables save-events.
-        args.save_events = True
-        args.resume = False  # Force rerendering.
+    manifest = load_manifest_index(args.manifest_file, 'app_type')
+    _hydrate_info_from_manifest(event_records, manifest, APP_TYPES)
+    if manifest:
+        logger.info(f"[Manifest] Loaded {len(manifest)} app screenshot records")
 
-    # -- --force-regen: clear caches for the selected type.
-    if args.force_regen:
-        logger.info(f"[force-regen] Clearing *_info, checkpoint and PNG for types {APP_TYPES} ...")
-        # 1. Clear *_info fields in JSONL.
+    # Regeneration only clears this stage's records and image directories.
+    if args.all_events or args.force_regen:
+        mode = 'all-events' if args.all_events else 'force-regen'
+        logger.info(f"[{mode}] Clearing app manifest records, checkpoint and PNGs for {APP_TYPES} ...")
         for persona in event_records:
             if args.uuid_filter is not None and persona.get('uuid') not in args.uuid_filter:
                 continue
             for ev in persona.get('Events', []):
                 for t in APP_TYPES:
                     ev.pop(f"{t}_info", None)
-        write_jsonl_atomic(event_records, args.events_file)
-        logger.info("  *_info fields cleared and written back to JSONL")
-        # 2. Clear checkpoint entries for this type.
+
+        manifest = {
+            key: record for key, record in manifest.items()
+            if not _record_is_in_scope(record, args.uuid_filter, APP_TYPES)
+        }
+        if not args.dry_run:
+            write_manifest_index_atomic(manifest, args.manifest_file)
+
         before = len(checkpoint_done)
         checkpoint_done = {
             k for k in checkpoint_done
             if not any(f"_{t}_" in k or k.endswith(f"_{t}") for t in APP_TYPES)
         }
-        save_checkpoint(args.output_dir, checkpoint_done)
-        logger.info(f"  Checkpoint cleared {before - len(checkpoint_done)} entries")
-        # 3. Delete old PNG files.
+        if not args.dry_run:
+            save_checkpoint(args.output_dir, checkpoint_done)
+            logger.info(f"  Checkpoint cleared {before - len(checkpoint_done)} entries")
+
         import shutil
         out_root = Path(args.output_dir)
-        for t in APP_TYPES:
-            if args.uuid_filter is not None:
-                uid_dirs = [out_root / f"uid{u}" for u in args.uuid_filter]
-            else:
-                uid_dirs = [d for d in out_root.iterdir() if d.is_dir()] if out_root.exists() else []
-            for uid_dir in uid_dirs:
+        selected_uids = [
+            persona.get('uuid') for persona in event_records
+            if args.uuid_filter is None or persona.get('uuid') in args.uuid_filter
+        ]
+        for uid in selected_uids:
+            uid_dir = out_root / f'uid{uid}'
+            for t in APP_TYPES:
                 type_dir = uid_dir / DIR_NAME[t]
-                if type_dir.exists():
+                if type_dir.exists() and not args.dry_run:
                     shutil.rmtree(type_dir)
                     logger.info(f"  Removed {type_dir}")
         args.resume = False  # Force rerendering.
@@ -384,8 +407,6 @@ def main():
     effective_skip_llm = args.skip_llm or args.dry_run
 
     total_stats = {"done": 0, "skipped": 0, "failed": 0}
-    jsonl_records = []  # Collect standalone JSONL records.
-
     # -- Load templates and open one Playwright browser for reuse.
     templates = {}
     for lang, nat in [("cn", "Chinese"), ("en", "English")]:
@@ -412,7 +433,7 @@ def main():
             set_log_context(uuid=uid, stage="app_trace")
 
             def on_item_done(event, app_type, render_task):
-                """Save JSONL and render a screenshot immediately for each LLM item."""
+                """Checkpoint generated info, render it, then checkpoint the result."""
                 participants_raw = event.get('participants', [])
                 participant_names = [
                     p.get('name', '') if isinstance(p, dict) else str(p)
@@ -425,32 +446,34 @@ def main():
                 image_path = os.path.join(args.output_dir, f'uid{uid}', DIR_NAME[app_type],
                                           f'{uid}_{app_type}_{eid}.png')
 
-                status = "dry_run"
-                if not args.dry_run:
-                    status = render_single_sync(
-                        page, render_task, args.output_dir, templates,
-                        resume=args.resume, keep_html=args.keep_html)
-                    total_stats[status] = total_stats.get(status, 0) + 1
-
-                success = status in {"done", "skipped"} and os.path.exists(image_path)
-                jsonl_records.append({
+                record = {
                     'uuid': uid,
                     'sub_event_id': eid_str,
                     'event_id': parent_eid,
                     'event_name': event.get('event_name', event.get('event', event.get('title', ''))),
                     'participants': participant_names,
                     'app_type': app_type,
-                    # Never record a path for a render that failed: downstream
-                    # (memory_summary._manifest_image_exists) filters on
-                    # success/empty path, and a ghost path would defeat that.
-                    'image_path': image_path if success else '',
+                    'image_path': image_path,
                     'info': event.get(f'{app_type}_info', {}),
-                    'success': success,
-                    'status': status,
-                })
-                if args.save_events:
-                    write_jsonl_atomic(event_records, args.events_file)
-                    logger.info(f"  [uuid={uid}] event_{event['event_id']}: {app_type}_info saved")
+                    'success': False,
+                    'status': 'pending',
+                }
+                key = manifest_record_key(record, 'app_type')
+
+                status = "dry_run"
+                if not args.dry_run:
+                    manifest[key] = record
+                    write_manifest_index_atomic(manifest, args.manifest_file)
+                    status = render_single_sync(
+                        page, render_task, args.output_dir, templates,
+                        resume=args.resume, keep_html=args.keep_html)
+                    total_stats[status] = total_stats.get(status, 0) + 1
+                    record['status'] = status
+                    record['success'] = (
+                        status in {"done", "skipped"} and os.path.exists(image_path)
+                    )
+                    manifest[key] = record
+                    write_manifest_index_atomic(manifest, args.manifest_file)
                 return status
 
             process_persona(
@@ -462,7 +485,8 @@ def main():
                 output_dir=args.output_dir)
 
             # Persist checkpoint after each persona.
-            save_checkpoint(args.output_dir, checkpoint_done)
+            if not args.dry_run:
+                save_checkpoint(args.output_dir, checkpoint_done)
 
     finally:
         if browser:
@@ -474,12 +498,10 @@ def main():
                 f"skipped={total_stats.get('skipped',0)}, "
                 f"failed={total_stats.get('failed',0)}")
 
-    # -- Save standalone JSONL, even when empty, so downstream can distinguish
-    # "ran and selected no app screenshots" from "node never produced a manifest".
-    jsonl_output_path = os.path.join(os.path.dirname(args.events_file),
-                                     'app_screenshots.jsonl')
-    write_jsonl_atomic(jsonl_records, jsonl_output_path)
-    logger.info(f"Saved {len(jsonl_records)} records to {jsonl_output_path}")
+    # Ensure an empty-but-valid manifest exists when nothing was selected.
+    if not args.dry_run:
+        write_manifest_index_atomic(manifest, args.manifest_file)
+        logger.info(f"Saved {len(manifest)} records to {args.manifest_file}")
 
     logger.info("\n" + "=" * 70)
     logger.info("app_trace: Complete")

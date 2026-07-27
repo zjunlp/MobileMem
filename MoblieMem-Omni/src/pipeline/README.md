@@ -20,6 +20,9 @@ python -m pipeline.cli run --from social_world     # a node + everything downstr
 
 Each node is a thin adapter over a generator's public entry point. After a node
 runs, its expected output artifacts are verified before the next node starts.
+The runner also fingerprints outputs owned by other nodes and fails if a stage
+creates, removes, or rewrites a non-owned JSONL. In particular, media stages
+must not write expanded sub-events back to `annual_events.jsonl`.
 
 ## Pipeline stages
 
@@ -40,6 +43,11 @@ label. Run `python -m pipeline.cli list` to print the live topological order.
 | 9 | `conversation` | 7 | `group_chats.jsonl` + chat images |
 | 10 | `app_trace` | 7.2 | `app_screenshots.jsonl` + app images |
 | 11 | `event_photo` | 7.1 | `event_images.jsonl` + event photos |
-| 12 | `document` | 7.3 | `tickets.jsonl` + document images |
+| 12 | `document` | 7.3 | `document_records.jsonl` + document images |
 | 13 | `scenery` | 8 | scenery images |
 | 14 | `memory_summary` | 10 | `image_summaries.jsonl` + `total_images.jsonl` |
+
+`app_trace` and `document` recover generated `*_info` from their respective
+manifests. Manifest rows are atomically upserted by
+`(uuid, sub_event_id, type)`, with a `pending` row written before rendering so
+an interrupted run can resume without repeating the LLM call.

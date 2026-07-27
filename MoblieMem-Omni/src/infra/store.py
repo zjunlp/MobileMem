@@ -20,9 +20,10 @@ from __future__ import annotations
 import json
 import os
 import threading
-from typing import Any, Callable, Dict, Iterable, List, Sequence
+from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple
 
 Record = Dict[str, Any]
+ManifestKey = Tuple[Any, str, str]
 
 
 # Low-level JSONL I/O
@@ -102,6 +103,44 @@ def index_by(records: Sequence[Record], key: str) -> Dict[Any, Record]:
         if k is not None and k != '':
             out[k] = r
     return out
+
+
+def manifest_record_key(record: Record, type_field: str) -> Optional[ManifestKey]:
+    """Return the canonical ``(uuid, sub_event_id, type)`` manifest key."""
+    uid = record.get('uuid')
+    event_id = record.get('sub_event_id')
+    if event_id is None:
+        event_id = record.get('event_id')
+    record_type = record.get(type_field)
+    if uid is None or event_id is None or record_type in (None, ''):
+        return None
+    return uid, str(event_id), str(record_type)
+
+
+def load_manifest_index(path: str, type_field: str) -> Dict[ManifestKey, Record]:
+    """Load a per-image manifest; later duplicate keys win."""
+    indexed: Dict[ManifestKey, Record] = {}
+    for record in read_jsonl(path):
+        key = manifest_record_key(record, type_field)
+        if key is not None:
+            indexed[key] = record
+    return indexed
+
+
+def write_manifest_index_atomic(
+    records: Dict[ManifestKey, Record], path: str
+) -> None:
+    """Persist a complete composite-key manifest in deterministic order."""
+    def sort_key(item: Tuple[ManifestKey, Record]):
+        uid, event_id, record_type = item[0]
+        try:
+            uid_key = (0, int(uid))
+        except (TypeError, ValueError):
+            uid_key = (1, str(uid))
+        return uid_key, event_id, record_type
+
+    ordered = [record for _, record in sorted(records.items(), key=sort_key)]
+    write_jsonl_atomic(ordered, path)
 
 
 def load_existing_by_role(jsonl_path: str) -> Dict[str, Record]:

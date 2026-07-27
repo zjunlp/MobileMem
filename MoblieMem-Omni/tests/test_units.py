@@ -320,7 +320,7 @@ class MergeAllImagesCaptionJoinTest(unittest.TestCase):
                 }, ensure_ascii=False) + "\n",
                 encoding="utf-8",
             )
-            for name in ("app_screenshots.jsonl", "tickets.jsonl", "group_chats.jsonl"):
+            for name in ("app_screenshots.jsonl", "document_records.jsonl", "group_chats.jsonl"):
                 (data_dir / name).write_text("", encoding="utf-8")
 
             (data_dir / "image_summaries.jsonl").write_text(

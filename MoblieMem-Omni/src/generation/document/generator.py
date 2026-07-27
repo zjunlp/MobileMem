@@ -16,7 +16,12 @@ import random
 import sys
 import config
 from config import LOG_DIR
-from infra.store import read_jsonl, write_jsonl_atomic
+from infra.store import (
+    load_manifest_index,
+    manifest_record_key,
+    read_jsonl,
+    write_manifest_index_atomic,
+)
 from generation.event_expansion import load_sub_events_index, expand_events_for_imaging
 from core import DIR_NAME
 from core.lang import is_chinese_persona
@@ -61,6 +66,30 @@ logger.addHandler(sh)
 APP_TYPES = ["ticket", "money", "friend"]
 
 
+def _hydrate_info_from_manifest(personas, manifest, document_types):
+    """Attach cached document info to the expanded in-memory event view."""
+    for persona in personas:
+        uid = persona.get('uuid')
+        for event in persona.get('Events', []):
+            event_id = str(event.get('event_id'))
+            for document_type in document_types:
+                cached = manifest.get((uid, event_id, document_type))
+                if not cached:
+                    continue
+                info = cached.get(f'{document_type}_info', cached.get('info'))
+                if info:
+                    event[f'{document_type}_info'] = info
+
+
+def _record_is_in_scope(record, uuid_filter, document_types):
+    key = manifest_record_key(record, 'type')
+    if key is None:
+        return False
+    uid, _, document_type = key
+    return ((uuid_filter is None or uid in uuid_filter)
+            and document_type in document_types)
+
+
 def render_screenshot(page, html_content, png_path, html_path=None, keep_html=False):
     """Render HTML to a PNG screenshot, cropped to content height (to avoid bottom whitespace)."""
     return render_html_to_png(page, html_content, png_path, html_path=html_path,
@@ -77,6 +106,10 @@ def main():
                         default=os.path.join(config.OUTPUT_DIR, 'data', 'annual_events.jsonl'))
     parser.add_argument('--output-dir', type=str,
                         default=os.path.join(config.OUTPUT_DIR, 'image'))
+    parser.add_argument('--manifest-file', type=str,
+                        default=os.path.join(config.OUTPUT_DIR, 'data',
+                                             'document_records.jsonl'),
+                        help='Owned document manifest JSONL')
     parser.add_argument('--events-per-type', type=int, default=20)
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--keep-html', action='store_true')
@@ -98,6 +131,7 @@ def main():
     logger.info(f"UUID filter: {args.uuid_filter or 'ALL'}")
     logger.info(f"Events per type: {args.events_per_type}")
     logger.info(f"Output: {args.output_dir}")
+    logger.info(f"Manifest: {args.manifest_file}")
     logger.info(f"Sub-events file: {args.sub_events_file}")
     logger.info("=" * 60)
 
@@ -119,6 +153,37 @@ def main():
             expanded.append(ev)
         persona['Events'] = expanded
         logger.info(f"[uuid={_uid}] Events expanded: {len(original_events)} -> {len(expanded)}")
+
+    manifest = load_manifest_index(args.manifest_file, 'type')
+    _hydrate_info_from_manifest(event_records, manifest, args.types)
+    if manifest:
+        logger.info(f"[Manifest] Loaded {len(manifest)} document records")
+
+    if args.force:
+        manifest = {
+            key: record for key, record in manifest.items()
+            if not _record_is_in_scope(record, args.uuid_filter, args.types)
+        }
+        for persona in event_records:
+            uid = persona.get('uuid')
+            if args.uuid_filter is not None and uid not in args.uuid_filter:
+                continue
+            for event in persona.get('Events', []):
+                for document_type in args.types:
+                    event.pop(f'{document_type}_info', None)
+        if not args.dry_run:
+            write_manifest_index_atomic(manifest, args.manifest_file)
+
+        import shutil
+        for persona in event_records:
+            uid = persona.get('uuid')
+            if args.uuid_filter is not None and uid not in args.uuid_filter:
+                continue
+            for document_type in args.types:
+                type_dir = Path(args.output_dir) / f'uid{uid}' / DIR_NAME[document_type]
+                if type_dir.exists() and not args.dry_run:
+                    shutil.rmtree(type_dir)
+                    logger.info(f"  Removed {type_dir}")
     # Read base info
     data_dir = os.path.dirname(args.events_file)
     profiles_file = os.path.join(data_dir, 'basic_profiles.jsonl')
@@ -152,9 +217,8 @@ def main():
         page = browser.new_page(viewport={"width": 450, "height": 900})
 
     stats = {"done": 0, "skipped": 0, "failed": 0}
-    jsonl_records = []
 
-    def append_manifest_record(uid, ev, app_type, png_path, info, status):
+    def save_manifest_record(uid, ev, app_type, png_path, info, status):
         participants = []
         for p in ev.get('participants', []):
             if isinstance(p, dict):
@@ -164,22 +228,21 @@ def main():
         eid = ev.get('event_id', '')
         eid_str = str(eid)
         parent_eid = int(eid_str.split('_')[0]) if '_' in eid_str else eid
-        success = status in {'done', 'skipped'} and os.path.exists(png_path)
-        jsonl_records.append({
+        record = {
             'uuid': uid,
             'sub_event_id': eid_str,
             'event_id': parent_eid,
             'event_name': ev.get('event_name', ev.get('event_title', ev.get('title', ''))),
             'participants': participants,
             'type': app_type,
-            # Never record a path for a render that failed: downstream
-            # (memory_summary._manifest_image_exists) filters on
-            # success/empty path, and a ghost path would defeat that.
-            'image_path': png_path if success else '',
+            'image_path': png_path,
             f'{app_type}_info': info,
-            'success': success,
+            'success': status in {'done', 'skipped'} and os.path.exists(png_path),
             'status': status,
-        })
+        }
+        key = manifest_record_key(record, 'type')
+        manifest[key] = record
+        write_manifest_index_atomic(manifest, args.manifest_file)
 
     try:
         for persona in event_records:
@@ -236,6 +299,13 @@ def main():
                         for e in events:
                             if e['event_id'] == eid:
                                 e[f"{app_type}_info"] = info
+                                if not args.dry_run:
+                                    type_dir = os.path.join(
+                                        args.output_dir, f'uid{uid}', DIR_NAME[app_type])
+                                    png_path = os.path.join(
+                                        type_dir, f"{uid}_{app_type}_{eid}.png")
+                                    save_manifest_record(
+                                        uid, e, app_type, png_path, info, 'pending')
                                 break
 
                     if args.save_prompts:
@@ -263,7 +333,8 @@ def main():
 
                     if os.path.exists(png_path) and not args.force:
                         stats['skipped'] += 1
-                        append_manifest_record(uid, ev, app_type, png_path, info, 'skipped')
+                        if not args.dry_run:
+                            save_manifest_record(uid, ev, app_type, png_path, info, 'skipped')
                         logger.debug(f"  SKIP: {png_name}")
                         continue
 
@@ -271,6 +342,7 @@ def main():
                         logger.info(f"  [DRY] {png_name}")
                         continue
 
+                    save_manifest_record(uid, ev, app_type, png_path, info, 'pending')
                     try:
                         if app_type == "ticket":
                             if ticket_id_last4 is None:
@@ -296,10 +368,10 @@ def main():
                         stats['done'] += 1
                         logger.info(f"  OK: {png_name}")
 
-                        append_manifest_record(uid, ev, app_type, png_path, info, 'done')
+                        save_manifest_record(uid, ev, app_type, png_path, info, 'done')
                     except Exception as e:
                         stats['failed'] += 1
-                        append_manifest_record(uid, ev, app_type, png_path, info, 'failed')
+                        save_manifest_record(uid, ev, app_type, png_path, info, 'failed')
                         logger.error(f"  FAIL: {png_name}: {e}")
 
     finally:
@@ -308,15 +380,10 @@ def main():
         if pw_ctx:
             pw_ctx.stop()
 
-    # Save the updated JSONL
+    # The expanded event view and generated *_info stay in this process only.
     if not args.dry_run:
-        write_jsonl_atomic(event_records, args.events_file)
-        logger.info(f"Updated {args.events_file}")
-
-    # Save the standalone JSONL, even when empty.
-    jsonl_path = os.path.join(os.path.dirname(args.events_file), 'tickets.jsonl')
-    write_jsonl_atomic(jsonl_records, jsonl_path)
-    logger.info(f"Saved standalone JSONL: {jsonl_path} ({len(jsonl_records)} records)")
+        write_manifest_index_atomic(manifest, args.manifest_file)
+        logger.info(f"Saved standalone JSONL: {args.manifest_file} ({len(manifest)} records)")
 
     logger.info("=" * 60)
     logger.info(f"DONE: {stats['done']} done, {stats['skipped']} skipped, {stats['failed']} failed")

@@ -3,8 +3,6 @@ import logging
 import os
 from typing import Dict, Optional
 
-import jsonlines
-
 from infra.store import read_jsonl
 
 logger = logging.getLogger('event_photo')
@@ -40,12 +38,11 @@ def load_nationality_map(profiles_file: str) -> Dict[int, str]:
 
     nationality_map = {}
     try:
-        with jsonlines.open(profiles_file, 'r') as reader:
-            for record in reader:
-                uuid = record.get('uuid')
-                nationality = record.get('nationality')
-                if uuid is not None and nationality is not None:
-                    nationality_map[uuid] = nationality
+        for record in read_jsonl(profiles_file):
+            uuid = record.get('uuid')
+            nationality = record.get('nationality')
+            if uuid is not None and nationality is not None:
+                nationality_map[uuid] = nationality
         logger.info(f"Loaded nationality map from {profiles_file}: {len(nationality_map)} records")
     except Exception as e:
         logger.error(f"Error loading nationality map: {e}")

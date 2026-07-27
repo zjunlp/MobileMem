@@ -113,7 +113,11 @@ def _run_nodes(selected: List[str], ctx: RunContext) -> None:
         node = dag.NODES[name]
         print(f"\n{bar}\nNODE: {name}  [{node.kind}]  {node.description}\n{bar}")
         t0 = time.time()
-        node.run(ctx)
+        ownership_snapshot = dag.snapshot_non_owned_outputs(ctx, name)
+        try:
+            node.run(ctx)
+        finally:
+            dag.assert_non_owned_outputs_unchanged(ctx, name, ownership_snapshot)
         dag.verify_node_outputs(ctx, node)
         print(f"[{name}] done in {time.time() - t0:.1f}s")
     print(f"\n{bar}\nALL NODES COMPLETE  ({time.time() - total_start:.1f}s)\n{bar}")

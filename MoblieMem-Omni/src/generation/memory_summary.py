@@ -407,6 +407,20 @@ def _normalize_image_path(path_str):
     return p
 
 
+def _resolve_document_manifest(data_dir: str, document_file: str = None) -> str:
+    """Prefer the owned document manifest, with read-only legacy fallback."""
+    preferred = document_file or os.path.join(data_dir, 'document_records.jsonl')
+    if os.path.exists(preferred):
+        return preferred
+    legacy_path = os.path.join(data_dir, 'tickets.jsonl')
+    if os.path.exists(legacy_path):
+        logger.warning(
+            "Using legacy tickets.jsonl; rerun document to create document_records.jsonl"
+        )
+        return legacy_path
+    return preferred
+
+
 def _load_summary_index(summaries_file: str) -> Dict[str, Dict[str, str]]:
     """Index Phase 1 captions by normalized path and basename for join."""
     index: Dict[str, Dict[str, str]] = {}
@@ -479,7 +493,8 @@ def _load_scenery_into_grouped(grouped: dict, data_dir: str, image_dir: Optional
 
 def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
                      sub_events_file: str, events_file: str,
-                     image_dir: Optional[str] = None):
+                     image_dir: Optional[str] = None,
+                     document_file: Optional[str] = None):
     """Merge all stage image JSONL files into a unified per-sub-event format.
 
     Output files:
@@ -605,7 +620,7 @@ def merge_all_images(data_dir: str, summaries_file: str, merged_output: str,
     logger.info(f"app_trace: {len(app_trace_records)} records loaded")
 
     # 3c. document tickets, transfers, and social-feed screenshots.
-    document_path = os.path.join(data_dir, 'tickets.jsonl')
+    document_path = _resolve_document_manifest(data_dir, document_file)
     document_records = _read_jsonl(document_path, required=True)
     for rec in document_records:
         if not _manifest_image_exists(rec, data_dir):
@@ -852,6 +867,11 @@ def main():
     parser.add_argument('--events-file', type=str,
                         default=os.path.join(PROJECT_ROOT, 'output', 'data', 'annual_events.jsonl'),
                         help='Annual events JSONL for short-term event metadata')
+
+    parser.add_argument('--document-file', type=str,
+                        default=os.path.join(PROJECT_ROOT, 'output', 'data',
+                                             'document_records.jsonl'),
+                        help='Document records JSONL (ticket, money, and friend)')
     
     parser.add_argument('--workers', type=int, default=4,
                         help='Number of parallel workers for Vision LLM calls (default: 4)')
@@ -870,6 +890,7 @@ def main():
             sub_events_file=args.sub_events_file,
             events_file=args.events_file,
             image_dir=args.image_base_dir,
+            document_file=args.document_file,
         )
         return
     
@@ -1012,6 +1033,7 @@ def main():
             sub_events_file=args.sub_events_file,
             events_file=args.events_file,
             image_dir=args.image_base_dir,
+            document_file=args.document_file,
         )
 
 if __name__ == '__main__':
