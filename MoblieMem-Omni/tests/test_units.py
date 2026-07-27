@@ -266,9 +266,9 @@ class ExpandEventsForImagingTest(unittest.TestCase):
 
 
 class MergeAllImagesCaptionJoinTest(unittest.TestCase):
-    """Phase 2 joins Phase 1 captions and includes scenery from manifest."""
+    """Phase 2 joins captions while keeping scenery out of event memories."""
 
-    def test_captions_and_scenery_land_in_merged_outputs(self) -> None:
+    def test_scenery_lands_only_in_total_images(self) -> None:
         memory_summary = importlib.import_module("generation.memory_summary")
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -358,17 +358,13 @@ class MergeAllImagesCaptionJoinTest(unittest.TestCase):
             ]
             by_seid = {r["sub_event_id"]: r for r in rows}
             self.assertIn("0_1", by_seid)
-            self.assertIn("scenery", by_seid)
+            self.assertNotIn("scenery", by_seid)
 
             event_imgs = by_seid["0_1"]["images"]
             self.assertEqual(len(event_imgs), 1)
             self.assertIsInstance(event_imgs[0], dict)
             self.assertEqual(event_imgs[0]["summary_zh"], "事件图摘要")
             self.assertTrue(event_imgs[0]["image_path"].endswith("1_event_0.png"))
-
-            scenery_imgs = by_seid["scenery"]["images"]
-            self.assertEqual(len(scenery_imgs), 1)
-            self.assertEqual(scenery_imgs[0]["summary_zh"], "风景图摘要")
 
             total = [
                 json.loads(line)
@@ -378,6 +374,8 @@ class MergeAllImagesCaptionJoinTest(unittest.TestCase):
             self.assertEqual(len(total), 2)
             self.assertTrue(any(t.get("summary_zh") == "事件图摘要" for t in total))
             self.assertTrue(any(t.get("summary_zh") == "风景图摘要" for t in total))
+            scenery = next(t for t in total if t.get("type") == "scenery")
+            self.assertIsNone(scenery["sub_event_id"])
 
 
 if __name__ == "__main__":
