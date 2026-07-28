@@ -6,7 +6,7 @@
 
 <p>
   <a href="https://huggingface.co/datasets/zjunlp/MobileMem">Dataset</a> |
-  <a href="https://github.com/zjunlp/MemBase">MemBase</a> |
+  <a href="https://github.com/zjunlp/MemBase">MemBase</a> 
 </p>
 
 </div>
