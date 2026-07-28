@@ -439,7 +439,7 @@ async def main():
         slot_kwargs.append(build_agent_kwargs(model))
 
     with open(INPUT_PATH, "r", encoding="utf-8") as f:
-        samples = json.load(f)[-1:]
+        samples = json.load(f)
 
     if not samples:
         print(f"No samples found in {INPUT_PATH}.")

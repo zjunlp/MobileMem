@@ -194,8 +194,12 @@ TRAJECTORY_DIR = str(_SCRIPT_DIR / "output" / "trajectories")
 
 EMBEDDING_MODEL_NAME = "text-embedding-3-small"
 EMBEDDING_DIMENSIONS = 1536
-EMBEDDING_API_KEY = "YOUR_API_KEY"
-EMBEDDING_BASE_URL = "YOUR_BASE_URL"
+EMBEDDING_API_KEY = os.environ.get("EMBEDDING_API_KEY") or os.environ.get(
+    "OPENAI_API_KEY",
+)
+EMBEDDING_BASE_URL = os.environ.get("EMBEDDING_BASE_URL") or os.environ.get(
+    "OPENAI_API_BASE",
+)
 EMBEDDING_BATCH_SIZE = 16
 EMBEDDING_CACHE_DIR = str(_SCRIPT_DIR / "output" / ".cache" / "embeddings")
 
