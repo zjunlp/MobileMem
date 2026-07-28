@@ -183,7 +183,7 @@ def answer_long_context_questions(
     responses: list[dict[str, Any]] = []
     idx = 0
     total = len(questions)
-    # ── 检测 API client pool 大小 ──
+    # ── Detect the API client pool size ──
     _pool_size = 1
     if (
         hasattr(qa_operator, "interface")
@@ -196,7 +196,7 @@ def answer_long_context_questions(
             f"batch size {multi_qa_batch_size}, pool_size={_pool_size})..."
         )
 
-    # ── 辅助：构建单个子批次的 prompt ──
+    # ── Helper: build the prompt for a single sub-batch ──
     def _build_sub_messages(sub_qs, batch_ctx, img_base_idx):
         numbered_qs = "\n".join(
             f"Question {i}: {q}" for i, q in enumerate(sub_qs)
@@ -245,7 +245,7 @@ def answer_long_context_questions(
             {"role": "user", "content": prompt_text},
         ]
 
-    # ── 辅助：解析单条响应 → {index: answer} ──
+    # ── Helper: parse a single response into {index: answer} ──
     def _parse_response(raw_content, expected_count):
         if not raw_content.strip():
             raise ValueError("empty response (model rejected or timed out)")
@@ -262,13 +262,13 @@ def answer_long_context_questions(
         for a in answers:
             if isinstance(a, dict) and "index" in a:
                 answer_map[a["index"]] = str(a.get("answer", ""))
-        # 确保数量匹配
+        # Ensure the counts match
         for i in range(expected_count):
             if i not in answer_map:
                 answer_map[i] = ""
         return answer_map
 
-    # ── 子批次日志目录 ──
+    # ── Sub-batch log directory ──
     _sub_log_dir = ""
     if interface_kwargs:
         _debug_dir = interface_kwargs.get("debug_output_dir", "")
@@ -278,7 +278,7 @@ def answer_long_context_questions(
             )
             _os.makedirs(_sub_log_dir, exist_ok=True)
 
-    # ── 写子批次日志 ──
+    # ── Write a sub-batch log ──
     def _write_sub_log(k, s, e, raw_content, status, detail=""):
         if not _sub_log_dir:
             return
@@ -294,7 +294,7 @@ def answer_long_context_questions(
                 f.write(f"Detail: {detail}\n")
             f.write(f"\n--- Raw Response ---\n{raw_content}\n")
 
-    # ── 主批处理循环 ──
+    # ── Main batching loop ──
     while idx < total:
         remaining = total - idx
         curr = min(multi_qa_batch_size, remaining)
@@ -303,7 +303,7 @@ def answer_long_context_questions(
             batch_qs = questions[idx: idx + curr]
             batch_ctx = contexts[idx]
 
-            # ── 并行路径：拆成 pool_size 个子批次并发发送 ──
+            # ── Parallel path: split into pool_size sub-batches and send them concurrently ──
             if _pool_size > 1 and curr >= _pool_size:
                 n_keys = min(_pool_size, curr)
                 sub_size = (curr + n_keys - 1) // n_keys
@@ -378,7 +378,7 @@ def answer_long_context_questions(
                     responses.extend(temp_responses)
                     idx += curr
                     break
-                # ── 部分成功：保留已成功子批次，只重试失败及后续 ──
+                # ── Partial success: keep successful sub-batches and retry failed and subsequent ones ──
                 responses.extend(temp_responses)
                 idx += first_failed[0]  # advance past successfully parsed questions
                 remain = curr - first_failed[0]
@@ -386,7 +386,7 @@ def answer_long_context_questions(
                 curr = remain
                 continue
             else:
-                # ── 单路径：原始行为 ──
+                # ── Sequential path: preserve the original behavior ──
                 messages = _build_sub_messages(batch_qs, batch_ctx, idx)
 
                 if idx == 0:
@@ -439,7 +439,7 @@ def answer_long_context_questions(
                         f"(batch size {curr} at idx {idx}): {e}"
                     )
 
-            # ── 公共重试逻辑 ──
+            # ── Shared retry logic ──
             if curr <= 5:
                 print(f"  Already at minimum ({curr}), giving up.")
                 for _ in range(curr):

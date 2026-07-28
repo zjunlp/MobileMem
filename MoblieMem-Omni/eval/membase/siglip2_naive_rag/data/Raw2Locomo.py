@@ -14,7 +14,7 @@ import copy
 from pathlib import Path
 from datetime import datetime
 
-# ============ 图片路径工具 ============
+# ============ Image Path Utilities ============
 
 def normalize_image_path(image_path: str) -> str:
     if not image_path:
@@ -35,7 +35,7 @@ def clean_filename(image_path_value: str) -> str:
     return image_path_value
 
 
-# ============ 时间戳转换 ============
+# ============ Timestamp Conversion ============
 
 def parse_stage5_timestamp(ts_str: str) -> datetime | None:
     """解析 stage5 中的时间戳字符串 '2025-01-01 09:00:00'"""
@@ -64,7 +64,7 @@ def format_locomo_date(dt: datetime) -> str:
     return f"{hour}:{minute} {am_pm} on {day} {month}, {year}"
 
 
-# ============ 图片摘要加载 ============
+# ============ Image Summary Loading ============
 
 def load_image_summaries(path: str) -> dict[str, str]:
     """加载 stage10_image_summaries.jsonl，返回 filename -> summary_zh/en 映射"""
@@ -85,7 +85,7 @@ def load_image_summaries(path: str) -> dict[str, str]:
     return summary_map
 
 
-# ============ 问题类型映射 ============
+# ============ Question Type Mapping ============
 
 QUESTION_TYPE_TO_CATEGORY = {
     "single_hop": 4,
@@ -99,7 +99,7 @@ QUESTION_TYPE_TO_CATEGORY = {
 }
 
 
-# ============ 核心转换 ============
+# ============ Core Conversion ============
 
 def convert_session(session: dict, session_index: int, image_summary_map: dict, no_caption_in_text: bool = False) -> tuple[list[dict], str]:
     """将 stage5 的一个 session 转换为 locomo session 格式"""
@@ -119,9 +119,9 @@ def convert_session(session: dict, session_index: int, image_summary_map: dict, 
             "text": content,
         }
 
-        # 图片处理
+        # Process images
         if image_inline:
-            # image_inline 可能是字符串或数组
+            # image_inline may be a string or an array
             if isinstance(image_inline, str):
                 img_list = [image_inline]
             elif isinstance(image_inline, list):
@@ -129,7 +129,7 @@ def convert_session(session: dict, session_index: int, image_summary_map: dict, 
             else:
                 img_list = []
 
-            # 清理路径并添加 data/ 前缀
+            # Clean the path and add the data/ prefix
             clean_paths = []
             for p in img_list:
                 if isinstance(p, str) and p.strip():
@@ -139,7 +139,7 @@ def convert_session(session: dict, session_index: int, image_summary_map: dict, 
                     clean_paths.append(cleaned)
             turn_item["image_path"] = clean_paths if clean_paths else None
 
-            # 从 stage10 匹配 caption 并加入 text
+            # Match the caption from stage10 and append it to text
             caption = None
             for p in (clean_paths or []):
                 lookup_key = normalize_image_path(p)
@@ -149,11 +149,11 @@ def convert_session(session: dict, session_index: int, image_summary_map: dict, 
             if caption and not no_caption_in_text:
                 turn_item["text"] += f"\nImage Caption: {caption}"
 
-        # 处理 speaker
+        # Process the speaker
         if role == "user":
-            turn_item["speaker"] = None  # 稍后填充
+            turn_item["speaker"] = None  # Populate later
         elif role == "assistant":
-            turn_item["speaker"] = None  # 稍后填充
+            turn_item["speaker"] = None  # Populate later
         else:
             turn_item["speaker"] = role
 
@@ -174,7 +174,7 @@ def convert_question(q: dict, session_id_to_timestamp: dict) -> dict:
     qtype = q.get("question_type", "")
     category = QUESTION_TYPE_TO_CATEGORY.get(qtype, 0)
 
-    # 提取 evidence 文本
+    # Extract the evidence text
     evidence_list = q.get("evidence", [])
     evidence_texts = []
     for ev in evidence_list:
@@ -185,7 +185,7 @@ def convert_question(q: dict, session_id_to_timestamp: dict) -> dict:
         elif isinstance(ev, str):
             evidence_texts.append(ev)
 
-    # 取第一个 source session 的 timestamp
+    # Get the timestamp of the first source session
     timestamp = ""
     src_sessions = q.get("source_session_ids", [])
     if src_sessions and isinstance(src_sessions, list):
@@ -242,10 +242,10 @@ def convert_user(
 
     sessions = record.get("sessions", [])
 
-    # 构建 conversation
+    # Build the conversation
     conversation = {"speaker_a": persona_name, "speaker_b": speaker_b}
 
-    # 构建 session_id -> timestamp 映射
+    # Build the session_id -> timestamp mapping
     session_id_to_timestamp = {}
     for i, s in enumerate(sessions, 1):
         sid = s.get("session_id", "")
@@ -260,16 +260,16 @@ def convert_user(
         sid = s.get("session_id", "")
         session_summaries[f"session_{i}_summary"] = s.get("dialogue_summary", "")
 
-        # 转换对话
+        # Convert the conversation
         turns, date_str = convert_session(s, i, image_summary_map, no_caption_in_text)
 
-        # 填充 speaker
+        # Populate the speaker
         for turn in turns:
             if turn.get("speaker") is None:
-                # 如果原来的 role 不在 turn 中，需要根据对话判断
+                # If the original role is absent from the turn, infer it from the conversation
                 pass
 
-        # 根据 turns 和 role 信息确定 speaker
+        # Determine the speaker from the turn and role information
         dialogue = s.get("dialogue", [])
         for j, turn in enumerate(turns):
             if j < len(dialogue):
@@ -279,7 +279,7 @@ def convert_user(
         conversation[f"session_{i}_date_time"] = date_str
         conversation[f"session_{i}"] = turns
 
-    # 转换 QA
+    # Convert QA data
     qa_list = []
     if stage6_user:
         questions = stage6_user["records"][0].get("questions", [])
@@ -287,7 +287,7 @@ def convert_user(
             qa_item = convert_question(q, session_id_to_timestamp)
             qa_list.append(qa_item)
 
-    # 构建结构化字段
+    # Build structured fields
     observation = build_observation_structure(sessions, persona_name, speaker_b)
     event_summary = build_event_summary_structure(sessions, persona_name, speaker_b)
 
@@ -302,7 +302,7 @@ def convert_user(
     return locomo_sample
 
 
-# ============ 主入口 ============
+# ============ Main Entry Point ============
 
 def main():
     parser = argparse.ArgumentParser(description="将 stage5 + stage6 合并格式转换为 locomo 格式")
@@ -318,7 +318,7 @@ def main():
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    # 加载数据
+    # Load data
     print("=" * 60)
     print("加载 stage5.json ...")
     with open(args.stage5, encoding="utf-8") as f:
@@ -335,7 +335,7 @@ def main():
     print("加载 stage10_image_summaries.jsonl ...")
     image_summary_map = load_image_summaries(args.stage10)
 
-    # ── 生成 image -> event_start_time 映射 ──
+    # ── Generate the image -> event_start_time mapping ──
     image_to_timestamp: dict[str, str] = {}
     for u_data in stage5["users"]:
         for rec in u_data.get("records", []):
@@ -363,23 +363,23 @@ def main():
         json.dump(image_to_timestamp, f, ensure_ascii=False, indent=2)
     print(f"  -> {ts_map_path} ({len(image_to_timestamp)} entries)")
 
-    # ── 生成 image -> caption 映射（来自 stage10） ──
+    # ── Generate the image -> caption mapping from stage10 ──
     cap_map_path = os.path.normpath(os.path.join(args.output_dir, "..", "image_to_caption_map.json"))
     with open(cap_map_path, "w", encoding="utf-8") as f:
         json.dump(image_summary_map, f, ensure_ascii=False, indent=2)
     print(f"  -> {cap_map_path} ({len(image_summary_map)} entries)")
 
-    # 构建 stage6 user_id -> user 映射
+    # Build the stage6 user_id -> user mapping
     stage6_by_uid = {}
     for u in stage6["users"]:
         uid = u["user_id"]
         stage6_by_uid[uid] = u
 
-    # ── 确定要处理的用户 ──
+    # ── Determine which users to process ──
     target_uids = args.users if args.users is not None else s5_summary["user_ids"]
     print(f"\n处理用户: {target_uids}")
 
-    # ── 确保 tmp 目录存在（用于 SigLIP2 索引） ──
+    # ── Ensure the tmp directory exists for the SigLIP2 index ──
     tmp_dir = os.path.normpath(os.path.join(args.output_dir, "..", "tmp"))
     os.makedirs(tmp_dir, exist_ok=True)
 
@@ -400,11 +400,11 @@ def main():
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump([locomo_sample], f, ensure_ascii=False, indent=2)
 
-        n_sessions = len(locomo_sample["conversation"]) // 2  # 粗略：减去 speaker_a/speaker_b
+        n_sessions = len(locomo_sample["conversation"]) // 2  # Approximation: exclude speaker_a/speaker_b
         actual_sessions = sum(1 for k in locomo_sample["conversation"] if k.startswith("session_") and not k.endswith("_date_time"))
         print(f"  -> {output_path} ({actual_sessions} 个会话, {len(locomo_sample['qa'])} 个问题)")
 
-        # ── 生成 per-user SigLIP2 图像索引 ──
+        # ── Generate a per-user SigLIP2 image index ──
         if not args.no_image and not args.no_siglip2_index:
             _build_user_siglip2_index(uid, locomo_sample, tmp_dir)
 

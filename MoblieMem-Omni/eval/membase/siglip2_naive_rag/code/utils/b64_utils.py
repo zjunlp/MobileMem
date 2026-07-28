@@ -44,8 +44,8 @@ def convert_image_to_base64(file_path: str, target_size: tuple[int, int] | None 
     try:
         img = Image.open(file_path)
         
-        # ====================== 关键修改 ======================
-        # 只有传入 target_size 才执行 resize
+        # ====================== Key Change ======================
+        # Resize only when target_size is provided
         if target_size is not None:
             img = img.resize(target_size, Image.Resampling.LANCZOS)
         # ======================================================

@@ -108,7 +108,7 @@ class Mem0Layer(MemBaseLayer):
         
         # print("Adding the following message to Mem0Layer:")
         # print(message)
-        # 构建包含 images 的元数据
+        # Build metadata containing images
         metadata = {
             "timestamp": message.timestamp,
             "speakers": message.name,
@@ -213,7 +213,7 @@ class Mem0Layer(MemBaseLayer):
             nested_metadata = metadata.get("metadata", {})
             # Extract nested metadata and merge it into top-level metadata
             metadata.update(nested_metadata)
-            # 在 formatted_content 中添加图像信息
+            # Add image information to formatted_content
             parts = [f"Memory: {content}"]
             if metadata.get("image_path"):
                 parts.append(f"[Images attached: {len(metadata['image_path'])}]")

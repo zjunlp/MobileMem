@@ -29,7 +29,7 @@ API_KEYS = [
 API_BASE_URL = 'https://www.dmxapi.cn/v1'
 LLM_MODEL = 'gpt-5.4-mini'
 
-# Model Paths (HuggingFace 模型 ID，首次运行自动下载)
+# Model paths (HuggingFace model IDs; downloaded automatically on first run)
 LLMLINGUA_MODEL_PATH = 'microsoft/llmlingua-2-bert-base-multilingual-cased-meetingbank'
 EMBEDDING_MODEL_PATH = 'sentence-transformers/all-MiniLM-L6-v2'
 

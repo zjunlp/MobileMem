@@ -61,7 +61,7 @@ class NaiveRAGLayer(MemBaseLayer, MessageBufferMixin):
         if doc is not None:
             # Index the document into naive RAG.
             mem_id = str(uuid.uuid4())
-            # 构建包含 images 的元数据
+            # Build metadata containing images
             value = {
                 "content": doc
             }
@@ -94,7 +94,7 @@ class NaiveRAGLayer(MemBaseLayer, MessageBufferMixin):
                 key: value
                 for key, value in memory_dict.items() if key != "value"
             }
-            # 检查是否有 metadata 字段
+            # Check whether a metadata field exists
             nested_metadata = memory_dict.get("value", {})
             parts = [f"Memory: {content}"]
             if nested_metadata.get("image_path"):

@@ -48,8 +48,8 @@ def extract_gender(profile: Dict[str, str]) -> str:
         if kw in info:
             return 'Female'
 
-    # Explicit male indicators must outrank the weak single-character '女'
-    # heuristic below: "单身男，和女友同住" contains '女' (in 女友) but the
+    # Explicit male indicators must outrank the weak female-marker heuristic
+    # below: a sentence may mention a girlfriend even when the
     # subject is male.
     male_keywords = ['男性', '男大学生', '已婚男', '离异男', '单身男',
                      '爸爸', '父亲', '宝爸']

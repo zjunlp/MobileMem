@@ -176,7 +176,7 @@ def truncate_qwen(
         context = ""
         print("[Qwen Truncate] Context fully dropped (budget consumed by template + question).")
     else:
-        # 👇 这里改成保留开头
+        # Keep the beginning here
         truncated_tokens = context_tokens[:allowed_context]
         context = _tokenizer.decode(truncated_tokens) if _tokenizer else context
         print(f"[Qwen Truncate] Context: {context_count} -> {len(truncated_tokens)} tokens (kept prefix)")
