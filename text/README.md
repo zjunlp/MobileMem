@@ -1,8 +1,16 @@
-# MobileMem
+<div align="center">
 
-### KEME: Knowledge-Guided Experience Synthesis for Evolving Memory
+<h1>MobileMem</h1>
 
-[Dataset](https://huggingface.co/datasets/zjunlp/MobileMem) | [MemBase](https://github.com/zjunlp/MemBase) | [License](LICENSE)
+<h3>KEME: Knowledge-Guided Experience Synthesis for Evolving Memory</h3>
+
+<p>
+  <a href="https://huggingface.co/datasets/zjunlp/MobileMem">Dataset</a> |
+  <a href="https://github.com/zjunlp/MemBase">MemBase</a> |
+  <a href="LICENSE">License</a>
+</p>
+
+</div>
 
 ---
 
