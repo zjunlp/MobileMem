@@ -172,6 +172,10 @@ Visualization options:
 - `--studio_url` enables AgentScope Studio integration. `--studio_project` sets its project name (launcher default: `keme`).
 - `--ngrok_authtoken` supplies an ngrok token, otherwise `NGROK_AUTHTOKEN` is used. The launcher always passes `--disable_ngrok`. To enable a public URL, invoke `run_synthesis.py` directly without that flag.
 
+During trajectory synthesis, you can inspect the trajectory structure and content in real time:
+
+![Real-time trajectory visualization](figures/keme_web.gif)
+
 ### 2. Question-Answer Pair Synthesis
 
 This stage traverses the person profile and hierarchical trajectory from the leaf sessions upward. It generates and composes question-answer pairs covering single-hop, multi-hop, temporal reasoning, preference inference and updates,preference-oriented generalization, relationships, query-focused summarization, and adversarial settings:
