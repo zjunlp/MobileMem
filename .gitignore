@@ -1,0 +1,5 @@
+node_modules/
+.venv/
+test-results/
+__pycache__/
+*.pyc
