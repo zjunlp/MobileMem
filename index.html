@@ -4,7 +4,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>MobileMem</title>
-    <meta name="description" content="MobileMem project page" />
+    <meta
+      name="description"
+      content="MobileMem is an on-device memory benchmark for continually evolving mobile AI agents."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="MobileMem" />
+    <meta
+      property="og:description"
+      content="On-device memory for continually evolving mobile AI agents."
+    />
+    <meta property="og:site_name" content="MobileMem" />
+    <meta name="twitter:card" content="summary" />
     <link rel="stylesheet" href="assets/web/css/site.css" />
     <link rel="stylesheet" href="assets/web/css/case-demo.css" />
     <link rel="stylesheet" href="assets/web/css/application-browser.css" />
@@ -18,6 +29,8 @@
             class="brand-logo"
             src="assets/web/institutions-transparent.png"
             alt="OPPO and OpenKG.CN"
+            width="770"
+            height="154"
           />
         </a>
         <nav class="nav-links" aria-label="Section navigation">
@@ -78,7 +91,7 @@
               <div class="case-flow">
                 <div class="case-phone">
                   <div class="case-phone-top">Mobile Assistant</div>
-                  <div class="case-chat" data-case-chat aria-live="polite">
+                  <div class="case-chat" data-case-chat>
                     <div class="case-message user" data-case-user-message>
                       <span class="case-avatar" aria-hidden="true">
                         <img src="assets/web/case-user-avatar.jpg" alt="" />
@@ -324,6 +337,9 @@
                 id="feature-visual-image"
                 src="assets/web/paper/figure-2-data-silos.png"
                 alt="Figure 2 from the MobileMem paper, showing communication, social media, photos, books, shopping, and travel applications connected through a shared memory layer."
+                width="2800"
+                height="1617"
+                loading="lazy"
                 decoding="async"
               />
             </figure>
@@ -462,12 +478,14 @@
       </section>
 
       <!-- Interactive MobileMem sample browser -->
-      <section class="section application" id="application" aria-labelledby="application-title-zh">
+      <section class="section application" id="application" aria-labelledby="application-title">
         <div class="wrap">
           <div class="center-head">
             <p class="eyebrow">Applications</p>
-            <h2 id="application-title-zh" data-lang="zh">MobileMem 的应用场景</h2>
-            <h2 id="application-title-en" data-lang="en">Application Scenarios</h2>
+            <h2 id="application-title">
+              <span data-lang="zh">MobileMem 的应用场景</span>
+              <span data-lang="en">Application Scenarios</span>
+            </h2>
           </div>
           <div class="application-layout" data-application-showcase>
             <div class="application-accordion">
@@ -684,12 +702,7 @@
                 </div>
               </details>
             </div>
-            <figure
-              class="application-phone-visual"
-              data-application-step="detail"
-              aria-live="polite"
-              tabindex="0"
-            >
+            <figure class="application-phone-visual" data-application-step="detail" tabindex="0">
               <header class="application-browser-head">
                 <span class="application-browser-title">
                   <strong>
@@ -701,11 +714,10 @@
                   <span class="application-uid-switch" aria-label="Switch memory owner">
                     <span class="application-uid-group" data-lang="zh">
                       <button
-                        class="is-active"
                         type="button"
                         data-application-phone-uid="uid0"
                         aria-label="中文用户 A"
-                        aria-pressed="true"
+                        aria-pressed="false"
                       >
                         <img src="assets/web/memweb/uid0-person-01.png" alt="" />
                       </button>
@@ -728,10 +740,11 @@
                     </span>
                     <span class="application-uid-group" data-lang="en">
                       <button
+                        class="is-active"
                         type="button"
                         data-application-phone-uid="uid10"
                         aria-label="English profile A"
-                        aria-pressed="false"
+                        aria-pressed="true"
                       >
                         <img src="assets/web/memweb/uid10-person-01.png" alt="" />
                       </button>
@@ -787,7 +800,7 @@
                         >
                           <span class="application-ai-portal-avatar" aria-hidden="true"
                             ><img
-                              src="assets/web/memweb/uid0-person-01.png"
+                              src="assets/web/memweb/uid10-person-01.png"
                               alt=""
                               data-application-ai-user-avatar
                           /></span>
@@ -821,14 +834,14 @@
                               <button type="button" data-application-phone-type="group_chat">
                                 <span
                                   ><img
-                                    src="assets/web/memweb/curated/uid0-group_chat-01.png"
+                                    src="assets/web/memweb/curated/uid10-group_chat-01.png"
                                     alt="" /></span
                                 ><b data-lang="zh">聊天</b><b data-lang="en">Chat</b>
                               </button>
                               <button type="button" data-application-phone-type="friend">
                                 <span
                                   ><img
-                                    src="assets/web/memweb/curated/uid0-friend-01.png"
+                                    src="assets/web/memweb/curated/uid10-friend-01.png"
                                     alt="" /></span
                                 ><b data-lang="zh">动态</b><b data-lang="en">Posts</b>
                               </button>
@@ -838,7 +851,7 @@
                               >
                                 <span
                                   ><img
-                                    src="assets/web/memweb/uid0-group_chat_members-01.png"
+                                    src="assets/web/memweb/uid10-group_chat_members-01.png"
                                     alt="" /></span
                                 ><b data-lang="zh">群成员</b><b data-lang="en">Members</b>
                               </button>
@@ -853,21 +866,21 @@
                               <button type="button" data-application-phone-type="shopping">
                                 <span
                                   ><img
-                                    src="assets/web/memweb/curated/uid0-shopping-01.png"
+                                    src="assets/web/memweb/curated/uid10-shopping-01.png"
                                     alt="" /></span
                                 ><b data-lang="zh">购物</b><b data-lang="en">Shopping</b>
                               </button>
                               <button type="button" data-application-phone-type="money">
                                 <span
                                   ><img
-                                    src="assets/web/memweb/curated/uid0-money-01.png"
+                                    src="assets/web/memweb/curated/uid10-money-01.png"
                                     alt="" /></span
                                 ><b data-lang="zh">账单</b><b data-lang="en">Bills</b>
                               </button>
                               <button type="button" data-application-phone-type="ticket">
                                 <span
                                   ><img
-                                    src="assets/web/memweb/curated/uid0-ticket-01.png"
+                                    src="assets/web/memweb/curated/uid10-ticket-01.png"
                                     alt="" /></span
                                 ><b data-lang="zh">票务</b><b data-lang="en">Tickets</b>
                               </button>
@@ -882,21 +895,21 @@
                               <button type="button" data-application-phone-type="music">
                                 <span
                                   ><img
-                                    src="assets/web/memweb/curated/uid0-music-01.png"
+                                    src="assets/web/memweb/curated/uid10-music-01.png"
                                     alt="" /></span
                                 ><b data-lang="zh">音乐</b><b data-lang="en">Music</b>
                               </button>
                               <button type="button" data-application-phone-type="video">
                                 <span
                                   ><img
-                                    src="assets/web/memweb/curated/uid0-video-01.png"
+                                    src="assets/web/memweb/curated/uid10-video-01.png"
                                     alt="" /></span
                                 ><b data-lang="zh">视频</b><b data-lang="en">Video</b>
                               </button>
                               <button type="button" data-application-phone-type="book">
                                 <span
                                   ><img
-                                    src="assets/web/memweb/curated/uid0-book-01.png"
+                                    src="assets/web/memweb/curated/uid10-book-01.png"
                                     alt="" /></span
                                 ><b data-lang="zh">阅读</b><b data-lang="en">Books</b>
                               </button>
@@ -910,19 +923,19 @@
                             <div class="application-memory-mosaic">
                               <button type="button" data-application-phone-type="person">
                                 <span
-                                  ><img src="assets/web/memweb/uid0-person-01.png" alt="" /></span
+                                  ><img src="assets/web/memweb/uid10-person-01.png" alt="" /></span
                                 ><b data-lang="zh">人物</b><b data-lang="en">Person</b>
                               </button>
                               <button type="button" data-application-phone-type="event">
                                 <span
                                   ><img
-                                    src="assets/web/memweb/curated/uid0-event-01.png"
+                                    src="assets/web/memweb/curated/uid10-event-01.png"
                                     alt="" /></span
                                 ><b data-lang="zh">事件</b><b data-lang="en">Events</b>
                               </button>
                               <button type="button" data-application-phone-type="scenery">
                                 <span
-                                  ><img src="assets/web/memweb/uid0-scenery-01.png" alt="" /></span
+                                  ><img src="assets/web/memweb/uid10-scenery-01.png" alt="" /></span
                                 ><b data-lang="zh">场景</b><b data-lang="en">Scenes</b>
                               </button>
                             </div>
@@ -949,7 +962,7 @@
                             </svg>
                           </button>
                           <strong data-application-ai-session-title
-                            >元旦早晨的年度规划与朋友圈记录</strong
+                            >New Year's Day solo reflection and ordering takeout</strong
                           >
                           <span class="application-ai-chatbar-spacer" aria-hidden="true"></span>
                         </header>
@@ -988,7 +1001,6 @@
                           <div
                             class="application-ai-history-list"
                             data-application-ai-session-tabs
-                            role="listbox"
                             aria-label="Choose a dialogue session"
                           ></div>
                         </section>
@@ -1001,7 +1013,7 @@
                         <button type="button" data-application-recents-open>
                           <img
                             data-application-recents-image
-                            src="assets/web/memweb/curated/uid0-group_chat-01.png"
+                            src="assets/web/memweb/curated/uid10-group_chat-01.png"
                             alt=""
                           />
                           <span><strong>MobileMem</strong></span>
@@ -1026,9 +1038,8 @@
                       >
                         <img
                           id="application-visual-image"
-                          src="assets/web/memweb/curated/uid0-group_chat-01.png"
-                          alt="MemWeb group chat screenshot from uid0."
-                          decoding="async"
+                          src="assets/web/memweb/curated/uid10-group_chat-01.png"
+                          alt="MemWeb group chat screenshot from uid10."
                         />
                       </button>
                       <nav
@@ -1111,8 +1122,8 @@
                 <img
                   class="application-lightbox-image"
                   id="application-lightbox-image"
-                  src="assets/web/memweb/curated/uid0-group_chat-01.png"
-                  alt="MemWeb group chat screenshot from uid0."
+                  src="assets/web/memweb/curated/uid10-group_chat-01.png"
+                  alt="MemWeb group chat screenshot from uid10."
                 />
                 <button
                   class="application-lightbox-direction"
@@ -1197,7 +1208,7 @@
                     Evaluation
                   </button>
                 </div>
-                <div class="terminal-body" data-terminal-output aria-live="polite"></div>
+                <div class="terminal-body" data-terminal-output></div>
               </div>
             </div>
             <div class="github-cta">
@@ -1258,6 +1269,10 @@
             <img
               src="assets/web/institutions-transparent.png"
               alt="OPPO and OpenKG.CN, 中文开放知识图谱"
+              width="770"
+              height="154"
+              loading="lazy"
+              decoding="async"
             />
             <div class="institution-counter" aria-label="Page views">
               <span class="counter-item">
@@ -1277,13 +1292,23 @@
         <button class="video-close" type="button" aria-label="Close video modal">&times;</button>
       </div>
       <div class="video-player-shell">
-        <video class="oppo-video" controls preload="metadata" playsinline data-oppo-video>
+        <video class="oppo-video" controls preload="none" playsinline data-oppo-video>
           <source src="assets/web/videos/oppo-application-scenarios.mp4" type="video/mp4" />
         </video>
       </div>
     </dialog>
-    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js"></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"
+      integrity="sha384-XmJ9SoHtVOHoQUcKvFAzVXwdkKo1Ie3bhmSoIAkcdsHGaIrVJIkmozyq0FJeb/Ly"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js"
+      integrity="sha384-wl5TeDVvOWt30Pbf8aSo2ZrzsOjddu3avOBvHe+p+OhJt9gP6w9YXmDkN5DK2/dF"
+      crossorigin="anonymous"
+    ></script>
     <script src="assets/web/memweb/trajectories.js"></script>
     <script src="assets/web/memweb/trajectories-extra.js"></script>
     <script src="assets/web/js/application-data.js"></script>

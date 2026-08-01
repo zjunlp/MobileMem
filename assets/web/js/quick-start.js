@@ -15,7 +15,7 @@
     ],
     download: [
       {
-        text: "huggingface-cli download --repo-type dataset --resume-download zjunlp/MobileMem-Omni --local-dir data/MobileMem-Omni",
+        text: "hf download zjunlp/MobileMem-Omni --repo-type dataset --local-dir data/MobileMem-Omni",
         prompt: true,
       },
       {
@@ -24,7 +24,7 @@
       },
     ],
     pipeline: [
-      { text: "cd MoblieMem-Omni/src", prompt: true },
+      { text: "cd MobileMem-Omni/src", prompt: true },
       {
         text: "cp .env.example .env    # then fill in your API keys",
         prompt: true,
@@ -37,7 +37,7 @@
       },
     ],
     evaluation: [
-      { text: "cd MoblieMem-Omni/eval", prompt: true },
+      { text: "cd MobileMem-Omni/eval", prompt: true },
       {
         text: 'python eval/Jsonl2Locomo.py --stage5 path/to/stage5_all_users.jsonl --stage6-dir path/to/stage6 --stage10 "" --output-dir data/Locomo --users 0 --no-image',
         prompt: true,

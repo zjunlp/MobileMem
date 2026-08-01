@@ -31,6 +31,7 @@ const setLanguageToggle = (lang) => {
 
 const setPageLanguage = (lang) => {
   const normalizedLang = lang === "zh" ? "zh" : "en";
+  document.documentElement.lang = normalizedLang;
   document.body.classList.toggle("lang-zh", normalizedLang === "zh");
   document.body.classList.toggle("lang-en", normalizedLang === "en");
   setLanguageToggle(normalizedLang);

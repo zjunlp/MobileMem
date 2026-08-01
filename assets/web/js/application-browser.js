@@ -193,9 +193,8 @@
 
         button.type = "button";
         button.className = `application-ai-history-item${active ? " is-active" : ""}`;
-        button.setAttribute("role", "option");
         button.setAttribute("aria-label", session.title);
-        button.setAttribute("aria-selected", String(active));
+        if (active) button.setAttribute("aria-current", "true");
 
         avatar.className = "application-ai-history-avatar";
         avatarImage.src = "assets/web/xiaobu-avatar.png";

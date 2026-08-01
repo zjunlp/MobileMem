@@ -163,8 +163,6 @@
   animation: pixelWalkToResult 820ms steps(8, end) both;
 }
 
-/* 翻检覆盖记忆墙照片图谱区（贴合背景真实照片，非凭空浮卡） */
-
 /* 候选 = 在记忆墙照片上游走的扫描框 */
 .cand {
   position: absolute;
@@ -1078,7 +1076,7 @@
   }
 }
 
-/* step2 候选逐张点亮：暗淡待检 → 亮起高亮检查 → 回暗（dim 态在 delay 期间由 fill:both 反向生效，呈现「背景贴着很多照片」感） */
+/* Candidate highlight sequence */
 @keyframes wallLight {
   0% {
     opacity: 0.24;
@@ -1197,7 +1195,7 @@
     width: 78px;
   }
 }
-/* ===================== Pixel agent stage (2D pixel rebuild) ===================== */
+/* Pixel agent stage */
 .case-story-panel {
   display: flex;
   align-items: center;

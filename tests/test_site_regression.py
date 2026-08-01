@@ -67,6 +67,33 @@ def assert_geometry(page: Page, viewport: str) -> None:
     require(scroll_width == viewport_width, f"{viewport} page has horizontal overflow")
 
 
+def assert_release_metadata(page: Page) -> None:
+    description = page.locator('meta[name="description"]').get_attribute("content") or ""
+    require(len(description) >= 60, "Page description is missing or too generic")
+
+    cdn_scripts = page.locator('script[src^="https://cdn.jsdelivr.net/"]')
+    require(cdn_scripts.count() == 2, "Expected the two pinned GSAP CDN scripts")
+    for index in range(cdn_scripts.count()):
+        script = cdn_scripts.nth(index)
+        require(
+            (script.get_attribute("integrity") or "").startswith("sha384-"),
+            "CDN script is missing SHA-384 integrity metadata",
+        )
+        require(
+            script.get_attribute("crossorigin") == "anonymous",
+            "CDN script is missing anonymous CORS mode",
+        )
+
+    require(
+        page.locator("[data-oppo-video]").get_attribute("preload") == "none",
+        "Hidden video must not preload on initial page load",
+    )
+    require(
+        page.locator("#busuanzi_value_site_pv").count() == 1,
+        "Required page-view counter target is missing",
+    )
+
+
 def assert_application_interactions(page: Page) -> None:
     require(page.locator("#dataset-construction").count() == 0, "Removed dataset DOM returned")
     require(page.locator(".application-path").count() == 0, "Removed breadcrumb DOM returned")
@@ -86,12 +113,14 @@ def assert_application_interactions(page: Page) -> None:
     language_toggle = page.locator("[data-toggle-lang]")
     language_toggle.click()
     require(page.locator("body.lang-zh").count() == 1, "Language toggle did not switch to Chinese")
+    require(page.locator("html").get_attribute("lang") == "zh", "Document language did not switch")
     require(
         active_profile.get_attribute("data-application-phone-uid") == "uid0",
         "Chinese must switch to uid0",
     )
     require(page.locator(".application-uid-group:visible button").count() == 3, "Expected 3 Chinese profiles")
     language_toggle.click()
+    require(page.locator("html").get_attribute("lang") == "en", "Document language did not reset")
 
     image = page.locator("#application-visual-image")
     image_before_accordion = image.get_attribute("src")
@@ -162,6 +191,22 @@ def assert_application_interactions(page: Page) -> None:
 
 
 def run() -> None:
+    quick_start_source = (PROJECT_ROOT / "assets/web/js/quick-start.js").read_text()
+    main_source = (PROJECT_ROOT / "assets/web/js/main.js").read_text()
+    require("MoblieMem" not in quick_start_source, "Quick Start contains a misspelled project path")
+    require(
+        "huggingface-cli" not in quick_start_source,
+        "Quick Start contains the retired Hugging Face CLI command",
+    )
+    require(
+        'text: "pip install -r MobileMem/requirements.txt"' in quick_start_source,
+        "Quick Start is missing the textual benchmark dependency path",
+    )
+    require(
+        "busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" in main_source,
+        "Required page-view counter was removed or replaced",
+    )
+
     errors: list[str] = []
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True)
@@ -173,6 +218,7 @@ def run() -> None:
             desktop.on("pageerror", lambda error: errors.append(str(error)))
             desktop.goto(PAGE_URL)
             desktop.wait_for_load_state("networkidle")
+            assert_release_metadata(desktop)
             assert_geometry(desktop, "desktop")
             assert_application_interactions(desktop)
 

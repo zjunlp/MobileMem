@@ -6,7 +6,7 @@ and mobile interactions.
 ## One-time setup
 
 ```bash
-npm install
+npm ci
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-test.txt
@@ -28,3 +28,5 @@ npm run images:check
 ```
 
 Failed browser checks write diagnostic screenshots to `test-results/`.
+
+The same quality gate runs in `.github/workflows/site-checks.yml` for pushes and pull requests.
