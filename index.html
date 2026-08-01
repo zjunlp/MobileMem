@@ -2142,6 +2142,19 @@
       pointer-events: none;
     }
 
+    .framework-figure[data-visual-kind="paper"] {
+      background:
+        radial-gradient(circle at 18% 18%, rgba(122, 160, 211, 0.12), transparent 34%),
+        radial-gradient(circle at 82% 78%, rgba(220, 135, 190, 0.11), transparent 34%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(247, 250, 248, 0.96));
+    }
+
+    @media (min-width: 981px) {
+      .framework-figure[data-visual-kind="paper"] {
+        height: clamp(420px, calc(100vh - var(--nav-h) - 370px), 480px);
+      }
+    }
+
     .framework-figure img {
       position: relative;
       z-index: 1;
@@ -2157,6 +2170,10 @@
       transition: opacity 220ms ease, transform 220ms ease, filter 220ms ease;
     }
 
+    .framework-figure[data-visual-kind="paper"] img {
+      padding: clamp(10px, 1.4vw, 18px);
+    }
+
     .framework-figure img.is-swapping {
       opacity: 0.16;
       transform: scale(0.985);
@@ -2169,12 +2186,57 @@
       min-height: 58px;
       margin: 0;
       padding: 12px 18px 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
       border-top: 1px solid rgba(15, 83, 53, 0.12);
       background: rgba(255, 255, 255, 0.76);
       color: var(--muted);
       font-size: 13px;
       line-height: 1.35;
       font-weight: 760;
+    }
+
+    .framework-caption-main {
+      min-width: 0;
+      display: grid;
+      gap: 3px;
+    }
+
+    .framework-caption-label {
+      color: var(--green);
+      font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      line-height: 1.1;
+      text-transform: uppercase;
+    }
+
+    .framework-caption-copy {
+      display: block;
+    }
+
+    .figure-view-link {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 11px;
+      border: 1px solid rgba(15, 123, 79, 0.2);
+      border-radius: 7px;
+      background: rgba(238, 246, 241, 0.86);
+      color: var(--green-dark);
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .figure-view-link:hover {
+      border-color: rgba(15, 123, 79, 0.42);
+      background: #e6f4eb;
     }
 
     .pipeline-grid {
@@ -2595,188 +2657,207 @@
       position: relative;
       overflow: hidden;
       align-items: start;
-      min-height: calc(100vh - var(--nav-h) + 220px);
-      padding: 44px 0 76px;
+      min-height: 0;
+      padding: 54px 0 76px;
       isolation: isolate;
-      background:
-        radial-gradient(circle at 72% 18%, rgba(54, 157, 103, 0.16), transparent 32%),
-        radial-gradient(circle at 14% 82%, rgba(40, 111, 158, 0.1), transparent 30%),
-        linear-gradient(180deg, #f8fbf8 0%, #eef6f2 48%, #fbfcf9 100%);
+      background: linear-gradient(180deg, #f8fbf9 0%, #f0f6f2 100%);
     }
 
     .application::before {
-      content: "";
+      content: none;
       position: absolute;
       inset: 0;
       z-index: -1;
       background:
-        linear-gradient(90deg, rgba(15, 123, 79, 0.04) 1px, transparent 1px),
-        linear-gradient(180deg, rgba(15, 123, 79, 0.035) 1px, transparent 1px);
-      background-size: 44px 44px;
-      mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent);
+        linear-gradient(90deg, rgba(15, 123, 79, 0.035) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(15, 123, 79, 0.03) 1px, transparent 1px);
+      background-size: 46px 46px;
+      mask-image: linear-gradient(180deg, transparent, #000 12%, #000 88%, transparent);
     }
 
     .application .wrap {
-      width: min(1320px, calc(100% - 48px));
+      width: min(1180px, calc(100% - 48px));
+    }
+
+    .application .center-head h2 {
+      margin-bottom: 0;
+      font-family: "Avenir Next", Avenir, Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: clamp(38px, 4vw, 52px);
+      font-weight: 670;
+      letter-spacing: -0.045em;
     }
 
     .application-layout {
       display: grid;
-      grid-template-columns: minmax(440px, 0.86fr) minmax(620px, 1.14fr);
-      gap: 28px;
-      align-items: stretch;
-      margin-top: 18px;
+      grid-template-columns: minmax(0, 680px) minmax(300px, 1fr);
+      gap: 72px;
+      align-items: start;
+      margin-top: 24px;
     }
 
     .application-accordion {
       display: grid;
+      grid-template-columns: minmax(0, 1fr);
       align-content: start;
       gap: 8px;
       min-width: 0;
-      max-height: clamp(470px, calc(100vh - var(--nav-h) - 248px), 590px);
-      overflow-y: auto;
-      padding-right: 4px;
-      overscroll-behavior: contain;
-      scrollbar-gutter: stable;
-      scrollbar-color: rgba(15, 123, 79, 0.34) transparent;
+      max-height: none;
+      overflow: visible;
+      padding: 0;
     }
 
     .application-item {
-      border: 1px solid rgba(15, 83, 53, 0.14);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.78);
-      box-shadow: 0 14px 42px rgba(23, 33, 28, 0.08);
+      min-width: 0;
       overflow: hidden;
-      transition:
-        border-color 180ms ease,
-        background 180ms ease,
-        box-shadow 180ms ease,
-        transform 180ms ease;
-      will-change: transform, opacity;
+      border: 1px solid rgba(15, 83, 53, 0.14);
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 10px 26px rgba(23, 33, 28, 0.06);
+      transition: border-color 160ms ease, background 160ms ease;
     }
 
     .application-item[open] {
       border-color: rgba(15, 123, 79, 0.38);
-      background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(241, 249, 244, 0.95));
-      box-shadow: 0 22px 62px rgba(23, 33, 28, 0.15);
+      background: rgba(255, 255, 255, 0.96);
     }
 
     .application-item:hover {
-      transform: translateY(-1px);
-      border-color: rgba(15, 123, 79, 0.32);
+      transform: none;
     }
 
     .application-item summary {
-      min-height: 58px;
       display: grid;
-      grid-template-columns: 32px minmax(0, 1fr) 22px;
+      grid-template-columns: 34px minmax(0, 1fr) 22px;
+      gap: 11px;
       align-items: center;
-      gap: 10px;
+      min-height: 60px;
       padding: 10px 12px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
       cursor: pointer;
       list-style: none;
+      text-align: left;
     }
 
-	    .application-item summary::-webkit-details-marker {
-	      display: none;
-	    }
+    .application-item summary:hover {
+      background: rgba(235, 244, 239, 0.65);
+    }
+
+    .application-item[open] summary {
+      background: transparent;
+    }
+
+    .application-item summary::-webkit-details-marker {
+      display: none;
+    }
 
     .application-index {
-      width: 32px;
-      height: 32px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      width: 34px;
+      height: 34px;
       border-radius: 999px;
-      background: #e9f4ef;
+      background: #e8f2ec;
       color: var(--green-dark);
-      font-size: 12px;
-      font-weight: 950;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 10px;
+      font-weight: 850;
     }
 
-	    .application-summary-copy {
-	      display: grid;
-	      gap: 3px;
-	      min-width: 0;
-	    }
+    .application-summary-copy {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
 
-	    .application-summary-copy strong {
-	      color: #12231b;
-	      font-size: 16px;
-	      line-height: 1.08;
-	      font-weight: 950;
-	    }
+    .application-summary-copy strong {
+      color: #12231b;
+      font-size: 15px;
+      font-weight: 850;
+      line-height: 1.2;
+    }
 
-	    .application-summary-copy small {
-	      color: var(--muted);
-	      font-size: 11px;
-	      line-height: 1.25;
-	      font-weight: 820;
-	    }
+    .application-item[open] .application-summary-copy strong {
+      color: #12231b;
+    }
 
-	    .application-chevron {
-	      width: 22px;
-	      height: 22px;
-	      position: relative;
-	      border-radius: 999px;
-	      background: rgba(15, 123, 79, 0.08);
-	      transition:
-	        background 180ms ease,
-	        transform 180ms ease;
-	    }
+    .application-summary-copy small {
+      display: none;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 740;
+      line-height: 1.3;
+    }
 
-	    .application-chevron::before,
-	    .application-chevron::after {
-	      content: "";
-	      position: absolute;
-	      left: 7px;
-	      right: 7px;
-	      top: 11px;
-	      height: 2px;
-	      border-radius: 999px;
-	      background: var(--green-dark);
-	    }
+    .application-chevron {
+      position: relative;
+      display: block;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: rgba(15, 123, 79, 0.08);
+      transition:
+        background 180ms ease,
+        transform 180ms ease;
+    }
 
-	    .application-chevron::after {
-	      transform: rotate(90deg);
-	    }
+    .application-chevron::before,
+    .application-chevron::after {
+      content: "";
+      position: absolute;
+      top: 10px;
+      right: 7px;
+      left: 7px;
+      height: 2px;
+      border-radius: 999px;
+      background: var(--green-dark);
+    }
 
-	    .application-item[open] .application-index {
-	      background: var(--green);
-	      color: #ffffff;
-	    }
+    .application-chevron::after {
+      transform: rotate(90deg);
+    }
 
-	    .application-item[open] .application-chevron {
-	      background: rgba(15, 123, 79, 0.16);
-	      transform: rotate(180deg);
-	    }
+    .application-item[open] .application-index {
+      background: var(--green);
+      color: #ffffff;
+    }
 
-	    .application-item[open] .application-chevron::after {
-	      opacity: 0;
-	    }
+    .application-item[open] .application-chevron {
+      background: rgba(15, 123, 79, 0.16);
+      transform: rotate(180deg);
+    }
+
+    .application-item[open] .application-chevron::after {
+      opacity: 0;
+    }
 
     .application-body {
-      height: clamp(140px, calc(100vh - var(--nav-h) - 540px), 188px);
-      overflow-x: hidden;
-      overflow-y: auto;
-      padding: 0 12px 14px 54px;
-      overscroll-behavior: contain;
-      scrollbar-gutter: stable;
-      scrollbar-color: rgba(15, 123, 79, 0.36) transparent;
-      -webkit-overflow-scrolling: touch;
+      position: static;
+      width: auto;
+      max-height: 300px;
+      overflow: hidden;
+      padding: 0 18px 18px 58px;
+      text-align: left;
+      transform: none;
     }
 
     .application-body p {
       margin: 0;
-      color: #26382f;
-      font-size: clamp(14px, 0.92vw, 15px);
-      line-height: 1.54;
-      font-weight: 650;
+      color: #304139;
+      font-size: 13px;
+      font-weight: 540;
+      line-height: 1.58;
     }
 
     .application-body p + p {
-      margin-top: 12px;
+      margin-top: 0;
+    }
+
+    .application-body p[data-lang="zh"] ~ p[data-lang="zh"],
+    .application-body p[data-lang="en"] ~ p[data-lang="en"] {
+      display: none !important;
     }
 
     .application-body::-webkit-scrollbar,
@@ -2797,79 +2878,2623 @@
       background-clip: padding-box;
     }
 
-	    .application-source {
-	      display: block;
-	      margin-top: 14px;
-	      padding-top: 12px;
-	      border-top: 1px solid rgba(15, 83, 53, 0.12);
-	      color: var(--muted);
-	      font-size: 11px;
-	      font-weight: 900;
-	      text-transform: uppercase;
-	    }
-
-    .application-visual {
-      position: sticky;
-      top: calc(var(--nav-h) + 24px);
-      align-self: start;
+    .application-phone-visual {
+      position: relative;
+      top: auto;
+      width: 300px;
+      max-width: 100%;
       min-width: 0;
-      margin: 0;
-      padding: 10px;
-      border: 1px solid rgba(15, 83, 53, 0.16);
-      border-radius: 8px;
-      background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(237, 246, 242, 0.9));
-      box-shadow: 0 34px 90px rgba(23, 33, 28, 0.18);
+      min-height: 0;
+      margin: 0 auto;
+      overflow: visible;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
       will-change: transform, opacity;
     }
 
-    .application-image-shell {
-      position: relative;
-      min-height: clamp(360px, calc(100vh - var(--nav-h) - 320px), 520px);
-      overflow: hidden;
-      border-radius: 6px;
-      background:
-        radial-gradient(circle at 50% 50%, rgba(15, 123, 79, 0.12), transparent 38%),
-        linear-gradient(90deg, rgba(15, 123, 79, 0.08) 1px, transparent 1px),
-        linear-gradient(180deg, rgba(40, 111, 158, 0.08) 1px, transparent 1px),
-        #ffffff;
-      background-size: auto, 34px 34px, 34px 34px, auto;
+    .application-browser-head {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 0 14px;
+      border: 0;
+      background: transparent;
+      color: #315440;
     }
 
-    .application-image-shell img {
-      position: absolute;
-      inset: 0;
+    .application-path {
+      display: none;
+    }
+
+    .application-browser-title {
+      display: none;
+      grid-template-columns: 8px minmax(0, 1fr);
+      column-gap: 9px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .application-browser-title::before {
+      content: "";
+      grid-row: 1 / span 2;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #67d391;
+      box-shadow: 0 0 0 5px rgba(103, 211, 145, 0.1);
+    }
+
+    .application-browser-title strong {
+      overflow: hidden;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 0.01em;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .application-browser-title small,
+    .application-browser-scope {
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 7px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .application-browser-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 0 0 auto;
+    }
+
+    .application-uid-switch {
+      display: inline-flex;
+      align-items: center;
+      width: auto;
+      max-width: 100%;
+      padding: 4px 7px;
+      border: 1px solid rgba(21, 95, 64, 0.1);
+      border-radius: 999px;
+      background: rgba(249, 252, 250, 0.9);
+      box-shadow: 0 8px 22px rgba(31, 74, 48, 0.1), inset 0 1px rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(14px);
+    }
+
+    .application-uid-group {
+      display: inline-grid;
+      grid-template-columns: repeat(3, 34px);
+      align-items: center;
+      gap: 4px;
+    }
+
+    .application-uid-switch button {
+      width: 34px;
+      height: 34px;
+      min-height: 0;
+      padding: 3px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: #64766c;
+      cursor: pointer;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 8px;
+      font-weight: 820;
+      transition: background 150ms ease, color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+    }
+
+    .application-uid-switch button img {
+      display: block;
       width: 100%;
       height: 100%;
-      padding: 18px;
-      object-fit: contain;
-      transform-origin: center center;
-      will-change: transform, opacity;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #e4ece7;
+      transition: filter 150ms ease;
     }
 
-	    .application-visual-caption {
-	      display: flex;
-	      align-items: center;
-	      justify-content: space-between;
-	      gap: 14px;
-	      min-height: 50px;
-	      margin: 12px 2px 0;
-	      color: #26382f;
-	    }
+    .application-uid-switch button.is-active {
+      background: #145f40;
+      box-shadow: 0 4px 10px rgba(20, 95, 64, 0.22);
+    }
 
-	    .application-visual-caption strong {
-	      font-size: 15px;
-	      line-height: 1.15;
-	      font-weight: 950;
-	    }
+    .application-uid-switch button.is-active img {
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.94);
+    }
 
-	    .application-visual-caption span {
-	      color: var(--muted);
-	      font-size: 11px;
-	      font-weight: 900;
-	      text-transform: uppercase;
-	      text-align: right;
-	    }
+    .application-uid-switch button:hover:not(.is-active) {
+      background: rgba(21, 95, 64, 0.07);
+    }
+
+    .application-browser-source {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 30px;
+      padding: 0 10px;
+      border: 1px solid rgba(21, 95, 64, 0.14);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.72);
+      color: #315440;
+      font-size: 9px;
+      font-weight: 780;
+      text-decoration: none;
+      transition:
+        border-color 150ms ease,
+        background 150ms ease;
+    }
+
+    .application-browser-source:hover {
+      border-color: rgba(21, 95, 64, 0.32);
+      background: #ffffff;
+    }
+
+    .application-browser-source svg {
+      width: 12px;
+      height: 12px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.6;
+    }
+
+    .application-path {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 60px;
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(15, 83, 53, 0.12);
+      background: #ffffff;
+    }
+
+    .application-path-main,
+    .application-breadcrumb,
+    .application-step-track {
+      display: flex;
+      align-items: center;
+    }
+
+    .application-path-main {
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .application-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 34px;
+      padding: 0 11px;
+      border: 1px solid rgba(15, 83, 53, 0.14);
+      border-radius: 7px;
+      background: #edf4ef;
+      color: #28503a;
+      cursor: pointer;
+      font: inherit;
+      font-size: 9px;
+      font-weight: 820;
+      white-space: nowrap;
+      transition:
+        border-color 160ms ease,
+        background 160ms ease,
+        transform 160ms ease;
+    }
+
+    .application-back:hover {
+      border-color: rgba(15, 123, 79, 0.34);
+      background: #e2eee6;
+      transform: translateX(-2px);
+    }
+
+    .application-back svg,
+    .application-entry-arrow svg,
+    .application-type-arrow svg {
+      width: 13px;
+      height: 13px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .application-breadcrumb {
+      min-width: 0;
+      color: #89958e;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.025em;
+    }
+
+    .application-crumb {
+      max-width: 150px;
+      overflow: hidden;
+      padding: 5px 3px;
+      border: 0;
+      background: transparent;
+      color: #75847b;
+      cursor: pointer;
+      font: inherit;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .application-crumb:hover {
+      color: #0f7349;
+    }
+
+    .application-crumb.is-current {
+      color: #183d28;
+      cursor: default;
+    }
+
+    .application-crumb-separator {
+      margin: 0 3px;
+      color: #bbc4be;
+    }
+
+    .application-step-track {
+      flex: 0 0 auto;
+      gap: 10px;
+      color: #718078;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 7px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .application-step-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .application-step-dots i {
+      width: 14px;
+      height: 3px;
+      border-radius: 999px;
+      background: #d2dbd5;
+      transition:
+        width 180ms ease,
+        background 180ms ease;
+    }
+
+    .application-phone-visual[data-application-step="users"] .application-step-dots i:nth-child(1),
+    .application-phone-visual[data-application-step="types"] .application-step-dots i:nth-child(-n + 2),
+    .application-phone-visual[data-application-step="detail"] .application-step-dots i {
+      background: #1a9460;
+    }
+
+    .application-phone-visual[data-application-step="users"] .application-step-dots i:nth-child(1),
+    .application-phone-visual[data-application-step="types"] .application-step-dots i:nth-child(2),
+    .application-phone-visual[data-application-step="detail"] .application-step-dots i:nth-child(3) {
+      width: 23px;
+    }
+
+    .application-browser-view {
+      min-height: 732px;
+      background: #e8efea;
+      animation: application-view-enter 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .application-browser-view[hidden] {
+      display: none;
+    }
+
+    @keyframes application-view-enter {
+      from {
+        opacity: 0;
+        transform: translateX(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .application-entry-view,
+    .application-types-view {
+      padding: clamp(24px, 3vw, 34px);
+      background:
+        radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.92), transparent 38%),
+        linear-gradient(rgba(23, 75, 46, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 75, 46, 0.04) 1px, transparent 1px),
+        #e8efea;
+      background-size: auto, 24px 24px, 24px 24px, auto;
+    }
+
+    .application-entry-head {
+      max-width: 570px;
+    }
+
+    .application-entry-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      color: #0c7649;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 8px;
+      font-weight: 850;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .application-entry-eyebrow::before {
+      content: "";
+      width: 18px;
+      height: 2px;
+      border-radius: 999px;
+      background: #1a9460;
+    }
+
+    .application-entry-head h3 {
+      margin: 0;
+      color: #14291d;
+      font-family: "Avenir Next", Avenir, Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: clamp(25px, 2.55vw, 34px);
+      font-weight: 780;
+      letter-spacing: -0.045em;
+      line-height: 1.04;
+    }
+
+    .application-entry-head p {
+      max-width: 520px;
+      margin: 11px 0 0;
+      color: #637168;
+      font-size: 11px;
+      font-weight: 570;
+      line-height: 1.55;
+    }
+
+    .application-user-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .application-user-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 480px;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid rgba(16, 73, 44, 0.16);
+      border-radius: 14px;
+      background: #fbfcfb;
+      color: #1a3323;
+      cursor: pointer;
+      font: inherit;
+      text-align: left;
+      box-shadow: 0 18px 42px rgba(31, 62, 43, 0.08);
+      transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        transform 180ms ease;
+    }
+
+    .application-user-card:hover {
+      border-color: rgba(15, 123, 79, 0.48);
+      box-shadow: 0 24px 52px rgba(27, 67, 43, 0.15);
+      transform: translateY(-4px);
+    }
+
+    .application-user-card.is-active {
+      border-color: rgba(15, 123, 79, 0.56);
+    }
+
+    .application-user-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px 18px 15px;
+    }
+
+    .application-user-identity {
+      display: grid;
+      gap: 2px;
+    }
+
+    .application-user-identity strong {
+      font-family: "Avenir Next", Avenir, Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: 25px;
+      font-weight: 790;
+      letter-spacing: -0.04em;
+    }
+
+    .application-user-identity small {
+      color: #718078;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 7px;
+      font-weight: 790;
+      letter-spacing: 0.055em;
+      text-transform: uppercase;
+    }
+
+    .application-user-count {
+      display: grid;
+      justify-items: end;
+      gap: 1px;
+      color: #0f7248;
+    }
+
+    .application-user-count strong {
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 15px;
+      font-weight: 850;
+    }
+
+    .application-user-count small {
+      color: #869289;
+      font-size: 7px;
+      font-weight: 760;
+      text-transform: uppercase;
+    }
+
+    .application-user-mosaic {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      gap: 4px;
+      height: 300px;
+      margin: 0 10px;
+      overflow: hidden;
+      border-radius: 10px;
+      background: #dce5df;
+    }
+
+    .application-user-mosaic::after {
+      content: "12 TYPES";
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      padding: 6px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 5px;
+      background: rgba(14, 31, 20, 0.78);
+      color: #ffffff;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 7px;
+      font-weight: 850;
+      letter-spacing: 0.07em;
+      backdrop-filter: blur(8px);
+    }
+
+    .application-user-mosaic img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      background: #ffffff;
+      transition: transform 320ms ease;
+    }
+
+    .application-user-mosaic img:first-child {
+      grid-row: 1 / span 2;
+    }
+
+    .application-user-card:hover .application-user-mosaic img {
+      transform: scale(1.025);
+    }
+
+    .application-user-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      min-height: 70px;
+      padding: 14px 18px;
+    }
+
+    .application-user-footer-copy {
+      display: grid;
+      gap: 3px;
+    }
+
+    .application-user-footer-copy strong {
+      font-size: 11px;
+      font-weight: 820;
+    }
+
+    .application-user-footer-copy small {
+      color: #7b8880;
+      font-size: 8px;
+      font-weight: 620;
+    }
+
+    .application-entry-arrow {
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #173d29;
+      color: #ffffff;
+      transition:
+        background 160ms ease,
+        transform 160ms ease;
+    }
+
+    .application-user-card:hover .application-entry-arrow {
+      background: #0f7b4f;
+      transform: translateX(3px);
+    }
+
+    .application-types-view .application-entry-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: end;
+      max-width: none;
+    }
+
+    .application-types-total {
+      display: grid;
+      justify-items: end;
+      gap: 2px;
+      padding-bottom: 2px;
+      color: #0c7348;
+    }
+
+    .application-types-total strong {
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 19px;
+      font-weight: 860;
+    }
+
+    .application-types-total small {
+      color: #7c8981;
+      font-size: 7px;
+      font-weight: 780;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .application-type-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .application-type-card {
+      display: grid;
+      grid-template-columns: 57px minmax(0, 1fr) auto 24px;
+      gap: 10px;
+      align-items: center;
+      min-width: 0;
+      min-height: 81px;
+      padding: 7px 10px 7px 7px;
+      border: 1px solid rgba(15, 83, 53, 0.13);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.88);
+      color: #243d2e;
+      cursor: pointer;
+      font: inherit;
+      text-align: left;
+      box-shadow: 0 7px 18px rgba(27, 61, 41, 0.045);
+      transition:
+        border-color 160ms ease,
+        box-shadow 160ms ease,
+        transform 160ms ease;
+    }
+
+    .application-type-card:hover {
+      border-color: rgba(15, 123, 79, 0.43);
+      box-shadow: 0 12px 24px rgba(25, 67, 41, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .application-type-card.is-active {
+      border-color: rgba(15, 123, 79, 0.48);
+      background: #ffffff;
+    }
+
+    .application-type-preview {
+      position: relative;
+      width: 57px;
+      height: 65px;
+      overflow: hidden;
+      border-radius: 7px;
+      background: #e7ece9;
+    }
+
+    .application-type-preview img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      background: #ffffff;
+      transition: transform 220ms ease;
+    }
+
+    .application-type-card:hover .application-type-preview img {
+      transform: scale(1.04);
+    }
+
+    .application-type-preview span {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      padding: 3px 4px;
+      border-radius: 3px;
+      background: rgba(12, 28, 18, 0.78);
+      color: #ffffff;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 6px;
+      font-weight: 820;
+      backdrop-filter: blur(4px);
+    }
+
+    .application-type-copy {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .application-type-copy strong {
+      overflow: hidden;
+      font-size: 10px;
+      font-weight: 830;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .application-type-copy small {
+      display: -webkit-box;
+      overflow: hidden;
+      color: #7b8980;
+      font-size: 7px;
+      font-weight: 600;
+      line-height: 1.35;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .application-type-count {
+      min-width: 28px;
+      color: #0e7549;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 9px;
+      font-weight: 850;
+      text-align: right;
+    }
+
+    .application-type-arrow {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #edf4ef;
+      color: #4c6c58;
+      transition:
+        background 160ms ease,
+        color 160ms ease,
+        transform 160ms ease;
+    }
+
+    .application-type-card:hover .application-type-arrow {
+      background: #173d29;
+      color: #ffffff;
+      transform: translateX(2px);
+    }
+
+    .application-stage {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      width: 300px;
+      max-width: 100%;
+      min-height: 0;
+      padding: 0;
+      background: transparent;
+    }
+
+    .application-phone-visual .application-path {
+      display: none;
+    }
+
+    .application-phone-wrap {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 300px;
+      max-width: 100%;
+      margin: 0 auto;
+      min-width: 0;
+      min-height: 630px;
+      isolation: isolate;
+    }
+
+    .application-phone-wrap::before,
+    .application-phone-wrap::after {
+      content: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      z-index: -1;
+      border: 1px solid rgba(31, 112, 73, 0.1);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .application-phone-wrap::before {
+      width: 455px;
+      height: 455px;
+      box-shadow:
+        0 0 0 34px rgba(255, 255, 255, 0.18),
+        0 0 0 35px rgba(31, 112, 73, 0.055);
+    }
+
+    .application-phone-wrap::after {
+      width: 372px;
+      height: 372px;
+      border-style: dashed;
+      opacity: 0.72;
+    }
+
+    .application-phone {
+      position: relative;
+      z-index: 2;
+      width: 300px;
+      height: 630px;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.62);
+      border-radius: 48px;
+      background:
+        linear-gradient(145deg, #3b463f 0%, #141a16 45%, #2a332d 100%);
+      box-shadow:
+        0 42px 86px rgba(26, 43, 33, 0.28),
+        0 4px 0 rgba(255, 255, 255, 0.22) inset,
+        0 -2px 0 rgba(0, 0, 0, 0.4) inset;
+    }
+
+    .application-phone::before {
+      content: "";
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      z-index: 5;
+      width: 62px;
+      height: 17px;
+      border-radius: 999px;
+      background: #101511;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    .application-phone::after {
+      content: "";
+      position: absolute;
+      top: 22px;
+      left: calc(50% + 21px);
+      z-index: 6;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #25352c;
+      box-shadow: 0 0 0 1px #090c0a;
+      pointer-events: none;
+    }
+
+    .application-phone-screen {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      overflow: hidden;
+      border: 0;
+      border-radius: 38px;
+      background: #ffffff;
+      cursor: zoom-in;
+    }
+
+    .application-phone-screen[hidden],
+    .application-phone-desktop[hidden],
+    .application-phone-app-back[hidden] {
+      display: none;
+    }
+
+    .application-phone-desktop {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 34px 12px 58px;
+      overflow: hidden;
+      border-radius: 38px;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.92), transparent 28%),
+        radial-gradient(circle at 92% 84%, rgba(112, 103, 193, 0.1), transparent 34%),
+        linear-gradient(155deg, #eaf3ee 0%, #dcebe3 54%, #d2e4da 100%);
+    }
+
+    .application-phone-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #214431;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 8px;
+    }
+
+    .application-phone-status span {
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .application-phone-desktop-head {
+      display: grid;
+      margin: 29px 2px 18px;
+      color: #173c29;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .application-phone-memory-widget {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      width: fit-content;
+      margin-bottom: 22px;
+      padding: 10px 13px;
+      border: 1px solid rgba(255, 255, 255, 0.52);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.42);
+      color: #2f5641;
+      backdrop-filter: blur(12px);
+    }
+
+    .application-phone-memory-widget > span {
+      color: #587267;
+      font-size: 8px;
+      font-weight: 750;
+    }
+
+    .application-phone-memory-widget strong {
+      color: #116e48;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 20px;
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .application-phone-user-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px;
+      margin: 0 0 16px;
+      padding: 3px;
+      border: 1px solid rgba(22, 79, 47, 0.12);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.44);
+    }
+
+    .application-phone-user-switch button {
+      min-height: 30px;
+      padding: 0 10px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: #587064;
+      cursor: pointer;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 8px;
+      font-weight: 800;
+      transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .application-phone-user-switch button.is-active {
+      background: rgba(255, 255, 255, 0.94);
+      color: #116e48;
+      box-shadow: 0 3px 10px rgba(26, 72, 45, 0.11);
+    }
+
+    .application-phone-user-switch button:hover {
+      color: #116e48;
+    }
+
+    .application-phone-apps {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(2, 172px);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .application-phone-ai-entry {
+      position: relative;
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr) 46px;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      height: 82px;
+      margin-top: 16px;
+      padding: 11px 14px;
+      overflow: hidden;
+      border: 1px solid rgba(24, 91, 58, 0.12);
+      border-radius: 17px;
+      background:
+        radial-gradient(circle at 91% 50%, rgba(102, 163, 214, 0.16), transparent 25%),
+        linear-gradient(118deg, rgba(253, 255, 254, 0.98) 0 62%, rgba(228, 241, 234, 0.96) 100%);
+      color: #173f2b;
+      cursor: pointer;
+      font: inherit;
+      text-align: left;
+      box-shadow: 0 10px 22px rgba(22, 70, 44, 0.11), inset 0 1px rgba(255, 255, 255, 0.86);
+      transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+    }
+
+    .application-phone-ai-entry:hover {
+      transform: translateY(-1px);
+      border-color: rgba(24, 91, 58, 0.24);
+      box-shadow: 0 14px 28px rgba(22, 70, 44, 0.15), inset 0 1px rgba(255, 255, 255, 0.9);
+    }
+
+    .application-ai-portal-avatar {
+      position: relative;
+      z-index: 2;
+      display: block;
+      width: 34px;
+      height: 34px;
+      padding: 2px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 5px 13px rgba(22, 70, 44, 0.16), 0 0 0 1px rgba(23, 94, 60, 0.1);
+    }
+
+    .application-ai-portal-avatar img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      object-fit: cover;
+      background: #e3ece7;
+    }
+
+    .application-ai-portal-copy {
+      z-index: 2;
+      display: grid;
+      align-content: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .application-ai-portal-copy strong {
+      font-size: 14px;
+      font-weight: 850;
+      letter-spacing: -0.03em;
+    }
+
+    .application-ai-portal-thread {
+      display: block;
+      width: 100%;
+      height: 17px;
+      overflow: visible;
+    }
+
+    .application-ai-portal-thread path {
+      fill: none;
+      stroke: #58a57d;
+      stroke-linecap: round;
+      stroke-width: 1.8;
+    }
+
+    .application-ai-portal-thread circle {
+      fill: #ffffff;
+      stroke: #2c8e60;
+      stroke-width: 1.6;
+    }
+
+    .application-ai-portal-thread circle:last-child {
+      fill: #2c8e60;
+    }
+
+    .application-ai-portal-orbit {
+      position: relative;
+      z-index: 2;
+      justify-self: end;
+      width: 46px;
+      height: 46px;
+      border: 1px solid rgba(31, 101, 66, 0.13);
+      border-radius: 50%;
+      box-shadow: 0 0 0 8px rgba(35, 118, 78, 0.045), 0 0 0 16px rgba(35, 118, 78, 0.025);
+    }
+
+    .application-ai-portal-orbit::before,
+    .application-ai-portal-orbit::after {
+      position: absolute;
+      border-radius: 50%;
+      content: "";
+    }
+
+    .application-ai-portal-orbit::before {
+      inset: 8px;
+      background: conic-gradient(from 35deg, #62d59e, #65a9df, #9580d2, #62d59e);
+      box-shadow: 0 7px 16px rgba(28, 80, 52, 0.18);
+    }
+
+    .application-ai-portal-orbit::after {
+      inset: 18px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.76);
+    }
+
+    .application-memory-cluster {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 5px;
+      min-width: 0;
+      min-height: 0;
+      padding: 7px;
+      overflow: hidden;
+      border: 1px solid rgba(26, 79, 49, 0.1);
+      border-radius: 15px;
+      background: rgba(250, 253, 251, 0.7);
+      box-shadow: 0 8px 18px rgba(33, 76, 50, 0.08), inset 0 1px rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(14px);
+    }
+
+    .application-memory-cluster-title {
+      padding: 0 2px;
+      color: #244333;
+      font-size: 9px;
+      font-weight: 820;
+      line-height: 1.2;
+    }
+
+    .application-memory-mosaic {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      gap: 4px;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .application-memory-cluster:nth-child(1) .application-memory-mosaic button:first-child,
+    .application-memory-cluster:nth-child(4) .application-memory-mosaic button:first-child {
+      grid-column: 1 / -1;
+    }
+
+    .application-memory-cluster:nth-child(2) .application-memory-mosaic button:first-child {
+      grid-row: 1 / -1;
+    }
+
+    .application-memory-cluster:nth-child(3) .application-memory-mosaic button:first-child {
+      grid-row: 1 / -1;
+      grid-column: 2;
+    }
+
+    .application-memory-cluster:nth-child(3) .application-memory-mosaic button:nth-child(2),
+    .application-memory-cluster:nth-child(3) .application-memory-mosaic button:nth-child(3) {
+      grid-column: 1;
+    }
+
+    .application-phone-apps button {
+      position: relative;
+      display: grid;
+      min-height: 0;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      overflow: hidden;
+      border-radius: 9px;
+      background: #dfe9e3;
+      color: #ffffff;
+      cursor: pointer;
+      font: inherit;
+      isolation: isolate;
+    }
+
+    .application-phone-apps button > span {
+      display: block;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border: 0;
+      border-radius: inherit;
+      background: #e3ebe6;
+      transition: transform 220ms ease;
+    }
+
+    .application-phone-apps button:hover > span {
+      transform: scale(1.045);
+    }
+
+    .application-phone-apps img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top;
+    }
+
+    .application-phone-apps b {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 2;
+      overflow: hidden;
+      padding: 4px 3px 5px;
+      background: rgba(249, 252, 250, 0.94);
+      color: #173d2a;
+      font-size: 9px;
+      font-weight: 850;
+      letter-spacing: -0.015em;
+      line-height: 1.1;
+      text-align: left;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      backdrop-filter: blur(5px);
+    }
+
+    .application-phone-apps button::after {
+      content: none;
+    }
+
+    .application-phone-system-nav {
+      position: absolute;
+      right: 11px;
+      bottom: 11px;
+      left: 11px;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      align-items: center;
+      height: 46px;
+      padding: 0 18px;
+      border-radius: 0 0 37px 37px;
+      background: rgba(250, 252, 250, 0.96);
+      box-shadow: 0 -1px 0 rgba(24, 62, 39, 0.08);
+      backdrop-filter: blur(12px);
+    }
+
+    .application-phone-system-nav button {
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 44px;
+      margin: 0 auto;
+      padding: 0;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: #25342c;
+      cursor: pointer;
+      transition: background 120ms ease, transform 120ms ease;
+    }
+
+    .application-phone-system-nav button:hover {
+      background: rgba(33, 92, 58, 0.08);
+    }
+
+    .application-phone-system-nav button:active {
+      transform: scale(0.92);
+    }
+
+    .application-phone-system-nav svg {
+      width: 19px;
+      height: 19px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .application-phone-system-nav button:first-child svg {
+      fill: currentColor;
+      stroke: none;
+    }
+
+    .application-phone-recents {
+      position: absolute;
+      inset: 11px;
+      z-index: 4;
+      padding: 48px 18px 68px;
+      overflow: hidden;
+      border-radius: 38px;
+      background: linear-gradient(155deg, #e7f1eb 0%, #cadfd3 100%);
+    }
+
+    .application-ai-dialogue {
+      position: absolute;
+      inset: 11px;
+      z-index: 4;
+      display: grid;
+      grid-template-rows: auto auto auto minmax(0, 1fr);
+      padding: 31px 0 58px;
+      overflow: hidden;
+      border-radius: 38px;
+      background:
+        radial-gradient(circle at 92% 4%, rgba(82, 173, 139, 0.16), transparent 32%),
+        linear-gradient(180deg, #f7faf8 0%, #edf3ef 100%);
+      color: #24362c;
+    }
+
+    .application-ai-dialogue[hidden] {
+      display: none;
+    }
+
+    .application-ai-dialogue > header {
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 0 15px 8px;
+    }
+
+    .application-ai-dialogue > header img {
+      width: 30px;
+      height: 30px;
+      padding: 3px;
+      border: 1px solid rgba(22, 79, 47, 0.1);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.86);
+      object-fit: cover;
+      box-shadow: 0 5px 14px rgba(25, 62, 39, 0.09);
+    }
+
+    .application-ai-dialogue > header strong {
+      display: block;
+      overflow: hidden;
+      font-size: 11px;
+      line-height: 1.2;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .application-ai-turn-total {
+      padding: 5px 7px;
+      border-radius: 999px;
+      background: #173e2a;
+      color: #ffffff;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 7px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .application-ai-session {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 9px;
+      margin: 0 14px 3px;
+      padding: 7px 0 9px;
+      border-bottom: 1px solid rgba(22, 79, 47, 0.11);
+    }
+
+    .application-ai-session-tabs {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      margin: 0 14px 5px;
+      border-bottom: 1px solid rgba(22, 79, 47, 0.1);
+    }
+
+    .application-ai-session-tabs button {
+      min-height: 25px;
+      padding: 0;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      border-radius: 0;
+      background: transparent;
+      color: #738279;
+      cursor: pointer;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 7px;
+      font-weight: 850;
+      transition: border-color 140ms ease, color 140ms ease;
+    }
+
+    .application-ai-session-tabs button:hover {
+      color: #195f42;
+    }
+
+    .application-ai-session-tabs button.is-active {
+      border-bottom-color: #16744c;
+      background: transparent;
+      color: #125b3d;
+    }
+
+    .application-ai-session time {
+      color: #11724a;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 8px;
+      font-weight: 850;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .application-ai-session strong {
+      display: -webkit-box;
+      overflow: hidden;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1.3;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .application-ai-dialogue-stream {
+      display: grid;
+      align-content: start;
+      gap: 2px;
+      overflow-y: auto;
+      padding: 9px 14px 22px;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+    }
+
+    .application-ai-dialogue-stream::-webkit-scrollbar {
+      display: none;
+    }
+
+    .application-ai-dialogue article {
+      position: relative;
+      display: grid;
+      align-items: flex-start;
+      width: 100%;
+      max-width: none;
+      padding: 0 0 12px;
+    }
+
+    .application-ai-dialogue article.is-user {
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: end;
+      justify-self: stretch;
+      padding-left: 18%;
+    }
+
+    .application-ai-dialogue article.is-ai {
+      grid-template-columns: 14px minmax(0, 1fr);
+      column-gap: 7px;
+      justify-self: stretch;
+      padding-right: 3%;
+    }
+
+    .application-ai-dialogue article::before {
+      display: none;
+      content: "";
+    }
+
+    .application-ai-dialogue article.is-ai::before {
+      position: relative;
+      z-index: 2;
+      display: block;
+      grid-column: 1;
+      width: 10px;
+      height: 10px;
+      margin: 6px auto 0;
+      border: 0;
+      border-radius: 50%;
+      background: conic-gradient(from 35deg, #3ab27e, #3b84bd, #9b6fc2, #3ab27e);
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.92), 0 3px 8px rgba(38, 103, 72, 0.22);
+    }
+
+    .application-ai-dialogue article::after {
+      display: none;
+      content: none;
+    }
+
+    .application-ai-dialogue article > p,
+    .application-ai-dialogue article > div {
+      margin: 0;
+      max-width: 100%;
+    }
+
+    .application-ai-dialogue article.is-user > p {
+      padding: 8px 10px;
+      border: 1px solid rgba(29, 91, 60, 0.08);
+      border-radius: 14px;
+      background: #e7eeea;
+      color: #34483d;
+      box-shadow: none;
+    }
+
+    .application-ai-dialogue article.is-ai > p {
+      grid-column: 2;
+      padding: 3px 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #263b30;
+      box-shadow: none;
+    }
+
+    .application-ai-dialogue p {
+      margin: 0;
+      font-size: 8.5px;
+      font-weight: 620;
+      line-height: 1.42;
+    }
+
+    .application-ai-dialogue article > .application-ai-image-bubble {
+      width: min(154px, 82%);
+      padding: 4px;
+      overflow: hidden;
+      border: 1px solid rgba(22, 79, 47, 0.11);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 6px 18px rgba(25, 62, 39, 0.07);
+    }
+
+    .application-ai-dialogue article.is-user > .application-ai-image-bubble {
+      justify-self: end;
+    }
+
+    .application-ai-dialogue article.is-ai > .application-ai-image-bubble {
+      grid-column: 2;
+      justify-self: start;
+    }
+
+    .application-ai-image-bubble img {
+      display: block;
+      width: 100%;
+      max-height: 176px;
+      border-radius: 8px;
+      object-fit: contain;
+      background: #f8faf9;
+    }
+
+    .application-phone-recents[hidden] {
+      display: none;
+    }
+
+    .application-phone-recents-title {
+      display: block;
+      margin-bottom: 18px;
+      color: #244a35;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .application-phone-recents > button {
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      width: 78%;
+      height: 72%;
+      margin: 0 auto;
+      padding: 7px;
+      overflow: hidden;
+      border: 1px solid rgba(23, 75, 46, 0.13);
+      border-radius: 18px;
+      background: #ffffff;
+      color: #244333;
+      cursor: pointer;
+      text-align: left;
+      box-shadow: 0 18px 40px rgba(30, 70, 46, 0.18);
+      transition: transform 160ms ease, box-shadow 160ms ease;
+    }
+
+    .application-phone-recents > button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 22px 48px rgba(30, 70, 46, 0.23);
+    }
+
+    .application-phone-recents img {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      border-radius: 12px;
+      object-fit: cover;
+      object-position: top;
+      background: #eef3ef;
+    }
+
+    .application-phone-recents button > span {
+      display: grid;
+      gap: 2px;
+      padding: 9px 5px 5px;
+    }
+
+    .application-phone-recents strong {
+      font-size: 10px;
+    }
+
+    .application-phone-recents small {
+      color: #76857c;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 7px;
+    }
+
+    .application-phone-recents[hidden],
+    .application-phone-system-nav[hidden] {
+      display: none;
+    }
+
+    .application-phone-record-count {
+      position: absolute;
+      top: 42px;
+      right: 20px;
+      z-index: 8;
+      padding: 5px 8px;
+      border: 1px solid rgba(22, 79, 47, 0.12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      color: #315440;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 7px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      backdrop-filter: blur(8px);
+    }
+
+    .application-phone-record-count[hidden],
+    .application-phone-direction[hidden],
+    .application-phone-caption[hidden] {
+      display: none;
+    }
+
+    .application-phone-screen img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #ffffff;
+      transition:
+        opacity 170ms ease,
+        transform 220ms ease;
+    }
+
+    .application-phone-screen[data-record-type="event"] img,
+    .application-phone-screen[data-record-type="person"] img,
+    .application-phone-screen[data-record-type="scenery"] img,
+    .application-phone-screen[data-record-type="group_chat_members"] img {
+      width: calc(100% - 28px);
+      height: auto;
+      max-height: calc(100% - 142px);
+      object-fit: contain;
+      object-position: center;
+      border: 4px solid rgba(255, 255, 255, 0.92);
+      border-radius: 16px;
+      background: #ffffff;
+      box-shadow:
+        0 18px 42px rgba(18, 49, 32, 0.16),
+        0 2px 8px rgba(18, 49, 32, 0.08);
+    }
+
+    .application-phone-screen[data-record-type="event"],
+    .application-phone-screen[data-record-type="person"],
+    .application-phone-screen[data-record-type="scenery"],
+    .application-phone-screen[data-record-type="group_chat_members"] {
+      background:
+        radial-gradient(circle at 72% 24%, rgba(255, 255, 255, 0.9), transparent 28%),
+        linear-gradient(155deg, #edf5f0 0%, #dbe9e1 100%);
+    }
+
+    .application-phone-screen img.is-switching {
+      opacity: 0.12;
+      transform: translateY(7px) scale(0.986);
+    }
+
+    .application-phone-system-nav button {
+      align-items: center;
+    }
+
+    .application-phone-direction {
+      position: absolute;
+      top: 50%;
+      z-index: 4;
+      display: grid;
+      place-items: center;
+      width: 43px;
+      height: 43px;
+      border: 1px solid rgba(22, 79, 47, 0.2);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.94);
+      color: #21422e;
+      cursor: pointer;
+      transform: translateY(-50%);
+      backdrop-filter: blur(9px);
+      transition:
+        border-color 150ms ease,
+        background 150ms ease,
+        transform 150ms ease;
+    }
+
+    .application-phone-direction:hover {
+      border-color: #57826a;
+      background: #ffffff;
+      transform: translateY(-50%) scale(1.05);
+    }
+
+    .application-phone-direction[data-application-direction="previous"] {
+      left: -58px;
+    }
+
+    .application-phone-direction[data-application-direction="next"] {
+      right: -58px;
+    }
+
+    .application-phone-direction svg {
+      width: 17px;
+      height: 17px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .application-phone-caption {
+      position: absolute;
+      right: auto;
+      bottom: 58px;
+      left: 20px;
+      z-index: 8;
+      width: fit-content;
+      max-width: calc(100% - 40px);
+      padding: 6px 9px 7px;
+      overflow: hidden;
+      border: 0;
+      border-radius: 8px;
+      background: rgba(18, 46, 30, 0.82);
+      color: #ffffff;
+      box-shadow: 0 5px 14px rgba(15, 40, 25, 0.15);
+      backdrop-filter: blur(10px);
+    }
+
+    .application-phone-caption strong {
+      display: block;
+      overflow: hidden;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.2;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .application-record-panel {
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      padding: 18px;
+      border: 1px solid rgba(15, 83, 53, 0.13);
+      border-radius: 12px;
+      background: rgba(250, 252, 250, 0.94);
+      box-shadow: 0 18px 42px rgba(22, 52, 35, 0.09);
+    }
+
+    .application-record-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 24px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 7px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .application-record-state {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #0f6f47;
+    }
+
+    .application-record-state::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #23a76a;
+      box-shadow: 0 0 0 4px rgba(35, 167, 106, 0.1);
+    }
+
+    .application-record-global {
+      color: #7a8a80;
+    }
+
+    .application-record-kicker {
+      display: block;
+      margin-bottom: 10px;
+      color: #0d7449;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 8px;
+      font-weight: 850;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .application-record-title {
+      margin: 0;
+      color: #14261c;
+      font-family: "Avenir Next", Avenir, Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: clamp(21px, 2vw, 28px);
+      font-weight: 780;
+      letter-spacing: -0.035em;
+      line-height: 1.06;
+    }
+
+    .application-record-event {
+      margin: 13px 0 20px;
+      color: #5b6b62;
+      font-size: 11px;
+      font-weight: 590;
+      line-height: 1.55;
+    }
+
+    .application-record-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      margin: 0;
+      overflow: hidden;
+      border: 1px solid rgba(15, 83, 53, 0.12);
+      border-radius: 7px;
+      background: rgba(15, 83, 53, 0.12);
+    }
+
+    .application-record-meta div {
+      min-width: 0;
+      padding: 9px 10px;
+      background: #f8fbf9;
+    }
+
+    .application-record-meta dt {
+      margin-bottom: 3px;
+      color: #8a968f;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 6px;
+      font-weight: 780;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .application-record-meta dd {
+      overflow: hidden;
+      margin: 0;
+      color: #31463a;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 8px;
+      font-weight: 800;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .application-image-picker {
+      margin-top: auto;
+      padding-top: 24px;
+    }
+
+    .application-image-picker-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 9px;
+      color: #66786d;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 7px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .application-phone-position {
+      color: #0d6d45;
+    }
+
+    .application-thumbs {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .application-thumb {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+      min-width: 0;
+      min-height: 57px;
+      padding: 6px;
+      border: 1px solid rgba(15, 83, 53, 0.13);
+      border-radius: 8px;
+      background: #ffffff;
+      color: #4d6256;
+      cursor: pointer;
+      text-align: left;
+      transition:
+        border-color 150ms ease,
+        box-shadow 150ms ease,
+        transform 150ms ease;
+    }
+
+    .application-thumb:hover {
+      border-color: rgba(15, 123, 79, 0.38);
+      transform: translateY(-1px);
+    }
+
+    .application-thumb.is-active {
+      border-color: #15925d;
+      box-shadow: 0 0 0 2px rgba(21, 146, 93, 0.1);
+    }
+
+    .application-thumb img {
+      display: block;
+      width: 42px;
+      height: 43px;
+      object-fit: cover;
+      object-position: top;
+      border-radius: 5px;
+      background: #eef2ef;
+    }
+
+    .application-thumb-copy {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .application-thumb-copy strong,
+    .application-thumb-copy small {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .application-thumb-copy strong {
+      color: #273a2f;
+      font-size: 8px;
+      font-weight: 820;
+    }
+
+    .application-thumb-copy small {
+      color: #87938c;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 6px;
+    }
+
+    .application-record-nav {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 9px;
+    }
+
+    .application-record-nav button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 36px;
+      border: 1px solid rgba(15, 83, 53, 0.14);
+      border-radius: 7px;
+      background: #edf4ef;
+      color: #315440;
+      cursor: pointer;
+      font: inherit;
+      font-size: 8px;
+      font-weight: 820;
+      transition:
+        border-color 150ms ease,
+        background 150ms ease;
+    }
+
+    .application-record-nav button:hover {
+      border-color: rgba(15, 123, 79, 0.34);
+      background: #e3eee7;
+    }
+
+    .application-record-nav svg {
+      width: 12px;
+      height: 12px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .application-dataset-wall {
+      padding: 16px;
+      overflow: hidden;
+      background: rgba(248, 251, 249, 0.97);
+    }
+
+    .application-wall-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 13px;
+    }
+
+    .application-wall-head > div {
+      display: grid;
+      gap: 3px;
+    }
+
+    .application-wall-head strong {
+      color: #183526;
+      font-size: 17px;
+      letter-spacing: -0.025em;
+    }
+
+    .application-wall-kicker {
+      color: #168055;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 7px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .application-dataset-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      min-height: 0;
+    }
+
+    .application-dataset-tile {
+      position: relative;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      min-width: 0;
+      height: 138px;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid rgba(23, 75, 46, 0.13);
+      border-radius: 9px;
+      background: #e8eeea;
+      color: #183526;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+
+    .application-dataset-tile:hover {
+      border-color: rgba(16, 130, 81, 0.52);
+      transform: translateY(-2px);
+    }
+
+    .application-dataset-tile.is-active {
+      border-color: #118452;
+      box-shadow: 0 0 0 2px rgba(17, 132, 82, 0.15);
+    }
+
+    .application-dataset-tile > img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      object-fit: cover;
+      object-position: top;
+      background: #edf2ef;
+      transition: transform 220ms ease;
+    }
+
+    .application-dataset-tile:hover > img {
+      transform: scale(1.025);
+    }
+
+    .application-dataset-tile > span {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      min-height: 30px;
+      padding: 6px 7px;
+      background: rgba(250, 252, 250, 0.92);
+      backdrop-filter: blur(8px);
+    }
+
+    .application-dataset-tile b {
+      overflow: hidden;
+      font-size: 8px;
+      font-weight: 800;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .application-dataset-tile small {
+      flex: 0 0 auto;
+      color: #168055;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 7px;
+      font-weight: 800;
+    }
+
+    .application-dataset-wall .application-record-nav {
+      margin-top: auto;
+      padding-top: 10px;
+    }
+
+    .application-sample-panel {
+      overflow: hidden;
+      padding: 16px;
+      background: rgba(250, 252, 250, 0.97);
+    }
+
+    .application-sample-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 13px;
+    }
+
+    .application-sample-head .application-record-kicker {
+      margin-bottom: 4px;
+      font-size: 7px;
+    }
+
+    .application-sample-head .application-record-title {
+      font-size: 19px;
+    }
+
+    .application-sample-panel .application-thumbs {
+      flex: 1;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      min-height: 0;
+    }
+
+    .application-sample-panel .application-thumb {
+      grid-template-columns: 1fr;
+      grid-template-rows: minmax(0, 1fr) auto;
+      gap: 8px;
+      min-height: 0;
+      padding: 7px;
+      border-radius: 10px;
+    }
+
+    .application-sample-panel .application-thumb:hover {
+      border-color: rgba(15, 123, 79, 0.42);
+      box-shadow: 0 8px 22px rgba(24, 62, 39, 0.1);
+      transform: none;
+    }
+
+    .application-sample-panel .application-thumb:only-child {
+      grid-column: 1 / -1;
+    }
+
+    .application-sample-panel .application-thumb img {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      border-radius: 7px;
+      object-fit: contain;
+      object-position: center;
+      background: #f1f5f2;
+    }
+
+    .application-sample-panel .application-thumb-copy {
+      gap: 2px;
+      padding: 2px 1px;
+    }
+
+    .application-sample-panel .application-thumb-copy strong {
+      font-size: 9px;
+    }
+
+    .application-sample-panel .application-thumb-copy small {
+      font-size: 7px;
+    }
+
+    .application-sample-panel .application-record-nav {
+      margin-top: 10px;
+    }
+
+    .application-back:focus-visible,
+    .application-crumb:focus-visible,
+    .application-user-card:focus-visible,
+    .application-type-card:focus-visible,
+    .application-dataset-tile:focus-visible,
+    .application-phone-user-switch button:focus-visible,
+    .application-uid-switch button:focus-visible,
+    .application-phone-ai-entry:focus-visible,
+    .application-phone-apps button:focus-visible,
+    .application-phone-system-nav button:focus-visible,
+    .application-phone-recents > button:focus-visible,
+    .application-phone-app-back:focus-visible,
+    .application-thumb:focus-visible,
+    .application-record-nav button:focus-visible,
+    .application-phone-direction:focus-visible,
+    .application-phone-screen:focus-visible,
+    .application-browser-source:focus-visible,
+    .application-phone-visual:focus-visible {
+      outline: 3px solid rgba(15, 123, 79, 0.32);
+      outline-offset: 3px;
+    }
+
+    .application-lightbox {
+      width: min(880px, calc(100vw - 32px));
+      max-width: none;
+      max-height: calc(100dvh - 32px);
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 14px;
+      background: #151c17;
+      color: #ffffff;
+      box-shadow: 0 34px 110px rgba(0, 0, 0, 0.44);
+    }
+
+    .application-lightbox::backdrop {
+      background: rgba(10, 15, 12, 0.78);
+      backdrop-filter: blur(9px);
+    }
+
+    .application-lightbox-inner {
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      min-height: min(790px, calc(100dvh - 34px));
+    }
+
+    .application-lightbox-media {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 0;
+      padding: 58px 68px 24px;
+    }
+
+    .application-lightbox-image {
+      display: block;
+      max-width: calc(100% - 58px);
+      max-height: calc(100dvh - 150px);
+      object-fit: contain;
+      border: 5px solid #f4f6f4;
+      border-radius: 20px;
+      background: #ffffff;
+      box-shadow: 0 32px 84px rgba(0, 0, 0, 0.38);
+    }
+
+    .application-lightbox-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 5;
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 50%;
+      background: rgba(20, 29, 23, 0.76);
+      color: #ffffff;
+      cursor: pointer;
+      font: inherit;
+      font-size: 20px;
+      backdrop-filter: blur(8px);
+    }
+
+    .application-lightbox-direction {
+      position: absolute;
+      top: 50%;
+      z-index: 4;
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 50%;
+      background: rgba(20, 29, 23, 0.78);
+      color: #ffffff;
+      cursor: pointer;
+      transform: translateY(-50%);
+      backdrop-filter: blur(8px);
+    }
+
+    .application-lightbox-direction[data-application-direction="previous"] {
+      left: 15px;
+    }
+
+    .application-lightbox-direction[data-application-direction="next"] {
+      right: 15px;
+    }
+
+    .application-lightbox-direction svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .application-lightbox-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      min-height: 68px;
+      padding: 12px 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      background: #1b241e;
+    }
+
+    .application-lightbox-copy {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .application-lightbox-copy strong {
+      overflow: hidden;
+      font-size: 12px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .application-lightbox-copy small,
+    .application-lightbox-count {
+      color: rgba(255, 255, 255, 0.54);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 8px;
+    }
+
+    @media (max-width: 1100px) {
+      .application-layout {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 26px;
+      }
+
+      .application-stage {
+        width: 300px;
+        grid-template-columns: minmax(0, 1fr);
+        padding: 0;
+      }
+
+      .application-phone-visual,
+      .application-phone-wrap {
+        width: 300px;
+      }
+
+      .application-phone-wrap {
+        min-height: 630px;
+      }
+
+      .application-phone {
+        width: 300px;
+        height: 630px;
+      }
+
+      .application-thumb {
+        grid-template-columns: 36px minmax(0, 1fr);
+        gap: 6px;
+      }
+
+      .application-thumb img {
+        width: 36px;
+        height: 40px;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .application {
+        min-height: auto;
+        padding-top: 58px;
+      }
+
+      .application .wrap {
+        width: min(100% - 28px, 760px);
+      }
+
+      .application-layout {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 30px;
+      }
+
+      .application-accordion {
+        max-height: none;
+        padding-right: 0;
+      }
+
+      .application-phone-visual {
+        position: relative;
+        top: auto;
+        width: 300px;
+        min-height: 0;
+      }
+
+      .application-stage,
+      .application-phone-wrap {
+        width: 300px;
+      }
+
+      .application-phone-wrap {
+        min-height: 630px;
+      }
+
+      .application-phone {
+        width: 300px;
+        height: 630px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .application {
+        padding-top: 50px;
+      }
+
+      .application .center-head h2 {
+        font-size: clamp(38px, 12vw, 50px);
+      }
+
+      .application-layout {
+        margin-top: 22px;
+      }
+
+      .application-item summary {
+        grid-template-columns: 30px minmax(0, 1fr) 22px;
+        gap: 9px;
+        min-height: 58px;
+        padding: 9px 10px;
+      }
+
+      .application-index {
+        width: 30px;
+        height: 30px;
+      }
+
+      .application-summary-copy strong {
+        font-size: 15px;
+      }
+
+      .application-summary-copy small {
+        display: none;
+      }
+
+      .application-body {
+        max-height: 190px;
+        padding: 0 12px 14px 49px;
+      }
+
+      .application-body p {
+        font-size: 13px;
+      }
+
+      .application-phone-visual {
+        min-height: 0;
+        border-radius: 18px;
+      }
+
+      .application-browser-head {
+        min-height: 55px;
+        padding: 11px 12px;
+      }
+
+      .application-browser-scope {
+        display: none;
+      }
+
+      .application-browser-source {
+        width: 34px;
+        padding: 0;
+        justify-content: center;
+      }
+
+      .application-browser-source span {
+        display: none;
+      }
+
+      .application-path {
+        gap: 8px;
+        min-height: 56px;
+        padding: 9px 10px;
+      }
+
+      .application-path-main {
+        gap: 7px;
+      }
+
+      .application-back {
+        width: 34px;
+        min-height: 34px;
+        padding: 0;
+        justify-content: center;
+      }
+
+      .application-back span {
+        display: none;
+      }
+
+      .application-breadcrumb {
+        font-size: 7px;
+      }
+
+      .application-crumb {
+        max-width: 92px;
+      }
+
+      .application-step-track > span:last-child {
+        display: none;
+      }
+
+      .application-browser-view {
+        min-height: 0;
+      }
+
+      .application-entry-view,
+      .application-types-view {
+        padding: 20px 12px;
+      }
+
+      .application-entry-head h3 {
+        font-size: 27px;
+      }
+
+      .application-user-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .application-user-card {
+        min-height: 430px;
+      }
+
+      .application-user-mosaic {
+        height: 260px;
+      }
+
+      .application-types-view .application-entry-head {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+      }
+
+      .application-types-total strong {
+        font-size: 15px;
+      }
+
+      .application-type-list {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .application-stage {
+        width: min(100%, 266px);
+        grid-template-columns: minmax(0, 1fr);
+        min-height: 0;
+        padding: 0;
+      }
+
+      .application-phone-visual,
+      .application-phone-wrap {
+        width: min(100%, 266px);
+      }
+
+      .application-phone-wrap {
+        min-height: 548px;
+      }
+
+      .application-phone {
+        width: min(266px, calc(100% - 76px));
+        height: 548px;
+        padding: 10px;
+        border-radius: 43px;
+      }
+
+      .application-phone-screen {
+        border-radius: 33px;
+      }
+
+      .application-phone-direction {
+        top: 48%;
+        bottom: auto;
+        width: 40px;
+        height: 40px;
+        transform: translateY(-50%);
+      }
+
+      .application-phone-direction:hover {
+        transform: translateY(-50%) scale(1.04);
+      }
+
+      .application-phone-direction[data-application-direction="previous"] {
+        left: 0;
+      }
+
+      .application-phone-direction[data-application-direction="next"] {
+        right: 0;
+      }
+
+      .application-phone-caption {
+        right: auto;
+        left: 16px;
+        max-width: calc(100% - 32px);
+      }
+
+      .application-record-panel {
+        min-height: 430px;
+        padding: 16px;
+      }
+
+      .application-record-title {
+        font-size: 26px;
+      }
+
+      .application-thumbs {
+        grid-template-columns: repeat(2, minmax(150px, 1fr));
+        overflow-x: auto;
+        padding: 2px;
+      }
+
+      .application-thumb {
+        grid-template-columns: 42px minmax(0, 1fr);
+      }
+
+      .application-thumb img {
+        width: 42px;
+        height: 43px;
+      }
+
+      .application-lightbox {
+        width: 100vw;
+        height: 100dvh;
+        max-height: none;
+        border-radius: 0;
+      }
+
+      .application-lightbox-inner {
+        min-height: 100dvh;
+      }
+
+      .application-lightbox-media {
+        padding: 58px 8px 16px;
+      }
+
+      .application-lightbox-image {
+        max-width: calc(100% - 40px);
+        max-height: calc(100dvh - 138px);
+      }
+
+      .application-lightbox-direction[data-application-direction="previous"] {
+        left: 4px;
+      }
+
+      .application-lightbox-direction[data-application-direction="next"] {
+        right: 4px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .application *,
+      .application-lightbox * {
+        scroll-behavior: auto !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
 
 	    .quick {
 	      min-height: auto;
@@ -3357,7 +5982,7 @@
 		      }
 
 		      .application {
-		        padding-bottom: 220px;
+		        padding-bottom: 72px;
 		      }
 
 		      .application-accordion {
@@ -3379,6 +6004,35 @@
 		      .application-image-shell {
 		        min-height: 390px;
 		      }
+
+          .dataset-gallery {
+            min-height: 0;
+          }
+
+          .dataset-gallery-stage {
+            grid-template-columns: minmax(0, 1fr);
+          }
+
+          .dataset-gallery-focus-media {
+            min-height: clamp(520px, 64vh, 650px);
+          }
+
+          .dataset-gallery-thumbs {
+            display: flex;
+            gap: 9px;
+            max-height: none;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 3px 3px 12px;
+            scroll-snap-type: x proximity;
+          }
+
+          .dataset-gallery-thumb {
+            flex: 0 0 104px;
+            width: 104px;
+            height: 180px;
+            aspect-ratio: auto;
+          }
 
 			      .pipeline-grid {
 			        grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3487,12 +6141,16 @@
 		      }
 
 		      .application {
-		        padding-bottom: 390px;
+		        padding-bottom: 56px;
 		      }
 
 		      .application-layout {
 		        margin-top: 16px;
 		      }
+
+          .application-accordion {
+            grid-template-columns: minmax(0, 1fr);
+          }
 
 		      .application-item summary {
 		        grid-template-columns: 30px minmax(0, 1fr) 22px;
@@ -3530,7 +6188,7 @@
 		      }
 
 		      .application-visual {
-		        padding: 10px;
+		        padding: 0;
 		      }
 
 		      .application-image-shell {
@@ -3540,6 +6198,194 @@
 		      .application-image-shell img {
 		        padding: 14px;
 		      }
+
+          .dataset-gallery-card {
+            padding: 0;
+          }
+
+          .dataset-gallery {
+            min-height: 0;
+            gap: 0;
+            padding: 0;
+          }
+
+          .dataset-gallery-toolbar {
+            align-items: flex-start;
+            gap: 10px;
+            padding: 15px 14px 10px;
+          }
+
+          .dataset-gallery-source {
+            gap: 10px;
+          }
+
+          .dataset-gallery-source-copy strong {
+            font-size: 14px;
+          }
+
+          .dataset-gallery-source-copy small {
+            max-width: 220px;
+          }
+
+          .dataset-gallery-link {
+            width: 36px;
+            min-height: 36px;
+            justify-content: center;
+            padding: 8px;
+          }
+
+          .dataset-gallery-link span {
+            display: none;
+          }
+
+          .dataset-gallery-filters {
+            gap: 6px;
+            padding: 0 14px 11px;
+          }
+
+          .dataset-gallery-filter {
+            min-height: 32px;
+            padding: 7px 11px;
+          }
+
+          .dataset-gallery-progress {
+            margin: 0 14px 12px;
+          }
+
+          .dataset-gallery-stage {
+            grid-template-columns: 1fr;
+            gap: 10px;
+            padding: 0 10px 10px;
+          }
+
+          .dataset-gallery-focus-media {
+            min-height: clamp(460px, 65vh, 560px);
+          }
+
+          .dataset-gallery-open {
+            padding: 14px 48px;
+          }
+
+          .dataset-gallery-main {
+            max-width: calc(100% - 84px);
+            height: calc(100% - 24px);
+            max-height: none;
+            border-width: 5px;
+            border-radius: 20px;
+          }
+
+          .dataset-gallery-nav {
+            width: 42px;
+            height: 42px;
+          }
+
+          .dataset-gallery-nav[data-gallery-direction="previous"] {
+            left: 8px;
+          }
+
+          .dataset-gallery-nav[data-gallery-direction="next"] {
+            right: 8px;
+          }
+
+          .dataset-gallery-zoom-hint {
+            right: 10px;
+            bottom: 10px;
+          }
+
+          .dataset-gallery-focus-meta {
+            grid-template-columns: minmax(0, 1fr) auto;
+            grid-template-areas:
+              "kind position"
+              "title title"
+              "context context";
+            gap: 6px 10px;
+            padding: 13px 14px 14px;
+          }
+
+          .dataset-gallery-title {
+            font-size: 16px;
+          }
+
+          .dataset-gallery-context {
+            font-size: 11px;
+          }
+
+          .dataset-gallery-thumbs {
+            display: flex;
+            gap: 8px;
+            max-height: none;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 3px 3px 10px;
+            scroll-snap-type: x proximity;
+          }
+
+          .dataset-gallery-thumb {
+            flex: 0 0 92px;
+            width: 92px;
+            height: 158px;
+            aspect-ratio: auto;
+            scroll-snap-align: start;
+          }
+
+          .dataset-gallery-thumb-label {
+            font-size: 8px;
+          }
+
+          .dataset-gallery-caption {
+            display: grid;
+            gap: 3px;
+            min-height: 0;
+            padding: 0 14px 15px;
+          }
+
+          .dataset-gallery-caption span:last-child {
+            text-align: left;
+          }
+
+          .dataset-lightbox {
+            width: 100vw;
+            height: 100dvh;
+            max-height: none;
+            border-radius: 0;
+          }
+
+          .dataset-lightbox-inner {
+            min-height: 100dvh;
+          }
+
+          .dataset-lightbox-media {
+            padding: 58px 12px 14px;
+          }
+
+          .dataset-lightbox-image {
+            max-height: calc(100dvh - 138px);
+          }
+
+          .dataset-lightbox-close {
+            top: 12px;
+            right: 12px;
+            width: 42px;
+            height: 42px;
+          }
+
+          .dataset-lightbox-nav {
+            width: 44px;
+            height: 44px;
+          }
+
+          .dataset-lightbox-nav[data-gallery-direction="previous"] {
+            left: 8px;
+          }
+
+          .dataset-lightbox-nav[data-gallery-direction="next"] {
+            right: 8px;
+          }
+
+          .dataset-lightbox-meta {
+            min-height: 72px;
+            padding: 12px 14px;
+          }
 
 		      .application-visual-caption {
 		        display: grid;
@@ -3629,10 +6475,19 @@
         max-height: 230px;
       }
 
-	      .feature-grid,
-	      .pipeline-grid {
-	        grid-template-columns: 1fr;
-	      }
+      .feature-grid,
+      .pipeline-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .framework-caption {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .figure-view-link {
+        justify-self: start;
+      }
 
       .image-frame .video-play {
         right: 12px;
@@ -4171,6 +7026,71 @@
       white-space: nowrap;
       image-rendering: auto;
     }
+
+    @media (max-width: 760px) {
+      .application .wrap {
+        width: min(100% - 28px, 620px);
+      }
+
+      .application-accordion {
+        grid-template-columns: repeat(5, minmax(126px, 1fr));
+        overflow-x: auto;
+        padding-bottom: 122px;
+        scrollbar-width: none;
+      }
+
+      .application-accordion::-webkit-scrollbar {
+        display: none;
+      }
+
+      .application-item summary {
+        display: flex;
+        grid-template-columns: none;
+        min-height: 44px;
+        padding: 8px 9px;
+      }
+
+      .application-summary-copy strong {
+        font-size: 11px;
+      }
+
+      .application-body {
+        position: absolute;
+        top: 60px;
+        right: auto;
+        left: 0;
+        width: min(100vw - 28px, 620px);
+        max-height: 84px;
+        padding: 0 6px;
+        text-align: left;
+        transform: none;
+      }
+
+      .application-body p {
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .application-stage,
+      .application-phone-visual,
+      .application-phone-wrap {
+        width: min(100%, 266px);
+      }
+
+      .application-stage {
+        padding: 0;
+      }
+
+      .application-phone-wrap {
+        min-height: 548px;
+      }
+
+      .application-phone {
+        width: min(266px, 100%);
+        height: 548px;
+      }
+    }
   </style>
 </head>
 <body class="lang-en">
@@ -4395,17 +7315,46 @@
           </h2>
 	        </div>
 	        <div class="feature-layout">
-	          <figure class="framework-figure">
-	            <img id="feature-visual-image" src="assets/web/case-story-layout.png" alt="Personal memory agent case showing identity linking, memory search, reasoning, and a grounded birthday photo.">
-	            <figcaption class="framework-caption">
-	              <span id="feature-caption-zh" data-lang="zh">MobileMem 作为用户的个人记忆智能体。</span>
-	              <span id="feature-caption-en" data-lang="en">MobileMem acts as a personal memory agent.</span>
+	          <figure class="framework-figure" data-visual-kind="paper" aria-describedby="feature-visual-caption">
+	            <img id="feature-visual-image" src="assets/web/paper/figure-2-data-silos.png" alt="Figure 2 from the MobileMem paper, showing communication, social media, photos, books, shopping, and travel applications connected through a shared memory layer." decoding="async">
+	            <figcaption class="framework-caption" id="feature-visual-caption">
+	              <span class="framework-caption-main">
+	                <span class="framework-caption-label" id="feature-visual-label">Figure 2</span>
+	                <span class="framework-caption-copy">
+	                  <span id="feature-caption-zh" data-lang="zh">MobileMem 打破应用之间的数据孤岛。</span>
+	                  <span id="feature-caption-en" data-lang="en">MobileMem breaks down data silos between apps.</span>
+	                </span>
+	              </span>
+	              <a class="figure-view-link" id="feature-visual-link" href="assets/web/paper/figure-2-data-silos.png" target="_blank" rel="noopener" aria-label="Open the current research figure in a new tab">
+	                <span data-lang="zh">查看图片</span>
+	                <span data-lang="en">View image</span>
+	                <span aria-hidden="true">↗</span>
+	              </a>
 	            </figcaption>
 	          </figure>
 	          <div class="feature-accordion" aria-label="MobileMem features">
-	            <details open data-feature-image="assets/web/case-story-layout.png" data-feature-alt="Personal memory agent case showing identity linking, memory search, reasoning, and a grounded birthday photo." data-caption-zh="MobileMem 作为用户的个人记忆智能体。" data-caption-en="MobileMem acts as a personal memory agent.">
+	            <details open>
 	              <summary>
 	                <span class="step-number">01</span>
+	                <span class="feature-summary-copy">
+	                  <strong>
+	                    <span data-lang="zh">打破应用数据孤岛</span>
+	                    <span data-lang="en">Breaking Data Silos</span>
+	                  </strong>
+	                  <small>
+	                    <span data-lang="zh">跨应用的统一记忆层</span>
+	                    <span data-lang="en">One memory layer across applications</span>
+	                  </small>
+	                </span>
+	              </summary>
+	              <div class="accordion-body">
+	                <p class="quote small" data-lang="zh">MobileMem 将聊天、社交媒体、照片、阅读、购物和日历等数据汇入统一的记忆层，使手机能够跨场景理解用户的关系、兴趣与上下文。</p>
+	                <p class="quote small" data-lang="en">MobileMem unifies chat, social media, photos, reading, shopping, and calendar data in a shared memory layer, preserving relationships, interests, and context across scenarios.</p>
+	              </div>
+	            </details>
+	            <details>
+	              <summary>
+	                <span class="step-number">02</span>
 	                <span class="feature-summary-copy">
 	                  <strong>
 	                    <span data-lang="zh">从推理到记忆</span>
@@ -4422,26 +7371,7 @@
 	                <p class="quote small" data-lang="en">Consequently, the future of AI lies not only in reasoning but also in remembering.</p>
 	              </div>
 	            </details>
-	            <details data-feature-image="assets/web/features/multimodal-trajectories.png" data-feature-alt="Multiple mobile applications and interaction records feeding into a unified memory layer." data-caption-zh="MobileMem 打破应用之间的数据孤岛。" data-caption-en="MobileMem breaks down data silos between apps.">
-	              <summary>
-	                <span class="step-number">02</span>
-	                <span class="feature-summary-copy">
-	                  <strong>
-	                    <span data-lang="zh">移动记忆的形态</span>
-	                    <span data-lang="en">Mobile Memory Streams</span>
-	                  </strong>
-	                  <small>
-	                    <span data-lang="zh">多模态、跨应用、时间连续</span>
-	                    <span data-lang="en">Multimodal, cross-application, temporal</span>
-	                  </small>
-	                </span>
-	              </summary>
-	              <div class="accordion-body">
-	                <p class="quote small" data-lang="zh">这类数据天然具有多模态、跨应用和强时间连续性。重要用户记忆往往表现为分布在不同模态和应用中的事件。</p>
-	                <p class="quote small" data-lang="en">Such data are inherently multimodal, cross-application, and strongly temporally continuous. Important user memories often manifest as events distributed across different modalities and applications.</p>
-	              </div>
-	            </details>
-	            <details data-feature-image="assets/web/features/on-device-ecosystem.png" data-feature-alt="On-device memory ecosystem with a system-level memory layer, standardized protocol layer, and application-specific memory layer." data-caption-zh="这两个组件可以通过标准化协议协作，形成统一的记忆生态。" data-caption-en="These two components can collaborate through standardized protocols, forming a unified memory ecosystem whose capability exceeds the simple aggregation of individual modules.">
+	            <details>
 	              <summary>
 	                <span class="step-number">03</span>
 	                <span class="feature-summary-copy">
@@ -4460,7 +7390,7 @@
 	                <p class="quote small" data-lang="en">Instead, we envision a composite memory architecture consisting of two complementary components. These two components can collaborate through standardized protocols, forming a unified memory ecosystem whose capability exceeds the simple aggregation of individual modules.</p>
 	              </div>
 	            </details>
-	            <details data-feature-image="assets/web/features/keme-synthesis.png" data-feature-alt="MobileMem-Omni construction pipeline from persona and memory modeling to knowledge graph generation, multimodal dialogue synthesis, event building, and question generation." data-caption-zh="这个图谱锚定了所有后续合成过程。" data-caption-en="This graph anchors all subsequent synthesis.">
+	            <details>
 	              <summary>
 	                <span class="step-number">04</span>
 	                <span class="feature-summary-copy">
@@ -4479,7 +7409,7 @@
 	                <p class="quote small" data-lang="en">Guided by user persona knowledge and temporal constraints, KEME hierarchically organizes these anchored sessions into a unified interaction stream, while progressively synthesizing human-assistant interactions that naturally emerge as the user’s experiences unfold over time.</p>
 	              </div>
 	            </details>
-	            <details data-feature-image="assets/web/dataset-omni-1.png" data-feature-alt="MobileMem-Omni framework overview showing real-user participation, multimodal interaction, and multi-source content." data-caption-zh="这些基准形成了评估移动经验中结构化知识合成、组织和检索的综合框架。" data-caption-en="Together, these benchmarks provide a comprehensive framework for assessing how effectively memory systems synthesize, organize, and retrieve structured knowledge from raw mobile experiences.">
+	            <details>
 	              <summary>
 	                <span class="step-number">05</span>
 	                <span class="feature-summary-copy">
@@ -4618,7 +7548,7 @@
         </div>
         <div class="application-layout" data-application-showcase>
           <div class="application-accordion">
-            <details class="application-item" open data-application-image="assets/web/application-cinematic.png" data-application-alt="Cinematic OPPO-style mobile memory ecosystem with phone, assistant, and connected memory modules." data-application-caption-en="Ecosystem" data-application-caption-zh="生态系统" data-application-kicker-en="Applications · 01" data-application-kicker-zh="应用场景 · 01">
+            <details class="application-item" open data-application-uid="uid0" data-application-type="group_chat">
               <summary>
                 <span class="application-index">01</span>
                 <span class="application-summary-copy">
@@ -4638,7 +7568,7 @@
                 <p data-lang="en">MobileMem is designed as a unified benchmark for evaluating long-term memory in mobile AI assistants rather than a standalone memory system. Its modular architecture seamlessly integrates with the existing mobile agent ecosystem, including task understanding, memory retrieval, question answering, web search, response safety, and execution modules. Consequently, MobileMem supports reproducible comparison across different memory architectures and facilitates the integration of long-term memory evaluation into real-world development pipelines.</p>
               </div>
             </details>
-            <details class="application-item" data-application-image="assets/web/features/multimodal-trajectories.png" data-application-alt="Multiple native mobile applications and memory sources forming a unified smartphone memory stream." data-application-caption-en="Standardization" data-application-caption-zh="标准化" data-application-kicker-en="Applications · 02" data-application-kicker-zh="应用场景 · 02">
+            <details class="application-item" data-application-uid="uid0" data-application-type="book">
               <summary>
                 <span class="application-index">02</span>
                 <span class="application-summary-copy">
@@ -4658,7 +7588,7 @@
                 <p data-lang="en">A key characteristic of MobileMem is that it is constructed from authentic smartphone memory rather than synthetic interaction logs or manually curated user profiles. The benchmark unifies foundational memory, cognitive memory, preference memory, temporal reasoning, and visual reasoning within a single evaluation framework, while grounding assessment in approximately one year of real user activities. MobileMem is built upon heterogeneous memory sources generated by native mobile applications, including calendars, albums, notes, documents, to-do lists, bills, voice memos, screen memories, video memories, and other user-generated records.</p>
               </div>
             </details>
-            <details class="application-item" data-application-image="assets/web/xiaobu-functional-cabin-white.png" data-application-alt="Xiaobu assistant inside a functional on-device memory cabin with visible memory zones and reasoning displays." data-application-caption-en="On-Device Intelligence" data-application-caption-zh="端侧智能" data-application-kicker-en="Applications · 03" data-application-kicker-zh="应用场景 · 03">
+            <details class="application-item" data-application-uid="uid0" data-application-type="money">
               <summary>
                 <span class="application-index">03</span>
                 <span class="application-summary-copy">
@@ -4678,7 +7608,7 @@
                 <p data-lang="en">MobileMem shifts long-term memory evaluation from qualitative capability demonstrations to measurable, comparable, and continuously improvable assessment. The benchmark provides comprehensive metrics for retrieval accuracy, temporal consistency, preference understanding, multimodal reasoning, and long-horizon knowledge integration, enabling objective comparison among different memory architectures and retrieval strategies. As foundation models increasingly migrate from cloud services to edge devices, MobileMem offers an effective framework for evaluating reliable, efficient, and privacy-aware memory systems that continuously evolve through long-term user interactions.</p>
               </div>
             </details>
-            <details class="application-item" data-application-image="assets/web/daughter-case-replacement.png" data-application-alt="A horizontal personal memory case with a phone dialogue and birthday memory reasoning." data-application-caption-en="User Memory Value" data-application-caption-zh="用户记忆价值" data-application-kicker-en="Applications · 04" data-application-kicker-zh="应用场景 · 04">
+            <details class="application-item" data-application-uid="uid1" data-application-type="event">
               <summary>
                 <span class="application-index">04</span>
                 <span class="application-summary-copy">
@@ -4698,7 +7628,7 @@
                 <p data-lang="en">At its core, MobileMem treats long-term multimodal user memory as the fundamental unit of personalization. Unlike conventional question answering benchmarks that primarily evaluate isolated factual recall, MobileMem evaluates whether AI assistants can continuously accumulate, retrieve, integrate, and reason over evolving user memories across extended temporal horizons. By modeling authentic user trajectories, multilingual interactions, dynamic preferences, and real-world events, the benchmark encourages the development of AI assistants capable of delivering context-aware, proactive, and continuously adaptive assistance.</p>
               </div>
             </details>
-            <details class="application-item" data-application-image="assets/web/application-scenarios-v2.png" data-application-alt="OPPO native memory ecosystem with a central phone, assistant, and structured memories from everyday smartphone usage." data-application-caption-en="OPPO Application Scenarios" data-application-caption-zh="OPPO 应用场景" data-application-kicker-en="Applications · 05" data-application-kicker-zh="应用场景 · 05">
+            <details class="application-item" data-application-uid="uid1" data-application-type="video">
               <summary>
                 <span class="application-index">05</span>
                 <span class="application-summary-copy">
@@ -4721,16 +7651,350 @@
               </div>
             </details>
           </div>
-          <figure class="application-visual">
-            <div class="application-image-shell">
-              <img id="application-visual-image" src="assets/web/application-cinematic.png" alt="Cinematic OPPO-style mobile memory ecosystem with phone, assistant, and connected memory modules.">
+          <figure class="application-phone-visual" data-application-step="detail" aria-live="polite" tabindex="0">
+            <header class="application-browser-head">
+              <span class="application-browser-title">
+                <strong>
+                  <span data-lang="zh">可交互移动记忆索引</span>
+                  <span data-lang="en">Interactive memory index</span>
+                </strong>
+              </span>
+                <span class="application-browser-actions">
+                  <span class="application-uid-switch" aria-label="Switch memory owner">
+                    <span class="application-uid-group" data-lang="zh">
+                      <button class="is-active" type="button" data-application-phone-uid="uid0" aria-label="中文用户 A" aria-pressed="true"><img src="assets/web/memweb/uid0-person-01.png" alt=""></button>
+                      <button type="button" data-application-phone-uid="uid1" aria-label="中文用户 B" aria-pressed="false"><img src="assets/web/memweb/uid1-person-01.png" alt=""></button>
+                      <button type="button" data-application-phone-uid="uid2" aria-label="中文用户 C" aria-pressed="false"><img src="assets/web/memweb/curated/uid2-person-01.png" alt=""></button>
+                    </span>
+                    <span class="application-uid-group" data-lang="en">
+                      <button type="button" data-application-phone-uid="uid10" aria-label="English profile A" aria-pressed="false"><img src="assets/web/memweb/uid10-person-01.png" alt=""></button>
+                      <button type="button" data-application-phone-uid="uid11" aria-label="English profile B" aria-pressed="false"><img src="assets/web/memweb/curated/uid11-person-01.png" alt=""></button>
+                      <button type="button" data-application-phone-uid="uid12" aria-label="English profile C" aria-pressed="false"><img src="assets/web/memweb/curated/uid12-person-01.png" alt=""></button>
+                    </span>
+                  </span>
+              </span>
+            </header>
+
+            <nav class="application-path" aria-label="Memory browser path">
+              <div class="application-path-main">
+                <button class="application-back" type="button" data-application-back hidden>
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m12.5 4.5-5 5.5 5 5.5"></path></svg>
+                  <span data-application-back-label>返回用户</span>
+                </button>
+                <div class="application-breadcrumb">
+                  <button class="application-crumb is-current" type="button" data-application-home>
+                    <span data-lang="zh">用户档案</span><span data-lang="en">Users</span>
+                  </button>
+                  <span class="application-crumb-separator" data-application-path-user-separator hidden>/</span>
+                  <button class="application-crumb" type="button" data-application-path-user hidden>UID 0</button>
+                  <span class="application-crumb-separator" data-application-path-type-separator hidden>/</span>
+                  <span class="application-crumb is-current" data-application-path-type hidden>群聊</span>
+                </div>
+              </div>
+              <div class="application-step-track" aria-hidden="true">
+                <span class="application-step-dots"><i></i><i></i><i></i></span>
+                <span data-application-step-label>01 / 03 · 用户</span>
+              </div>
+            </nav>
+
+            <section class="application-browser-view application-entry-view" data-application-view="users" aria-labelledby="application-users-title" hidden>
+              <div class="application-entry-head">
+                <span class="application-entry-eyebrow">
+                  <span data-lang="zh">第一步 · 选择记忆主体</span>
+                  <span data-lang="en">Step one · Choose a memory owner</span>
+                </span>
+                <h3 id="application-users-title">
+                  <span data-lang="zh">先进入一位用户的记忆档案</span>
+                  <span data-lang="en">Enter a user's memory archive</span>
+                </h3>
+                <p>
+                  <span data-lang="zh">每位用户拥有独立的跨应用图片记录。选择用户后，再按图片类型继续浏览。</span>
+                  <span data-lang="en">Each user has an independent cross-app image archive. Choose one, then browse by image type.</span>
+                </p>
+              </div>
+
+              <div class="application-user-grid">
+                <button class="application-user-card is-active" type="button" data-application-enter-uid="uid0">
+                  <span class="application-user-head">
+                    <span class="application-user-identity">
+                      <strong>UID 0</strong>
+                      <small>memory owner / 01</small>
+                    </span>
+                    <span class="application-user-count">
+                      <strong>1,263</strong>
+                      <small><span data-lang="zh">图片</span><span data-lang="en">images</span></small>
+                    </span>
+                  </span>
+                  <span class="application-user-mosaic" aria-hidden="true">
+                    <img src="assets/web/memweb/uid0-group_chat-01.png" alt="" decoding="async">
+                    <img src="assets/web/memweb/uid0-event-01.png" alt="" loading="lazy" decoding="async">
+                    <img src="assets/web/memweb/uid0-book-01.png" alt="" loading="lazy" decoding="async">
+                  </span>
+                  <span class="application-user-footer">
+                    <span class="application-user-footer-copy">
+                      <strong><span data-lang="zh">打开 UID 0</span><span data-lang="en">Open UID 0</span></strong>
+                      <small><span data-lang="zh">查看 12 类记忆图片</span><span data-lang="en">Browse 12 memory types</span></small>
+                    </span>
+                    <span class="application-entry-arrow" aria-hidden="true">
+                      <svg viewBox="0 0 20 20"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg>
+                    </span>
+                  </span>
+                </button>
+
+                <button class="application-user-card" type="button" data-application-enter-uid="uid1">
+                  <span class="application-user-head">
+                    <span class="application-user-identity">
+                      <strong>UID 1</strong>
+                      <small>memory owner / 02</small>
+                    </span>
+                    <span class="application-user-count">
+                      <strong>1,360</strong>
+                      <small><span data-lang="zh">图片</span><span data-lang="en">images</span></small>
+                    </span>
+                  </span>
+                  <span class="application-user-mosaic" aria-hidden="true">
+                    <img src="assets/web/memweb/uid1-group_chat-01.png" alt="" decoding="async">
+                    <img src="assets/web/memweb/uid1-event-01.png" alt="" loading="lazy" decoding="async">
+                    <img src="assets/web/memweb/uid1-video-01.png" alt="" loading="lazy" decoding="async">
+                  </span>
+                  <span class="application-user-footer">
+                    <span class="application-user-footer-copy">
+                      <strong><span data-lang="zh">打开 UID 1</span><span data-lang="en">Open UID 1</span></strong>
+                      <small><span data-lang="zh">查看 12 类记忆图片</span><span data-lang="en">Browse 12 memory types</span></small>
+                    </span>
+                    <span class="application-entry-arrow" aria-hidden="true">
+                      <svg viewBox="0 0 20 20"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg>
+                    </span>
+                  </span>
+                </button>
+              </div>
+            </section>
+
+            <section class="application-browser-view application-types-view" data-application-view="types" aria-labelledby="application-types-title" hidden>
+              <div class="application-entry-head">
+                <div>
+                  <span class="application-entry-eyebrow">
+                    <span data-lang="zh">第二步 · 选择图片类型</span>
+                    <span data-lang="en">Step two · Choose an image type</span>
+                  </span>
+                  <h3 id="application-types-title">
+                    <span data-lang="zh">UID 0 的记忆目录</span>
+                    <span data-lang="en">UID 0 memory directory</span>
+                  </h3>
+                </div>
+                <span class="application-types-total">
+                  <strong data-application-user-total>1,263</strong>
+                  <small><span data-lang="zh">全部图片</span><span data-lang="en">all images</span></small>
+                </span>
+              </div>
+
+              <div class="application-type-list" role="list" aria-label="Image categories">
+                <button class="application-type-card is-active" type="button" data-application-enter-type="group_chat" role="listitem">
+                  <span class="application-type-preview"><img src="assets/web/memweb/uid0-group_chat-01.png" alt="" data-application-type-preview loading="lazy"><span>01</span></span>
+                  <span class="application-type-copy"><strong><span data-lang="zh">群聊</span><span data-lang="en">Group chat</span></strong><small><span data-lang="zh">对话参与者、消息与跨会话线索</span><span data-lang="en">Participants, messages, and cross-session cues</span></small></span>
+                  <span class="application-type-count" data-application-type-count>834</span>
+                  <span class="application-type-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg></span>
+                </button>
+                <button class="application-type-card" type="button" data-application-enter-type="event" role="listitem">
+                  <span class="application-type-preview"><img src="assets/web/memweb/uid0-event-01.png" alt="" data-application-type-preview loading="lazy"><span>02</span></span>
+                  <span class="application-type-copy"><strong><span data-lang="zh">事件</span><span data-lang="en">Events</span></strong><small><span data-lang="zh">具体时间、地点与生活经历</span><span data-lang="en">Times, places, and lived experiences</span></small></span>
+                  <span class="application-type-count" data-application-type-count>208</span>
+                  <span class="application-type-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg></span>
+                </button>
+                <button class="application-type-card" type="button" data-application-enter-type="person" role="listitem">
+                  <span class="application-type-preview"><img src="assets/web/memweb/uid0-person-01.png" alt="" data-application-type-preview loading="lazy"><span>03</span></span>
+                  <span class="application-type-copy"><strong><span data-lang="zh">人物</span><span data-lang="en">Person</span></strong><small><span data-lang="zh">长期交互中的身份参考</span><span data-lang="en">Identity references across interactions</span></small></span>
+                  <span class="application-type-count" data-application-type-count>1</span>
+                  <span class="application-type-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg></span>
+                </button>
+                <button class="application-type-card" type="button" data-application-enter-type="scenery" role="listitem">
+                  <span class="application-type-preview"><img src="assets/web/memweb/uid0-scenery-01.png" alt="" data-application-type-preview loading="lazy"><span>04</span></span>
+                  <span class="application-type-copy"><strong><span data-lang="zh">场景</span><span data-lang="en">Scenes</span></strong><small><span data-lang="zh">室内、食物与日常环境</span><span data-lang="en">Indoor, food, and everyday contexts</span></small></span>
+                  <span class="application-type-count" data-application-type-count>18</span>
+                  <span class="application-type-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg></span>
+                </button>
+                <button class="application-type-card" type="button" data-application-enter-type="book" role="listitem">
+                  <span class="application-type-preview"><img src="assets/web/memweb/uid0-book-01.png" alt="" data-application-type-preview loading="lazy"><span>05</span></span>
+                  <span class="application-type-copy"><strong><span data-lang="zh">阅读</span><span data-lang="en">Books</span></strong><small><span data-lang="zh">书目、进度与长期兴趣</span><span data-lang="en">Titles, progress, and long-term interests</span></small></span>
+                  <span class="application-type-count" data-application-type-count>30</span>
+                  <span class="application-type-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg></span>
+                </button>
+                <button class="application-type-card" type="button" data-application-enter-type="music" role="listitem">
+                  <span class="application-type-preview"><img src="assets/web/memweb/uid0-music-01.png" alt="" data-application-type-preview loading="lazy"><span>06</span></span>
+                  <span class="application-type-copy"><strong><span data-lang="zh">音乐</span><span data-lang="en">Music</span></strong><small><span data-lang="zh">播放记录、歌单与情绪偏好</span><span data-lang="en">Playback, playlists, and preferences</span></small></span>
+                  <span class="application-type-count" data-application-type-count>30</span>
+                  <span class="application-type-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg></span>
+                </button>
+                <button class="application-type-card" type="button" data-application-enter-type="shopping" role="listitem">
+                  <span class="application-type-preview"><img src="assets/web/memweb/uid0-shopping-01.png" alt="" data-application-type-preview loading="lazy"><span>07</span></span>
+                  <span class="application-type-copy"><strong><span data-lang="zh">购物</span><span data-lang="en">Shopping</span></strong><small><span data-lang="zh">商品、价格、订单与购买选择</span><span data-lang="en">Products, prices, orders, and choices</span></small></span>
+                  <span class="application-type-count" data-application-type-count>30</span>
+                  <span class="application-type-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg></span>
+                </button>
+                <button class="application-type-card" type="button" data-application-enter-type="money" role="listitem">
+                  <span class="application-type-preview"><img src="assets/web/memweb/uid0-money-01.png" alt="" data-application-type-preview loading="lazy"><span>08</span></span>
+                  <span class="application-type-copy"><strong><span data-lang="zh">账单</span><span data-lang="en">Bills</span></strong><small><span data-lang="zh">金额、商户、支付状态与时间</span><span data-lang="en">Amounts, merchants, status, and time</span></small></span>
+                  <span class="application-type-count" data-application-type-count>21</span>
+                  <span class="application-type-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg></span>
+                </button>
+                <button class="application-type-card" type="button" data-application-enter-type="ticket" role="listitem">
+                  <span class="application-type-preview"><img src="assets/web/memweb/uid0-ticket-01.png" alt="" data-application-type-preview loading="lazy"><span>09</span></span>
+                  <span class="application-type-copy"><strong><span data-lang="zh">票务</span><span data-lang="en">Tickets</span></strong><small><span data-lang="zh">出行、活动与预约行程</span><span data-lang="en">Travel, events, and reservations</span></small></span>
+                  <span class="application-type-count" data-application-type-count>25</span>
+                  <span class="application-type-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg></span>
+                </button>
+                <button class="application-type-card" type="button" data-application-enter-type="video" role="listitem">
+                  <span class="application-type-preview"><img src="assets/web/memweb/uid0-video-01.png" alt="" data-application-type-preview loading="lazy"><span>10</span></span>
+                  <span class="application-type-copy"><strong><span data-lang="zh">视频</span><span data-lang="en">Video</span></strong><small><span data-lang="zh">标题、封面、互动与观看语境</span><span data-lang="en">Titles, covers, activity, and context</span></small></span>
+                  <span class="application-type-count" data-application-type-count>30</span>
+                  <span class="application-type-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg></span>
+                </button>
+                <button class="application-type-card" type="button" data-application-enter-type="friend" role="listitem">
+                  <span class="application-type-preview"><img src="assets/web/memweb/uid0-friend-01.png" alt="" data-application-type-preview loading="lazy"><span>11</span></span>
+                  <span class="application-type-copy"><strong><span data-lang="zh">好友</span><span data-lang="en">Friends</span></strong><small><span data-lang="zh">好友身份与关系线索</span><span data-lang="en">Friend identities and relationship cues</span></small></span>
+                  <span class="application-type-count" data-application-type-count>20</span>
+                  <span class="application-type-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg></span>
+                </button>
+                <button class="application-type-card" type="button" data-application-enter-type="group_chat_members" role="listitem">
+                  <span class="application-type-preview"><img src="assets/web/memweb/uid0-group_chat_members-01.png" alt="" data-application-type-preview loading="lazy"><span>12</span></span>
+                  <span class="application-type-copy"><strong><span data-lang="zh">群成员</span><span data-lang="en">Members</span></strong><small><span data-lang="zh">群聊角色与视觉身份对应</span><span data-lang="en">Roles connected to visual identities</span></small></span>
+                  <span class="application-type-count" data-application-type-count>16</span>
+                  <span class="application-type-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg></span>
+                </button>
+              </div>
+            </section>
+
+            <section class="application-browser-view application-detail-view" data-application-view="detail" aria-label="Selected image detail">
+              <div class="application-stage">
+              <div class="application-phone-wrap">
+                <button class="application-phone-direction" type="button" data-application-direction="previous" data-application-phone-direction aria-label="Previous image" hidden>
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m12.5 4.5-5 5.5 5 5.5"></path></svg>
+                </button>
+
+                <div class="application-phone" data-application-phone-mode="home">
+                  <div class="application-phone-desktop" data-application-phone-desktop>
+                    <div class="application-phone-status"><strong>9:41</strong><span>MobileMem</span></div>
+                    <button class="application-phone-ai-entry" type="button" data-application-phone-ai>
+                      <span class="application-ai-portal-avatar" aria-hidden="true"><img src="assets/web/memweb/uid0-person-01.png" alt="" data-application-ai-user-avatar></span>
+                      <span class="application-ai-portal-copy">
+                        <strong><span data-lang="zh">AI 对话</span><span data-lang="en">AI dialogue</span></strong>
+                        <svg class="application-ai-portal-thread" viewBox="0 0 120 17" preserveAspectRatio="none" aria-hidden="true">
+                          <path d="M2 11 C24 11 28 3 49 3 S78 15 118 7"></path>
+                          <circle cx="2" cy="11" r="2.5"></circle>
+                          <circle cx="49" cy="3" r="2.5"></circle>
+                          <circle cx="82" cy="13" r="2.5"></circle>
+                          <circle cx="118" cy="7" r="2.5"></circle>
+                        </svg>
+                      </span>
+                      <span class="application-ai-portal-orbit" aria-hidden="true"></span>
+                    </button>
+                    <div class="application-phone-apps">
+                      <section class="application-memory-cluster">
+                        <strong class="application-memory-cluster-title"><span data-lang="zh">人际</span><span data-lang="en">People</span></strong>
+                        <div class="application-memory-mosaic">
+                          <button type="button" data-application-phone-type="group_chat"><span><img src="assets/web/memweb/uid0-group_chat-01.png" alt=""></span><b data-lang="zh">聊天</b><b data-lang="en">Chat</b></button>
+                          <button type="button" data-application-phone-type="friend"><span><img src="assets/web/memweb/uid0-friend-01.png" alt=""></span><b data-lang="zh">动态</b><b data-lang="en">Posts</b></button>
+                          <button type="button" data-application-phone-type="group_chat_members"><span><img src="assets/web/memweb/uid0-group_chat_members-01.png" alt=""></span><b data-lang="zh">群成员</b><b data-lang="en">Members</b></button>
+                        </div>
+                      </section>
+                      <section class="application-memory-cluster">
+                        <strong class="application-memory-cluster-title"><span data-lang="zh">消费</span><span data-lang="en">Life</span></strong>
+                        <div class="application-memory-mosaic">
+                          <button type="button" data-application-phone-type="shopping"><span><img src="assets/web/memweb/uid0-shopping-01.png" alt=""></span><b data-lang="zh">购物</b><b data-lang="en">Shopping</b></button>
+                          <button type="button" data-application-phone-type="money"><span><img src="assets/web/memweb/uid0-money-01.png" alt=""></span><b data-lang="zh">账单</b><b data-lang="en">Bills</b></button>
+                          <button type="button" data-application-phone-type="ticket"><span><img src="assets/web/memweb/uid0-ticket-01.png" alt=""></span><b data-lang="zh">票务</b><b data-lang="en">Tickets</b></button>
+                        </div>
+                      </section>
+                      <section class="application-memory-cluster">
+                        <strong class="application-memory-cluster-title"><span data-lang="zh">内容</span><span data-lang="en">Media</span></strong>
+                        <div class="application-memory-mosaic">
+                          <button type="button" data-application-phone-type="music"><span><img src="assets/web/memweb/uid0-music-01.png" alt=""></span><b data-lang="zh">音乐</b><b data-lang="en">Music</b></button>
+                          <button type="button" data-application-phone-type="video"><span><img src="assets/web/memweb/uid0-video-01.png" alt=""></span><b data-lang="zh">视频</b><b data-lang="en">Video</b></button>
+                          <button type="button" data-application-phone-type="book"><span><img src="assets/web/memweb/uid0-book-01.png" alt=""></span><b data-lang="zh">阅读</b><b data-lang="en">Books</b></button>
+                        </div>
+                      </section>
+                      <section class="application-memory-cluster">
+                        <strong class="application-memory-cluster-title"><span data-lang="zh">现实</span><span data-lang="en">World</span></strong>
+                        <div class="application-memory-mosaic">
+                          <button type="button" data-application-phone-type="person"><span><img src="assets/web/memweb/uid0-person-01.png" alt=""></span><b data-lang="zh">人物</b><b data-lang="en">Person</b></button>
+                          <button type="button" data-application-phone-type="event"><span><img src="assets/web/memweb/uid0-event-01.png" alt=""></span><b data-lang="zh">事件</b><b data-lang="en">Events</b></button>
+                          <button type="button" data-application-phone-type="scenery"><span><img src="assets/web/memweb/uid0-scenery-01.png" alt=""></span><b data-lang="zh">场景</b><b data-lang="en">Scenes</b></button>
+                        </div>
+                      </section>
+                    </div>
+                  </div>
+                  <section class="application-ai-dialogue" data-application-ai-dialogue hidden aria-label="User and AI dialogue trajectory">
+                    <header>
+                      <img src="assets/web/xiaobu-avatar.png" alt="">
+                      <strong><span data-lang="zh">小布记忆回放</span><span data-lang="en">Xiaobu memory replay</span></strong>
+                      <span class="application-ai-turn-total" data-application-ai-turn-total>72 轮</span>
+                    </header>
+                    <div class="application-ai-session-tabs" data-application-ai-session-tabs aria-label="Choose a dialogue session"></div>
+                    <div class="application-ai-session">
+                      <time data-application-ai-session-time>JAN 01 · 08:30</time>
+                      <strong data-application-ai-session-title>元旦早晨的年度规划与朋友圈记录</strong>
+                    </div>
+                    <div class="application-ai-dialogue-stream" data-application-ai-dialogue-stream></div>
+                  </section>
+                  <div class="application-phone-recents" data-application-phone-recents hidden>
+                    <span class="application-phone-recents-title">
+                      <span data-lang="zh">最近任务</span><span data-lang="en">Recent tasks</span>
+                    </span>
+                    <button type="button" data-application-recents-open>
+                      <img data-application-recents-image src="assets/web/memweb/uid0-group_chat-01.png" alt="">
+                      <span><strong>MobileMem</strong></span>
+                    </button>
+                  </div>
+                  <span class="application-phone-record-count" id="application-phone-position" data-application-phone-count hidden>01 / 02</span>
+                  <span class="application-phone-caption" data-application-phone-caption hidden>
+                    <strong data-application-phone-caption-title></strong>
+                  </span>
+                  <button class="application-phone-screen" type="button" data-application-open aria-label="Open original screenshot" hidden>
+                    <img id="application-visual-image" src="assets/web/memweb/uid0-group_chat-01.png" alt="MemWeb group chat screenshot from uid0." decoding="async">
+                  </button>
+                  <nav class="application-phone-system-nav" aria-label="ColorOS system navigation">
+                    <button type="button" data-application-system-action="back" aria-label="Back">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12 17 5.5v13Z"></path></svg>
+                    </button>
+                    <button type="button" data-application-system-action="home" aria-label="Home">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.5"></circle></svg>
+                    </button>
+                    <button type="button" data-application-system-action="recents" aria-label="Recent tasks">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect></svg>
+                    </button>
+                  </nav>
+                </div>
+
+                <button class="application-phone-direction" type="button" data-application-direction="next" data-application-phone-direction aria-label="Next image" hidden>
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg>
+                </button>
+              </div>
             </div>
-            <figcaption class="application-visual-caption">
-              <strong id="application-visual-caption">Ecosystem</strong>
-              <span id="application-visual-kicker">Applications · 01</span>
-            </figcaption>
+            </section>
           </figure>
         </div>
+
+        <dialog class="application-lightbox" id="application-lightbox" aria-labelledby="application-lightbox-title">
+          <div class="application-lightbox-inner">
+            <div class="application-lightbox-media">
+              <button class="application-lightbox-close" type="button" data-application-close aria-label="Close screenshot">×</button>
+              <button class="application-lightbox-direction" type="button" data-application-direction="previous" aria-label="Previous application">
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m12.5 4.5-5 5.5 5 5.5"></path></svg>
+              </button>
+              <img class="application-lightbox-image" id="application-lightbox-image" src="assets/web/memweb/uid0-group_chat-01.png" alt="MemWeb group chat screenshot from uid0.">
+              <button class="application-lightbox-direction" type="button" data-application-direction="next" aria-label="Next application">
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7.5 4.5 5 5.5-5 5.5"></path></svg>
+              </button>
+            </div>
+            <div class="application-lightbox-meta">
+              <span class="application-lightbox-copy">
+                <strong id="application-lightbox-title">Group chat records</strong>
+                <small id="application-lightbox-record">uid0 / group_chat / 01</small>
+              </span>
+              <span class="application-lightbox-count" id="application-lightbox-count">01 / 02</span>
+            </div>
+          </div>
+        </dialog>
       </div>
     </section>
 
@@ -4824,6 +8088,8 @@
 	  </dialog>
 	  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
 	  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js"></script>
+	  <script src="assets/web/memweb/trajectories.js"></script>
+	  <script src="assets/web/memweb/trajectories-extra.js"></script>
 	  <script>
 	    if (["http:", "https:"].includes(window.location.protocol)) {
 	      const busuanziScript = document.createElement("script");
@@ -5477,41 +8743,6 @@
     });
 
 	    const featureDetails = Array.from(document.querySelectorAll(".feature-accordion details"));
-	    const featureImage = document.getElementById("feature-visual-image");
-	    const featureCaptionZh = document.getElementById("feature-caption-zh");
-	    const featureCaptionEn = document.getElementById("feature-caption-en");
-	    let featureImageTimer;
-
-	    const syncFeatureVisual = (details, animate = true) => {
-	      if (!details) return;
-
-	      const nextImage = details.dataset.featureImage;
-	      const nextAlt = details.dataset.featureAlt || "";
-	      const nextCaptionZh = details.dataset.captionZh || "";
-	      const nextCaptionEn = details.dataset.captionEn || "";
-
-	      if (featureCaptionZh) featureCaptionZh.textContent = nextCaptionZh;
-	      if (featureCaptionEn) featureCaptionEn.textContent = nextCaptionEn;
-	      if (!featureImage || !nextImage) return;
-
-	      if (featureImage.getAttribute("src") === nextImage) {
-	        featureImage.alt = nextAlt;
-	        return;
-	      }
-
-	      window.clearTimeout(featureImageTimer);
-	      if (animate) featureImage.classList.add("is-swapping");
-
-	      const finishSwap = () => {
-	        featureImage.classList.remove("is-swapping");
-	        featureImage.removeEventListener("load", finishSwap);
-	      };
-
-	      featureImage.addEventListener("load", finishSwap);
-	      featureImage.src = nextImage;
-	      featureImage.alt = nextAlt;
-	      featureImageTimer = window.setTimeout(finishSwap, 520);
-	    };
 
 	    featureDetails.forEach((details) => {
 	      const summary = details.querySelector("summary");
@@ -5524,143 +8755,1050 @@
 	        featureDetails.forEach((item) => {
 	          item.open = item === details;
 	        });
-	        syncFeatureVisual(details);
 	      });
 	    });
 
-	    syncFeatureVisual(featureDetails.find((details) => details.open) || featureDetails[0], false);
+    const applicationCategoryOrder = [
+      "group_chat",
+      "event",
+      "person",
+      "scenery",
+      "book",
+      "music",
+      "shopping",
+      "money",
+      "ticket",
+      "video",
+      "friend",
+      "group_chat_members",
+    ];
 
-		    const applicationShowcase = document.querySelector("[data-application-showcase]");
-		    const applicationItems = Array.from(document.querySelectorAll(".application-item"));
-		    const applicationImage = document.getElementById("application-visual-image");
-			    const applicationCaption = document.getElementById("application-visual-caption");
-			    const applicationKicker = document.getElementById("application-visual-kicker");
-			    const applicationVisual = applicationShowcase?.querySelector(".application-visual");
-			    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-			    const mobileApplicationQuery = window.matchMedia("(max-width: 700px)");
-			    let applicationImageTimer;
-			    let applicationLang = document.body.classList.contains("lang-zh") ? "zh" : "en";
+    const applicationTypeCopy = {
+      group_chat: {
+        zh: "群聊",
+        en: "Group chat",
+        title: { zh: "群聊记录", en: "Group chat records" },
+        description: {
+          zh: "群聊截图保留参与者、消息内容与跨会话线索。",
+          en: "Conversation screenshots preserve participants, messages, and cross-session context.",
+        },
+      },
+      event: {
+        zh: "事件",
+        en: "Events",
+        title: { zh: "事件场景", en: "Event scenes" },
+        description: {
+          zh: "事件场景图把人物经历锚定在具体时间、地点和环境中。",
+          en: "Event scenes ground personal experiences in concrete times, places, and environments.",
+        },
+      },
+      person: {
+        zh: "人物",
+        en: "Person",
+        title: { zh: "人物参考", en: "Persona reference" },
+        description: {
+          zh: "人物参考照用于在长期、多轮交互中保持角色身份一致。",
+          en: "Persona references keep character identity consistent across long-running interactions.",
+        },
+      },
+      scenery: {
+        zh: "场景",
+        en: "Scenes",
+        title: { zh: "生活场景", en: "Life scenes" },
+        description: {
+          zh: "食物、室内与日常生活图片补充移动记忆的环境上下文。",
+          en: "Food, indoor, and everyday images add environmental context to mobile memory.",
+        },
+      },
+      book: {
+        zh: "阅读",
+        en: "Books",
+        title: { zh: "阅读记录", en: "Book records" },
+        description: {
+          zh: "阅读平台截图记录书名、阅读进度与长期兴趣。",
+          en: "Reading-platform screenshots preserve titles, progress, and long-term interests.",
+        },
+      },
+      music: {
+        zh: "音乐",
+        en: "Music",
+        title: { zh: "音乐记录", en: "Music records" },
+        description: {
+          zh: "音乐应用记录播放内容、歌单以及与事件关联的情绪偏好。",
+          en: "Music-app records connect playback, playlists, events, and emotional preferences.",
+        },
+      },
+      shopping: {
+        zh: "购物",
+        en: "Shopping",
+        title: { zh: "购物记录", en: "Shopping records" },
+        description: {
+          zh: "购物截图保留商品、价格、订单状态与购买选择。",
+          en: "Shopping screenshots preserve products, prices, order status, and purchase choices.",
+        },
+      },
+      money: {
+        zh: "账单",
+        en: "Bills",
+        title: { zh: "账单记录", en: "Payment records" },
+        description: {
+          zh: "账单与支付截图保留金额、商户、状态和时间信息。",
+          en: "Bills and payment screenshots preserve amounts, merchants, status, and time.",
+        },
+      },
+      ticket: {
+        zh: "票务",
+        en: "Tickets",
+        title: { zh: "票务记录", en: "Ticket records" },
+        description: {
+          zh: "电子票据把出行、活动和预约记忆锚定到具体行程。",
+          en: "Digital tickets anchor travel, events, and reservations to concrete journeys.",
+        },
+      },
+      video: {
+        zh: "视频",
+        en: "Video",
+        title: { zh: "视频记录", en: "Video records" },
+        description: {
+          zh: "视频平台截图承载标题、封面、互动信息与观看语境。",
+          en: "Video-platform screenshots carry titles, covers, interactions, and viewing context.",
+        },
+      },
+      friend: {
+        zh: "动态",
+        en: "Posts",
+        title: { zh: "朋友圈记录", en: "Social posts" },
+        description: {
+          zh: "朋友圈与社交动态保留文字、配图、时间和互动语境。",
+          en: "Social posts preserve text, imagery, timing, and interaction context.",
+        },
+      },
+      group_chat_members: {
+        zh: "群成员",
+        en: "Members",
+        title: { zh: "群成员头像", en: "Group member portraits" },
+        description: {
+          zh: "群成员头像把群聊中的名字、角色与视觉身份对应起来。",
+          en: "Member portraits connect names and roles in group chats with visual identities.",
+        },
+      },
+    };
 
-			    const syncApplicationVisual = (details, animate = true) => {
-			      if (!details) return;
+    const applicationCategoryCounts = {
+      uid0: {
+        group_chat: 834, event: 208, person: 5, scenery: 18, book: 30, music: 30,
+        shopping: 30, money: 21, ticket: 20, video: 30, friend: 20, group_chat_members: 16,
+      },
+      uid1: {
+        group_chat: 917, event: 229, person: 5, scenery: 18, book: 30, music: 30,
+        shopping: 30, money: 20, ticket: 22, video: 28, friend: 20, group_chat_members: 15,
+      },
+      uid2: {
+        group_chat: 967, event: 234, person: 5, scenery: 18, book: 30, music: 30,
+        shopping: 30, money: 20, ticket: 19, video: 29, friend: 20, group_chat_members: 15,
+      },
+      uid10: {
+        group_chat: 789, event: 215, person: 5, scenery: 18, book: 30, music: 30,
+        shopping: 30, money: 20, ticket: 22, video: 30, friend: 20, group_chat_members: 15,
+      },
+      uid11: {
+        group_chat: 760, event: 221, person: 5, scenery: 18, book: 30, music: 30,
+        shopping: 30, money: 20, ticket: 20, video: 30, friend: 20, group_chat_members: 15,
+      },
+      uid12: {
+        group_chat: 806, event: 202, person: 5, scenery: 18, book: 30, music: 30,
+        shopping: 30, money: 20, ticket: 17, video: 30, friend: 20, group_chat_members: 15,
+      },
+    };
 
-			      const nextImage = details.dataset.applicationImage;
-			      const nextAlt = details.dataset.applicationAlt || "";
-			      const nextCaption = details.dataset[`applicationCaption${applicationLang === "zh" ? "Zh" : "En"}`] || details.dataset.applicationCaptionEn || "";
-			      const nextKicker = details.dataset[`applicationKicker${applicationLang === "zh" ? "Zh" : "En"}`] || details.dataset.applicationKickerEn || "";
+    const applicationCuratedTypes = new Set([
+      "group_chat", "event", "book", "music", "shopping", "money", "ticket", "video", "friend",
+    ]);
+    const applicationFullyCuratedUids = new Set(["uid2", "uid12"]);
 
-		      if (applicationCaption) applicationCaption.textContent = nextCaption;
-		      if (applicationKicker) applicationKicker.textContent = nextKicker;
-		      if (!applicationImage || !nextImage) return;
+    const applicationAssetPath = (uid, type, sampleNumber = 1) => {
+      const hasPortraitOverride = uid === "uid11" && ["person", "group_chat_members"].includes(type);
+      const useCurated = applicationCuratedTypes.has(type) || applicationFullyCuratedUids.has(uid) || hasPortraitOverride;
+      const directory = useCurated ? "assets/web/memweb/curated" : "assets/web/memweb";
+      return `${directory}/${uid}-${type}-${String(sampleNumber).padStart(2, "0")}.png`;
+    };
 
-		      if (applicationImage.getAttribute("src") === nextImage) {
-		        applicationImage.alt = nextAlt;
-		        return;
-		      }
+    const applicationRecords = ["uid0", "uid1", "uid2", "uid10", "uid11", "uid12"].flatMap((uid) => applicationCategoryOrder.flatMap((type) => {
+      const previewCount = 5;
+      const copy = applicationTypeCopy[type];
+      return Array.from({ length: previewCount }, (_, sampleIndex) => {
+        const sampleNumber = sampleIndex + 1;
+        const file = `${uid}-${type}-${String(sampleNumber).padStart(2, "0")}.png`;
+        return {
+          uid,
+          type,
+          file,
+          sampleNumber,
+          previewCount,
+          total: applicationCategoryCounts[uid][type],
+          src: applicationAssetPath(uid, type, sampleNumber),
+          source: { zh: "MemWeb", en: "MemWeb" },
+          title: copy.title,
+          event: copy.description,
+        };
+      });
+    }));
 
-		      window.clearTimeout(applicationImageTimer);
-		      applicationImage.alt = nextAlt;
+    const applicationShowcase = document.querySelector("[data-application-showcase]");
+    const applicationItems = Array.from(document.querySelectorAll(".application-item"));
+    const applicationViews = Array.from(document.querySelectorAll("[data-application-view]"));
+    const applicationUserButtons = Array.from(document.querySelectorAll("[data-application-enter-uid]"));
+    const applicationTypeButtons = Array.from(document.querySelectorAll("[data-application-enter-type]"));
+    const applicationBack = document.querySelector("[data-application-back]");
+    const applicationBackLabel = document.querySelector("[data-application-back-label]");
+    const applicationHome = document.querySelector("[data-application-home]");
+    const applicationPathUser = document.querySelector("[data-application-path-user]");
+    const applicationPathType = document.querySelector("[data-application-path-type]");
+    const applicationPathUserSeparator = document.querySelector("[data-application-path-user-separator]");
+    const applicationPathTypeSeparator = document.querySelector("[data-application-path-type-separator]");
+    const applicationStepLabel = document.querySelector("[data-application-step-label]");
+    const applicationTypesTitle = document.getElementById("application-types-title");
+    const applicationUserTotal = document.querySelector("[data-application-user-total]");
+    const applicationThumbs = document.querySelector("[data-application-thumbs]");
+    const applicationImage = document.getElementById("application-visual-image");
+    const applicationCaption = document.getElementById("application-visual-caption");
+    const applicationKicker = document.getElementById("application-visual-kicker");
+    const applicationPosition = document.getElementById("application-phone-position");
+    const applicationRecordGlobal = document.getElementById("application-record-global");
+    const applicationRecordKicker = document.getElementById("application-record-kicker");
+    const applicationRecordTitle = document.getElementById("application-record-title");
+    const applicationRecordEvent = document.getElementById("application-record-event");
+    const applicationRecordSource = document.getElementById("application-record-source");
+    const applicationRecordId = document.getElementById("application-record-id");
+    const applicationRecordEventId = document.getElementById("application-record-event-id");
+    const applicationRecordFields = document.getElementById("application-record-fields");
+    const applicationVisual = applicationShowcase?.querySelector(".application-phone-visual");
+    const applicationPhone = document.querySelector(".application-phone");
+    const applicationPhoneDesktop = document.querySelector("[data-application-phone-desktop]");
+    const applicationAiDialogue = document.querySelector("[data-application-ai-dialogue]");
+    const applicationAiEntry = document.querySelector("[data-application-phone-ai]");
+    const applicationPhoneRecents = document.querySelector("[data-application-phone-recents]");
+    const applicationRecentsImage = document.querySelector("[data-application-recents-image]");
+    const applicationRecentsLabel = document.querySelector("[data-application-recents-label]");
+    const applicationRecentsOpen = document.querySelector("[data-application-recents-open]");
+    const applicationSystemButtons = Array.from(document.querySelectorAll("[data-application-system-action]"));
+    const applicationPhoneCount = document.querySelector("[data-application-phone-count]");
+    const applicationPhoneCaption = document.querySelector("[data-application-phone-caption]");
+    const applicationPhoneCaptionTitle = document.querySelector("[data-application-phone-caption-title]");
+    const applicationPhoneDirectionButtons = Array.from(document.querySelectorAll("[data-application-phone-direction]"));
+    const applicationPhoneUidButtons = Array.from(document.querySelectorAll("[data-application-phone-uid]"));
+    const applicationAiUserAvatar = document.querySelector("[data-application-ai-user-avatar]");
+    const applicationPhoneTotal = document.querySelector("[data-application-phone-total]");
+    const applicationPhoneApps = Array.from(document.querySelectorAll("[data-application-phone-type]"));
+    const applicationOpen = document.querySelector("[data-application-open]");
+    const applicationDirectionButtons = Array.from(document.querySelectorAll("[data-application-direction]"));
+    const applicationLightbox = document.getElementById("application-lightbox");
+    const applicationLightboxImage = document.getElementById("application-lightbox-image");
+    const applicationLightboxTitle = document.getElementById("application-lightbox-title");
+    const applicationLightboxRecord = document.getElementById("application-lightbox-record");
+    const applicationLightboxCount = document.getElementById("application-lightbox-count");
+    const applicationClose = document.querySelector("[data-application-close]");
+    const applicationLightboxMedia = document.querySelector(".application-lightbox-media");
+    const applicationMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const applicationAiStream = document.querySelector("[data-application-ai-dialogue-stream]");
+    const applicationAiSessionTime = document.querySelector("[data-application-ai-session-time]");
+    const applicationAiSessionTitle = document.querySelector("[data-application-ai-session-title]");
+    const applicationAiTurnTotal = document.querySelector("[data-application-ai-turn-total]");
+    const applicationAiSessionTabs = document.querySelector("[data-application-ai-session-tabs]");
 
-		      if (!animate || !window.gsap || motionQuery.matches) {
-		        applicationImage.src = nextImage;
-		        return;
-		      }
+    // Authentic session samples from the public zjunlp/MobileMem Hugging Face dataset.
+    // Each item is [role, text, optional local image category].
+    const applicationDialogueSamples = window.applicationTrajectoryData || {
+      uid0: {
+        date: "JAN 01 · 08:30",
+        title: "元旦早晨的年度规划与朋友圈记录",
+        messages: [
+          ["user", `我先把我的头像发给你看一下，后面这些经历都围绕我来整理。`],
+          ["user", "", "person"],
+          ["assistant", `看到了，我会把这张头像作为你的主角身份参考，后面再把具体事情和你对应起来。`],
+          ["user", `我想把今天早上元旦做年度规划这件事整理一下，顺便看看我这次写得会不会太保守。`],
+          ["assistant", `可以，我帮你复盘成一条清晰的时间线。你今天早上是和蔡雪宁一起在家，边喝淡茶边开始写新一年的规划，对吗？`],
+          ["user", `对，就是在家，不是去外面。我们两个人坐着慢慢写，我还是习惯拿本子记。`],
+          ["assistant", `明白了。那这次规划应该还是按你一贯的风格，先把大方向列出来，再细分到每个季度？`],
+          ["user", `对，我一直比较习惯这么做。去年也是差不多的方法，不过今年写得更细一点。`],
+          ["assistant", `你今年是重点围绕婚礼、购车和理财来安排的吧？`],
+          ["user", `不对，购车不是重点，这次主要是婚礼、差旅和理财。差旅我也想提前规划好，工作上别到时候太被动。`],
+          ["assistant", `收到，我修正一下：婚礼、差旅和理财才是这次的核心。这样其实很符合你现在的阶段，先把成家和工作安排都稳住。`],
+          ["user", `嗯，尤其是今年要正式成家，我写的时候心里其实有点紧张。`],
+          ["assistant", `这种紧张很正常，但也说明你开始把很多事情想得更长远了。你当时有没有觉得，责任感比以前更强了？`],
+          ["user", `有，确实是这样。以前更多是想把工作和生活过稳，今年会更明显地想，不能只顾眼前。`],
+          ["assistant", `所以你把目标写得更细，不只是为了“完成任务”，而是想让计划真的能落地。`],
+          ["user", `对，我不太喜欢写那种很空的目标。最好能按季度分开，这样我知道每个阶段该干什么。`],
+          ["assistant", `这个思路很好。像你这样的规划方式，反而更容易坚持，而且不容易因为一开始定太大而半路放弃。`],
+          ["user", `我也担心这个。总觉得我是不是定得太稳了，少了一点突破。`],
+          ["assistant", `其实“稳”和“突破”不冲突。你这种年份里，更适合在稳定框架里加一个或两个提升点，比如把理财做得更系统，或者把工作上的差旅安排提前优化。`],
+          ["user", `嗯，我就是想听听这种建议。不是一下子大改，而是在原来基础上往前走一点。`],
+          ["assistant", `那你今天早上写的时候，除了纸面上的目标，还有没有顺手做些记录，比如把优先级也排一下？`],
+          ["user", `有，我把几件事都按顺序写了。婚礼放在最前面，差旅和理财也都列了细项。`],
+          ["assistant", `很清楚了。这样一来，你的新年目标就不是泛泛而谈，而是能直接执行的版本。`],
+          ["user", `我后来还发了条朋友圈，想把这个元旦早晨的状态记录下来，也看看大家会怎么反馈。`],
+          ["assistant", `这一步也挺像你平时的风格，先记录，再根据反馈微调。你发朋友圈时主要是想留个纪念，还是也想借大家的意见帮你优化一下？`],
+          ["user", `两者都有吧。纪念肯定是有的，但我也确实想看看别人会不会觉得我太保守。`],
+          ["assistant", `我觉得你不是保守，而是比较务实。你可以把今年目标拆成三层：必须完成的、争取完成的、额外加分的，这样既稳又有一点弹性。`],
+          ["user", `这个方法不错，听起来就不会把自己卡得太死。`],
+          ["assistant", `对，而且你是体制内工作，又马上进入成家的阶段，最重要的是节奏稳定、预期清晰。你去年是不是也有类似的年度规划习惯？`],
+          ["user", `有，基本每年元旦都会写，只是今年比往年更认真一点。`],
+          ["assistant", `那今年最大的变化，就是你把“我自己”的规划，慢慢变成“我们一起”的规划了。`],
+          ["user", `对，这个感觉很明显。虽然有点压力，但也挺踏实的。`],
+          ["assistant", `如果你愿意，我可以帮你把这次的年度规划整理成一个更适合保存的版本，比如按季度拆成婚礼、工作差旅、理财三栏，再补一栏“个人提升”。`],
+          ["user", `可以，你先帮我梳理成一个简洁版。`],
+          ["assistant", `没问题。我先给你总结成一句：2025年元旦早晨，你和蔡雪宁在家喝着淡茶，按季度认真写下围绕婚礼、差旅和理财的新年计划，同时也在思考如何在稳妥里保留一点进步空间。`],
+          ["user", `我把当时发朋友圈那条的截图也发你，你帮我看看和这个总结是不是一致。`],
+          ["user", "", "event"],
+          ["assistant", `可以，我看一下。这样的话，你那条朋友圈和这次整理出来的主线是对得上的，重点还是在记录元旦早晨的年度规划和你的心态变化。`],
+          ["user", `对，我就是想留住这个节点。毕竟今年开始，很多事都不是只为自己考虑了。`],
+          ["assistant", `这句话很重要，也很适合放进你的年度目标里。它能把“责任感”落到实际行动上，而不是停留在感受上。`],
+          ["user", `那你觉得我还要不要再加一点突破性的目标？我怕写得太稳，后面没动力。`],
+          ["assistant", `可以加，但建议加得轻一点，比如一个和工作能力相关的提升项，或者一个持续性的生活习惯目标，不要一下子拉太高。`],
+          ["user", `明白了，就是在稳的基础上留一个可以往上走的口子。`],
+          ["assistant", `对，这样最适合你。你要是愿意，我下一步可以直接帮你把今天这份规划整理成适合发给自己留档的正式文本。`],
+          ["user", `行，那你帮我整理吧。`],
+          ["user", `我把当时的读书页面也发你看一下。`],
+          ["user", "", "book"],
+          ["assistant", `收到，这张阅读应用截图里能看到高效能人士的七个习惯详情页，后面整理时我会和前面的内容对上。`],
+          ["user", `我把那条朋友圈截图也发你看一下。`],
+          ["user", "", "friend"],
+          ["assistant", `看到了，这张图补充了朋友圈新年规划配图，我会连着前面的经过一起理解。`],
+          ["user", `这段群聊一共4页，我一次都发给你，你看完再帮我整理。`],
+          ["user", "", "group_chat"],
+          ["user", "", "group_chat_alt"],
+          ["user", "", "group_chat"],
+          ["user", "", "group_chat_alt"],
+          ["assistant", `看完了，这4页群聊里能看到微信群讨论新年年度计划；微信群聊婚礼与工作规划，我会把它们作为同一段对话来整理。`],
+          ["user", `这是蒋立新的头像，我也发给你，方便后面对应这个人。`],
+          ["user", "", "member"],
+          ["assistant", `看到了，后面提到蒋立新时，我会把这张头像和相关对话对应起来。`],
+          ["user", `这是蔡雪宁的头像，我也发给你，方便后面对应这个人。`],
+          ["user", "", "member_alt"],
+          ["assistant", `看到了，后面提到蔡雪宁时，我会把这张头像和相关对话对应起来。`],
+          ["user", `这是郝志强的头像，我也发给你，方便后面对应这个人。`],
+          ["user", "", "member"],
+          ["assistant", `看到了，后面提到郝志强时，我会把这张头像和相关对话对应起来。`],
+          ["user", `我把那笔收支记录页面也发你看一下。`],
+          ["user", "", "money"],
+          ["assistant", `看到了，这张图补充了88元转账已收款详情，我会连着前面的经过一起理解。`],
+          ["user", `我把当时刷到的那个视频页面也发你看一下。`],
+          ["user", "", "video"],
+          ["assistant", `收到，这张视频应用截图里能看到年度规划手账模板视频，后面整理时我会和前面的内容对上。`],
+        ],
+      },
+      uid1: {
+        date: "JAN 01 · 10:00",
+        title: "New Year's Day solo reflection and ordering takeout",
+        messages: [
+          ["user", `I will send my profile photo first, so the later experiences can stay tied to me as the main person.`],
+          ["user", "", "person"],
+          ["assistant", `Got it. I will use this profile photo as the identity reference for you and connect the later events back to you.`],
+          ["user", `I woke up pretty early today and just sat there for a while thinking about the year ahead. It felt hopeful, but also kind of anxious.`],
+          ["assistant", `That sounds like a very New Year’s Day kind of mood. Do you want to unpack what was driving the hope and what was making you anxious?`],
+          ["user", `Mostly work stuff. Last year at the startup was intense with all the product pivots, and I was thinking about how much of my energy went into just keeping up.`],
+          ["assistant", `So the pivots left you feeling like you were always reacting instead of steering. Did you journal about that, or was it more of a mental pass?`],
+          ["user", `I journaled about it. I wanted to be honest that I’ve got a competitive drive, but I don’t want to let that turn into just grinding harder without taking care of myself.`],
+          ["assistant", `That’s a good distinction. It sounds like you’re trying to keep the ambition, but not let it swallow everything else. Did you write anything concrete about health or mentoring?`],
+          ["user", `Yeah. I wrote that I want to be healthier this year and also be a better mentor on the team. I’ve been thinking that being useful at work shouldn’t just mean working longer hours.`],
+          ["assistant", `That’s a solid reset. Maybe this year is less about proving you can go fast and more about building a pace you can actually sustain. Did that journaling leave you feeling clearer, or still mixed?`],
+          ["user", `A bit clearer, but still mixed. By late morning I got lazy about cooking, so I decided to order from the taqueria I usually like instead.`],
+          ["assistant", `That makes sense. On a day like today, an easy local burrito feels a lot better than forcing a whole cooking project. I assume you went with your usual kind of order?`],
+          ["user", `Pretty much, yes. I just wanted something familiar and satisfying, not a bunch of effort. I was definitely not in the mood for anything fancy.`],
+          ["assistant", `Got it. While you were waiting, did you end up just zoning out, or did you do something with the time?`],
+          ["user", `I scrolled through tech blogs. That’s kind of my default when I want something practical and work-related, especially when I’m in that reflective headspace.`],
+          ["assistant", `That fits your style pretty well. It’s funny how on holidays some people want a complete break, and others still reach for something familiar and useful. Were you reading anything specific, like startup stuff or more general engineering articles?`],
+          ["user", `Mostly engineering and product-related pieces. I wasn’t trying to escape work completely, just trying to think through whether I should make the new year about bigger career goals or about life outside work.`],
+          ["assistant", `That’s the real question, isn’t it. Let me check I’ve got the sequence right: you woke up anxious but hopeful, then spent time journaling, then ordered tacos from the taqueria, and while waiting you read startup newsletters.`],
+          ["user", `Not tacos. I ordered a burrito, and it was tech blogs, not startup newsletters. The rest is right.`],
+          ["assistant", `Thanks for correcting that. So it was a burrito and tech blogs, which actually sounds even more in line with your usual routine. Want to turn that vague career-versus-life-outside-work tension into a couple of concrete goals?`],
+          ["user", `Yeah, I do. I keep thinking I need something ambitious enough to matter, but not so broad that it turns into another year of just reacting to whatever the startup needs.`],
+          ["assistant", `That’s a useful framing. One path is to define one career goal, one health goal, and one relationship or mentoring goal, so none of them gets completely crowded out. Would that feel too rigid, or actually helpful?`],
+          ["user", `Helpful, I think. I like goals when they’re specific enough to act on. I just don’t want them to turn into a giant list that makes me feel behind before January even gets going.`],
+          ["assistant", `That makes total sense. You probably want something like a few anchors, not a giant scoreboard. For health, is the main thing consistency, sleep, workouts, or food?`],
+          ["user", `Consistency. If I’m being honest, I’m better when I keep a steady routine instead of trying to make huge changes all at once. Same thing with mentoring, actually.`],
+          ["assistant", `That’s a good insight. Small repeatable habits will probably fit you better than an extreme reset. It also sounds like this year you’re trying to be more intentional than you were during last year’s chaos.`],
+          ["user", `Exactly. Last year felt like one long sprint. This year I want to keep growing, but I don’t want to look back and realize I ignored everything outside work.`],
+          ["assistant", `That’s a very grounded New Year’s intention. If you want, I can help you turn this into a simple plan with three bullets: work, health, and balance, plus a short weekly check-in.`],
+          ["user", `Yeah, that would help. I don’t need some huge resolution list. I mostly need a way to keep the year from drifting.`],
+          ["assistant", `Then the plan can stay lightweight: one career objective tied to impact at the startup, one health habit you can actually keep, and one mentoring or personal-life habit that protects balance. That way you can revisit it without it feeling like homework.`],
+          ["user", `That sounds right. Honestly, just talking it through makes the morning feel less vague.`],
+          ["assistant", `Good. If you want, I can draft those three goals for you next in a really plain format so you can save them and come back later this month.`],
+          ["user", `Please do. And maybe keep it practical, not inspirational-poster practical.`],
+          ["assistant", `Deal. Practical it is: measurable, short, and not too polished. Also, once your burrito arrives, that probably makes for a much better New Year’s lunch than trying to force something elaborate.`],
+          ["user", `I also sent over the scene photo from that moment.`],
+          ["user", "", "event"],
+          ["assistant", `Got it. I will connect this scene with the earlier context.`],
+          ["user", `This chat thread has 4 pages. I will send all of them together, and you can respond after seeing the full set.`],
+          ["user", "", "group_chat"],
+          ["user", "", "group_chat_alt"],
+          ["user", "", "group_chat"],
+          ["user", "", "group_chat_alt"],
+          ["assistant", `Got it. I will treat these four pages as one continuous conversation.`],
+          ["user", `This is Liam O'Brien's avatar. I am sending it too so we can match this person later.`],
+          ["user", "", "member"],
+          ["assistant", `Got it. When Liam O'Brien comes up later, I will connect this avatar with the related conversation.`],
+          ["user", `I also sent that music page.`],
+          ["user", "", "music"],
+          ["assistant", `Got it. I will read this music record together with the earlier experience.`],
+          ["user", `I also sent that shopping page.`],
+          ["user", "", "shopping"],
+          ["assistant", `Understood. This shopping record helps anchor that part of the trajectory.`],
+          ["user", `I also sent that ticket or itinerary page.`],
+          ["user", "", "ticket"],
+          ["assistant", `Got it. I will connect this itinerary record with the rest of the session.`],
+        ],
+      },
+    };
 
-		      gsap.killTweensOf(applicationImage);
-		      gsap.to(applicationImage, {
-		        autoAlpha: 0,
-		        y: 12,
-		        scale: 0.985,
-		        duration: 0.18,
-		        ease: "power2.out",
-		        onComplete: () => {
-		          applicationImage.src = nextImage;
-		          gsap.fromTo(
-		            applicationImage,
-		            { autoAlpha: 0, y: 14, scale: 0.985 },
-		            { autoAlpha: 1, y: 0, scale: 1, duration: 0.38, ease: "power3.out" }
-		          );
-		        },
-		      });
+    let applicationImageTimer = 0;
+    let applicationLang = document.body.classList.contains("lang-zh") ? "zh" : "en";
+    let applicationView = "detail";
+    let activeApplicationUid = "uid0";
+    let activeApplicationType = "group_chat";
+    let activeApplicationIndex = 0;
+    let activeApplicationSessionIndex = 0;
+    let visibleApplicationIndices = [];
+    let applicationSwipeStartX = 0;
+    let applicationSwipeStartY = 0;
+    let applicationSwipeLockUntil = 0;
 
-		      applicationImageTimer = window.setTimeout(() => {
-		        applicationImage.src = nextImage;
-		      }, 260);
-		    };
+    const applicationValue = (record, key) => record?.[key]?.[applicationLang] || record?.[key]?.en || "";
 
-		    applicationItems.forEach((details) => {
-		      const summary = details.querySelector("summary");
-		      if (!summary) return;
+    const applicationIdentityLabels = {
+      uid0: {
+        person: ["王景川", "蒋立新", "蔡雪宁", "郝志强", "穆长安"],
+        group_chat_members: ["蒋立新", "蔡雪宁", "郝志强", "穆长安", "敖晨露"],
+      },
+      uid1: {
+        person: ["李曼青", "穆佳悦", "赵可欣", "郝小乐", "靳若楠"],
+        group_chat_members: ["穆佳悦", "赵可欣", "郝小乐", "靳若楠", "李建东"],
+      },
+      uid2: {
+        person: ["赵雨棠", "梅晓彤", "甘晨曦", "郝心怡", "蒋立恒"],
+        group_chat_members: ["梅晓彤", "甘晨曦", "郝心怡", "蒋立恒", "赵慧敏"],
+      },
+      uid10: {
+        person: ["Michael Carter", "Liam O’Brien", "Alex Rivera", "Rachel Stein", "Jason Miller"],
+        group_chat_members: ["Liam O’Brien", "Alex Rivera", "Rachel Stein", "Jason Miller", "Kevin Lee"],
+      },
+      uid11: {
+        person: ["Emily Rose Carter", "Madison Clark", "Michael Carter", "Noah Baker", "Rebecca Carter"],
+        group_chat_members: ["Madison Clark", "Michael Carter", "Noah Baker", "Rebecca Carter", "Sophie Carter"],
+      },
+      uid12: {
+        person: ["Melissa Ann Carter", "Erica Morales", "Justin Ward", "Tara Mitchell", "Sandra Lopez"],
+        group_chat_members: ["Erica Morales", "Justin Ward", "Tara Mitchell", "Sandra Lopez", "Paula Jenkins"],
+      },
+    };
 
-		      summary.addEventListener("click", (event) => {
-		        event.preventDefault();
-		        if (details.open) return;
+    const applicationEventLabels = {
+      uid0: ["元旦年度规划", "婚礼方向长谈", "单位工作计划定稿", "春节前商场采购", "春节前加班餐"],
+      uid1: ["元旦跑单目标", "给家人报平安", "夜间饺子外卖", "冬季车辆安全检查", "春节前在家囤干粮"],
+      uid2: ["宿舍制定新年规划", "元旦宿舍小聚", "图书馆碰头", "课程与见习安排", "每日时间块设计"],
+      uid10: ["New Year reflection", "Q1 roadmap lunch", "ML course research", "Cramped apartment", "ML course discussion"],
+      uid11: ["New Year goals", "Semester stress dinner", "Club workload", "Soccer conditioning", "MLK Day volunteering"],
+      uid12: ["Quiet New Year shift", "Realistic New Year goals", "Rural burnout book", "Comfort Tex-Mex", "Car maintenance"],
+    };
 
-		        applicationItems.forEach((item) => {
-		          item.open = item === details;
-		        });
-		        syncApplicationVisual(details);
+    const applicationAnnotationLabel = (record) => {
+      if (!record) return "";
+      const position = Math.max(0, record.sampleNumber - 1);
+      if (record.type === "event") return applicationEventLabels[record.uid]?.[position] || "";
+      if (record.type === "person" || record.type === "group_chat_members") {
+        return applicationIdentityLabels[record.uid]?.[record.type]?.[position] || "";
+      }
+      return "";
+    };
 
-		        if (window.gsap && !motionQuery.matches) {
-		          gsap.fromTo(details, { y: 10 }, { y: 0, duration: 0.3, ease: "power3.out" });
-		        }
+    const applicationRecordLabel = (record) => (
+      `${record.uid} / ${record.type} / ${String(record.sampleNumber).padStart(2, "0")}`
+    );
 
-		        if (mobileApplicationQuery.matches) {
-		          window.setTimeout(() => {
-		            const navOffset = document.querySelector(".site-nav")?.offsetHeight || 0;
-		            const focusGap = Math.min(112, Math.max(84, window.innerHeight * 0.13));
-		            const targetTop = window.scrollY + details.getBoundingClientRect().top - navOffset - focusGap;
-		            window.scrollTo({
-		              top: Math.max(0, targetTop),
-		              behavior: motionQuery.matches ? "auto" : "smooth",
-		            });
-		          }, 80);
-		        } else {
-		          window.setTimeout(() => {
-		            requestAnimationFrame(() => {
-		              const bottomOverflow = details.getBoundingClientRect().bottom - (window.innerHeight - 42);
-		              if (bottomOverflow <= 0) return;
-		              window.scrollBy({
-		                top: bottomOverflow,
-		                behavior: "auto",
-		              });
-		            });
-		          }, 140);
-		        }
-		      });
-		    });
+    const getVisibleApplicationIndices = () => applicationRecords
+      .map((record, index) => ({ record, index }))
+      .filter(({ record }) => record.uid === activeApplicationUid && record.type === activeApplicationType)
+      .map(({ index }) => index);
 
-			    syncApplicationVisual(applicationItems.find((details) => details.open) || applicationItems[0], false);
+    const applicationUidLabel = (uid) => `UID ${uid.replace("uid", "")}`;
 
-			    const setApplicationLanguage = (lang) => {
-			      applicationLang = lang === "zh" ? "zh" : "en";
-			      syncApplicationVisual(applicationItems.find((details) => details.open) || applicationItems[0], false);
-			    };
+    const applicationDialogueImageSources = (uid) => ({
+      person: applicationAssetPath(uid, "person"),
+      event: applicationAssetPath(uid, "event"),
+      book: applicationAssetPath(uid, "book"),
+      friend: applicationAssetPath(uid, "friend"),
+      group_chat: applicationAssetPath(uid, "group_chat"),
+      group_chat_alt: applicationAssetPath(uid, "group_chat", 2),
+      member: applicationAssetPath(uid, "group_chat_members"),
+      member_alt: applicationAssetPath(uid, "group_chat_members", 2),
+      money: applicationAssetPath(uid, "money"),
+      video: applicationAssetPath(uid, "video"),
+      music: applicationAssetPath(uid, "music"),
+      shopping: applicationAssetPath(uid, "shopping"),
+      ticket: applicationAssetPath(uid, "ticket"),
+    });
 
-			    const initApplicationMotion = () => {
-		      if (!applicationShowcase || !window.gsap || !window.ScrollTrigger) return;
+    const renderApplicationDialogue = () => {
+      const source = applicationDialogueSamples[activeApplicationUid] || applicationDialogueSamples.uid0;
+      const sessions = Array.isArray(source) ? source : [source];
+      if (!sessions.length || !applicationAiStream) return;
 
-		      gsap.registerPlugin(ScrollTrigger);
-		      const mm = gsap.matchMedia();
+      activeApplicationSessionIndex = Math.min(activeApplicationSessionIndex, sessions.length - 1);
+      const sample = sessions[activeApplicationSessionIndex];
 
-		      mm.add("(prefers-reduced-motion: no-preference)", () => {
-		        gsap.set(applicationItems, { autoAlpha: 0, y: 18 });
-		        gsap.set(applicationVisual, { autoAlpha: 0, y: 28, scale: 0.985 });
+      if (applicationAiSessionTabs) {
+        const tabs = document.createDocumentFragment();
+        sessions.slice(0, 5).forEach((session, index) => {
+          const button = document.createElement("button");
+          const active = index === activeApplicationSessionIndex;
+          button.type = "button";
+          button.className = active ? "is-active" : "";
+          button.textContent = String(index + 1).padStart(2, "0");
+          button.setAttribute("aria-label", `${index + 1}: ${session.title}`);
+          button.setAttribute("aria-pressed", String(active));
+          button.addEventListener("click", () => {
+            activeApplicationSessionIndex = index;
+            renderApplicationDialogue();
+          });
+          tabs.append(button);
+        });
+        applicationAiSessionTabs.replaceChildren(tabs);
+      }
 
-		        gsap.timeline({
-		          scrollTrigger: {
-		            trigger: applicationShowcase,
-		            start: "top 74%",
-		            once: true,
-		          },
-		          defaults: { ease: "power3.out" },
-		        })
-		          .to(applicationVisual, { autoAlpha: 1, y: 0, scale: 1, duration: 0.72 }, 0)
-		          .to(applicationItems, { autoAlpha: 1, y: 0, duration: 0.46, stagger: 0.055 }, 0.12);
-		      });
-		    };
+      if (applicationAiSessionTime) applicationAiSessionTime.textContent = sample.date;
+      if (applicationAiSessionTitle) applicationAiSessionTitle.textContent = sample.title;
+      if (applicationAiTurnTotal) {
+        applicationAiTurnTotal.textContent = applicationLang === "zh"
+          ? `${sample.messages.length} 轮`
+          : `${sample.messages.length} turns`;
+      }
 
-		    window.addEventListener("load", initApplicationMotion, { once: true });
+      const imageSources = applicationDialogueImageSources(activeApplicationUid);
+      const fragment = document.createDocumentFragment();
+
+      sample.messages.forEach(([role, content, imageType], index) => {
+        const article = document.createElement("article");
+        article.className = role === "user" ? "is-user" : "is-ai";
+        article.dataset.turn = String(index + 1).padStart(2, "0");
+
+        if (imageType) {
+          const imageBubble = document.createElement("div");
+          imageBubble.className = "application-ai-image-bubble";
+          const image = document.createElement("img");
+          const localAsset = imageType.match(
+            /^assets\/web\/memweb\/(?:curated\/)?(uid\d+)-(.+)-(\d{2})\.png$/
+          );
+          image.src = localAsset
+            ? applicationAssetPath(localAsset[1], localAsset[2], Number(localAsset[3]))
+            : imageType.startsWith("assets/")
+              ? imageType
+              : (imageSources[imageType] || imageSources.event);
+          image.alt = applicationLang === "zh" ? "该轮发送的数据集图片" : "Dataset image sent in this turn";
+          image.loading = "lazy";
+          imageBubble.append(image);
+          article.append(imageBubble);
+        } else {
+          const bubble = document.createElement("p");
+          bubble.textContent = content;
+          article.append(bubble);
+        }
+
+        fragment.append(article);
+      });
+
+      applicationAiStream.replaceChildren(fragment);
+      applicationAiStream.scrollTop = 0;
+    };
+
+    const syncApplicationPath = () => {
+      const atUsers = applicationView === "users";
+      const atTypes = applicationView === "types";
+      const atDetail = applicationView === "detail";
+      const uidLabel = applicationUidLabel(activeApplicationUid);
+      const typeLabel = applicationTypeCopy[activeApplicationType]?.[applicationLang] || activeApplicationType;
+
+      if (applicationVisual) applicationVisual.dataset.applicationStep = applicationView;
+      if (applicationBack) applicationBack.hidden = atUsers;
+      if (applicationPathUserSeparator) applicationPathUserSeparator.hidden = atUsers;
+      if (applicationPathUser) {
+        applicationPathUser.hidden = atUsers;
+        applicationPathUser.textContent = uidLabel;
+        applicationPathUser.classList.toggle("is-current", atTypes);
+      }
+      if (applicationPathTypeSeparator) applicationPathTypeSeparator.hidden = !atDetail;
+      if (applicationPathType) {
+        applicationPathType.hidden = !atDetail;
+        applicationPathType.textContent = typeLabel;
+      }
+      if (applicationHome) applicationHome.classList.toggle("is-current", atUsers);
+      if (applicationBackLabel) {
+        applicationBackLabel.textContent = applicationLang === "zh"
+          ? (atDetail ? "返回类型" : "返回用户")
+          : (atDetail ? "Back to types" : "Back to users");
+      }
+      if (applicationStepLabel) {
+        const stepCopy = {
+          users: applicationLang === "zh" ? "01 / 03 · 用户" : "01 / 03 · Users",
+          types: applicationLang === "zh" ? "02 / 03 · 类型" : "02 / 03 · Types",
+          detail: applicationLang === "zh" ? "03 / 03 · 图片" : "03 / 03 · Image",
+        };
+        applicationStepLabel.textContent = stepCopy[applicationView];
+      }
+    };
+
+    const setApplicationView = (nextView, { focus = false } = {}) => {
+      if (!["users", "types", "detail"].includes(nextView)) return;
+      nextView = "detail";
+      applicationView = "detail";
+      applicationViews.forEach((view) => {
+        view.hidden = view.dataset.applicationView !== nextView;
+      });
+      syncApplicationPath();
+
+      if (!focus || !applicationVisual) return;
+      applicationVisual.focus({ preventScroll: true });
+    };
+
+    const setApplicationPhoneMode = (mode) => {
+      const atHome = mode === "home";
+      const atRecord = mode === "record";
+      const atRecents = mode === "recents";
+      const atDialogue = mode === "dialogue";
+      if (applicationPhone) {
+        applicationPhone.dataset.applicationPhoneMode = atHome
+          ? "home"
+          : atRecents
+            ? "recents"
+            : atDialogue
+              ? "dialogue"
+              : "record";
+      }
+      if (applicationPhoneDesktop) applicationPhoneDesktop.hidden = !atHome;
+      if (applicationAiDialogue) applicationAiDialogue.hidden = !atDialogue;
+      if (applicationPhoneRecents) applicationPhoneRecents.hidden = !atRecents;
+      if (applicationPhoneCount) applicationPhoneCount.hidden = !atRecord;
+      const annotationLabel = atRecord ? applicationAnnotationLabel(applicationRecords[activeApplicationIndex]) : "";
+      if (applicationPhoneCaptionTitle) applicationPhoneCaptionTitle.textContent = annotationLabel;
+      if (applicationPhoneCaption) applicationPhoneCaption.hidden = !annotationLabel;
+      applicationPhoneDirectionButtons.forEach((button) => {
+        button.hidden = !atRecord;
+      });
+      if (applicationOpen) applicationOpen.hidden = !atRecord;
+      if (applicationPathType && applicationView === "detail") {
+        applicationPathType.textContent = atHome
+          ? (applicationLang === "zh" ? "记忆桌面" : "Memory home")
+          : atRecents
+            ? (applicationLang === "zh" ? "最近任务" : "Recent tasks")
+            : atDialogue
+              ? (applicationLang === "zh" ? "用户–AI 轨迹" : "User–AI trajectory")
+              : (applicationTypeCopy[activeApplicationType]?.[applicationLang] || activeApplicationType);
+      }
+    };
+
+    const syncApplicationDirectory = () => {
+      const counts = applicationCategoryCounts[activeApplicationUid] || {};
+      const uidLabel = applicationUidLabel(activeApplicationUid);
+      const userTotal = Object.values(counts).reduce((sum, count) => sum + count, 0);
+
+      applicationUserButtons.forEach((button) => {
+        const active = button.dataset.applicationEnterUid === activeApplicationUid;
+        button.classList.toggle("is-active", active);
+        if (active) button.setAttribute("aria-current", "true");
+        else button.removeAttribute("aria-current");
+      });
+
+      applicationTypeButtons.forEach((button) => {
+        const type = button.dataset.applicationEnterType;
+        const active = type === activeApplicationType;
+        const count = button.querySelector("[data-application-type-count]");
+        const preview = button.querySelector("[data-application-type-preview]");
+        const wallPreview = button.matches(".application-dataset-tile") ? button.querySelector(":scope > img") : null;
+
+        button.classList.toggle("is-active", active);
+        if (active) button.setAttribute("aria-current", "true");
+        else button.removeAttribute("aria-current");
+        if (count) count.textContent = String(counts[type] || 0);
+        if (preview) {
+          preview.src = applicationAssetPath(activeApplicationUid, type);
+          preview.alt = "";
+        }
+        if (wallPreview) {
+          wallPreview.src = applicationAssetPath(activeApplicationUid, type);
+          wallPreview.alt = "";
+        }
+      });
+
+      applicationPhoneApps.forEach((button) => {
+        const type = button.dataset.applicationPhoneType;
+        const preview = button.querySelector("img");
+        if (preview) {
+          preview.src = applicationAssetPath(activeApplicationUid, type);
+          preview.alt = "";
+        }
+      });
+
+      if (applicationAiUserAvatar) {
+        applicationAiUserAvatar.src = applicationAssetPath(activeApplicationUid, "person");
+      }
+
+      applicationPhoneUidButtons.forEach((button) => {
+        const active = button.dataset.applicationPhoneUid === activeApplicationUid;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+
+      if (applicationTypesTitle) {
+        applicationTypesTitle.textContent = applicationLang === "zh"
+          ? `${uidLabel} 的记忆目录`
+          : `${uidLabel} memory directory`;
+      }
+      if (applicationUserTotal) applicationUserTotal.textContent = userTotal.toLocaleString("en-US");
+      if (applicationPhoneTotal) applicationPhoneTotal.textContent = userTotal.toLocaleString("en-US");
+      syncApplicationPath();
+    };
+
+    const renderApplicationThumbs = () => {
+      if (!applicationThumbs) return;
+      applicationThumbs.innerHTML = visibleApplicationIndices.map((recordIndex) => {
+        const record = applicationRecords[recordIndex];
+        const active = recordIndex === activeApplicationIndex;
+        return `
+          <button class="application-thumb${active ? " is-active" : ""}" type="button"
+            data-application-record-index="${recordIndex}" aria-pressed="${active}">
+            <img src="${record.src}" alt="" loading="lazy" decoding="async">
+            <span class="application-thumb-copy">
+              <strong>${applicationValue(record, "title")} · ${String(record.sampleNumber).padStart(2, "0")}</strong>
+              <small>${record.uid} / ${record.type}</small>
+            </span>
+          </button>`;
+      }).join("");
+    };
+
+    const syncApplicationVisual = (recordIndex, animate = true) => {
+      const record = applicationRecords[recordIndex];
+      if (!record) return;
+
+      activeApplicationIndex = recordIndex;
+      activeApplicationUid = record.uid;
+      activeApplicationType = record.type;
+      visibleApplicationIndices = getVisibleApplicationIndices();
+
+      const position = Math.max(0, visibleApplicationIndices.indexOf(recordIndex));
+      const count = `${String(position + 1).padStart(2, "0")} / ${String(visibleApplicationIndices.length).padStart(2, "0")}`;
+      const globalCount = `${applicationLang === "zh" ? "样本" : "Preview"} ${String(recordIndex + 1).padStart(2, "0")} / ${String(applicationRecords.length).padStart(2, "0")}`;
+      const typeLabel = applicationTypeCopy[record.type]?.[applicationLang] || applicationTypeCopy[record.type]?.en || record.type;
+      const sourceLabel = applicationValue(record, "source");
+      const title = applicationValue(record, "title");
+      const event = applicationValue(record, "event");
+      const recordLabel = applicationRecordLabel(record);
+      const totalLabel = applicationLang === "zh" ? `${record.total} 张图片` : `${record.total} images`;
+      const nextAlt = `MemWeb ${applicationTypeCopy[record.type]?.en || record.type} screenshot from ${record.uid}.`;
+
+      syncApplicationDirectory();
+      renderApplicationThumbs();
+
+      if (applicationCaption) applicationCaption.textContent = `${sourceLabel} · ${typeLabel}`;
+      if (applicationKicker) applicationKicker.textContent = recordLabel;
+      if (applicationPosition) applicationPosition.textContent = count;
+      const annotationLabel = applicationAnnotationLabel(record);
+      if (applicationPhoneCaptionTitle) applicationPhoneCaptionTitle.textContent = annotationLabel;
+      if (applicationPhoneCaption) {
+        const atRecord = applicationPhone?.dataset.applicationPhoneMode === "record";
+        applicationPhoneCaption.hidden = !atRecord || !annotationLabel;
+      }
+      if (applicationRecordGlobal) applicationRecordGlobal.textContent = globalCount;
+      if (applicationRecordKicker) applicationRecordKicker.textContent = `${typeLabel} · ${record.uid.toUpperCase()} · ${totalLabel}`;
+      if (applicationRecordTitle) applicationRecordTitle.textContent = title;
+      if (applicationRecordEvent) applicationRecordEvent.textContent = event;
+      if (applicationRecordSource) applicationRecordSource.textContent = sourceLabel;
+      if (applicationRecordId) applicationRecordId.textContent = record.file;
+      if (applicationRecordEventId) applicationRecordEventId.textContent = `${record.type} · ${record.total}`;
+      if (applicationRecordFields) applicationRecordFields.textContent = `${position + 1} / ${visibleApplicationIndices.length}`;
+      if (applicationLightboxTitle) applicationLightboxTitle.textContent = title;
+      if (applicationLightboxRecord) applicationLightboxRecord.textContent = recordLabel;
+      if (applicationLightboxCount) applicationLightboxCount.textContent = count;
+      if (applicationRecentsImage) {
+        applicationRecentsImage.src = record.src;
+        applicationRecentsImage.alt = nextAlt;
+      }
+      if (applicationRecentsLabel) applicationRecentsLabel.textContent = `${typeLabel} · ${record.uid.toUpperCase()}`;
+      if (applicationOpen) {
+        applicationOpen.dataset.recordType = record.type;
+        applicationOpen.setAttribute(
+          "aria-label",
+          applicationLang === "zh" ? `查看原始截图：${title}` : `Open original screenshot: ${title}`
+        );
+      }
+
+      if (applicationLightboxImage) {
+        applicationLightboxImage.src = record.src;
+        applicationLightboxImage.alt = nextAlt;
+      }
+
+      window.clearTimeout(applicationImageTimer);
+      if (applicationImage) {
+        applicationImage.alt = nextAlt;
+        if (!animate || applicationMotionQuery.matches || applicationImage.getAttribute("src") === record.src) {
+          applicationImage.src = record.src;
+          applicationImage.classList.remove("is-switching");
+        } else {
+          applicationImage.classList.add("is-switching");
+          applicationImageTimer = window.setTimeout(() => {
+            applicationImage.src = record.src;
+            requestAnimationFrame(() => applicationImage.classList.remove("is-switching"));
+          }, 90);
+        }
+      }
+
+      if (typeof Image === "function" && visibleApplicationIndices.length > 1) {
+        [-1, 1].forEach((offset) => {
+          const nearbyPosition = (position + offset + visibleApplicationIndices.length) % visibleApplicationIndices.length;
+          const nearbyRecord = applicationRecords[visibleApplicationIndices[nearbyPosition]];
+          if (!nearbyRecord) return;
+          const preload = new Image();
+          preload.src = nearbyRecord.src;
+        });
+      }
+    };
+
+    const activateApplication = (index, { animate = true, revealItem = null } = {}) => {
+      if (!applicationRecords.length) return;
+      const normalizedIndex = (index + applicationRecords.length) % applicationRecords.length;
+
+      if (revealItem) {
+        applicationItems.forEach((item) => {
+          item.open = item === revealItem;
+        });
+        revealItem.scrollIntoView({
+          block: "nearest",
+          inline: "nearest",
+          behavior: applicationMotionQuery.matches ? "auto" : "smooth",
+        });
+      }
+
+      syncApplicationVisual(normalizedIndex, animate);
+    };
+
+    const moveApplication = (direction) => {
+      visibleApplicationIndices = getVisibleApplicationIndices();
+      if (!visibleApplicationIndices.length) return;
+      const currentPosition = Math.max(0, visibleApplicationIndices.indexOf(activeApplicationIndex));
+      const nextPosition = (currentPosition + direction + visibleApplicationIndices.length) % visibleApplicationIndices.length;
+      activateApplication(visibleApplicationIndices[nextPosition], { animate: true });
+    };
+
+    applicationItems.forEach((details) => {
+      const summary = details.querySelector("summary");
+      if (!summary) return;
+
+      summary.addEventListener("click", (event) => {
+        event.preventDefault();
+        const recordIndex = applicationRecords.findIndex(
+          (record) => record.uid === details.dataset.applicationUid && record.type === details.dataset.applicationType
+        );
+        if (recordIndex < 0) return;
+        activateApplication(recordIndex, { animate: true, revealItem: details });
+        setApplicationView("detail", { focus: false });
+        setApplicationPhoneMode("record");
+      });
+    });
+
+    applicationUserButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const nextUid = button.dataset.applicationEnterUid;
+        const recordIndex = applicationRecords.findIndex(
+          (record) => record.uid === nextUid && record.type === activeApplicationType
+        );
+        if (recordIndex >= 0) activateApplication(recordIndex, { animate: false });
+        setApplicationView("detail", { focus: false });
+        setApplicationPhoneMode("home");
+      });
+    });
+
+    applicationTypeButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const nextType = button.dataset.applicationEnterType;
+        const recordIndex = applicationRecords.findIndex(
+          (record) => record.uid === activeApplicationUid && record.type === nextType
+        );
+        if (recordIndex < 0) return;
+        activateApplication(recordIndex, { animate: true });
+        setApplicationView("detail", { focus: false });
+        setApplicationPhoneMode("record");
+      });
+    });
+
+    applicationPhoneApps.forEach((button) => {
+      button.addEventListener("click", () => {
+        const nextType = button.dataset.applicationPhoneType;
+        const recordIndex = applicationRecords.findIndex(
+          (record) => record.uid === activeApplicationUid && record.type === nextType
+        );
+        if (recordIndex < 0) return;
+        activateApplication(recordIndex, { animate: true });
+        setApplicationPhoneMode("record");
+      });
+    });
+
+    applicationAiEntry?.addEventListener("click", () => {
+      renderApplicationDialogue();
+      setApplicationPhoneMode("dialogue");
+    });
+
+    applicationPhoneUidButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const nextUid = button.dataset.applicationPhoneUid;
+        const recordIndex = applicationRecords.findIndex(
+          (record) => record.uid === nextUid && record.type === activeApplicationType
+        );
+        if (recordIndex < 0) return;
+        activeApplicationSessionIndex = 0;
+        activateApplication(recordIndex, { animate: false });
+        renderApplicationDialogue();
+      });
+    });
+
+    applicationSystemButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const action = button.dataset.applicationSystemAction;
+        const currentMode = applicationPhone?.dataset.applicationPhoneMode || "home";
+        if (action === "home") {
+          setApplicationPhoneMode("home");
+          return;
+        }
+        if (action === "recents") {
+          if (applicationPhone) applicationPhone.dataset.applicationPreviousMode = currentMode;
+          setApplicationPhoneMode("recents");
+          return;
+        }
+        if (action === "back" && currentMode === "recents") {
+          setApplicationPhoneMode(applicationPhone?.dataset.applicationPreviousMode || "home");
+          return;
+        }
+        if (action === "back" && ["record", "dialogue"].includes(currentMode)) setApplicationPhoneMode("home");
+      });
+    });
+
+    applicationRecentsOpen?.addEventListener("click", () => {
+      setApplicationPhoneMode(applicationPhone?.dataset.applicationPreviousMode || "home");
+    });
+
+    applicationBack?.addEventListener("click", () => {
+      setApplicationView(applicationView === "detail" ? "types" : "users", { focus: false });
+    });
+
+    applicationHome?.addEventListener("click", () => {
+      setApplicationView("users", { focus: false });
+    });
+
+    applicationPathUser?.addEventListener("click", () => {
+      setApplicationView("types", { focus: false });
+    });
+
+    applicationThumbs?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-application-record-index]");
+      if (!button) return;
+      const recordIndex = Number(button.dataset.applicationRecordIndex);
+      if (Number.isInteger(recordIndex)) activateApplication(recordIndex, { animate: true });
+    });
+
+    applicationDirectionButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        moveApplication(button.dataset.applicationDirection === "previous" ? -1 : 1);
+      });
+    });
+
+    applicationVisual?.addEventListener("keydown", (event) => {
+      if (applicationView !== "detail" || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+      event.preventDefault();
+      moveApplication(event.key === "ArrowLeft" ? -1 : 1);
+    });
+
+    const openApplicationLightbox = () => {
+      if (!applicationLightbox) return;
+      if (typeof applicationLightbox.showModal === "function") applicationLightbox.showModal();
+      else applicationLightbox.setAttribute("open", "");
+    };
+
+    const closeApplicationLightbox = () => {
+      if (!applicationLightbox) return;
+      if (typeof applicationLightbox.close === "function") applicationLightbox.close();
+      else applicationLightbox.removeAttribute("open");
+    };
+
+    applicationOpen?.addEventListener("click", () => {
+      if (Date.now() < applicationSwipeLockUntil) return;
+      openApplicationLightbox();
+    });
+    applicationClose?.addEventListener("click", closeApplicationLightbox);
+    applicationLightbox?.addEventListener("click", (event) => {
+      if (event.target === applicationLightbox) closeApplicationLightbox();
+    });
+    applicationLightbox?.addEventListener("keydown", (event) => {
+      if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+      event.preventDefault();
+      moveApplication(event.key === "ArrowLeft" ? -1 : 1);
+    });
+
+    const bindApplicationSwipe = (element) => {
+      if (!element) return;
+      element.addEventListener("pointerdown", (event) => {
+        if (event.pointerType !== "touch") return;
+        applicationSwipeStartX = event.clientX;
+        applicationSwipeStartY = event.clientY;
+      });
+      element.addEventListener("pointerup", (event) => {
+        if (event.pointerType !== "touch") return;
+        const deltaX = event.clientX - applicationSwipeStartX;
+        const deltaY = event.clientY - applicationSwipeStartY;
+        if (Math.abs(deltaX) < 46 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) return;
+        event.preventDefault();
+        applicationSwipeLockUntil = Date.now() + 360;
+        moveApplication(deltaX > 0 ? -1 : 1);
+      });
+    };
+
+    bindApplicationSwipe(applicationOpen);
+    bindApplicationSwipe(applicationLightboxMedia);
+
+    const setApplicationLanguage = (lang) => {
+      applicationLang = lang === "zh" ? "zh" : "en";
+      const languageUids = applicationLang === "zh" ? ["uid0", "uid1", "uid2"] : ["uid10", "uid11", "uid12"];
+      let nextIndex = activeApplicationIndex;
+      if (!languageUids.includes(activeApplicationUid)) {
+        nextIndex = applicationRecords.findIndex(
+          (record) => record.uid === languageUids[0] && record.type === activeApplicationType
+        );
+      }
+      syncApplicationVisual(nextIndex >= 0 ? nextIndex : activeApplicationIndex, false);
+      renderApplicationDialogue();
+    };
+
+    const initApplicationMotion = () => {
+      if (!applicationShowcase || !window.gsap || !window.ScrollTrigger || applicationMotionQuery.matches) return;
+      gsap.registerPlugin(ScrollTrigger);
+      gsap.fromTo(
+        applicationShowcase,
+        { autoAlpha: 0, y: 28 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.72,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: applicationShowcase,
+            start: "top 78%",
+            once: true,
+          },
+        }
+      );
+    };
+
+    activateApplication(activeApplicationIndex, { animate: false });
+    setApplicationLanguage(applicationLang);
+    setApplicationView("detail", { focus: false });
+    setApplicationPhoneMode("home");
+    window.addEventListener("load", initApplicationMotion, { once: true });
 
 	    const datasetTabs = document.querySelectorAll("[data-dataset-tab]");
     const datasetPanels = document.querySelectorAll("[data-dataset-panel]");
