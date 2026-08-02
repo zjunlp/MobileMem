@@ -170,7 +170,7 @@
     },
   };
 
-  const identityLabels = {
+  const sourceIdentityLabels = {
     uid0: {
       person: ["王景川", "蒋立新", "蔡雪宁", "郝志强", "穆长安"],
       group_chat_members: ["蒋立新", "蔡雪宁", "郝志强", "穆长安", "敖晨露"],
@@ -266,8 +266,61 @@
     "friend",
   ]);
   const fullyCuratedUsers = new Set(["uid2", "uid12"]);
+  const personSelections = {
+    uid0: [
+      { type: "group_chat_members", sampleNumber: 1 },
+      { type: "group_chat_members", sampleNumber: 2 },
+      { type: "group_chat_members", sampleNumber: 3 },
+      { type: "group_chat_members", sampleNumber: 5 },
+    ],
+    uid1: [
+      { type: "group_chat_members", sampleNumber: 2 },
+      { type: "group_chat_members", sampleNumber: 4 },
+      { type: "group_chat_members", sampleNumber: 5 },
+      { type: "person", sampleNumber: 3 },
+    ],
+    uid2: [
+      { type: "group_chat_members", sampleNumber: 2 },
+      { type: "group_chat_members", sampleNumber: 3 },
+      { type: "group_chat_members", sampleNumber: 4 },
+      { type: "group_chat_members", sampleNumber: 5 },
+    ],
+    uid10: [
+      { type: "group_chat_members", sampleNumber: 2 },
+      { type: "group_chat_members", sampleNumber: 3 },
+      { type: "group_chat_members", sampleNumber: 5 },
+      { type: "person", sampleNumber: 2 },
+    ],
+    uid11: [
+      { type: "group_chat_members", sampleNumber: 2 },
+      { type: "group_chat_members", sampleNumber: 3 },
+      { type: "group_chat_members", sampleNumber: 4 },
+      { type: "group_chat_members", sampleNumber: 5 },
+    ],
+    uid12: [
+      { type: "person", sampleNumber: 2 },
+      { type: "person", sampleNumber: 3 },
+      { type: "person", sampleNumber: 4 },
+      { type: "person", sampleNumber: 5 },
+    ],
+  };
 
-  const resolveAssetPath = (uid, type, sampleNumber = 1) => {
+  const identityLabels = Object.fromEntries(
+    users.map((uid) => [
+      uid,
+      {
+        person: [
+          sourceIdentityLabels[uid].person[0],
+          ...personSelections[uid].map(
+            ({ type, sampleNumber }) => sourceIdentityLabels[uid][type][sampleNumber - 1],
+          ),
+        ],
+        group_chat_members: sourceIdentityLabels[uid].group_chat_members,
+      },
+    ]),
+  );
+
+  const resolveSourceAssetPath = (uid, type, sampleNumber) => {
     const portraitOverride = uid === "uid11" && ["person", "group_chat_members"].includes(type);
     const directory =
       curatedTypes.has(type) || fullyCuratedUsers.has(uid) || portraitOverride
@@ -276,14 +329,25 @@
     return `${directory}/${uid}-${type}-${String(sampleNumber).padStart(2, "0")}.png`;
   };
 
+  const resolveAssetPath = (uid, type, sampleNumber = 1) => {
+    const selectedPerson = type === "person" ? personSelections[uid]?.[sampleNumber - 2] : null;
+    return resolveSourceAssetPath(
+      uid,
+      selectedPerson?.type || type,
+      selectedPerson?.sampleNumber || sampleNumber,
+    );
+  };
+
   globalThis.MobileMemApplicationData = Object.freeze({
     users,
     categories,
     typeCopy,
     categoryCounts,
     identityLabels,
+    sourceIdentityLabels,
     eventLabels,
     previewCount: 5,
     resolveAssetPath,
+    resolveSourceAssetPath,
   });
 })();

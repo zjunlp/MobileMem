@@ -5,8 +5,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "format": "prettier --write index.html assets/web/css assets/web/js scripts tests 'package*.json' '*.md' '.github/**/*.yml'",
-    "format:check": "prettier --check index.html assets/web/css assets/web/js scripts tests 'package*.json' '*.md' '.github/**/*.yml'",
+    "format": "prettier --write '*.html' assets/web/css assets/web/js scripts tests 'package*.json' '*.md' '.github/**/*.yml'",
+    "format:check": "prettier --check '*.html' assets/web/css assets/web/js scripts tests 'package*.json' '*.md' '.github/**/*.yml'",
     "images:build": "node scripts/build-image-manifest.mjs",
     "images:check": "node scripts/check-image-manifest.mjs",
     "references:check": "node scripts/check-static-references.mjs",
