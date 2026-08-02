@@ -717,47 +717,82 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   align-items: center;
-  height: 46px;
-  padding: 0 18px;
+  height: 48px;
+  padding: 0 20px;
+  overflow: hidden;
+  border-top: 1px solid rgba(22, 62, 39, 0.1);
   border-radius: 0 0 27px 27px;
-  background: rgba(250, 252, 250, 0.96);
-  box-shadow: 0 -1px 0 rgba(24, 62, 39, 0.08);
-  backdrop-filter: blur(12px);
+  background: rgba(248, 251, 249, 0.97);
+  color: #202d26;
+  box-shadow:
+    0 -10px 24px rgba(22, 62, 39, 0.035),
+    inset 0 1px rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(20px) saturate(1.15);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
 }
 .application-phone-system-nav button {
+  position: relative;
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 44px;
+  width: 44px;
+  height: 42px;
   margin: 0 auto;
   padding: 0;
   border: 0;
-  border-radius: 12px;
+  border-radius: 50%;
   background: transparent;
-  color: #25342c;
+  color: inherit;
   cursor: pointer;
+  transition: transform 120ms ease;
+}
+.application-phone-system-nav button::before {
+  position: absolute;
+  inset: 6px 7px;
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
+  opacity: 0;
+  transform: scale(0.82);
   transition:
-    background 120ms ease,
+    opacity 120ms ease,
     transform 120ms ease;
 }
-.application-phone-system-nav button:hover {
-  background: rgba(33, 92, 58, 0.08);
+.application-phone-system-nav button:hover::before {
+  opacity: 0.07;
+  transform: scale(1);
 }
 .application-phone-system-nav button:active {
   transform: scale(0.92);
 }
+.application-phone-system-nav button:active::before {
+  opacity: 0.12;
+  transform: scale(0.9);
+}
 .application-phone-system-nav svg {
-  width: 19px;
-  height: 19px;
+  position: relative;
+  z-index: 1;
+  width: 16px;
+  height: 16px;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 1.8;
+  stroke-width: 1.65;
 }
 .application-phone-system-nav button:first-child svg {
   fill: currentColor;
   stroke: none;
+}
+.application-phone-screen[data-record-type="music"]:not([hidden]) ~ .application-phone-system-nav {
+  border-top-color: rgba(232, 244, 255, 0.09);
+  background: rgba(10, 29, 54, 0.97);
+  color: rgba(240, 247, 244, 0.9);
+  box-shadow:
+    0 -12px 26px rgba(4, 17, 34, 0.2),
+    inset 0 1px rgba(255, 255, 255, 0.055);
 }
 .application-phone-recents {
   position: absolute;
