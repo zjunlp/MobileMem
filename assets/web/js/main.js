@@ -7,11 +7,16 @@
 
 // Optional page analytics ---------------------------------------------------
 
-if (["http:", "https:"].includes(window.location.protocol)) {
+const pageViewCounter = document.querySelector("#busuanzi_value_page_pv");
+const isLocalPreview = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+
+if (["http:", "https:"].includes(window.location.protocol) && !isLocalPreview) {
   const busuanziScript = document.createElement("script");
   busuanziScript.defer = true;
   busuanziScript.src = "https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js";
   document.head.appendChild(busuanziScript);
+} else if (pageViewCounter) {
+  pageViewCounter.textContent = "—";
 }
 
 const languageToggle = document.querySelector("[data-toggle-lang]");

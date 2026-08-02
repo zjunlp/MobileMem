@@ -89,8 +89,16 @@ def assert_release_metadata(page: Page) -> None:
         "Hidden video must not preload on initial page load",
     )
     require(
-        page.locator("#busuanzi_value_site_pv").count() == 1,
+        page.locator("#busuanzi_value_page_pv").count() == 1,
         "Required page-view counter target is missing",
+    )
+    require(
+        page.locator("#busuanzi_value_page_pv").inner_text() == "—",
+        "Local previews must not report production page views",
+    )
+    require(
+        page.locator('script[src*="busuanzi"]').count() == 0,
+        "Local previews must not load the production analytics script",
     )
 
 
@@ -104,7 +112,11 @@ def assert_application_interactions(page: Page) -> None:
 
     phone = page.locator(".application-phone")
     require(phone.get_attribute("data-application-phone-mode") == "home", "Phone must open at home")
-    require(page.locator("[data-application-phone-type]").count() == 12, "Expected 12 image types")
+    require(page.locator("[data-application-phone-type]").count() == 11, "Expected 11 image types")
+    require(
+        page.locator('[data-application-phone-type="group_chat_members"]').count() == 0,
+        "Members must not duplicate the person index on the phone home screen",
+    )
 
     active_profile = page.locator('[data-application-phone-uid][aria-pressed="true"]')
     require(active_profile.get_attribute("data-application-phone-uid") == "uid10", "English must use uid10 initially")

@@ -530,7 +530,6 @@
   object-fit: cover;
   background: #e3ece7;
 }
-.application-phone[data-application-uid="uid1"] [data-application-phone-type="person"] img,
 .application-phone[data-application-uid="uid1"] .application-ai-portal-avatar img,
 .application-phone[data-application-uid="uid1"] .application-ai-message-avatar img.is-user {
   transform: scale(2.25);
@@ -627,9 +626,8 @@
   min-width: 0;
   min-height: 0;
 }
-.application-memory-cluster:nth-child(1) .application-memory-mosaic button:first-child,
-.application-memory-cluster:nth-child(4) .application-memory-mosaic button:first-child {
-  grid-column: 1 / -1;
+.application-memory-cluster:nth-child(1) .application-memory-mosaic button {
+  grid-row: 1 / -1;
 }
 .application-memory-cluster:nth-child(2) .application-memory-mosaic button:first-child {
   grid-row: 1 / -1;
@@ -641,6 +639,17 @@
 .application-memory-cluster:nth-child(3) .application-memory-mosaic button:nth-child(2),
 .application-memory-cluster:nth-child(3) .application-memory-mosaic button:nth-child(3) {
   grid-column: 1;
+}
+.application-memory-cluster:nth-child(4) .application-memory-mosaic button:first-child {
+  grid-row: 1 / -1;
+  grid-column: 1;
+}
+.application-memory-cluster:nth-child(4) .application-memory-mosaic button:nth-child(2),
+.application-memory-cluster:nth-child(4) .application-memory-mosaic button:nth-child(3) {
+  grid-column: 2;
+}
+.application-memory-cluster:nth-child(4) [data-application-phone-type="person"] img {
+  object-position: center;
 }
 .application-phone-apps button {
   position: relative;
