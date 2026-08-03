@@ -330,4 +330,4 @@ KEME is built with [AgentScope](https://github.com/agentscope-ai/agentscope). Ba
 
 ## License
 
-This project is released under the [MIT License](LICENSE).
+This project is released under the [MIT License](../LICENSE).

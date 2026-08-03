@@ -178,7 +178,7 @@ Each question contains:
 
 ## 🏆 Leaderboard
 
-*(Coming soon)*
+<img src="asset/results.png" style="width:100%; height: auto;" align=center>
 
 ---
 
