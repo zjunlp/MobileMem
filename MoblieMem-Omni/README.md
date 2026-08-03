@@ -1,31 +1,6 @@
 
-<div align="center">
-
-# <img src="https://img.icons8.com/fluency/48/iphone.png" alt="iPhone" width="30" height="30" style="vertical-align: middle;"/> MobileMem-Omni <img src="https://img.icons8.com/fluency/48/gallery.png" alt="Gallery" width="30" height="30" style="vertical-align: middle;"/>
-
-**A Benchmark for Long-Term Multimodal Memory on Mobile Devices**
-
-[![Paper](https://img.shields.io/badge/Paper-2026.XXXXX-b31b1b?style=flat-square&logo=arxiv&logoColor=white)](https://arxiv.org/abs/XXXX)
-[![Website](https://img.shields.io/badge/Website-MobileMem-blue?style=flat-square&logo=googlechrome&logoColor=white)](https://mobilemem.github.io)
-[![HuggingFace](https://img.shields.io/badge/🤗-Dataset-yellow?style=flat-square)](https://huggingface.co/datasets/yourusername/MobileMem-Omni)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square&logo=opensourceinitiative&logoColor=white)](#license)
-
-**MobileMem-Omni** is a large-scale benchmark specifically designed for evaluating **long-term multimodal memory** in **mobile scenarios**.
-
-</div>
-
----
-
-## 🔔 News
-
-- **2025-06-01** — We launched the MobileMem project.
-
----
-
 ## 📑 Table of Contents
 
-- [🔔 News](#-news)
-- [🌟 Overview](#-overview)
 - [📚 Datasets](#-datasets)
   - [📊 Benchmark Statistics](#-benchmark-statistics)
   - [🖼️ Image Types](#️-image-types)
@@ -122,25 +97,6 @@ MobileMem-Omni evaluates **7 types** of memory reasoning tasks:
 | `sessions` | List of multi-turn conversational sessions |
 | `session_stats_summary` | Summary statistics across all sessions of the persona |
 | `_errors` | List of data processing errors; empty if no errors occurred |
-
----
-
-#### Event Structure
-
-During data construction, each persona contains an `Events` list. Each event in the list contains:
-
-| Field | Description |
-|:------|:------------|
-| `event_id` | Sequential event identifier starting from `0` |
-| `event_name` | Concise title of the event |
-| `event_start_time` | Start time in `YYYY-MM-DD HH:MM:SS` format |
-| `event_end_time` | End time in `YYYY-MM-DD HH:MM:SS` format; must be later than `event_start_time` |
-| `duration_type` | Duration category, one of `short-term`, `mid-term`, or `long-term` |
-| `participants` | List of people involved in the event, excluding the persona; contains at most two people |
-| `description` | First-person description of the event, including its context, actions, emotions, and potential need for assistance |
-| `importance` | Significance level of the event, one of `low`, `medium`, or `high` |
-| `additional_info` | Single-element list indicating the associated mobile content type: `food`, `friend`, `money`, `ticket`, or `wechat` |
-| `*_info` | Optional type-specific metadata corresponding to the value of `additional_info` |
 
 ---
 
@@ -340,13 +296,5 @@ Records are written to `output/data/` (JSONL); rendered media to `output/image/`
 
 ## 🌻 Acknowledgement
 
-This project is based on open-source projects including [xxx](https://xxx). Thanks for their great contributions!
+We thank the open-source community for their contributions. This work has benefited from the foundational efforts of [Mem-Gallery](https://github.com/YuanchenBei/Mem-Gallery) and [HaluMem](https://github.com/MemTensor/HaluMem).
 
----
-
-## 🚩 Citation
-
-If this paper or datasets is helpful, please kindly cite as this:
-
-```bibtex
-```
