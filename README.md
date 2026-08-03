@@ -21,7 +21,6 @@
 
 ---
 
----
 ## 📂 Project Structure
 
 ```
@@ -30,6 +29,7 @@ MobileMem/
 ├── omni/                    # MobileMem-Omni (Multimodal Benchmark)
 └── README.md
 ```
+---
 ## 🚩 Citation
 
 If this paper or datasets is helpful, please kindly cite as this:
