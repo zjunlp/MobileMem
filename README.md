@@ -28,9 +28,11 @@ MobileMem contains textual and multimodal benchmark tracks. Choose the track and
 ### Text
 
 1. **KEME synthesis and analysis**
+
    See the corresponding [documentation](text/README.md) for environment setup, trajectory and question-answer synthesis, postprocessing, and analysis.
 
 2. **Trace memory lifecycles with MemTrace**
+
    Follow the [MemTrace example](https://github.com/zjunlp/MemBase/tree/main/examples/trace_memory_lifecycle_with_membase) in MemBase.
 
    For the best EverMemOS retrieval performance, serve the reranker with:
@@ -44,7 +46,8 @@ MobileMem contains textual and multimodal benchmark tracks. Choose the track and
    ```
 
 3. **Evaluate baselines on MobileMem**
-   Follow the [MobileMem baseline evaluation example](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem) to run supported memory systems.
+
+   Follow the [MobileMem baseline evaluation example](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem) in MemBase to run supported memory systems.
 
 ### Omni
 
