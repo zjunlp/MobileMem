@@ -17,7 +17,38 @@
 
 ## 🔔 News
 
-- **2025-06-01** — We launched the MobileMem project.
+- **2025-06-01** — We launch the MobileMem project.
+
+---
+
+## 🚀 Getting Started
+
+MobileMem contains textual and multimodal benchmark tracks. Choose the track and workflow that matches your use case.
+
+### Text
+
+1. **KEME synthesis and analysis**
+   See the corresponding [documentation](text/README.md) for environment setup, trajectory and question-answer synthesis, postprocessing, and analysis.
+
+2. **Trace memory lifecycles with MemTrace**
+   Follow the [MemTrace example](https://github.com/zjunlp/MemBase/tree/main/examples/trace_memory_lifecycle_with_membase) in MemBase.
+
+   For the best EverMemOS retrieval performance, serve the reranker with:
+
+   ```bash
+   CUDA_VISIBLE_DEVICES=0 vllm serve pretrained_models/Qwen3-Reranker-4B \
+       --port 8001 \
+       --served-model-name Qwen3-Reranker-4B \
+       --gpu-memory-utilization 0.4 \
+       --hf_overrides '{"architectures": ["Qwen3ForSequenceClassification"], "classifier_from_token": ["no", "yes"], "is_original_qwen3_reranker": true}'
+   ```
+
+3. **Evaluate baselines on MobileMem**
+   Follow the [MobileMem baseline evaluation example](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem) to run supported memory systems.
+
+### Omni
+
+See the [`omni/` documentation](omni/README.md) for the multimodal MobileMem-Omni benchmark.
 
 ---
 
@@ -29,7 +60,9 @@ MobileMem/
 ├── omni/                    # MobileMem-Omni (Multimodal Benchmark)
 └── README.md
 ```
+
 ---
+
 ## 🚩 Citation
 
 If this paper or datasets is helpful, please kindly cite as this:
