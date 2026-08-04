@@ -318,8 +318,8 @@
   background: rgba(21, 95, 64, 0.07);
 }
 .application-browser-view {
-  min-height: 732px;
-  background: #e8efea;
+  min-height: 0;
+  background: transparent;
   animation: application-view-enter 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .application-browser-view[hidden] {
