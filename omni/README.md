@@ -294,6 +294,10 @@ Records are written to `output/data/` (JSONL); rendered media to `output/image/`
 
 ---
 
+## 📋 Dataset Logs
+
+The [MobileMem-Omni Logs](https://drive.google.com/file/d/1ZPaUzsu-gyDXZYqiy2b47v6grnfBg7HW/view?usp=drive_link) contain the experimental logs.
+
 ## 🌻 Acknowledgement
 
 We thank the open-source community for their contributions. This work has benefited from the foundational efforts of [Mem-Gallery](https://github.com/YuanchenBei/Mem-Gallery) and [HaluMem](https://github.com/MemTensor/HaluMem).
