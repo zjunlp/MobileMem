@@ -189,17 +189,44 @@ Each question contains:
 #### Create and activate a dedicated conda environment:
 
 ```bash
-conda create -n mobilemem python=3.11
-conda activate mobilemem
+conda create -n mobilemem2 python=3.11
+conda activate mobilemem2
 ```
 
 #### Clone code
 
 ```bash
 git clone https://github.com/zjunlp/MobileMem
-cd MobileMem
+cd MobileMem/omni
 pip install -r requirements.txt
+playwright install --with-deps chromium
 ```
+
+`--with-deps` pulls the system libraries headless Chromium needs (`libnss3`,
+`libatk`, …). It needs `sudo` on Debian/Ubuntu; drop the flag if those libraries
+are already present or you cannot elevate.
+
+#### Chinese screenshots need a CJK font
+
+Screenshot templates ask for `PingFang SC` / `Microsoft YaHei`, which do not
+exist on a bare Linux box. Without a CJK font installed, Chinese text renders as
+tofu boxes (`□□□`) and the failure is silent. On Debian/Ubuntu:
+
+```bash
+sudo apt-get install -y fonts-noto-cjk
+```
+
+Verify with `fc-list :lang=zh | head`.
+
+#### Optional face-swap weights
+
+`inswapper_128.onnx` is not distributed via pip. Face swapping is skipped
+cleanly when it is absent; set `INSWAPPER_MODEL` to its path to enable it. The
+`buffalo_l` detector is downloaded by InsightFace on first use.
+
+For the local API-free smoke pipeline, pass `--offline` (or set
+`MOBILEMEM_OFFLINE=true`). For online generation, copy `src/.env.example` to
+`src/.env` and configure the text API plus the selected image provider.
 
 ---
 
@@ -247,6 +274,9 @@ python -m pipeline.cli run --from social_world
 
 # Restrict to specific persona uuid(s) and cap the events per persona
 python -m pipeline.cli run --uuid 0 --max-events 15
+
+# Run a deterministic end-to-end smoke flow without API keys or network calls
+python -m pipeline.cli run --offline --uuid 10 --max-events 1 --max-workers 1
 
 # Create corresponding dialogues and memory points.
 python src/stage5_sessions.py `
@@ -301,4 +331,3 @@ The [MobileMem-Omni Logs](https://drive.google.com/file/d/1ZPaUzsu-gyDXZYqiy2b47
 ## 🌻 Acknowledgement
 
 We thank the open-source community for their contributions. This work has benefited from the foundational efforts of [Mem-Gallery](https://github.com/YuanchenBei/Mem-Gallery) and [HaluMem](https://github.com/MemTensor/HaluMem).
-

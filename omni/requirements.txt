@@ -1,21 +1,34 @@
+# MobileMem-Omni dependencies.
+#
+# Python 3.11 is the supported target (see README). The source itself is 3.9+
+# compatible, but the newest onnxruntime / numpy wheels require 3.11+, so older
+# interpreters silently resolve to older pins.
+# Install from this directory:
+#     pip install -r requirements.txt
+#     playwright install --with-deps chromium
+#
+# Upper bounds are deliberate: they keep a fresh `pip install` reproducible
+# instead of silently pulling a new major release.
+
 # Core (text pipeline: profile / life_state / dates / social / events)
-python-dotenv>=1.0
-openai>=1.30
-tenacity>=8.2
-requests>=2.31
-jsonlines>=4.0
-tqdm>=4.66
+python-dotenv>=1.0,<2
+openai>=1.30,<3
+tenacity>=8.2,<10
+requests>=2.31,<3
+jsonlines>=4.0,<5
+tqdm>=4.66,<5
 
 # Media rendering (conversation / app_trace / document screenshots)
-playwright>=1.44        # run `playwright install chromium` after install
-html2image>=2.0
-beautifulsoup4>=4.12
-Pillow>=10.0
-qrcode>=7.4
-numpy>=1.26
+playwright>=1.44,<2      # run `playwright install --with-deps chromium` after install
+beautifulsoup4>=4.12,<5
+Pillow>=10.0,<13
+qrcode[pil]>=7.4,<9     # [pil] extra: templates.py renders QR codes via the PIL factory
+numpy>=1.26,<3
 
-# Face pipeline (event_photo / avatars) -- heavy, optional for text-only stages
-insightface>=0.7.3
-onnxruntime>=1.17       # required by insightface
-opencv-python>=4.9
-scipy>=1.11             # optimal face pairing (linear_sum_assignment)
+# Face pipeline (event_photo / avatars) -- heavy, optional for text-only stages.
+# insightface >= 1.0 ships a pure-python wheel; 0.7.x is sdist-only and needs a
+# C++ toolchain + Cython + python3-dev to build.
+insightface>=1.0,<2
+onnxruntime>=1.17,<2     # required by insightface
+opencv-python>=4.9,<6
+scipy>=1.11,<2           # optimal face pairing (linear_sum_assignment)
