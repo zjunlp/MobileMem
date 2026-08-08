@@ -11,6 +11,9 @@
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square&logo=opensourceinitiative&logoColor=white)](#license)
 
 **MobileMem** is a comprehensive benchmarking framework for evaluating **on-device memory systems** in realistic mobile environments.
+
+<img src="omni/asset/fig1.png" style="width:100%; height: auto;" align=center>
+
 </div>
 
 ---
@@ -23,46 +26,27 @@
 
 ## 🚀 Getting Started
 
-MobileMem contains textual and multimodal benchmark tracks. Choose the track and workflow that matches your use case.
+MobileMem provides two benchmark tracks. Choose the one that fits your needs and navigate to the corresponding resources for data access, evaluation, and construction.
 
-### Text
+### 📖 Text Track
 
-1. **KEME synthesis and analysis**
+The textual benchmark for evaluating memory systems on long-term, knowledge-intensive mobile agent trajectories.
 
-   See the corresponding [documentation](text/README.md) for environment setup, trajectory and question-answer synthesis, postprocessing, and analysis.
+| Section | Description | Link |
+| :--- | :--- | :--- |
+| **Data** | Access the synthesized KEME trajectories and QA pairs. | [Link](https://huggingface.co/datasets/zjunlp/MobileMem) |
+| **Evaluation** | Run baseline memory systems and reproduce leaderboard results. | [Link](https://github.com/zjunlp/MemBase/tree/main/examples/trace_memory_lifecycle_with_membase) |
+| **Construction** | Reproduce the KEME synthesis pipeline from raw traces. | [Link](https://github.com/zjunlp/MobileMem/tree/main/text) |
 
-2. **Trace memory lifecycles with MemTrace**
+### 🖼️ Omni Track
 
-   Follow the [MemTrace example](https://github.com/zjunlp/MemBase/tree/main/examples/trace_memory_lifecycle_with_membase) in MemBase.
+The multimodal benchmark for evaluating on-device memory with realistic mobile images and dialogues.
 
-   For the best EverMemOS retrieval performance, serve the reranker with:
-
-   ```bash
-   CUDA_VISIBLE_DEVICES=0 vllm serve pretrained_models/Qwen3-Reranker-4B \
-       --port 8001 \
-       --served-model-name Qwen3-Reranker-4B \
-       --gpu-memory-utilization 0.4 \
-       --hf_overrides '{"architectures": ["Qwen3ForSequenceClassification"], "classifier_from_token": ["no", "yes"], "is_original_qwen3_reranker": true}'
-   ```
-
-3. **Evaluate baselines on MobileMem**
-
-   Follow the [MobileMem baseline evaluation example](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem) in MemBase to run supported memory systems.
-
-### Omni
-
-See the [`omni/` documentation](omni/README.md) for the multimodal MobileMem-Omni benchmark.
-
----
-
-## 📂 Project Structure
-
-```
-MobileMem/
-├── text/                    # MobileMem (Textual Benchmark)
-├── omni/                    # MobileMem-Omni (Multimodal Benchmark)
-└── README.md
-```
+| Section | Description | Link |
+| :--- | :--- | :--- |
+| **Data** | Download the MobileMem-Omni dataset with images and dialogues. | [Link](https://huggingface.co/datasets/zjunlp/MobileMem) |
+| **Evaluation** | Evaluate models on memory task types. | [Link](https://github.com/zjunlp/MobileMem/tree/main/omni/eval) |
+| **Construction** | Rebuild the MobileMem-Omni. | [Link](https://github.com/zjunlp/MobileMem/tree/main/omni) |
 
 ---
 
