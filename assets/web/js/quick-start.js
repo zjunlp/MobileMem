@@ -10,8 +10,9 @@
       { text: "conda create -n mobilemem python=3.11 -y", prompt: true },
       { text: "conda activate mobilemem", prompt: true },
       { text: "git clone https://github.com/zjunlp/MobileMem.git", prompt: true },
-      { text: "pip install -r MobileMem/omni/requirements.txt", prompt: true },
-      { text: "playwright install chromium", prompt: true },
+      { text: "cd MobileMem/omni", prompt: true },
+      { text: "pip install -r requirements.txt", prompt: true },
+      { text: "playwright install --with-deps chromium", prompt: true },
     ],
     download: [
       {
@@ -31,10 +32,6 @@
       },
       { text: "python -m pipeline.cli list", prompt: true },
       { text: "python -m pipeline.cli run", prompt: true },
-      {
-        text: "python -m pipeline.cli run --only event_photo --uuid 7",
-        prompt: true,
-      },
     ],
     evaluation: [
       { text: "git clone https://github.com/zjunlp/MemBase.git", prompt: true },
