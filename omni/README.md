@@ -189,8 +189,8 @@ Each question contains:
 #### Create and activate a dedicated conda environment:
 
 ```bash
-conda create -n mobilemem2 python=3.11
-conda activate mobilemem2
+conda create -n mobilemem python=3.11
+conda activate mobilemem
 ```
 
 #### Clone code
