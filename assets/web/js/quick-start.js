@@ -19,10 +19,6 @@
         text: "hf download zjunlp/MobileMem --repo-type dataset --local-dir data/MobileMem",
         prompt: true,
       },
-      {
-        text: "python -c 'from datasets import load_dataset; ds = load_dataset(\"zjunlp/MobileMem\")'",
-        prompt: true,
-      },
     ],
     pipeline: [
       { text: "cd MobileMem/omni/src", prompt: true },
