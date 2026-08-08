@@ -472,10 +472,14 @@ h3 {
 }
 
 .framework-figure[data-visual-kind="paper"] {
-  background:
-    radial-gradient(circle at 18% 18%, rgba(122, 160, 211, 0.12), transparent 34%),
-    radial-gradient(circle at 82% 78%, rgba(220, 135, 190, 0.11), transparent 34%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(247, 250, 248, 0.96));
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.framework-figure[data-visual-kind="paper"]::before {
+  display: none;
 }
 
 @media (min-width: 981px) {
@@ -503,7 +507,7 @@ h3 {
 }
 
 .framework-figure[data-visual-kind="paper"] img {
-  padding: clamp(10px, 1.4vw, 18px);
+  padding: 0;
 }
 
 .framework-figure img.is-swapping {
@@ -1122,9 +1126,17 @@ h3 {
     min-height: auto;
   }
 
+  .framework-figure[data-visual-kind="paper"] {
+    aspect-ratio: 16 / 10;
+  }
+
   .framework-figure img {
     height: auto;
     max-height: none;
+  }
+
+  .framework-figure[data-visual-kind="paper"] img {
+    height: 100%;
   }
 
   .pipeline-card::after {

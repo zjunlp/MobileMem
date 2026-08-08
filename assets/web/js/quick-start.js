@@ -7,24 +7,24 @@
   const terminalButtons = Array.from(document.querySelectorAll("[data-terminal-set]"));
   const terminalSets = {
     setup: [
-      { text: "conda create -n mobilemem python=3.11", prompt: true },
+      { text: "conda create -n mobilemem python=3.11 -y", prompt: true },
       { text: "conda activate mobilemem", prompt: true },
-      { text: "git clone https://github.com/zjunlp/MobileMem", prompt: true },
-      { text: "cd MobileMem", prompt: true },
-      { text: "pip install -r MobileMem/requirements.txt", prompt: true },
+      { text: "git clone https://github.com/zjunlp/MobileMem.git", prompt: true },
+      { text: "pip install -r MobileMem/omni/requirements.txt", prompt: true },
+      { text: "playwright install chromium", prompt: true },
     ],
     download: [
       {
-        text: "hf download zjunlp/MobileMem-Omni --repo-type dataset --local-dir data/MobileMem-Omni",
+        text: "hf download zjunlp/MobileMem --repo-type dataset --local-dir data/MobileMem",
         prompt: true,
       },
       {
-        text: "python -c 'from datasets import load_dataset; ds = load_dataset(\"zjunlp/MobileMem-Omni\")'",
+        text: "python -c 'from datasets import load_dataset; ds = load_dataset(\"zjunlp/MobileMem\")'",
         prompt: true,
       },
     ],
     pipeline: [
-      { text: "cd MobileMem-Omni/src", prompt: true },
+      { text: "cd MobileMem/omni/src", prompt: true },
       {
         text: "cp .env.example .env    # then fill in your API keys",
         prompt: true,
@@ -37,16 +37,20 @@
       },
     ],
     evaluation: [
-      { text: "cd MobileMem-Omni/eval", prompt: true },
+      { text: "git clone https://github.com/zjunlp/MemBase.git", prompt: true },
+      { text: "cd MemBase", prompt: true },
       {
-        text: 'python eval/Jsonl2Locomo.py --stage5 path/to/stage5_all_users.jsonl --stage6-dir path/to/stage6 --stage10 "" --output-dir data/Locomo --users 0 --no-image',
+        text: "bash examples/evaluate_memory_systems_on_mobilemem/run_construction.sh",
         prompt: true,
       },
       {
-        text: "# evaluator.py is a class module; initialize Evaluator with your method and judge.",
-        prompt: false,
+        text: "bash examples/evaluate_memory_systems_on_mobilemem/run_search.sh",
+        prompt: true,
       },
-      { text: "from eval.evaluator import Evaluator", prompt: false },
+      {
+        text: "bash examples/evaluate_memory_systems_on_mobilemem/run_evaluation.sh",
+        prompt: true,
+      },
     ],
   };
   const terminalSetOrder = ["setup", "download", "pipeline", "evaluation"];

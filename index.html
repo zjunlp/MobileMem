@@ -71,18 +71,43 @@
               returning the photo of the family of three gathered around the birthday cake.
             </p>
             <div class="actions" aria-label="Project links">
-              <a class="btn" href="#features">
-                <span data-lang="zh">查看详细</span>
-                <span data-lang="en">Details</span>
+              <a
+                class="btn"
+                href="#"
+                data-report-placeholder="en"
+                aria-disabled="true"
+                aria-label="English Technical Report, coming soon"
+                title="Coming soon"
+              >
+                <span data-lang="zh">英文技术报告</span>
+                <span data-lang="en">English Report</span>
               </a>
-              <a class="btn" href="https://github.com/zjunlp/MobileMem/">Code</a>
-              <a class="btn" href="mailto:contact@example.com">Email</a>
+              <a
+                class="btn"
+                href="#"
+                data-report-placeholder="zh"
+                aria-disabled="true"
+                aria-label="Chinese Technical Report, coming soon"
+                title="即将发布"
+              >
+                <span data-lang="zh">中文技术报告</span>
+                <span data-lang="en">Chinese Report</span>
+              </a>
+              <a class="btn" href="https://github.com/zjunlp/MobileMem/">
+                <span data-lang="zh">代码</span>
+                <span data-lang="en">Code</span>
+              </a>
+              <a class="btn" href="mailto:contact@example.com">
+                <span data-lang="zh">邮件</span>
+                <span data-lang="en">Email</span>
+              </a>
               <button
                 class="btn video-play"
                 type="button"
-                aria-label="OPPO Application Scenarios video"
+                aria-label="OPPO 应用场景视频 / OPPO Application Scenarios video"
               >
-                Video
+                <span data-lang="zh">视频</span>
+                <span data-lang="en">Video</span>
               </button>
             </div>
           </div>
@@ -337,14 +362,21 @@
                 id="feature-visual-image"
                 src="assets/web/paper/figure-2-data-silos.png"
                 alt="Figure 2 from the MobileMem paper, showing communication, social media, photos, books, shopping, and travel applications connected through a shared memory layer."
-                width="2800"
-                height="1617"
+                width="2000"
+                height="1155"
                 loading="lazy"
                 decoding="async"
               />
             </figure>
             <div class="feature-accordion" aria-label="MobileMem features">
-              <details open>
+              <details
+                open
+                data-feature-visual="assets/web/paper/figure-2-data-silos.png"
+                data-feature-width="2000"
+                data-feature-height="1155"
+                data-feature-alt-en="Mobile application screenshots connected through a shared memory layer, illustrating how MobileMem unifies fragmented data across applications."
+                data-feature-alt-zh="聊天、社交、相册、阅读、购物和旅行等移动应用通过共享记忆层相连，展示 MobileMem 如何统一跨应用数据。"
+              >
                 <summary>
                   <span class="step-number">01</span>
                   <span class="feature-summary-copy">
@@ -370,7 +402,13 @@
                   </p>
                 </div>
               </details>
-              <details>
+              <details
+                data-feature-visual="assets/web/paper/figure-mobilemem-overview.png"
+                data-feature-width="2000"
+                data-feature-height="1226"
+                data-feature-alt-en="MobileMem overview showing personal conversations and proactive mobile assistance connected by a memory benchmark workflow."
+                data-feature-alt-zh="MobileMem 总览：个人对话与主动式移动助理通过记忆基准流程相连接。"
+              >
                 <summary>
                   <span class="step-number">02</span>
                   <span class="feature-summary-copy">
@@ -394,7 +432,13 @@
                   </p>
                 </div>
               </details>
-              <details>
+              <details
+                data-feature-visual="assets/web/paper/figure-memory-ecosystem.png"
+                data-feature-width="2000"
+                data-feature-height="973"
+                data-feature-alt-en="Two-layer on-device memory ecosystem with a system-level memory layer, standardized protocol, and application-specific memory layers."
+                data-feature-alt-zh="由系统级记忆层、标准化协议与应用专属记忆层组成的双层端侧记忆生态。"
+              >
                 <summary>
                   <span class="step-number">03</span>
                   <span class="feature-summary-copy">
@@ -420,7 +464,13 @@
                   </p>
                 </div>
               </details>
-              <details>
+              <details
+                data-feature-visual="assets/web/paper/figure-keme-synthesis.png"
+                data-feature-width="2000"
+                data-feature-height="1181"
+                data-feature-alt-en="KEME synthesis framework covering prior knowledge construction, interaction trajectory synthesis, question-answer synthesis, and quality control."
+                data-feature-alt-zh="KEME 合成框架，包括先验知识构建、交互轨迹合成、问答对合成与质量控制。"
+              >
                 <summary>
                   <span class="step-number">04</span>
                   <span class="feature-summary-copy">
@@ -447,7 +497,13 @@
                   </p>
                 </div>
               </details>
-              <details>
+              <details
+                data-feature-visual="assets/web/paper/figure-dual-scenarios-cropped.png"
+                data-feature-width="753"
+                data-feature-height="397"
+                data-feature-alt-en="MobileMem dialogue interactions shown alongside multimodal scenarios including video, tickets, social posts, transactions, and music."
+                data-feature-alt-zh="MobileMem 对话交互与多模态场景并列展示，包括视频、票务、社交动态、交易和音乐。"
+              >
                 <summary>
                   <span class="step-number">05</span>
                   <span class="feature-summary-copy">
@@ -1213,15 +1269,15 @@
                 </div>
                 <div>
                   <span class="github-repo-name">Download and Usage</span>
-                  <span class="github-repo-path">Setup, data construction, and evaluation</span>
+                  <span class="github-repo-path">Text and multimodal benchmark resources</span>
                 </div>
               </div>
               <p class="quote small" data-lang="zh">
-                完整安装、数据构建和文本评测说明维护在项目仓库中。
+                文本与多模态基准的安装、构建和评测入口维护在项目仓库中。
               </p>
               <p class="quote small" data-lang="en">
-                Full setup, data construction, and text-only evaluation details are maintained in
-                the project repository.
+                Setup, construction, and evaluation entry points for both benchmark tracks are
+                maintained in the project repository.
               </p>
               <div class="github-links">
                 <a class="btn primary github-button" href="https://github.com/zjunlp/MobileMem/">

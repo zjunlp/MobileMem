@@ -51,6 +51,10 @@ languageToggle?.addEventListener("click", () => {
   setPageLanguage(languageToggle.dataset.toggleLang);
 });
 
+document.querySelectorAll("[data-report-placeholder]").forEach((link) => {
+  link.addEventListener("click", (event) => event.preventDefault());
+});
+
 setPageLanguage(document.body.classList.contains("lang-zh") ? "zh" : "en");
 
 // OPPO application video ----------------------------------------------------
@@ -87,6 +91,50 @@ if (videoModal && videoPlay && videoClose) {
 // Highlight accordion -------------------------------------------------------
 
 const featureDetails = Array.from(document.querySelectorAll(".feature-accordion details"));
+const featureVisualImage = document.querySelector("#feature-visual-image");
+let featureVisualRequestId = 0;
+
+const featureVisualAlt = (details) => {
+  const lang = document.documentElement.lang === "zh" ? "zh" : "en";
+  return details.dataset[lang === "zh" ? "featureAltZh" : "featureAltEn"] || "";
+};
+
+const updateFeatureVisual = (details) => {
+  if (!featureVisualImage || !details?.dataset.featureVisual) return;
+
+  const source = details.dataset.featureVisual;
+  featureVisualImage.alt = featureVisualAlt(details);
+  if (featureVisualImage.getAttribute("src") === source) return;
+
+  featureVisualRequestId += 1;
+  const requestId = featureVisualRequestId;
+  const preload = new Image();
+  let applied = false;
+
+  const applyVisual = () => {
+    if (applied || requestId !== featureVisualRequestId) return;
+    applied = true;
+    featureVisualImage.src = source;
+    featureVisualImage.width = Number(details.dataset.featureWidth);
+    featureVisualImage.height = Number(details.dataset.featureHeight);
+    featureVisualImage.alt = featureVisualAlt(details);
+    window.requestAnimationFrame(() => featureVisualImage.classList.remove("is-swapping"));
+  };
+
+  featureVisualImage.classList.add("is-swapping");
+  preload.addEventListener("load", applyVisual, { once: true });
+  preload.addEventListener(
+    "error",
+    () => {
+      if (requestId === featureVisualRequestId) {
+        featureVisualImage.classList.remove("is-swapping");
+      }
+    },
+    { once: true },
+  );
+  preload.src = source;
+  if (preload.complete) applyVisual();
+};
 
 featureDetails.forEach((details) => {
   const summary = details.querySelector("summary");
@@ -99,5 +147,10 @@ featureDetails.forEach((details) => {
     featureDetails.forEach((item) => {
       item.open = item === details;
     });
+    updateFeatureVisual(details);
   });
+});
+
+window.addEventListener("mobilemem:languagechange", () => {
+  updateFeatureVisual(featureDetails.find((details) => details.open));
 });
