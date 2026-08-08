@@ -35,7 +35,7 @@ The textual benchmark for evaluating memory systems on long-term, knowledge-inte
 | Section | Description | Link |
 | :--- | :--- | :--- |
 | **Data** | Access the synthesized KEME trajectories and QA pairs. | [Link](https://huggingface.co/datasets/zjunlp/MobileMem) |
-| **Evaluation** | Run baseline memory systems and reproduce leaderboard results. | [Link](https://github.com/zjunlp/MemBase/tree/main/examples/trace_memory_lifecycle_with_membase) |
+| **Evaluation** | Run baseline memory systems and reproduce leaderboard results. | [Link](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem) |
 | **Construction** | Reproduce the KEME synthesis pipeline from raw traces. | [Link](https://github.com/zjunlp/MobileMem/tree/main/text) |
 
 ### 🖼️ Omni Track
