@@ -1,14 +1,8 @@
 <div align="center">
 
-<div align="center">
-  <img src="omni/asset/logo_01.png" style="height: 60px; width: auto; box-shadow: 0 4px 18px rgba(0,0,0,0.06); vertical-align: middle; display: inline-block;">
-  <h1 style="font-size: 60px; font-weight: bold; margin: 0 0 0 12px; border-bottom: none; display: inline-block; vertical-align: middle; line-height: 1.2;">
-    MobileMem
-  </h1>
-</div>
+<img src="omni/asset/logo_01.png" style="width: 50%; height: auto; box-shadow: 0 4px 18px rgba(0,0,0,0.06); display: block; margin: 0 auto;">
 
-Learning from a Year of Mobile Experiences
-
+### MobileMem: Learning from a Year of Mobile Experiences
 
 [![Paper](https://img.shields.io/badge/📄_Paper-2026.XXXXX-b31b1b?style=flat-square&logo=arxiv&logoColor=white)](https://arxiv.org/abs/XXXX)
 [![Website](https://img.shields.io/badge/🌐_Website-MobileMem-1e7bbf?style=flat-square&logo=googlechrome&logoColor=white)](https://zjunlp.github.io/MobileMem/)
