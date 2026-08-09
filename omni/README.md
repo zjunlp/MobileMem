@@ -1,7 +1,7 @@
-
 ## 📑 Table of Contents
 
 - [📚 Datasets](#-datasets)
+  - [📥 Dataset Access](#-dataset-access)
   - [📊 Benchmark Statistics](#-benchmark-statistics)
   - [🖼️ Image Types](#️-image-types)
   - [🧠 Memory Tasks](#-memory-tasks)
@@ -10,13 +10,17 @@
 - [🚀 Quick Start](#-quick-start)
   - [📦 Environment Setup](#-environment-setup)
   - [📥 Dataset Download](#-dataset-download)
+  - [⚙️ Evaluation](#evaluation)
   - [🖼️ Data Construction](#️-data-construction)
 - [🌻 Acknowledgement](#-acknowledgement)
-- [🚩 Citation](#-citation)
 
 ---
 
 ## 🌟 Overview
+MobileMem-Omni provides multimodal dialogues for mobile scenarios grounded in real user information and year-long event trajectories.
+
+<img src="asset/intro_01.png" style="width:100%; height: auto; border-radius: 14px; box-shadow: 0 4px 18px rgba(0,0,0,0.06);" align=center>
+
 
 | Feature | Description |
 |:--------|:------------|
@@ -29,11 +33,7 @@
 
 ## 📚 Datasets
 ### 📥 Dataset Access
-
-| | |
-|:---|:---|
-| 🤗 **Hugging Face** | [`zjunlp/MobileMem-Omni`](https://huggingface.co/datasets/zjunlp/MobileMem-Omni) |
-| 📦 **GitHub Examples** | [https://github.com/zjunlp/MobileMem](https://github.com/zjunlp/MobileMem) |
+The MobileMem dataset is now publicly available on 🤗 Hugging Face at [`zjunlp/MobileMem-Omni`](https://huggingface.co/datasets/zjunlp/MobileMem-Omni).
 
 ### 📊 Benchmark Statistics
 | Category | Metric | Value |
@@ -235,7 +235,7 @@ For the local API-free smoke pipeline, pass `--offline` (or set
 #### Option 1: Using HuggingFace CLI
 
 ```bash
-huggingface-cli download --repo-type dataset --resume-download zjunlp/xxx --local-dir OceanBenchmark
+huggingface-cli download --repo-type dataset --resume-download zjunlp/MobileMem-Omni --local-dir OceanBenchmark
 ```
 
 #### Option 2: Using Python
@@ -243,14 +243,21 @@ huggingface-cli download --repo-type dataset --resume-download zjunlp/xxx --loca
 ```python
 from datasets import load_dataset
 
-dst = load_dataset("zjunlp/xxx")
+dst = load_dataset("zjunlp/MobileMem-Omni")
 ```
+---
+
+### <a id="evaluation"></a> ⚙️ Evaluation
+
+We provide step-by-step evaluation procedures and scripts in the [`omni/eval`](https://github.com/zjunlp/MobileMem/tree/main/omni/eval) directory to run baseline memory systems.
 
 ---
 
 ### 🖼️ Data Construction
+<img src="asset/framework_01.png" style="width:100%; height: auto; border-radius: 14px; box-shadow: 0 4px 18px rgba(0,0,0,0.06);" align=center>
 
 The dataset is produced by a declarative pipeline — a DAG of stages that turns a persona spec (or a CSV profile) into a full year of multimodal mobile memories.
+Then, the pipeline progressively generates event trajectories, memory points, images, and dialogues in a structured, stage-by-stage manner.
 
 #### Navigate to the directory
 
