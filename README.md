@@ -46,6 +46,8 @@
 
 MobileMem offers two benchmark tracks. Choose the path that fits your needs and navigate to the corresponding resources.
 
+For an interactive visualization of the MobileMem data, visit the [Dataset Explorer](https://github.com/zjunlp/MobileMem/tree/Dataset-Explorer) branch.
+
 ### 📖 Text Track
 The textual benchmark for evaluating memory systems on long-term, knowledge-intensive mobile agent trajectories.
 
