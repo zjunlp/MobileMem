@@ -150,6 +150,7 @@ Each utterance in `dialogue` contains:
 | `memory_content` | Textual description of the memory content |
 | `timestamp` | Time when the memory was created or when the corresponding event occurred |
 | `importance` | Relative importance score ranging from 0 to 1 |
+| `is_update` | Whether the memory updates or supersedes earlier information |
 | `original_memories` | List of original memories related to the current memory point |
 | `image_refs` | List of image paths that support the memory |
 | `dialogue_turn_ids` | List of dialogue turn indices that support the memory |
@@ -172,7 +173,6 @@ Each question contains:
 | `image_refs` | List of image paths involved in the question; this field is missing in a small number of records |
 | `source_session_ids` | List of source session identifiers |
 | `source_event_ids` | List of source event identifiers |
-| `target` | Target type for special questions; only a small number of records contain this field |
 
 ---
 
@@ -261,14 +261,14 @@ Then, the pipeline progressively generates event trajectories, memory points, im
 
 #### Navigate to the directory
 
-```bash
-cd MobileMem-Omni/src
+```powershell
+cd src
 cp .env.example .env          # then fill in your API keys
 ```
 
 #### Run the pipeline
 
-```bash
+```powershell
 # List all stages in topological order
 python -m pipeline.cli list
 
@@ -286,18 +286,18 @@ python -m pipeline.cli run --uuid 0 --max-events 15
 python -m pipeline.cli run --offline --uuid 10 --max-events 1 --max-workers 1
 
 # Create corresponding dialogues and memory points.
-python src/stage5_sessions.py `
-  --input-file output/data/stage4_annual_events.jsonl `
-  --output-file output/debug/stage5_uuid0.jsonl `
-  --image-dir output/image `
+python ../data/final_dataset/generate_code/stage5_sessions.py `
+  --input-file ../output/data/annual_events.jsonl `
+  --output-file ../output/debug/stage5_uuid0.jsonl `
+  --image-dir ../output/image `
   --uuid-filter 0 `
   --max-workers 1 `
   --session-workers 2
 
 # Generate seven categories of evaluation questions
-python src/stage6_questions.py `
-  --input-file data/stage5_all_users.jsonl `
-  --output-file data/stage6_questions_selected_all_users.jsonl `
+python ../data/final_dataset/generate_code/stage6_questions.py `
+  --input-file ../output/debug/stage5_uuid0.jsonl `
+  --output-file ../output/debug/stage6_questions_uuid0.jsonl `
   --uuid-filter 0 `
   --question-types single_hop multi_hop temporal_reasoning `
   --target-per-type 200 `

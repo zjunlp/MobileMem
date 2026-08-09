@@ -1,8 +1,8 @@
 """
 Stage 6: Generate 7 types of questions for each persona.
 
-Input: data/10_person/stage5_sessions.jsonl
-Output: data/10_person/stage6_questions.jsonl
+Input: output/debug/stage5_sessions.jsonl
+Output: output/debug/stage6_questions.jsonl
 """
 
 import argparse
@@ -20,7 +20,7 @@ import jsonlines
 from dotenv import load_dotenv
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..', '..'))
 SRC_DIR = os.path.join(PROJECT_ROOT, 'src')
 
 env_path = os.path.join(SRC_DIR, '.env')
@@ -30,7 +30,7 @@ if os.path.exists(env_path):
 if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
-from llm_request import llm_request
+from backends.llm import llm_request
 
 
 LOG_DIR = os.path.join(PROJECT_ROOT, 'logs')
@@ -2711,19 +2711,19 @@ def main():
     parser.add_argument(
         '--input-file',
         type=str,
-        default=os.path.join(PROJECT_ROOT, 'data', '10_person', 'stage5_sessions.jsonl'),
+        default=os.path.join(PROJECT_ROOT, 'output', 'debug', 'stage5_sessions.jsonl'),
         help='Input stage5 JSONL file',
     )
     parser.add_argument(
         '--output-file',
         type=str,
-        default=os.path.join(PROJECT_ROOT, 'data', '10_person', 'stage6_questions.jsonl'),
+        default=os.path.join(PROJECT_ROOT, 'output', 'debug', 'stage6_questions.jsonl'),
         help='Output stage6 JSONL file',
     )
     parser.add_argument(
         '--prompts-dir',
         type=str,
-        default=os.path.join(PROJECT_ROOT, 'prompts'),
+        default=os.path.join(PROJECT_ROOT, 'data', 'final_dataset', 'stage6_prompt'),
         help='Prompts directory',
     )
     parser.add_argument(

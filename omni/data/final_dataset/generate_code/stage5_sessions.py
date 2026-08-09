@@ -1,8 +1,8 @@
 """
 Stage 5: Generate Dialogue + Memory Points (combined).
 
-Input: data/10_person/stage4_annual_events.jsonl
-Output: data/10_person/stage5_sessions.jsonl
+Input: output/data/annual_events.jsonl
+Output: output/debug/stage5_sessions.jsonl
 
 Generate one session for each event of each persona, containing:
   - Dialogue (15-30 turns)
@@ -28,7 +28,7 @@ from typing import Dict, List, Optional, Set, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..', '..'))
 SRC_DIR = os.path.join(PROJECT_ROOT, 'src')
 
 from dotenv import load_dotenv
@@ -40,7 +40,8 @@ if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
 import jsonlines
-from llm_request import llm_request, _extract_json_from_content
+from backends.llm import llm_request
+from backends.llm.request import _extract_json_from_content
 
 # ============================================================================
 # Logging setup
@@ -3037,16 +3038,16 @@ def main():
     parser = argparse.ArgumentParser(description='Stage 5: Generate Dialogue + Memory Points')
     # ---- Key hyperparameters (modify here) ----
     parser.add_argument('--input-file', type=str,
-                        default=os.path.join(PROJECT_ROOT, 'data', '10_person', 'stage4_annual_events.jsonl'),
+                        default=os.path.join(PROJECT_ROOT, 'output', 'data', 'annual_events.jsonl'),
                         help='Input stage4 JSONL file')
     parser.add_argument('--output-file', type=str,
-                        default=os.path.join(PROJECT_ROOT, 'data', '10_person', 'stage5_sessions.jsonl'),
+                        default=os.path.join(PROJECT_ROOT, 'output', 'debug', 'stage5_sessions.jsonl'),
                         help='Output stage5 JSONL file')
     parser.add_argument('--prompts-dir', type=str,
-                        default=os.path.join(PROJECT_ROOT, 'prompts'),
+                        default=os.path.join(PROJECT_ROOT, 'data', 'final_dataset', 'stage5_prompt'),
                         help='Prompts directory')
     parser.add_argument('--image-dir', type=str,
-                        default=os.path.join(PROJECT_ROOT, 'image'),
+                        default=os.path.join(PROJECT_ROOT, 'output', 'image'),
                         help='Image base directory (contains person/, event/, social/ subdirs)')
     parser.add_argument('--max-workers', type=int, default=3,
                         help='Number of parallel persona workers (default: 3)')
