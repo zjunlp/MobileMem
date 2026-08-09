@@ -1,0 +1,20 @@
+{
+  "name": "mobilemem-project-page",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "format": "prettier --write '*.html' assets/web/css assets/web/js scripts tests 'package*.json' '*.md' '.github/**/*.yml'",
+    "format:check": "prettier --check '*.html' assets/web/css assets/web/js scripts tests 'package*.json' '*.md' '.github/**/*.yml'",
+    "images:build": "node scripts/build-image-manifest.mjs",
+    "images:check": "node scripts/check-image-manifest.mjs",
+    "references:check": "node scripts/check-static-references.mjs",
+    "test:syntax": "for file in assets/web/js/*.js scripts/*.mjs; do node --check \"$file\"; done && ${PYTHON:-python3} -m py_compile tests/test_site_regression.py",
+    "test:browser": "${PYTHON:-python3} tests/test_site_regression.py",
+    "test": "npm run format:check && npm run test:syntax && npm run images:check && npm run references:check && npm run test:browser"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
+  }
+}

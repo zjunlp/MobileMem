@@ -1,0 +1,1410 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MobileMem</title>
+    <meta
+      name="description"
+      content="MobileMem is an on-device memory benchmark for continually evolving mobile AI agents."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="MobileMem" />
+    <meta
+      property="og:description"
+      content="On-device memory for continually evolving mobile AI agents."
+    />
+    <meta property="og:site_name" content="MobileMem" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="stylesheet" href="assets/web/css/site.css" />
+    <link rel="stylesheet" href="assets/web/css/case-demo.css" />
+    <link rel="stylesheet" href="assets/web/css/application-browser.css" />
+  </head>
+  <body class="lang-en">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-nav" aria-label="Primary navigation">
+      <div class="nav-inner">
+        <a class="brand" href="#mobilemem" aria-label="MobileMem home">
+          <img
+            class="brand-logo"
+            src="assets/web/institutions-transparent.webp"
+            alt="OPPO and OpenKG.CN"
+            width="770"
+            height="154"
+          />
+        </a>
+        <nav class="nav-links" aria-label="Section navigation">
+          <a href="#mobilemem">MobileMem</a>
+          <a href="#features">Highlight</a>
+          <a href="#application">Application</a>
+          <a href="#quick-start">Quick Start</a>
+          <a href="https://github.com/zjunlp/MobileMem/">Github</a>
+        </nav>
+        <div class="language-toggle" role="group" aria-label="Language">
+          <button type="button" data-toggle-lang="zh" aria-label="Switch language to Chinese">
+            Chinese
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- Project overview and interactive memory case -->
+      <section class="section hero" id="mobilemem" aria-labelledby="mobilemem-title">
+        <div class="wrap hero-grid">
+          <div>
+            <p class="eyebrow">Why MobileMem</p>
+            <h1 id="mobilemem-title">MobileMem</h1>
+            <p class="quote" data-lang="zh">MobileMem：面向持续演进智能体的端侧记忆</p>
+            <p class="quote" data-lang="en">
+              MobileMem: On-Device Memory for Continually Evolving Agents
+            </p>
+            <p class="quote small" data-lang="zh">
+              MobileMem
+              作为用户的个人记忆智能体，能够自动理解用户意图，执行跨时间的人脸识别以关联多年间女儿的身份，从海量照片档案中定位
+              2016 年的生日场景，并返回一家三口围坐在生日蛋糕旁的照片。
+            </p>
+            <p class="quote small" data-lang="en">
+              MobileMem acts as the user's personal memory agent, automatically understanding user
+              intent, performing cross-time facial recognition to associate the daughter's identity
+              across years, locating the 2016 birthday scene from a vast photo archive, and
+              returning the photo of the family of three gathered around the birthday cake.
+            </p>
+            <div class="actions" aria-label="Project links">
+              <a
+                class="btn"
+                href="#"
+                data-report-link
+                data-report-href-en="#"
+                data-report-href-zh="#"
+                aria-disabled="true"
+                aria-label="Technical Report, coming soon"
+                title="Coming soon"
+              >
+                <span data-lang="zh">白皮书</span>
+                <span data-lang="en">Report</span>
+              </a>
+              <a class="btn" href="https://github.com/zjunlp/MobileMem/">
+                <span data-lang="zh">代码</span>
+                <span data-lang="en">Code</span>
+              </a>
+              <a class="btn" href="mailto:zhangningyu@zju.edu.cn">
+                <span data-lang="zh">邮件</span>
+                <span data-lang="en">Email</span>
+              </a>
+              <button
+                class="btn video-play"
+                type="button"
+                aria-label="OPPO 应用场景视频 / OPPO Application Scenarios video"
+              >
+                <span data-lang="zh">视频</span>
+                <span data-lang="en">Video</span>
+              </button>
+            </div>
+          </div>
+          <div class="media-stack">
+            <div class="case-stage" aria-label="MobileMem daughter birthday case demo">
+              <div class="case-flow">
+                <div class="case-phone">
+                  <div class="case-phone-top">Mobile Assistant</div>
+                  <div class="case-chat" data-case-chat>
+                    <div class="case-message user" data-case-user-message>
+                      <span class="case-avatar" aria-hidden="true">
+                        <img src="assets/web/case-user-avatar.webp" alt="" />
+                      </span>
+                      <div class="case-bubble">
+                        <p data-case-user-text>
+                          Could you find the photo from my daughter's 7th birthday?
+                        </p>
+                      </div>
+                    </div>
+                    <div
+                      class="case-message agent case-reasoning"
+                      data-case-thinking
+                      aria-label="MobileMem reasoning"
+                    >
+                      <span class="case-avatar" aria-hidden="true">
+                        <img class="xiaobu-avatar" src="assets/web/xiaobu-avatar.webp" alt="" />
+                      </span>
+                      <div class="case-bubble">
+                        <div class="case-current-thought" data-case-current-thought data-step="1">
+                          <b>Personalized KG</b>
+                          <span>Find daughter and family relations.</span>
+                          <div class="case-relation-proof">
+                            <div class="case-relation-card" data-year="2026">
+                              <img
+                                src="assets/web/case-user-2026-web.webp"
+                                alt="Current user portrait."
+                              />
+                              <small>User</small>
+                            </div>
+                            <div class="case-relation-card" data-year="2026">
+                              <img
+                                src="assets/web/case-daughter-2026-web.webp"
+                                alt="Current daughter portrait."
+                              />
+                              <small>Daughter</small>
+                            </div>
+                            <div class="case-relation-card" data-year="2016">
+                              <img
+                                src="assets/web/case-user-2016-web.webp"
+                                alt="Past user portrait."
+                              />
+                              <small>User</small>
+                            </div>
+                            <div class="case-relation-card" data-year="2016">
+                              <img
+                                src="assets/web/case-daughter-2016-web.webp"
+                                alt="Past daughter portrait."
+                              />
+                              <small>Daughter</small>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="case-message agent" data-case-reply>
+                      <span class="case-avatar" aria-hidden="true">
+                        <img class="xiaobu-avatar" src="assets/web/xiaobu-avatar.webp" alt="" />
+                      </span>
+                      <div class="case-bubble">
+                        <p data-case-reply-text>Got it. Is this the one?</p>
+                        <img
+                          class="case-result-photo"
+                          src="assets/web/case-result-birthday.webp"
+                          alt="A family photo around a birthday cake returned by MobileMem."
+                        />
+                      </div>
+                    </div>
+                    <div class="case-message user case-followup" data-case-followup>
+                      <span class="case-avatar" aria-hidden="true">
+                        <img src="assets/web/case-user-avatar.webp" alt="" />
+                      </span>
+                      <div class="case-bubble">
+                        <p data-case-followup-text>
+                          Yes. Do you remember other important photos from that year? Make an album
+                          for her birthday.
+                        </p>
+                      </div>
+                    </div>
+                    <div class="case-message agent case-album" data-case-album-reply>
+                      <span class="case-avatar" aria-hidden="true">
+                        <img class="xiaobu-avatar" src="assets/web/xiaobu-avatar.webp" alt="" />
+                      </span>
+                      <div class="case-bubble">
+                        <p data-case-album-text>OK, her album is ready.</p>
+                        <div
+                          class="case-memory-album"
+                          aria-label="Memories from 2016 album preview"
+                        >
+                          <div class="case-memory-album-grid">
+                            <div class="case-album-card school">
+                              <img src="assets/web/case-memory-bank.webp" alt="" />
+                              <span data-lang="zh">开学日</span
+                              ><span data-lang="en">School Day</span>
+                            </div>
+                            <div class="case-album-card lake">
+                              <img src="assets/web/case-memory-bank.webp" alt="" />
+                              <span data-lang="zh">西湖</span><span data-lang="en">West Lake</span>
+                            </div>
+                            <div class="case-album-card family">
+                              <img src="assets/web/case-memory-bank.webp" alt="" />
+                              <span data-lang="zh">全家</span><span data-lang="en">Family</span>
+                            </div>
+                            <div class="case-album-card birthday">
+                              <img src="assets/web/case-result-birthday.webp" alt="" />
+                              <span data-lang="zh">7 岁生日</span
+                              ><span data-lang="en">7th Birthday</span>
+                            </div>
+                          </div>
+                          <strong class="case-album-title">
+                            <span data-lang="zh">2016 年的回忆</span>
+                            <span data-lang="en">Memories from 2016</span>
+                          </strong>
+                          <p class="case-album-more">
+                            <span data-lang="zh">点击<u>这里</u>查看更多...</span>
+                            <span data-lang="en">Click <u>here</u> to see more...</span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="case-composer">
+                    <p class="case-composer-text" data-case-typed></p>
+                    <button class="case-send" type="button" data-case-send>Send</button>
+                  </div>
+                </div>
+              </div>
+              <div class="case-story-panel">
+                <div
+                  class="memory-room"
+                  data-memory-room
+                  data-room-step="0"
+                  aria-label="Animated MobileMem agent room"
+                >
+                  <div class="px-scene">
+                    <img
+                      class="room-bg"
+                      src="assets/web/xiaobu-functional-cabin-transparent.webp"
+                      alt=""
+                      aria-hidden="true"
+                    />
+
+                    <div class="px-zone kg" aria-hidden="true"></div>
+                    <div class="px-zone bank" aria-hidden="true"></div>
+                    <div class="px-zone reason" aria-hidden="true"></div>
+                    <div class="px-zone result" aria-hidden="true"></div>
+                    <div class="walk-area" aria-hidden="true"></div>
+
+                    <div class="px-relation-board" aria-hidden="true">
+                      <div class="px-relation-card" data-year="2026">
+                        <img src="assets/web/case-user-2026-web.webp" alt="" />
+                        <span data-lang="zh">用户</span><span data-lang="en">USER</span>
+                        <em class="px-thought" data-lang="zh">先确定当前请求者身份</em>
+                        <em class="px-thought" data-lang="en">Identify the current requester.</em>
+                      </div>
+                      <div class="px-relation-card" data-year="2026">
+                        <img src="assets/web/case-daughter-2026-web.webp" alt="" />
+                        <span data-lang="zh">女儿</span><span data-lang="en">DAUGHTER</span>
+                        <em class="px-thought" data-lang="zh">找到当前照片中的女儿</em>
+                        <em class="px-thought" data-lang="en">Find the daughter today.</em>
+                      </div>
+                      <div class="px-relation-card" data-year="2016">
+                        <img src="assets/web/case-user-2016-web.webp" alt="" />
+                        <span data-lang="zh">用户</span><span data-lang="en">USER</span>
+                        <em class="px-thought" data-lang="zh">回溯 2016 年的用户</em>
+                        <em class="px-thought" data-lang="en">Trace the user in 2016.</em>
+                      </div>
+                      <div class="px-relation-card" data-year="2016">
+                        <img src="assets/web/case-daughter-2016-web.webp" alt="" />
+                        <span data-lang="zh">女儿</span><span data-lang="en">DAUGHTER</span>
+                        <em class="px-thought" data-lang="zh">匹配过去照片里的女儿</em>
+                        <em class="px-thought" data-lang="en">Match the past daughter.</em>
+                      </div>
+                    </div>
+
+                    <div class="px-rifle" aria-hidden="true">
+                      <div class="px-cand">
+                        <img src="assets/web/case-daughter-identity.webp" alt="" /><span
+                          class="px-x"
+                          >NOT IT</span
+                        >
+                      </div>
+                      <div class="px-cand">
+                        <img src="assets/web/case-memory-bank.webp" alt="" /><span class="px-x"
+                          >NO CAKE</span
+                        >
+                      </div>
+                      <div class="px-cand">
+                        <img src="assets/web/case-daughter-identity.webp" alt="" /><span
+                          class="px-x"
+                          >2019?</span
+                        >
+                      </div>
+                      <div class="px-cand">
+                        <img src="assets/web/case-memory-bank.webp" alt="" /><span class="px-x"
+                          >WRONG DAY</span
+                        >
+                      </div>
+                      <div class="px-cand">
+                        <img src="assets/web/case-memory-bank.webp" alt="" /><span class="px-x"
+                          >SKIP</span
+                        >
+                      </div>
+                      <div class="px-cand px-hit">
+                        <img src="assets/web/case-result-birthday.webp" alt="" /><span class="px-o"
+                          >MATCH</span
+                        >
+                      </div>
+                    </div>
+
+                    <div class="px-screen" aria-hidden="true">
+                      <img src="assets/web/case-result-birthday.webp" alt="" />
+                      <span class="px-screen-label">
+                        <span class="screen-label-match" data-lang="zh">命中照片</span>
+                        <span class="screen-label-match" data-lang="en">MATCHED PHOTO</span>
+                        <span class="screen-label-album" data-lang="zh">相册完成</span>
+                        <span class="screen-label-album" data-lang="en">ALBUM READY</span>
+                      </span>
+                    </div>
+
+                    <div class="room-agent" aria-hidden="true">
+                      <div class="room-bubble">
+                        <span class="room-bubble-text"></span>
+                      </div>
+                      <img class="px-hero" src="assets/web/xiaobu-agent.webp" alt="" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Research highlights -->
+      <section class="section" id="features" aria-labelledby="features-title">
+        <div class="wrap">
+          <div class="center-head">
+            <p class="eyebrow">Research Features</p>
+            <h2 id="features-title">
+              <span data-lang="zh">MobileMem 的特色</span>
+              <span data-lang="en">MobileMem Features</span>
+            </h2>
+          </div>
+          <div class="feature-layout">
+            <figure class="framework-figure" data-visual-kind="paper">
+              <img
+                id="feature-visual-image"
+                src="assets/web/paper/figure-2-data-silos.webp"
+                alt="Figure 2 from the MobileMem paper, showing communication, social media, photos, books, shopping, and travel applications connected through a shared memory layer."
+                width="2000"
+                height="1155"
+                loading="lazy"
+                decoding="async"
+              />
+            </figure>
+            <div class="feature-accordion" aria-label="MobileMem features">
+              <details
+                open
+                data-feature-visual="assets/web/paper/figure-2-data-silos.webp"
+                data-feature-width="2000"
+                data-feature-height="1155"
+                data-feature-alt-en="Mobile application screenshots connected through a shared memory layer, illustrating how MobileMem unifies fragmented data across applications."
+                data-feature-alt-zh="聊天、社交、相册、阅读、购物和旅行等移动应用通过共享记忆层相连，展示 MobileMem 如何统一跨应用数据。"
+              >
+                <summary>
+                  <span class="step-number">01</span>
+                  <span class="feature-summary-copy">
+                    <strong>
+                      <span data-lang="zh">打破应用数据孤岛</span>
+                      <span data-lang="en">Breaking Data Silos</span>
+                    </strong>
+                    <small>
+                      <span data-lang="zh">跨应用的统一记忆层</span>
+                      <span data-lang="en">One memory layer across applications</span>
+                    </small>
+                  </span>
+                </summary>
+                <div class="accordion-body">
+                  <p class="quote small" data-lang="zh">
+                    MobileMem
+                    将聊天、社交媒体、照片、阅读、购物和日历等数据汇入统一的记忆层，使手机能够跨场景理解用户的关系、兴趣与上下文。
+                  </p>
+                  <p class="quote small" data-lang="en">
+                    MobileMem unifies chat, social media, photos, reading, shopping, and calendar
+                    data in a shared memory layer, preserving relationships, interests, and context
+                    across scenarios.
+                  </p>
+                </div>
+              </details>
+              <details
+                data-feature-visual="assets/web/paper/figure-mobilemem-overview.webp"
+                data-feature-width="2000"
+                data-feature-height="1226"
+                data-feature-alt-en="MobileMem overview showing personal conversations and proactive mobile assistance connected by a memory benchmark workflow."
+                data-feature-alt-zh="MobileMem 总览：个人对话与主动式移动助理通过记忆基准流程相连接。"
+              >
+                <summary>
+                  <span class="step-number">02</span>
+                  <span class="feature-summary-copy">
+                    <strong>
+                      <span data-lang="zh">从推理到记忆</span>
+                      <span data-lang="en">From Reasoning to Remembering</span>
+                    </strong>
+                    <small>
+                      <span data-lang="zh">下一代个人助手的核心能力</span>
+                      <span data-lang="en">A foundation for personal assistants</span>
+                    </small>
+                  </span>
+                </summary>
+                <div class="accordion-body">
+                  <p class="quote small" data-lang="zh">
+                    因此，AI 的未来不仅在于推理，也在于记忆。
+                  </p>
+                  <p class="quote small" data-lang="en">
+                    Consequently, the future of AI lies not only in reasoning but also in
+                    remembering.
+                  </p>
+                </div>
+              </details>
+              <details
+                data-feature-visual="assets/web/paper/figure-memory-ecosystem.webp"
+                data-feature-width="2000"
+                data-feature-height="973"
+                data-feature-alt-en="Two-layer on-device memory ecosystem with a system-level memory layer, standardized protocol, and application-specific memory layers."
+                data-feature-alt-zh="由系统级记忆层、标准化协议与应用专属记忆层组成的双层端侧记忆生态。"
+              >
+                <summary>
+                  <span class="step-number">03</span>
+                  <span class="feature-summary-copy">
+                    <strong>
+                      <span data-lang="zh">复合记忆架构</span>
+                      <span data-lang="en">Composite Memory Architecture</span>
+                    </strong>
+                    <small>
+                      <span data-lang="zh">系统级记忆层与应用专属记忆</span>
+                      <span data-lang="en">System-level and application-specific memory</span>
+                    </small>
+                  </span>
+                </summary>
+                <div class="accordion-body">
+                  <p class="quote small" data-lang="zh">
+                    相反，我们设想一种由两个互补组件构成的复合记忆架构。这两个组件可以通过标准化协议协作，形成统一的记忆生态，其能力超过各个模块的简单叠加。
+                  </p>
+                  <p class="quote small" data-lang="en">
+                    Instead, we envision a composite memory architecture consisting of two
+                    complementary components. These two components can collaborate through
+                    standardized protocols, forming a unified memory ecosystem whose capability
+                    exceeds the simple aggregation of individual modules.
+                  </p>
+                </div>
+              </details>
+              <details
+                data-feature-visual="assets/web/paper/figure-keme-synthesis.webp"
+                data-feature-width="2000"
+                data-feature-height="1181"
+                data-feature-alt-en="KEME synthesis framework covering prior knowledge construction, interaction trajectory synthesis, question-answer synthesis, and quality control."
+                data-feature-alt-zh="KEME 合成框架，包括先验知识构建、交互轨迹合成、问答对合成与质量控制。"
+              >
+                <summary>
+                  <span class="step-number">04</span>
+                  <span class="feature-summary-copy">
+                    <strong>
+                      <span data-lang="zh">KEME 合成框架</span>
+                      <span data-lang="en">KEME Synthesis Framework</span>
+                    </strong>
+                    <small>
+                      <span data-lang="zh">知识锚点、用户画像与时间约束</span>
+                      <span data-lang="en">Anchors, persona knowledge, temporal constraints</span>
+                    </small>
+                  </span>
+                </summary>
+                <div class="accordion-body">
+                  <p class="quote small" data-lang="zh">
+                    在用户画像知识和时间约束的引导下，KEME
+                    将这些锚定会话分层组织成统一的交互流，同时随着用户经历随时间展开，逐步合成人机交互。
+                  </p>
+                  <p class="quote small" data-lang="en">
+                    Guided by user persona knowledge and temporal constraints, KEME hierarchically
+                    organizes these anchored sessions into a unified interaction stream, while
+                    progressively synthesizing human-assistant interactions that naturally emerge as
+                    the user’s experiences unfold over time.
+                  </p>
+                </div>
+              </details>
+              <details
+                data-feature-visual="assets/web/paper/figure-dual-scenarios-cropped.webp"
+                data-feature-width="753"
+                data-feature-height="397"
+                data-feature-alt-en="MobileMem dialogue interactions shown alongside multimodal scenarios including video, tickets, social posts, transactions, and music."
+                data-feature-alt-zh="MobileMem 对话交互与多模态场景并列展示，包括视频、票务、社交动态、交易和音乐。"
+              >
+                <summary>
+                  <span class="step-number">05</span>
+                  <span class="feature-summary-copy">
+                    <strong>
+                      <span data-lang="zh">双场景基准</span>
+                      <span data-lang="en">Two Benchmark Scenarios</span>
+                    </strong>
+                    <small>
+                      <span data-lang="zh">文本 MobileMem 与多模态 MobileMem-Omni</span>
+                      <span data-lang="en">Textual MobileMem and multimodal MobileMem-Omni</span>
+                    </small>
+                  </span>
+                </summary>
+                <div class="accordion-body">
+                  <p class="quote small" data-lang="zh">
+                    这些基准共同提供了一个综合框架，用于评估记忆系统从原始移动经验中合成、组织和检索结构化知识的有效性。
+                  </p>
+                  <p class="quote small" data-lang="en">
+                    Together, these benchmarks provide a comprehensive framework for assessing how
+                    effectively memory systems synthesize, organize, and retrieve structured
+                    knowledge from raw mobile experiences.
+                  </p>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Interactive MobileMem sample browser -->
+      <section class="section application" id="application" aria-labelledby="application-title">
+        <div class="wrap">
+          <div class="center-head">
+            <p class="eyebrow">Applications</p>
+            <h2 id="application-title">
+              <span data-lang="zh">MobileMem 的应用场景</span>
+              <span data-lang="en">Application Scenarios</span>
+            </h2>
+          </div>
+          <div class="application-layout" data-application-showcase>
+            <div class="application-accordion">
+              <details
+                class="application-item"
+                open
+                data-application-uid="uid0"
+                data-application-type="group_chat"
+              >
+                <summary>
+                  <span class="application-index">01</span>
+                  <span class="application-summary-copy">
+                    <strong>
+                      <span data-lang="zh">生态系统</span>
+                      <span data-lang="en">Ecosystem</span>
+                    </strong>
+                    <small>
+                      <span data-lang="zh">移动 AI 助手长期记忆评测</span>
+                      <span data-lang="en"
+                        >Long-term memory evaluation for mobile AI assistants</span
+                      >
+                    </small>
+                  </span>
+                  <span class="application-chevron" aria-hidden="true"></span>
+                </summary>
+                <div class="application-body">
+                  <p data-lang="zh">
+                    MobileMem 被设计为一个统一基准，用于评估移动 AI
+                    助手中的长期记忆，而不是一个独立的记忆系统。其模块化架构可无缝集成到现有移动智能体生态中，包括任务理解、记忆检索、问答、网页搜索、回复安全和执行模块。因此，MobileMem
+                    支持不同记忆架构之间的可复现比较，并促进长期记忆评测接入真实开发管线。
+                  </p>
+                  <p data-lang="en">
+                    MobileMem is designed as a unified benchmark for evaluating long-term memory in
+                    mobile AI assistants rather than a standalone memory system. Its modular
+                    architecture seamlessly integrates with the existing mobile agent ecosystem,
+                    including task understanding, memory retrieval, question answering, web search,
+                    response safety, and execution modules. Consequently, MobileMem supports
+                    reproducible comparison across different memory architectures and facilitates
+                    the integration of long-term memory evaluation into real-world development
+                    pipelines.
+                  </p>
+                </div>
+              </details>
+              <details
+                class="application-item"
+                data-application-uid="uid0"
+                data-application-type="book"
+              >
+                <summary>
+                  <span class="application-index">02</span>
+                  <span class="application-summary-copy">
+                    <strong>
+                      <span data-lang="zh">标准化</span>
+                      <span data-lang="en">Standardization</span>
+                    </strong>
+                    <small>
+                      <span data-lang="zh">真实手机记忆与统一评测框架</span>
+                      <span data-lang="en">Authentic smartphone memory and unified protocols</span>
+                    </small>
+                  </span>
+                  <span class="application-chevron" aria-hidden="true"></span>
+                </summary>
+                <div class="application-body">
+                  <p data-lang="zh">
+                    MobileMem
+                    的一个关键特征是，它由真实智能手机记忆构建，而不是合成交互日志或人工整理的用户画像。该基准在单一评测框架中统一了基础记忆、认知记忆、偏好记忆、时间推理和视觉推理，同时将评估建立在约一年真实用户活动之上。MobileMem
+                    建立在原生移动应用生成的异构记忆源之上，包括日历、相册、笔记、文档、待办事项、账单、语音备忘录、屏幕记忆、视频记忆以及其他用户生成记录。
+                  </p>
+                  <p data-lang="en">
+                    A key characteristic of MobileMem is that it is constructed from authentic
+                    smartphone memory rather than synthetic interaction logs or manually curated
+                    user profiles. The benchmark unifies foundational memory, cognitive memory,
+                    preference memory, temporal reasoning, and visual reasoning within a single
+                    evaluation framework, while grounding assessment in approximately one year of
+                    real user activities. MobileMem is built upon heterogeneous memory sources
+                    generated by native mobile applications, including calendars, albums, notes,
+                    documents, to-do lists, bills, voice memos, screen memories, video memories, and
+                    other user-generated records.
+                  </p>
+                </div>
+              </details>
+              <details
+                class="application-item"
+                data-application-uid="uid0"
+                data-application-type="money"
+              >
+                <summary>
+                  <span class="application-index">03</span>
+                  <span class="application-summary-copy">
+                    <strong>
+                      <span data-lang="zh">端侧智能</span>
+                      <span data-lang="en">On-Device Intelligence</span>
+                    </strong>
+                    <small>
+                      <span data-lang="zh">可度量、可比较、可持续改进</span>
+                      <span data-lang="en">Measurable, comparable, continuously improvable</span>
+                    </small>
+                  </span>
+                  <span class="application-chevron" aria-hidden="true"></span>
+                </summary>
+                <div class="application-body">
+                  <p data-lang="zh">
+                    MobileMem
+                    将长期记忆评测从定性能力展示转向可度量、可比较且可持续改进的评估。该基准为检索准确性、时间一致性、偏好理解、多模态推理和长程知识整合提供综合指标，从而能够客观比较不同记忆架构和检索策略。随着基础模型日益从云服务迁移到边缘设备，MobileMem
+                    为评估可靠、高效、隐私感知且能通过长期用户交互持续演进的记忆系统提供了有效框架。
+                  </p>
+                  <p data-lang="en">
+                    MobileMem shifts long-term memory evaluation from qualitative capability
+                    demonstrations to measurable, comparable, and continuously improvable
+                    assessment. The benchmark provides comprehensive metrics for retrieval accuracy,
+                    temporal consistency, preference understanding, multimodal reasoning, and
+                    long-horizon knowledge integration, enabling objective comparison among
+                    different memory architectures and retrieval strategies. As foundation models
+                    increasingly migrate from cloud services to edge devices, MobileMem offers an
+                    effective framework for evaluating reliable, efficient, and privacy-aware memory
+                    systems that continuously evolve through long-term user interactions.
+                  </p>
+                </div>
+              </details>
+              <details
+                class="application-item"
+                data-application-uid="uid1"
+                data-application-type="event"
+              >
+                <summary>
+                  <span class="application-index">04</span>
+                  <span class="application-summary-copy">
+                    <strong>
+                      <span data-lang="zh">用户记忆价值</span>
+                      <span data-lang="en">User Memory Value</span>
+                    </strong>
+                    <small>
+                      <span data-lang="zh">以长期多模态用户记忆作为个性化基本单元</span>
+                      <span data-lang="en"
+                        >Long-term multimodal user memory as personalization</span
+                      >
+                    </small>
+                  </span>
+                  <span class="application-chevron" aria-hidden="true"></span>
+                </summary>
+                <div class="application-body">
+                  <p data-lang="zh">
+                    从核心上看，MobileMem
+                    将长期多模态用户记忆视为个性化的基本单元。不同于主要评估孤立事实回忆的传统问答基准，MobileMem
+                    评估 AI
+                    助手是否能够在扩展时间跨度内持续积累、检索、整合并推理不断演化的用户记忆。通过建模真实用户轨迹、多语言交互、动态偏好和真实世界事件，该基准鼓励开发能够提供上下文感知、主动且持续自适应辅助能力的
+                    AI 助手。
+                  </p>
+                  <p data-lang="en">
+                    At its core, MobileMem treats long-term multimodal user memory as the
+                    fundamental unit of personalization. Unlike conventional question answering
+                    benchmarks that primarily evaluate isolated factual recall, MobileMem evaluates
+                    whether AI assistants can continuously accumulate, retrieve, integrate, and
+                    reason over evolving user memories across extended temporal horizons. By
+                    modeling authentic user trajectories, multilingual interactions, dynamic
+                    preferences, and real-world events, the benchmark encourages the development of
+                    AI assistants capable of delivering context-aware, proactive, and continuously
+                    adaptive assistance.
+                  </p>
+                </div>
+              </details>
+              <details
+                class="application-item"
+                data-application-uid="uid1"
+                data-application-type="video"
+              >
+                <summary>
+                  <span class="application-index">05</span>
+                  <span class="application-summary-copy">
+                    <strong>
+                      <span data-lang="zh">应用场景</span>
+                      <span data-lang="en">Application Scenarios</span>
+                    </strong>
+                    <small>
+                      <span data-lang="zh">健康管理、行程规划、影视追踪与工作复盘</span>
+                      <span data-lang="en">Health, travel, entertainment, and work</span>
+                    </small>
+                  </span>
+                  <span class="application-chevron" aria-hidden="true"></span>
+                </summary>
+                <div class="application-body">
+                  <p data-lang="zh">
+                    <strong>健康管理与用药提醒：</strong
+                    >助手结合日历、笔记、浏览记录、体检报告和处方，核对用户的药物过敏史与当前用药，并及时给出风险提醒。<br /><br />
+                    <strong>旅行行程规划：</strong
+                    >助手整合用户收藏的游记、交通方式和住宿偏好，生成符合个人兴趣的具体行程。<br /><br />
+                    <strong>个人影视清单与追剧记录：</strong
+                    >助手从长期积累的观剧笔记和截图中识别相似作品，进行跨时间比较并生成个性化长评。<br /><br />
+                    <strong>工作复盘与年中总结：</strong
+                    >助手整合日历、文档、笔记和屏幕记忆，梳理学习轨迹、工作产出与长期存在的瓶颈。
+                  </p>
+                  <p data-lang="en">
+                    <strong>Health Management and Medication Reminder:</strong> The assistant
+                    matches the user's allergy history with the current medication list and provides
+                    a clear risk alert.<br /><br />
+                    <strong>Itinerary Planning for a Foreign Trip:</strong> The assistant integrates
+                    bookmarked guides with transportation and accommodation preferences to produce a
+                    personalized itinerary.<br /><br />
+                    <strong>Personal Watchlist and Drama Tracking:</strong> The assistant identifies
+                    works with similar styles or themes and generates a comparative review grounded
+                    in long-term personal memory.<br /><br />
+                    <strong>Work Review and Mid-Year Summary:</strong> The assistant integrates
+                    calendars, documents, notes, and screen memories to summarize learning
+                    trajectories, work output, and recurring bottlenecks.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <figure class="application-phone-visual" data-application-step="detail" tabindex="0">
+              <header class="application-browser-head">
+                <span class="application-browser-title">
+                  <strong>
+                    <span data-lang="zh">可交互移动记忆索引</span>
+                    <span data-lang="en">Interactive memory index</span>
+                  </strong>
+                </span>
+                <span class="application-browser-actions">
+                  <span class="application-uid-switch" aria-label="Switch memory owner">
+                    <span class="application-uid-group" data-lang="zh">
+                      <button
+                        type="button"
+                        data-application-phone-uid="uid0"
+                        aria-label="中文用户 A"
+                        aria-pressed="false"
+                      >
+                        <img
+                          data-src="assets/web/memweb/uid0-person-01.webp"
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        data-application-phone-uid="uid1"
+                        aria-label="中文用户 B"
+                        aria-pressed="false"
+                      >
+                        <img
+                          data-src="assets/web/memweb/uid1-person-01.webp"
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        data-application-phone-uid="uid2"
+                        aria-label="中文用户 C"
+                        aria-pressed="false"
+                      >
+                        <img
+                          data-src="assets/web/memweb/curated/uid2-person-01.webp"
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </button>
+                    </span>
+                    <span class="application-uid-group" data-lang="en">
+                      <button
+                        class="is-active"
+                        type="button"
+                        data-application-phone-uid="uid10"
+                        aria-label="English profile A"
+                        aria-pressed="true"
+                      >
+                        <img
+                          data-src="assets/web/memweb/uid10-person-01.webp"
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        data-application-phone-uid="uid11"
+                        aria-label="English profile B"
+                        aria-pressed="false"
+                      >
+                        <img
+                          data-src="assets/web/memweb/curated/uid11-person-01.webp"
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        data-application-phone-uid="uid12"
+                        aria-label="English profile C"
+                        aria-pressed="false"
+                      >
+                        <img
+                          data-src="assets/web/memweb/curated/uid12-person-01.webp"
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </button>
+                    </span>
+                  </span>
+                </span>
+              </header>
+
+              <section
+                class="application-browser-view application-detail-view"
+                aria-label="Selected image detail"
+              >
+                <div class="application-stage">
+                  <div class="application-phone-wrap">
+                    <button
+                      class="application-phone-direction"
+                      type="button"
+                      data-application-direction="previous"
+                      data-application-phone-direction
+                      aria-label="Previous image"
+                      hidden
+                    >
+                      <svg viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="m12.5 4.5-5 5.5 5 5.5"></path>
+                      </svg>
+                    </button>
+
+                    <div class="application-phone" data-application-phone-mode="home">
+                      <div class="application-phone-desktop" data-application-phone-desktop>
+                        <div class="application-phone-status">
+                          <strong>9:41</strong><span>MobileMem</span>
+                        </div>
+                        <button
+                          class="application-phone-ai-entry"
+                          type="button"
+                          data-application-phone-ai
+                        >
+                          <span class="application-ai-portal-avatar" aria-hidden="true"
+                            ><img
+                              data-src="assets/web/memweb/uid10-person-01.webp"
+                              alt=""
+                              data-application-ai-user-avatar
+                              loading="lazy"
+                              decoding="async"
+                          /></span>
+                          <span class="application-ai-portal-copy">
+                            <strong
+                              ><span data-lang="zh">AI 对话</span
+                              ><span data-lang="en">AI dialogue</span></strong
+                            >
+                            <svg
+                              class="application-ai-portal-thread"
+                              viewBox="0 0 120 17"
+                              preserveAspectRatio="none"
+                              aria-hidden="true"
+                            >
+                              <path d="M2 11 C24 11 28 3 49 3 S78 15 118 7"></path>
+                              <circle cx="2" cy="11" r="2.5"></circle>
+                              <circle cx="49" cy="3" r="2.5"></circle>
+                              <circle cx="82" cy="13" r="2.5"></circle>
+                              <circle cx="118" cy="7" r="2.5"></circle>
+                            </svg>
+                          </span>
+                          <span class="application-ai-portal-orbit" aria-hidden="true"></span>
+                        </button>
+                        <div class="application-phone-apps">
+                          <section class="application-memory-cluster">
+                            <strong class="application-memory-cluster-title"
+                              ><span data-lang="zh">人际</span
+                              ><span data-lang="en">People</span></strong
+                            >
+                            <div class="application-memory-mosaic">
+                              <button type="button" data-application-phone-type="group_chat">
+                                <span
+                                  ><img
+                                    data-src="assets/web/memweb/curated/uid10-group_chat-01.webp"
+                                    alt=""
+                                    loading="lazy"
+                                    decoding="async" /></span
+                                ><b data-lang="zh">聊天</b><b data-lang="en">Chat</b>
+                              </button>
+                              <button type="button" data-application-phone-type="friend">
+                                <span
+                                  ><img
+                                    data-src="assets/web/memweb/curated/uid10-friend-01.webp"
+                                    alt=""
+                                    loading="lazy"
+                                    decoding="async" /></span
+                                ><b data-lang="zh">动态</b><b data-lang="en">Posts</b>
+                              </button>
+                            </div>
+                          </section>
+                          <section class="application-memory-cluster">
+                            <strong class="application-memory-cluster-title"
+                              ><span data-lang="zh">消费</span
+                              ><span data-lang="en">Life</span></strong
+                            >
+                            <div class="application-memory-mosaic">
+                              <button type="button" data-application-phone-type="shopping">
+                                <span
+                                  ><img
+                                    data-src="assets/web/memweb/curated/uid10-shopping-01.webp"
+                                    alt=""
+                                    loading="lazy"
+                                    decoding="async" /></span
+                                ><b data-lang="zh">购物</b><b data-lang="en">Shopping</b>
+                              </button>
+                              <button type="button" data-application-phone-type="money">
+                                <span
+                                  ><img
+                                    data-src="assets/web/memweb/curated/uid10-money-01.webp"
+                                    alt=""
+                                    loading="lazy"
+                                    decoding="async" /></span
+                                ><b data-lang="zh">账单</b><b data-lang="en">Bills</b>
+                              </button>
+                              <button type="button" data-application-phone-type="ticket">
+                                <span
+                                  ><img
+                                    data-src="assets/web/memweb/curated/uid10-ticket-01.webp"
+                                    alt=""
+                                    loading="lazy"
+                                    decoding="async" /></span
+                                ><b data-lang="zh">票务</b><b data-lang="en">Tickets</b>
+                              </button>
+                            </div>
+                          </section>
+                          <section class="application-memory-cluster">
+                            <strong class="application-memory-cluster-title"
+                              ><span data-lang="zh">内容</span
+                              ><span data-lang="en">Media</span></strong
+                            >
+                            <div class="application-memory-mosaic">
+                              <button type="button" data-application-phone-type="music">
+                                <span
+                                  ><img
+                                    data-src="assets/web/memweb/curated/uid10-music-01.webp"
+                                    alt=""
+                                    loading="lazy"
+                                    decoding="async" /></span
+                                ><b data-lang="zh">音乐</b><b data-lang="en">Music</b>
+                              </button>
+                              <button type="button" data-application-phone-type="video">
+                                <span
+                                  ><img
+                                    data-src="assets/web/memweb/curated/uid10-video-01.webp"
+                                    alt=""
+                                    loading="lazy"
+                                    decoding="async" /></span
+                                ><b data-lang="zh">视频</b><b data-lang="en">Video</b>
+                              </button>
+                              <button type="button" data-application-phone-type="book">
+                                <span
+                                  ><img
+                                    data-src="assets/web/memweb/curated/uid10-book-01.webp"
+                                    alt=""
+                                    loading="lazy"
+                                    decoding="async" /></span
+                                ><b data-lang="zh">阅读</b><b data-lang="en">Books</b>
+                              </button>
+                            </div>
+                          </section>
+                          <section class="application-memory-cluster">
+                            <strong class="application-memory-cluster-title"
+                              ><span data-lang="zh">现实</span
+                              ><span data-lang="en">World</span></strong
+                            >
+                            <div class="application-memory-mosaic">
+                              <button type="button" data-application-phone-type="person">
+                                <span
+                                  ><img
+                                    data-src="assets/web/memweb/uid10-person-01.webp"
+                                    alt=""
+                                    loading="lazy"
+                                    decoding="async" /></span
+                                ><b data-lang="zh">人物</b><b data-lang="en">Person</b>
+                              </button>
+                              <button type="button" data-application-phone-type="event">
+                                <span
+                                  ><img
+                                    data-src="assets/web/memweb/curated/uid10-event-01.webp"
+                                    alt=""
+                                    loading="lazy"
+                                    decoding="async" /></span
+                                ><b data-lang="zh">事件</b><b data-lang="en">Events</b>
+                              </button>
+                              <button type="button" data-application-phone-type="scenery">
+                                <span
+                                  ><img
+                                    data-src="assets/web/memweb/uid10-scenery-01.webp"
+                                    alt=""
+                                    loading="lazy"
+                                    decoding="async" /></span
+                                ><b data-lang="zh">场景</b><b data-lang="en">Scenes</b>
+                              </button>
+                            </div>
+                          </section>
+                        </div>
+                      </div>
+                      <section
+                        class="application-ai-dialogue"
+                        data-application-ai-dialogue
+                        hidden
+                        aria-label="User and AI dialogue trajectory"
+                      >
+                        <header class="application-ai-chatbar">
+                          <button
+                            class="application-ai-history-open"
+                            type="button"
+                            data-application-ai-history-open
+                            aria-controls="application-ai-history"
+                            aria-expanded="false"
+                            aria-label="Open dialogue history"
+                          >
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                              <path d="M5 8h14M5 16h10" />
+                            </svg>
+                          </button>
+                          <strong data-application-ai-session-title
+                            >New Year's Day solo reflection and ordering takeout</strong
+                          >
+                          <span class="application-ai-chatbar-spacer" aria-hidden="true"></span>
+                        </header>
+                        <div
+                          class="application-ai-dialogue-stream"
+                          data-application-ai-dialogue-stream
+                        ></div>
+                        <footer class="application-ai-composer" aria-hidden="true">
+                          <span class="application-ai-composer-field"></span>
+                          <button type="button" tabindex="-1" disabled>
+                            <span data-lang="zh">已发送</span><span data-lang="en">Sent</span>
+                          </button>
+                        </footer>
+                        <section
+                          class="application-ai-history"
+                          id="application-ai-history"
+                          data-application-ai-history
+                          aria-label="Dialogue history"
+                          hidden
+                        >
+                          <header>
+                            <strong
+                              ><span data-lang="zh">对话</span
+                              ><span data-lang="en">Conversations</span></strong
+                            >
+                            <button
+                              type="button"
+                              data-application-ai-history-close
+                              aria-label="Close dialogue history"
+                            >
+                              <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m8 8 8 8M16 8l-8 8" />
+                              </svg>
+                            </button>
+                          </header>
+                          <div
+                            class="application-ai-history-list"
+                            data-application-ai-session-tabs
+                            aria-label="Choose a dialogue session"
+                          ></div>
+                        </section>
+                      </section>
+                      <div class="application-phone-recents" data-application-phone-recents hidden>
+                        <span class="application-phone-recents-title">
+                          <span data-lang="zh">最近任务</span
+                          ><span data-lang="en">Recent tasks</span>
+                        </span>
+                        <button type="button" data-application-recents-open>
+                          <img
+                            data-application-recents-image
+                            data-src="assets/web/memweb/curated/uid10-group_chat-01.webp"
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                          />
+                          <span><strong>MobileMem</strong></span>
+                        </button>
+                      </div>
+                      <span
+                        class="application-phone-record-count"
+                        id="application-phone-position"
+                        data-application-phone-count
+                        hidden
+                        >01 / 02</span
+                      >
+                      <span class="application-phone-caption" data-application-phone-caption hidden>
+                        <strong data-application-phone-caption-title></strong>
+                      </span>
+                      <button
+                        class="application-phone-screen"
+                        type="button"
+                        data-application-open
+                        aria-label="Open original screenshot"
+                        hidden
+                      >
+                        <img
+                          id="application-visual-image"
+                          data-src="assets/web/memweb/curated/uid10-group_chat-01.webp"
+                          alt="MemWeb group chat screenshot from uid10."
+                          loading="eager"
+                          fetchpriority="high"
+                          decoding="async"
+                        />
+                      </button>
+                      <nav
+                        class="application-phone-system-nav"
+                        aria-label="ColorOS system navigation"
+                      >
+                        <button
+                          type="button"
+                          data-application-system-action="back"
+                          aria-label="Back"
+                        >
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="m7.5 12 9-5.75v11.5Z"></path>
+                          </svg>
+                        </button>
+                        <button
+                          type="button"
+                          data-application-system-action="home"
+                          aria-label="Home"
+                        >
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="5.75"></circle>
+                          </svg>
+                        </button>
+                        <button
+                          type="button"
+                          data-application-system-action="recents"
+                          aria-label="Recent tasks"
+                        >
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="6.75" y="6.75" width="10.5" height="10.5" rx="1.35"></rect>
+                          </svg>
+                        </button>
+                      </nav>
+                    </div>
+
+                    <button
+                      class="application-phone-direction"
+                      type="button"
+                      data-application-direction="next"
+                      data-application-phone-direction
+                      aria-label="Next image"
+                      hidden
+                    >
+                      <svg viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="m7.5 4.5 5 5.5-5 5.5"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </section>
+            </figure>
+          </div>
+
+          <dialog
+            class="application-lightbox"
+            id="application-lightbox"
+            aria-labelledby="application-lightbox-title"
+          >
+            <div class="application-lightbox-inner">
+              <div class="application-lightbox-media">
+                <button
+                  class="application-lightbox-close"
+                  type="button"
+                  data-application-close
+                  aria-label="Close screenshot"
+                >
+                  ×
+                </button>
+                <button
+                  class="application-lightbox-direction"
+                  type="button"
+                  data-application-direction="previous"
+                  aria-label="Previous application"
+                >
+                  <svg viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="m12.5 4.5-5 5.5 5 5.5"></path>
+                  </svg>
+                </button>
+                <img
+                  class="application-lightbox-image"
+                  id="application-lightbox-image"
+                  data-src="assets/web/memweb/curated/uid10-group_chat-01.webp"
+                  alt="MemWeb group chat screenshot from uid10."
+                  loading="lazy"
+                  decoding="async"
+                />
+                <button
+                  class="application-lightbox-direction"
+                  type="button"
+                  data-application-direction="next"
+                  aria-label="Next application"
+                >
+                  <svg viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="m7.5 4.5 5 5.5-5 5.5"></path>
+                  </svg>
+                </button>
+              </div>
+              <div class="application-lightbox-meta">
+                <span class="application-lightbox-copy">
+                  <strong id="application-lightbox-title">Group chat records</strong>
+                  <small id="application-lightbox-record">uid0 / group_chat / 01</small>
+                </span>
+                <span class="application-lightbox-count" id="application-lightbox-count"
+                  >01 / 02</span
+                >
+              </div>
+            </div>
+          </dialog>
+        </div>
+      </section>
+
+      <!-- Quick start -->
+      <section class="section quick" id="quick-start" aria-labelledby="quick-title">
+        <div class="wrap">
+          <div class="quick-head">
+            <h2 id="quick-title">
+              <span data-lang="zh">快速开始</span>
+              <span data-lang="en">Quick Start</span>
+            </h2>
+          </div>
+          <div class="quick-grid">
+            <div class="terminal-demo" aria-label="Quick start terminal">
+              <div class="terminal-head">
+                <span class="terminal-dots" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </span>
+                <span>mobilemem-quick-start</span>
+              </div>
+              <div class="terminal-content">
+                <div class="quick-options" aria-label="Quick start command sets">
+                  <button
+                    class="quick-option"
+                    type="button"
+                    data-terminal-set="setup"
+                    data-step="01"
+                    aria-pressed="true"
+                  >
+                    Environment
+                  </button>
+                  <button
+                    class="quick-option"
+                    type="button"
+                    data-terminal-set="download"
+                    data-step="02"
+                    aria-pressed="false"
+                  >
+                    Dataset
+                  </button>
+                  <button
+                    class="quick-option"
+                    type="button"
+                    data-terminal-set="pipeline"
+                    data-step="03"
+                    aria-pressed="false"
+                  >
+                    Construction
+                  </button>
+                  <button
+                    class="quick-option"
+                    type="button"
+                    data-terminal-set="evaluation"
+                    data-step="04"
+                    aria-pressed="false"
+                  >
+                    Evaluation
+                  </button>
+                </div>
+                <div class="terminal-body" data-terminal-output></div>
+              </div>
+            </div>
+            <div class="github-cta">
+              <div class="github-card-head">
+                <div class="github-card-icon" aria-hidden="true">
+                  <svg class="github-icon" viewBox="0 0 16 16">
+                    <path
+                      fill="currentColor"
+                      d="M8 0C3.58 0 0 3.67 0 8.2c0 3.62 2.29 6.69 5.47 7.77.4.08.55-.18.55-.4 0-.2-.01-.86-.01-1.56-2.01.38-2.53-.5-2.69-.95-.09-.23-.48-.95-.82-1.14-.28-.16-.68-.55-.01-.56.63-.01 1.08.59 1.23.83.72 1.24 1.87.89 2.33.68.07-.53.28-.89.51-1.09-1.78-.21-3.64-.91-3.64-4.04 0-.89.31-1.62.82-2.19-.08-.21-.36-1.04.08-2.16 0 0 .67-.22 2.2.84A7.43 7.43 0 0 1 8 3.96c.68 0 1.36.09 2 .28 1.53-1.06 2.2-.84 2.2-.84.44 1.12.16 1.95.08 2.16.51.57.82 1.3.82 2.19 0 3.14-1.87 3.83-3.65 4.04.29.26.54.75.54 1.51 0 1.09-.01 1.97-.01 2.24 0 .22.15.48.55.4A8.08 8.08 0 0 0 16 8.2C16 3.67 12.42 0 8 0Z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <span class="github-repo-name">Download and Usage</span>
+                  <span class="github-repo-path">Text and multimodal benchmark resources</span>
+                </div>
+              </div>
+              <p class="quote small" data-lang="zh">
+                文本与多模态基准的安装、构建和评测入口维护在项目仓库中。
+              </p>
+              <p class="quote small" data-lang="en">
+                Setup, construction, and evaluation entry points for both benchmark tracks are
+                maintained in the project repository.
+              </p>
+              <div class="github-links">
+                <a class="btn primary github-button" href="https://github.com/zjunlp/MobileMem/">
+                  <svg class="github-icon" viewBox="0 0 16 16" aria-hidden="true">
+                    <path
+                      fill="currentColor"
+                      d="M8 0C3.58 0 0 3.67 0 8.2c0 3.62 2.29 6.69 5.47 7.77.4.08.55-.18.55-.4 0-.2-.01-.86-.01-1.56-2.01.38-2.53-.5-2.69-.95-.09-.23-.48-.95-.82-1.14-.28-.16-.68-.55-.01-.56.63-.01 1.08.59 1.23.83.72 1.24 1.87.89 2.33.68.07-.53.28-.89.51-1.09-1.78-.21-3.64-.91-3.64-4.04 0-.89.31-1.62.82-2.19-.08-.21-.36-1.04.08-2.16 0 0 .67-.22 2.2.84A7.43 7.43 0 0 1 8 3.96c.68 0 1.36.09 2 .28 1.53-1.06 2.2-.84 2.2-.84.44 1.12.16 1.95.08 2.16.51.57.82 1.3.82 2.19 0 3.14-1.87 3.83-3.65 4.04.29.26.54.75.54 1.51 0 1.09-.01 1.97-.01 2.24 0 .22.15.48.55.4A8.08 8.08 0 0 0 16 8.2C16 3.67 12.42 0 8 0Z"
+                    />
+                  </svg>
+                  <span>Go to GitHub</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Institutions and page statistics -->
+      <section
+        class="section compact institutions"
+        id="institutions"
+        aria-labelledby="institutions-title"
+      >
+        <div class="wrap institutions-grid">
+          <div>
+            <h2 id="institutions-title">Institutions</h2>
+            <p class="quote small" data-lang="zh">本工作由以下机构联合完成。</p>
+            <p class="quote small" data-lang="en">
+              This work is jointly conducted by the following institutions.
+            </p>
+            <p class="quote small" data-lang="zh">由 OPPO 和 OpenKG 开发。</p>
+            <p class="quote small" data-lang="en">Developed by OPPO and OpenKG.</p>
+          </div>
+          <div class="institution-logo-panel" aria-label="Institutions">
+            <img
+              src="assets/web/institutions-transparent.webp"
+              alt="OPPO and OpenKG.CN, 中文开放知识图谱"
+              width="770"
+              height="154"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="institution-counter" aria-label="Page views">
+              <span class="counter-item">
+                <span data-lang="zh">访问量</span>
+                <span data-lang="en">Page views</span>
+                <strong id="busuanzi_value_page_pv">--</strong>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!-- OPPO application scenario video -->
+    <dialog class="video-modal" id="oppo-video-modal" aria-labelledby="oppo-video-title">
+      <div class="video-modal-head">
+        <h2 id="oppo-video-title">OPPO Application Scenarios</h2>
+        <button class="video-close" type="button" aria-label="Close video modal">&times;</button>
+      </div>
+      <div class="video-player-shell">
+        <video class="oppo-video" controls preload="none" playsinline data-oppo-video>
+          <source
+            src="assets/web/videos/oppo-application-scenarios.mp4?v=20260809-1"
+            type="video/mp4"
+          />
+        </video>
+      </div>
+    </dialog>
+    <script src="assets/web/memweb/trajectories.js"></script>
+    <script src="assets/web/memweb/trajectories-extra.js"></script>
+    <script src="assets/web/js/application-data.js?v=20260809-2"></script>
+    <script src="assets/web/js/case-demo.js?v=20260809-2"></script>
+    <script src="assets/web/js/quick-start.js?v=20260809-1"></script>
+    <script src="assets/web/js/application-browser.js?v=20260809-4"></script>
+    <script src="assets/web/js/main.js?v=20260809-2"></script>
+  </body>
+</html>
