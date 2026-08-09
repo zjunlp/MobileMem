@@ -1,0 +1,3497 @@
+{
+  "summary": {
+    "sample_only": true,
+    "user_count": 2,
+    "session_count": 2,
+    "description": "Curated local demo containing one complete session for u0 and u10."
+  },
+  "users": [
+    {
+      "user_id": 0,
+      "source_file": "omni/data.jsonl",
+      "source_size_bytes": null,
+      "session_count": 1,
+      "records": [
+        {
+          "language": "Chinese",
+          "Basic_Profile": {
+            "name": "王景川",
+            "uuid": 0,
+            "gender": "Male",
+            "birth_date": "1996-06-15",
+            "nationality": "Chinese",
+            "language": "Chinese",
+            "personality_traits": "我性格比较务实稳重，不太喜欢折腾，习惯按照既定的节奏去安排生活和工作。我的作息很规律，早睡早起，生活轨迹也相对固定，基本是家、单位和出差地点三点一线。我在社交方面有些被动，不太主动结交新朋友，但和身边同事、老同学以及家人相处融洽，圈子相对稳定。我很看重家庭和工作，追求一种规律安稳、有节制的生活状态，同时也会通过运动和短途出行来平衡压力。",
+            "life_experiences": "我研究生毕业后就进入安徽省的烟草公司工作，成为体制内正式编制员工，一直在这里扎根发展，现在已经29岁了。工作中经常需要出差，平时主要在单位和各地基层之间奔波，但整体生活依然比较规律，多数时间仍然是从家到单位的往返。常住在安徽，有房有车，车是奇瑞的新能源汽车，平时通勤基本都开车，用导航规划路线，业余时间会去附近的体育公园散步或慢跑，顺便遛我养的阿拉斯加。我和未婚妻正在备婚，平时外出应酬和在单位食堂吃饭较多，日常开销相对克制，有房贷车贷但压力不算大，喜欢通过稳健理财和存钱为未来的家庭生活打基础。"
+          },
+          "Init_State": {
+            "description": "一位29岁的中国男性，身材中等略偏结实，方正脸型，穿着简约正式的衬衫西裤，五官端正，表情沉稳内敛，正对镜头。",
+            "education": "安徽财经大学, 硕士, 工商管理",
+            "location": "中国, 合肥",
+            "career": "安徽省烟草公司, 公务员",
+            "preferences": {
+              "食物偏好": {
+                "like": [
+                  "单位食堂饭菜",
+                  "徽菜",
+                  "清淡家常菜",
+                  "牛肉面",
+                  "水饺"
+                ],
+                "dislike": [
+                  "太油腻的菜",
+                  "生冷食物",
+                  "过甜的甜品",
+                  "重口味烧烤"
+                ]
+              },
+              "饮品偏好": {
+                "like": [
+                  "白开水",
+                  "淡茶",
+                  "豆浆",
+                  "淡咖啡"
+                ],
+                "dislike": [
+                  "高度白酒",
+                  "功能饮料",
+                  "太甜的奶茶",
+                  "碳酸饮料"
+                ]
+              },
+              "运动偏好": {
+                "like": [
+                  "在体育公园散步",
+                  "慢跑",
+                  "遛狗",
+                  "简单拉伸",
+                  "爬郊区小山"
+                ],
+                "dislike": [
+                  "对抗性强的球类运动",
+                  "高风险极限运动",
+                  "长时间高强度健身房训练"
+                ]
+              },
+              "音乐偏好": {
+                "like": [
+                  "轻音乐",
+                  "经典老歌",
+                  "钢琴纯音乐",
+                  "抒情流行歌曲"
+                ],
+                "dislike": [
+                  "音量很大的摇滚",
+                  "过于嘈杂的电子乐",
+                  "情绪过激的喊叫式歌曲"
+                ]
+              },
+              "电影偏好": {
+                "like": [
+                  "短视频影视片段",
+                  "主旋律影片片段",
+                  "纪录片片段",
+                  "职场励志类桥段"
+                ],
+                "dislike": [
+                  "超长时间的连续剧追更",
+                  "恐怖惊悚片",
+                  "节奏特别拖沓的电影"
+                ]
+              },
+              "购物偏好": {
+                "like": [
+                  "拼多多线上购物",
+                  "日用品比价后下单",
+                  "性价比高的家用电器",
+                  "实用型服饰",
+                  "汽车用品"
+                ],
+                "dislike": [
+                  "奢侈品消费",
+                  "冲动型买买买",
+                  "仅凭颜值不看性价比的商品"
+                ]
+              },
+              "服装偏好": {
+                "like": [
+                  "简约正装衬衫",
+                  "深色西裤",
+                  "商务休闲皮鞋",
+                  "深色外套",
+                  "不起眼的基础款毛衣"
+                ],
+                "dislike": [
+                  "夸张潮牌",
+                  "花哨图案服装",
+                  "颜色过于鲜艳的衣服"
+                ]
+              },
+              "宠物偏好": {
+                "like": [
+                  "阿拉斯加犬",
+                  "大型犬户外活动",
+                  "宠物健康零食",
+                  "宠物洗护用品"
+                ],
+                "dislike": [
+                  "爬行类宠物",
+                  "攻击性较强的动物",
+                  "室内异味较重的宠物环境"
+                ]
+              },
+              "旅行偏好": {
+                "like": [
+                  "周边短途自驾",
+                  "公司组织的长途福利旅游",
+                  "节假日近郊踏青",
+                  "有山有水的自然风景",
+                  "节奏适中的跟团游"
+                ],
+                "dislike": [
+                  "无计划的说走就走远行",
+                  "频繁更换城市的赶场式旅游",
+                  "人特别挤的景区黄金周出行"
+                ]
+              },
+              "科技使用偏好": {
+                "like": [
+                  "导航软件规划路线",
+                  "办公软件",
+                  "在线政务服务",
+                  "移动支付",
+                  "理财类官方应用"
+                ],
+                "dislike": [
+                  "复杂花哨但不实用的应用",
+                  "频繁广告的手机软件",
+                  "需要大量学习成本的新工具"
+                ]
+              }
+            },
+            "social_relationships": {
+              "郝志强": {
+                "relationship_type": "同事",
+                "description": "一位30岁出头的中国男性，身材偏壮，国字脸，短发，着深色衬衫西裤，神情认真稳重，正视镜头。"
+              },
+              "蒋立新": {
+                "relationship_type": "同事",
+                "description": "一位30多岁的中国男性，身材中等略偏瘦，长方形脸型，戴金属边框眼镜，穿浅色衬衫配深色西裤，表情沉静专注。"
+              },
+              "蔡雪宁": {
+                "relationship_type": "未婚妻",
+                "description": "一位二十多岁的中国女性，身材中等偏纤细，鹅蛋脸，直发及肩，穿浅色衬衫搭配简洁开衫，气质温和，面带浅笑看向镜头。"
+              },
+              "乔天皓": {
+                "relationship_type": "大学同学",
+                "description": "一位二十多岁的中国男性，身材中等，略带书卷气的椭圆脸，戴黑框眼镜，着休闲夹克配牛仔裤，神情随和。"
+              },
+              "温佳琪": {
+                "relationship_type": "研究生同学",
+                "description": "一位二十多岁的中国女性，身材中等，圆脸，扎低马尾，穿衬衫配针织开衫，神情理性柔和，正对镜头。"
+              },
+              "穆长安": {
+                "relationship_type": "领导",
+                "description": "一位四十多岁的中国男性，身材中等略微发福，方圆脸，短发梳理整齐，穿深色西装配领带，表情庄重冷静。"
+              },
+              "聂晓东": {
+                "relationship_type": "朋友",
+                "description": "一位接近三十岁的中国男性，身材偏瘦，长脸，短寸发型，穿运动外套与运动长裤，表情轻松自然。"
+              },
+              "梅子瑜": {
+                "relationship_type": "朋友",
+                "description": "一位二十多岁的中国女性，身材中等，瓜子脸，短发微卷，穿休闲卫衣配牛仔裤，神情爽朗大方。"
+              },
+              "裴建成": {
+                "relationship_type": "邻居",
+                "description": "一位三十多岁的中国男性，身材结实，略方的脸型，留短平头，穿居家休闲服，面部表情亲切随和。"
+              },
+              "甘丽华": {
+                "relationship_type": "邻居",
+                "description": "一位三十多岁的中国女性，身材中等，圆脸，齐肩直发，穿简单家居服，神情温婉安静。"
+              },
+              "霍子昂": {
+                "relationship_type": "高中同学",
+                "description": "一位二十多岁的中国男性，身材高挑略瘦，长方形脸型，戴细框眼镜，穿格子衬衫与休闲长裤，神情腼腆稳重。"
+              },
+              "童雅雯": {
+                "relationship_type": "表妹",
+                "description": "一位二十多岁的中国女性，身材偏瘦，鹅蛋脸，长发扎成马尾，着学院风针织衫与长裙，表情亲切明朗。"
+              },
+              "靳海鹏": {
+                "relationship_type": "同事",
+                "description": "一位三十岁左右的中国男性，身材中等，略圆的脸型，短发，穿浅色衬衫配深色马甲，面部表情随和认真。"
+              },
+              "敖晨露": {
+                "relationship_type": "朋友",
+                "description": "一位二十多岁的中国女性，身材中等偏娇小，瓜子脸，长发披肩，穿运动风外套与运动裤，神情放松自然。"
+              },
+              "王志诚": {
+                "relationship_type": "父亲",
+                "description": "一位五十多岁的中国男性，身材中等略有小肚腩，方脸，短发夹杂少许白发，穿格子衬衫配长裤，表情沉稳慈祥。"
+              },
+              "周淑琴": {
+                "relationship_type": "母亲",
+                "description": "一位五十多岁的中国女性，身材中等偏微胖，圆脸，短卷发，穿朴素针织衫与长裤，神情和蔼温和。"
+              }
+            },
+            "health": "High",
+            "emotion": "Medium",
+            "finance": "Medium"
+          },
+          "Important_Dates": {
+            "festivals": [
+              {
+                "day": "元旦",
+                "date": "2025-01-01"
+              },
+              {
+                "day": "春节",
+                "date": "2025-01-29"
+              },
+              {
+                "day": "除夕",
+                "date": "2025-01-28"
+              },
+              {
+                "day": "元宵节",
+                "date": "2025-02-12"
+              },
+              {
+                "day": "清明节",
+                "date": "2025-04-04"
+              },
+              {
+                "day": "劳动节",
+                "date": "2025-05-01"
+              },
+              {
+                "day": "端午节",
+                "date": "2025-05-31"
+              },
+              {
+                "day": "中秋节",
+                "date": "2025-10-06"
+              },
+              {
+                "day": "国庆节",
+                "date": "2025-10-01"
+              }
+            ],
+            "memorial_dates": [
+              {
+                "day": "王景川生日",
+                "date": "2025-06-15"
+              },
+              {
+                "day": "王志诚生日",
+                "date": "2025-03-10"
+              },
+              {
+                "day": "周淑琴生日",
+                "date": "2025-09-05"
+              },
+              {
+                "day": "蔡雪宁生日",
+                "date": "2025-08-08"
+              },
+              {
+                "day": "王景川和蔡雪宁订婚纪念日",
+                "date": "2025-05-20"
+              },
+              {
+                "day": "王景川和蔡雪宁结婚纪念日",
+                "date": "2025-10-02"
+              }
+            ],
+            "event_milestones": [
+              {
+                "day": "新年生活与工作规划梳理",
+                "date": "2025-01-02"
+              },
+              {
+                "day": "单位年度工作计划定稿",
+                "date": "2025-01-08"
+              },
+              {
+                "day": "春节前重点工作总结汇报",
+                "date": "2025-01-20"
+              },
+              {
+                "day": "春节返乡家庭团聚",
+                "date": "2025-01-29"
+              },
+              {
+                "day": "节后恢复通勤与作息调整",
+                "date": "2025-02-05"
+              },
+              {
+                "day": "一季度差旅计划安排与报备",
+                "date": "2025-02-18"
+              },
+              {
+                "day": "春季例行体检预约",
+                "date": "2025-03-05"
+              },
+              {
+                "day": "清明节扫墓及陪伴父母",
+                "date": "2025-04-04"
+              },
+              {
+                "day": "春季年度健康体检",
+                "date": "2025-04-13"
+              },
+              {
+                "day": "婚礼酒店与婚庆服务商最终确定",
+                "date": "2025-05-10"
+              },
+              {
+                "day": "婚礼请柬与宾客名单确认",
+                "date": "2025-06-01"
+              },
+              {
+                "day": "王景川三十岁阶段目标自我复盘",
+                "date": "2025-06-16"
+              },
+              {
+                "day": "上半年工作总结与述职准备",
+                "date": "2025-06-25"
+              },
+              {
+                "day": "上半年家庭收支与理财盘点",
+                "date": "2025-06-30"
+              },
+              {
+                "day": "夏季短途自驾郊游与放松",
+                "date": "2025-07-13"
+              },
+              {
+                "day": "婚礼流程彩排与家长沟通",
+                "date": "2025-08-24"
+              },
+              {
+                "day": "秋季重点项目工作推进节点",
+                "date": "2025-09-10"
+              },
+              {
+                "day": "婚礼前最后一轮体检与状态调整",
+                "date": "2025-09-21"
+              },
+              {
+                "day": "婚礼举办与亲友聚会",
+                "date": "2025-10-02"
+              },
+              {
+                "day": "国庆假期短途新婚自驾旅行",
+                "date": "2025-10-04"
+              },
+              {
+                "day": "婚后家庭角色与开支结构梳理",
+                "date": "2025-10-20"
+              },
+              {
+                "day": "秋季职业培训或内部学习班",
+                "date": "2025-11-05"
+              },
+              {
+                "day": "冬季车辆保养与年内用车检查",
+                "date": "2025-11-22"
+              },
+              {
+                "day": "年度重点项目收尾与资料归档",
+                "date": "2025-12-10"
+              },
+              {
+                "day": "年度体重与运动习惯自查调整",
+                "date": "2025-12-15"
+              },
+              {
+                "day": "年终家庭财务总结与来年理财规划",
+                "date": "2025-12-22"
+              },
+              {
+                "day": "单位年度述职汇报与绩效沟通",
+                "date": "2025-12-26"
+              },
+              {
+                "day": "跨年夜安静在家陪伴家人迎接新年",
+                "date": "2025-12-31"
+              },
+              {
+                "day": "冬季年度健康复查",
+                "date": "2025-12-28"
+              }
+            ]
+          },
+          "sessions": [
+            {
+              "session_id": "0_0",
+              "event_id": 0,
+              "parent_event_id": null,
+              "event_name": "元旦早晨的年度规划与朋友圈记录",
+              "event_start_time": "2025-01-01 08:30:00",
+              "event_end_time": "2025-01-01 10:30:00",
+              "image_refs": {
+                "person_avatar": "image/uid0/pensona_reference_photos/0_person_0.png",
+                "person_avatar_description": null,
+                "event_scene": "image/uid0/camera_photos/0_event_0.png",
+                "event_scene_description": null,
+                "extra_images": [
+                  {
+                    "type": "book",
+                    "file": "image/uid0/book_screenshots/0_book_0.png",
+                    "description": ""
+                  },
+                  {
+                    "type": "video",
+                    "file": "image/uid0/video_screenshots/0_video_0.png",
+                    "description": ""
+                  },
+                  {
+                    "type": "friend",
+                    "file": "image/uid0/posts/0_friend_0.png",
+                    "description": ""
+                  },
+                  {
+                    "type": "group_chat_member_avatar",
+                    "file": "image/uid0/kg_reference_photos/0_蒋立新_avatar.png",
+                    "description": ""
+                  },
+                  {
+                    "type": "group_chat_member_avatar",
+                    "file": "image/uid0/kg_reference_photos/0_蔡雪宁_avatar.png",
+                    "description": ""
+                  },
+                  {
+                    "type": "group_chat_member_avatar",
+                    "file": "image/uid0/kg_reference_photos/0_郝志强_avatar.png",
+                    "description": ""
+                  },
+                  {
+                    "type": "money",
+                    "file": "image/uid0/transaction_records/0_money_0.png",
+                    "description": ""
+                  },
+                  {
+                    "type": "group_chat",
+                    "file": "image/uid0/chat_records/0_gc_0_cropped1.png",
+                    "description": "同一段长群聊截图的连续第1页，共4页。"
+                  },
+                  {
+                    "type": "group_chat",
+                    "file": "image/uid0/chat_records/0_gc_0_cropped2.png",
+                    "description": "同一段长群聊截图的连续第2页，共4页。"
+                  },
+                  {
+                    "type": "group_chat",
+                    "file": "image/uid0/chat_records/0_gc_0_cropped3.png",
+                    "description": "同一段长群聊截图的连续第3页，共4页。"
+                  },
+                  {
+                    "type": "group_chat",
+                    "file": "image/uid0/chat_records/0_gc_0_cropped4.png",
+                    "description": "同一段长群聊截图的连续第4页，共4页。"
+                  },
+                  {
+                    "type": "event_scene",
+                    "file": "image/uid0/camera_photos/edited_20260422_061633.png",
+                    "description": ""
+                  }
+                ]
+              },
+              "image_candidates": [
+                "image/uid0/pensona_reference_photos/0_person_0.png",
+                "image/uid0/camera_photos/0_event_0.png",
+                "image/uid0/book_screenshots/0_book_0.png",
+                "image/uid0/video_screenshots/0_video_0.png",
+                "image/uid0/posts/0_friend_0.png",
+                "image/uid0/kg_reference_photos/0_蒋立新_avatar.png",
+                "image/uid0/kg_reference_photos/0_蔡雪宁_avatar.png",
+                "image/uid0/kg_reference_photos/0_郝志强_avatar.png",
+                "image/uid0/transaction_records/0_money_0.png",
+                "image/uid0/chat_records/0_gc_0_cropped1.png",
+                "image/uid0/chat_records/0_gc_0_cropped2.png",
+                "image/uid0/chat_records/0_gc_0_cropped3.png",
+                "image/uid0/chat_records/0_gc_0_cropped4.png",
+                "image/uid0/camera_photos/edited_20260422_061633.png"
+              ],
+              "dialogue_goal": "帮助你复盘元旦早晨和未婚妻一起做年度规划、发朋友圈记录并整理出更稳妥又有突破的年度目标。",
+              "dialogue_summary": "你回忆了2025年元旦早晨在家和蔡雪宁一起喝淡茶、翻本子写年度规划的经过，重点围绕婚礼、差旅和理财按季度拆解目标。聊天里也顺带核对了你对“今年要正式成家”带来的紧张和责任感，以及你发朋友圈希望听取反馈后再优化计划的想法。",
+              "dialogue": [
+                {
+                  "turn": 1,
+                  "role": "user",
+                  "content": "我先把我的头像发给你看一下，后面这些经历都围绕我来整理。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 2,
+                  "role": "user",
+                  "image_inline": "image/uid0/pensona_reference_photos/0_person_0.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 3,
+                  "role": "assistant",
+                  "content": "看到了，我会把这张头像作为你的主角身份参考，后面再把具体事情和你对应起来。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 4,
+                  "role": "user",
+                  "content": "我想把今天早上元旦做年度规划这件事整理一下，顺便看看我这次写得会不会太保守。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 5,
+                  "role": "assistant",
+                  "content": "可以，我帮你复盘成一条清晰的时间线。你今天早上是和蔡雪宁一起在家，边喝淡茶边开始写新一年的规划，对吗？",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 6,
+                  "role": "user",
+                  "content": "对，就是在家，不是去外面。我们两个人坐着慢慢写，我还是习惯拿本子记。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 7,
+                  "role": "assistant",
+                  "content": "明白了。那这次规划应该还是按你一贯的风格，先把大方向列出来，再细分到每个季度？",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 8,
+                  "role": "user",
+                  "content": "对，我一直比较习惯这么做。去年也是差不多的方法，不过今年写得更细一点。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 9,
+                  "role": "assistant",
+                  "content": "你今年是重点围绕婚礼、购车和理财来安排的吧？",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 10,
+                  "role": "user",
+                  "content": "不对，购车不是重点，这次主要是婚礼、差旅和理财。差旅我也想提前规划好，工作上别到时候太被动。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 11,
+                  "role": "assistant",
+                  "content": "收到，我修正一下：婚礼、差旅和理财才是这次的核心。这样其实很符合你现在的阶段，先把成家和工作安排都稳住。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 12,
+                  "role": "user",
+                  "content": "嗯，尤其是今年要正式成家，我写的时候心里其实有点紧张。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 13,
+                  "role": "assistant",
+                  "content": "这种紧张很正常，但也说明你开始把很多事情想得更长远了。你当时有没有觉得，责任感比以前更强了？",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 14,
+                  "role": "user",
+                  "content": "有，确实是这样。以前更多是想把工作和生活过稳，今年会更明显地想，不能只顾眼前。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 15,
+                  "role": "assistant",
+                  "content": "所以你把目标写得更细，不只是为了“完成任务”，而是想让计划真的能落地。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 16,
+                  "role": "user",
+                  "content": "对，我不太喜欢写那种很空的目标。最好能按季度分开，这样我知道每个阶段该干什么。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 17,
+                  "role": "assistant",
+                  "content": "这个思路很好。像你这样的规划方式，反而更容易坚持，而且不容易因为一开始定太大而半路放弃。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 18,
+                  "role": "user",
+                  "content": "我也担心这个。总觉得我是不是定得太稳了，少了一点突破。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 19,
+                  "role": "assistant",
+                  "content": "其实“稳”和“突破”不冲突。你这种年份里，更适合在稳定框架里加一个或两个提升点，比如把理财做得更系统，或者把工作上的差旅安排提前优化。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 20,
+                  "role": "user",
+                  "content": "嗯，我就是想听听这种建议。不是一下子大改，而是在原来基础上往前走一点。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 21,
+                  "role": "assistant",
+                  "content": "那你今天早上写的时候，除了纸面上的目标，还有没有顺手做些记录，比如把优先级也排一下？",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 22,
+                  "role": "user",
+                  "content": "有，我把几件事都按顺序写了。婚礼放在最前面，差旅和理财也都列了细项。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 23,
+                  "role": "assistant",
+                  "content": "很清楚了。这样一来，你的新年目标就不是泛泛而谈，而是能直接执行的版本。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 24,
+                  "role": "user",
+                  "content": "我后来还发了条朋友圈，想把这个元旦早晨的状态记录下来，也看看大家会怎么反馈。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 25,
+                  "role": "assistant",
+                  "content": "这一步也挺像你平时的风格，先记录，再根据反馈微调。你发朋友圈时主要是想留个纪念，还是也想借大家的意见帮你优化一下？",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 26,
+                  "role": "user",
+                  "content": "两者都有吧。纪念肯定是有的，但我也确实想看看别人会不会觉得我太保守。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 27,
+                  "role": "assistant",
+                  "content": "我觉得你不是保守，而是比较务实。你可以把今年目标拆成三层：必须完成的、争取完成的、额外加分的，这样既稳又有一点弹性。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 28,
+                  "role": "user",
+                  "content": "这个方法不错，听起来就不会把自己卡得太死。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 29,
+                  "role": "assistant",
+                  "content": "对，而且你是体制内工作，又马上进入成家的阶段，最重要的是节奏稳定、预期清晰。你去年是不是也有类似的年度规划习惯？",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 30,
+                  "role": "user",
+                  "content": "有，基本每年元旦都会写，只是今年比往年更认真一点。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 31,
+                  "role": "assistant",
+                  "content": "那今年最大的变化，就是你把“我自己”的规划，慢慢变成“我们一起”的规划了。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 32,
+                  "role": "user",
+                  "content": "对，这个感觉很明显。虽然有点压力，但也挺踏实的。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 33,
+                  "role": "assistant",
+                  "content": "如果你愿意，我可以帮你把这次的年度规划整理成一个更适合保存的版本，比如按季度拆成婚礼、工作差旅、理财三栏，再补一栏“个人提升”。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 34,
+                  "role": "user",
+                  "content": "可以，你先帮我梳理成一个简洁版。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 35,
+                  "role": "assistant",
+                  "content": "没问题。我先给你总结成一句：2025年元旦早晨，你和蔡雪宁在家喝着淡茶，按季度认真写下围绕婚礼、差旅和理财的新年计划，同时也在思考如何在稳妥里保留一点进步空间。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 36,
+                  "role": "user",
+                  "content": "我把当时发朋友圈那条的截图也发你，你帮我看看和这个总结是不是一致。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 37,
+                  "role": "user",
+                  "image_inline": "image/uid0/camera_photos/0_event_0.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 38,
+                  "role": "assistant",
+                  "content": "可以，我看一下。这样的话，你那条朋友圈和这次整理出来的主线是对得上的，重点还是在记录元旦早晨的年度规划和你的心态变化。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 39,
+                  "role": "user",
+                  "content": "对，我就是想留住这个节点。毕竟今年开始，很多事都不是只为自己考虑了。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 40,
+                  "role": "assistant",
+                  "content": "这句话很重要，也很适合放进你的年度目标里。它能把“责任感”落到实际行动上，而不是停留在感受上。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 41,
+                  "role": "user",
+                  "content": "那你觉得我还要不要再加一点突破性的目标？我怕写得太稳，后面没动力。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 42,
+                  "role": "assistant",
+                  "content": "可以加，但建议加得轻一点，比如一个和工作能力相关的提升项，或者一个持续性的生活习惯目标，不要一下子拉太高。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 43,
+                  "role": "user",
+                  "content": "明白了，就是在稳的基础上留一个可以往上走的口子。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 44,
+                  "role": "assistant",
+                  "content": "对，这样最适合你。你要是愿意，我下一步可以直接帮你把今天这份规划整理成适合发给自己留档的正式文本。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 45,
+                  "role": "user",
+                  "content": "行，那你帮我整理吧。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 46,
+                  "role": "user",
+                  "content": "我把当时的读书页面也发你看一下。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 47,
+                  "role": "user",
+                  "image_inline": "image/uid0/book_screenshots/0_book_0.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 48,
+                  "role": "assistant",
+                  "content": "收到，这张阅读应用截图里能看到高效能人士的七个习惯详情页，后面整理时我会和前面的内容对上。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 49,
+                  "role": "user",
+                  "content": "我把那条朋友圈截图也发你看一下。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 50,
+                  "role": "user",
+                  "image_inline": "image/uid0/posts/0_friend_0.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 51,
+                  "role": "assistant",
+                  "content": "看到了，这张图补充了朋友圈新年规划配图，我会连着前面的经过一起理解。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 52,
+                  "role": "user",
+                  "content": "这段群聊一共4页，我一次都发给你，你看完再帮我整理。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 53,
+                  "role": "user",
+                  "image_inline": "image/uid0/chat_records/0_gc_0_cropped1.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 54,
+                  "role": "user",
+                  "image_inline": "image/uid0/chat_records/0_gc_0_cropped2.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 55,
+                  "role": "user",
+                  "image_inline": "image/uid0/chat_records/0_gc_0_cropped3.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 56,
+                  "role": "user",
+                  "image_inline": "image/uid0/chat_records/0_gc_0_cropped4.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 57,
+                  "role": "assistant",
+                  "content": "看完了，这4页群聊里能看到微信群讨论新年年度计划；微信群聊婚礼与工作规划，我会把它们作为同一段对话来整理。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 58,
+                  "role": "user",
+                  "content": "这是蒋立新的头像，我也发给你，方便后面对应这个人。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 59,
+                  "role": "user",
+                  "image_inline": "image/uid0/kg_reference_photos/0_蒋立新_avatar.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 60,
+                  "role": "assistant",
+                  "content": "看到了，后面提到蒋立新时，我会把这张头像和相关对话对应起来。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 61,
+                  "role": "user",
+                  "content": "这是蔡雪宁的头像，我也发给你，方便后面对应这个人。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 62,
+                  "role": "user",
+                  "image_inline": "image/uid0/kg_reference_photos/0_蔡雪宁_avatar.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 63,
+                  "role": "assistant",
+                  "content": "看到了，后面提到蔡雪宁时，我会把这张头像和相关对话对应起来。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 64,
+                  "role": "user",
+                  "content": "这是郝志强的头像，我也发给你，方便后面对应这个人。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 65,
+                  "role": "user",
+                  "image_inline": "image/uid0/kg_reference_photos/0_郝志强_avatar.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 66,
+                  "role": "assistant",
+                  "content": "看到了，后面提到郝志强时，我会把这张头像和相关对话对应起来。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 67,
+                  "role": "user",
+                  "content": "我把那笔收支记录页面也发你看一下。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 68,
+                  "role": "user",
+                  "image_inline": "image/uid0/transaction_records/0_money_0.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 69,
+                  "role": "assistant",
+                  "content": "看到了，这张图补充了88元转账已收款详情，我会连着前面的经过一起理解。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 70,
+                  "role": "user",
+                  "content": "我把当时刷到的那个视频页面也发你看一下。",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 71,
+                  "role": "user",
+                  "image_inline": "image/uid0/video_screenshots/0_video_0.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 72,
+                  "role": "assistant",
+                  "content": "收到，这张视频应用截图里能看到年度规划手账模板视频，后面整理时我会和前面的内容对上。",
+                  "content_type": "text"
+                }
+              ],
+              "child_event_memories": [],
+              "own_memory_points": [
+                {
+                  "memory_id": "0_0_sys_0",
+                  "memory_source": "system",
+                  "memory_type": "Persona Memory",
+                  "memory_content": "一位29岁的中国男性，身材中等略偏结实，方正脸型，穿着简约正式的衬衫西裤，五官端正，表情沉稳内敛，正对镜头。",
+                  "timestamp": "2025-01-01 00:00:00",
+                  "importance": 1.0,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "0_0_sys_1",
+                  "memory_source": "system",
+                  "memory_type": "Persona Memory",
+                  "memory_content": "王景川的职业信息：安徽省烟草公司, 公务员。",
+                  "timestamp": "2025-01-01 00:00:00",
+                  "importance": 0.9,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "0_0_sys_2",
+                  "memory_source": "system",
+                  "memory_type": "Persona Memory",
+                  "memory_content": "王景川的常住和工作地点：中国, 合肥。",
+                  "timestamp": "2025-01-01 00:00:00",
+                  "importance": 0.85,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "0_0_sys_3",
+                  "memory_source": "system",
+                  "memory_type": "Persona Memory",
+                  "memory_content": "王景川的关键社会关系：郝志强: {'relationship_type': '同事', 'description': '一位30岁出头的中国男性，身材偏壮，国字脸，短发，着深色衬衫西裤，神情认真稳重，正视镜头。'}; 蒋立新: {'relationship_type': '同事', 'description': '一位30多岁的中国男性，身材中等略偏瘦，长方形脸型，戴金属边框眼镜，穿浅色衬衫配深色西裤，表情沉静专注。'}; 蔡雪宁: {'relationship_type': '未婚妻', 'description': '一位二十多岁的中国女性，身材中等偏纤细，鹅蛋脸，直发及肩，穿浅色衬衫搭配简洁开衫，气质温和，面带浅笑看向镜头。'}。",
+                  "timestamp": "2025-01-01 00:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "0_0_img_0",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张人物头像对应王景川、蔡雪宁，说明他们是“元旦早晨的年度规划与朋友圈记录”中的主要人物。王景川正在围绕规划与朋友圈记录推进这件事。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/pensona_reference_photos/0_person_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    1,
+                    2,
+                    3
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_1",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张事件场景图记录了王景川规划与朋友圈记录。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/camera_photos/0_event_0.png"
+                  ],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "0_0_img_2",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张阅读应用截图记录了王景川、蔡雪宁在“元旦早晨的年度规划与朋友圈记录”中通过应用规划与朋友圈记录。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/book_screenshots/0_book_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    46,
+                    47,
+                    48
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_3",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张视频应用截图记录了王景川、蔡雪宁在“元旦早晨的年度规划与朋友圈记录”中通过应用规划与朋友圈记录。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/video_screenshots/0_video_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    70,
+                    71,
+                    72
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_4",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张图片记录了王景川、蔡雪宁在“元旦早晨的年度规划与朋友圈记录”中的相关线索。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/posts/0_friend_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    49,
+                    50,
+                    51
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_5",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张图片记录了王景川、蔡雪宁在“元旦早晨的年度规划与朋友圈记录”中的相关线索。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/kg_reference_photos/0_蒋立新_avatar.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    58,
+                    59,
+                    60
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_6",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张图片记录了王景川、蔡雪宁在“元旦早晨的年度规划与朋友圈记录”中的相关线索。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/kg_reference_photos/0_蔡雪宁_avatar.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    61,
+                    62,
+                    63
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_7",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张图片记录了王景川、蔡雪宁在“元旦早晨的年度规划与朋友圈记录”中的相关线索。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/kg_reference_photos/0_郝志强_avatar.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    64,
+                    65,
+                    66
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_8",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张图片记录了王景川、蔡雪宁在“元旦早晨的年度规划与朋友圈记录”中的相关线索。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/transaction_records/0_money_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    67,
+                    68,
+                    69
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_9",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张群聊截图记录了王景川、蔡雪宁围绕“元旦早晨的年度规划与朋友圈记录”展开的讨论。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/chat_records/0_gc_0_cropped1.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    52,
+                    53,
+                    57
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_10",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张群聊截图记录了王景川、蔡雪宁围绕“元旦早晨的年度规划与朋友圈记录”展开的讨论。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/chat_records/0_gc_0_cropped2.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    52,
+                    54,
+                    57
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_11",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张群聊截图记录了王景川、蔡雪宁围绕“元旦早晨的年度规划与朋友圈记录”展开的讨论。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/chat_records/0_gc_0_cropped3.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    52,
+                    55,
+                    57
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_12",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张群聊截图记录了王景川、蔡雪宁围绕“元旦早晨的年度规划与朋友圈记录”展开的讨论。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/chat_records/0_gc_0_cropped4.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    52,
+                    56,
+                    57
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_13",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张事件场景图记录了王景川规划与朋友圈记录。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/camera_photos/edited_20260422_061633.png"
+                  ],
+                  "dialogue_turn_ids": []
+                }
+              ],
+              "memory_points": [
+                {
+                  "memory_id": "0_0_sys_0",
+                  "memory_source": "system",
+                  "memory_type": "Persona Memory",
+                  "memory_content": "一位29岁的中国男性，身材中等略偏结实，方正脸型，穿着简约正式的衬衫西裤，五官端正，表情沉稳内敛，正对镜头。",
+                  "timestamp": "2025-01-01 00:00:00",
+                  "importance": 1.0,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "0_0_sys_1",
+                  "memory_source": "system",
+                  "memory_type": "Persona Memory",
+                  "memory_content": "王景川的职业信息：安徽省烟草公司, 公务员。",
+                  "timestamp": "2025-01-01 00:00:00",
+                  "importance": 0.9,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "0_0_sys_2",
+                  "memory_source": "system",
+                  "memory_type": "Persona Memory",
+                  "memory_content": "王景川的常住和工作地点：中国, 合肥。",
+                  "timestamp": "2025-01-01 00:00:00",
+                  "importance": 0.85,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "0_0_sys_3",
+                  "memory_source": "system",
+                  "memory_type": "Persona Memory",
+                  "memory_content": "王景川的关键社会关系：郝志强: {'relationship_type': '同事', 'description': '一位30岁出头的中国男性，身材偏壮，国字脸，短发，着深色衬衫西裤，神情认真稳重，正视镜头。'}; 蒋立新: {'relationship_type': '同事', 'description': '一位30多岁的中国男性，身材中等略偏瘦，长方形脸型，戴金属边框眼镜，穿浅色衬衫配深色西裤，表情沉静专注。'}; 蔡雪宁: {'relationship_type': '未婚妻', 'description': '一位二十多岁的中国女性，身材中等偏纤细，鹅蛋脸，直发及肩，穿浅色衬衫搭配简洁开衫，气质温和，面带浅笑看向镜头。'}。",
+                  "timestamp": "2025-01-01 00:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "0_parent_0_pri_0",
+                  "memory_source": "primary",
+                  "memory_type": "Event Memory",
+                  "memory_content": "2025年元旦早晨，王景川和未婚妻蔡雪宁在家一起喝淡茶，拿出本子为新一年做年度规划。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.86,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    6,
+                    8,
+                    35
+                  ]
+                },
+                {
+                  "memory_id": "0_parent_0_pri_1",
+                  "memory_source": "primary",
+                  "memory_type": "Event Memory",
+                  "memory_content": "王景川按照往年的习惯，把新一年的生活和工作目标按季度写下来，重点围绕婚礼、差旅和理财三方面。",
+                  "timestamp": "2025-01-01 08:45:00",
+                  "importance": 0.88,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    9,
+                    10,
+                    22,
+                    35
+                  ]
+                },
+                {
+                  "memory_id": "0_parent_0_pri_2",
+                  "memory_source": "primary",
+                  "memory_type": "Event Memory",
+                  "memory_content": "在写年度目标时，王景川想到今年要正式成家，心里既有些紧张，也觉得责任感更强了，因此把计划写得比往年更细。",
+                  "timestamp": "2025-01-01 09:10:00",
+                  "importance": 0.82,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    12,
+                    13,
+                    14,
+                    31,
+                    32
+                  ]
+                },
+                {
+                  "memory_id": "0_parent_0_pri_3",
+                  "memory_source": "primary",
+                  "memory_type": "Event Memory",
+                  "memory_content": "王景川在元旦当天发了一条朋友圈，记录自己做年度规划的这一刻，希望得到大家反馈后再优化目标。",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.79,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    24,
+                    25,
+                    26,
+                    36,
+                    38
+                  ]
+                },
+                {
+                  "memory_id": "0_parent_0_sec_0",
+                  "memory_source": "secondary",
+                  "memory_type": "Preference Memory",
+                  "memory_content": "王景川在制定新年目标时偏好把计划写得具体、分季度推进，说明他更适合稳妥、可执行的年度规划方式。",
+                  "timestamp": "2025-01-01 10:10:00",
+                  "importance": 0.64,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    7,
+                    16,
+                    17,
+                    29,
+                    30
+                  ]
+                },
+                {
+                  "memory_id": "0_parent_0_sec_1",
+                  "memory_source": "secondary",
+                  "memory_type": "Dialogue Memory",
+                  "memory_content": "这次元旦规划让王景川明显在意“稳定”和“突破”的平衡，他担心目标过于保守，但又不想偏离自己规矩踏实的性格。",
+                  "timestamp": "2025-01-01 10:20:00",
+                  "importance": 0.61,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    18,
+                    19,
+                    20,
+                    41,
+                    42,
+                    43
+                  ]
+                },
+                {
+                  "memory_id": "0_parent_0_sec_2",
+                  "memory_source": "secondary",
+                  "memory_type": "Preference Memory",
+                  "memory_content": "王景川在新年规划中把婚礼、差旅和理财作为优先事项，说明他近期最关注的是成家后的生活安排、工作出行和资金管理。",
+                  "timestamp": "2025-01-01 10:25:00",
+                  "importance": 0.67,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    9,
+                    22,
+                    33,
+                    35
+                  ]
+                },
+                {
+                  "memory_id": "0_parent_0_int_0",
+                  "memory_source": "interference",
+                  "memory_type": "Event Memory",
+                  "memory_content": "2025年元旦上午，王景川是和未婚妻蔡雪宁在单位附近的茶馆里边喝淡茶边做年度规划的。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.42,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "0_parent_0_int_1",
+                  "memory_source": "interference",
+                  "memory_type": "Event Memory",
+                  "memory_content": "王景川这次把新一年规划重点写成了婚礼、购车和理财，而不是差旅安排。",
+                  "timestamp": "2025-01-01 09:00:00",
+                  "importance": 0.46,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "0_parent_0_int_2",
+                  "memory_source": "interference",
+                  "memory_type": "Event Memory",
+                  "memory_content": "王景川在元旦朋友圈里主要是发了一段关于工作晋升感想的文字，没有专门提到年度规划。",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.39,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "0_parent_0_img_0",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张人物头像对应王景川、蔡雪宁，说明他们是“元旦早晨的年度规划与朋友圈记录”中的主要人物。王景川正在围绕规划与朋友圈记录推进这件事。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/pensona_reference_photos/0_person_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    1,
+                    2,
+                    3
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_0",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张人物头像对应王景川、蔡雪宁，说明他们是“元旦早晨的年度规划与朋友圈记录”中的主要人物。王景川正在围绕规划与朋友圈记录推进这件事。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/pensona_reference_photos/0_person_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    1,
+                    2,
+                    3
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_1",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张事件场景图记录了王景川规划与朋友圈记录。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/camera_photos/0_event_0.png"
+                  ],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "0_0_img_2",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张阅读应用截图记录了王景川、蔡雪宁在“元旦早晨的年度规划与朋友圈记录”中通过应用规划与朋友圈记录。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/book_screenshots/0_book_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    46,
+                    47,
+                    48
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_3",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张视频应用截图记录了王景川、蔡雪宁在“元旦早晨的年度规划与朋友圈记录”中通过应用规划与朋友圈记录。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/video_screenshots/0_video_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    70,
+                    71,
+                    72
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_4",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张图片记录了王景川、蔡雪宁在“元旦早晨的年度规划与朋友圈记录”中的相关线索。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/posts/0_friend_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    49,
+                    50,
+                    51
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_5",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张图片记录了王景川、蔡雪宁在“元旦早晨的年度规划与朋友圈记录”中的相关线索。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/kg_reference_photos/0_蒋立新_avatar.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    58,
+                    59,
+                    60
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_6",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张图片记录了王景川、蔡雪宁在“元旦早晨的年度规划与朋友圈记录”中的相关线索。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/kg_reference_photos/0_蔡雪宁_avatar.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    61,
+                    62,
+                    63
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_7",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张图片记录了王景川、蔡雪宁在“元旦早晨的年度规划与朋友圈记录”中的相关线索。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/kg_reference_photos/0_郝志强_avatar.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    64,
+                    65,
+                    66
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_8",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张图片记录了王景川、蔡雪宁在“元旦早晨的年度规划与朋友圈记录”中的相关线索。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/transaction_records/0_money_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    67,
+                    68,
+                    69
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_9",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张群聊截图记录了王景川、蔡雪宁围绕“元旦早晨的年度规划与朋友圈记录”展开的讨论。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/chat_records/0_gc_0_cropped1.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    52,
+                    53,
+                    57
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_10",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张群聊截图记录了王景川、蔡雪宁围绕“元旦早晨的年度规划与朋友圈记录”展开的讨论。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/chat_records/0_gc_0_cropped2.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    52,
+                    54,
+                    57
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_11",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张群聊截图记录了王景川、蔡雪宁围绕“元旦早晨的年度规划与朋友圈记录”展开的讨论。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/chat_records/0_gc_0_cropped3.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    52,
+                    55,
+                    57
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_12",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张群聊截图记录了王景川、蔡雪宁围绕“元旦早晨的年度规划与朋友圈记录”展开的讨论。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/chat_records/0_gc_0_cropped4.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    52,
+                    56,
+                    57
+                  ]
+                },
+                {
+                  "memory_id": "0_0_img_13",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张事件场景图记录了王景川规划与朋友圈记录。这反映出王景川希望把后续节奏提前安排清楚。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/camera_photos/edited_20260422_061633.png"
+                  ],
+                  "dialogue_turn_ids": []
+                }
+              ],
+              "shared_parent_memory_points": [
+                {
+                  "memory_id": "0_parent_0_pri_0",
+                  "memory_source": "primary",
+                  "memory_type": "Event Memory",
+                  "memory_content": "2025年元旦早晨，王景川和未婚妻蔡雪宁在家一起喝淡茶，拿出本子为新一年做年度规划。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.86,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    6,
+                    8,
+                    35
+                  ]
+                },
+                {
+                  "memory_id": "0_parent_0_pri_1",
+                  "memory_source": "primary",
+                  "memory_type": "Event Memory",
+                  "memory_content": "王景川按照往年的习惯，把新一年的生活和工作目标按季度写下来，重点围绕婚礼、差旅和理财三方面。",
+                  "timestamp": "2025-01-01 08:45:00",
+                  "importance": 0.88,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    9,
+                    10,
+                    22,
+                    35
+                  ]
+                },
+                {
+                  "memory_id": "0_parent_0_pri_2",
+                  "memory_source": "primary",
+                  "memory_type": "Event Memory",
+                  "memory_content": "在写年度目标时，王景川想到今年要正式成家，心里既有些紧张，也觉得责任感更强了，因此把计划写得比往年更细。",
+                  "timestamp": "2025-01-01 09:10:00",
+                  "importance": 0.82,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    12,
+                    13,
+                    14,
+                    31,
+                    32
+                  ]
+                },
+                {
+                  "memory_id": "0_parent_0_pri_3",
+                  "memory_source": "primary",
+                  "memory_type": "Event Memory",
+                  "memory_content": "王景川在元旦当天发了一条朋友圈，记录自己做年度规划的这一刻，希望得到大家反馈后再优化目标。",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.79,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    24,
+                    25,
+                    26,
+                    36,
+                    38
+                  ]
+                },
+                {
+                  "memory_id": "0_parent_0_sec_0",
+                  "memory_source": "secondary",
+                  "memory_type": "Preference Memory",
+                  "memory_content": "王景川在制定新年目标时偏好把计划写得具体、分季度推进，说明他更适合稳妥、可执行的年度规划方式。",
+                  "timestamp": "2025-01-01 10:10:00",
+                  "importance": 0.64,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    7,
+                    16,
+                    17,
+                    29,
+                    30
+                  ]
+                },
+                {
+                  "memory_id": "0_parent_0_sec_1",
+                  "memory_source": "secondary",
+                  "memory_type": "Dialogue Memory",
+                  "memory_content": "这次元旦规划让王景川明显在意“稳定”和“突破”的平衡，他担心目标过于保守，但又不想偏离自己规矩踏实的性格。",
+                  "timestamp": "2025-01-01 10:20:00",
+                  "importance": 0.61,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    18,
+                    19,
+                    20,
+                    41,
+                    42,
+                    43
+                  ]
+                },
+                {
+                  "memory_id": "0_parent_0_sec_2",
+                  "memory_source": "secondary",
+                  "memory_type": "Preference Memory",
+                  "memory_content": "王景川在新年规划中把婚礼、差旅和理财作为优先事项，说明他近期最关注的是成家后的生活安排、工作出行和资金管理。",
+                  "timestamp": "2025-01-01 10:25:00",
+                  "importance": 0.67,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    9,
+                    22,
+                    33,
+                    35
+                  ]
+                },
+                {
+                  "memory_id": "0_parent_0_int_0",
+                  "memory_source": "interference",
+                  "memory_type": "Event Memory",
+                  "memory_content": "2025年元旦上午，王景川是和未婚妻蔡雪宁在单位附近的茶馆里边喝淡茶边做年度规划的。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.42,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "0_parent_0_int_1",
+                  "memory_source": "interference",
+                  "memory_type": "Event Memory",
+                  "memory_content": "王景川这次把新一年规划重点写成了婚礼、购车和理财，而不是差旅安排。",
+                  "timestamp": "2025-01-01 09:00:00",
+                  "importance": 0.46,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "0_parent_0_int_2",
+                  "memory_source": "interference",
+                  "memory_type": "Event Memory",
+                  "memory_content": "王景川在元旦朋友圈里主要是发了一段关于工作晋升感想的文字，没有专门提到年度规划。",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.39,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "0_parent_0_img_0",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "这张人物头像对应王景川、蔡雪宁，说明他们是“元旦早晨的年度规划与朋友圈记录”中的主要人物。王景川正在围绕规划与朋友圈记录推进这件事。",
+                  "timestamp": "2025-01-01 08:30:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid0/pensona_reference_photos/0_person_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    1,
+                    2,
+                    3
+                  ]
+                }
+              ],
+              "parent_memory_key": "0",
+              "session_stats": {
+                "dialogue_turn_count": 72,
+                "image_candidate_count": 14,
+                "image_inline_count": 13,
+                "memory_image_ref_count": 15,
+                "unique_image_count": 14,
+                "dialogue_output_tokens": 2254
+              }
+            }
+          ],
+          "session_stats_summary": {
+            "session_count": 1,
+            "total_dialogue_turn_count": 72,
+            "total_dialogue_output_tokens": 2254,
+            "total_image_candidate_count": 14,
+            "total_unique_image_count": 14
+          }
+        }
+      ]
+    },
+    {
+      "user_id": 10,
+      "source_file": "omni/data.jsonl",
+      "source_size_bytes": null,
+      "session_count": 1,
+      "records": [
+        {
+          "language": "en",
+          "Basic_Profile": {
+            "name": "Michael Carter",
+            "uuid": 10,
+            "gender": "Male",
+            "birth_date": "1993-07-14",
+            "nationality": "American",
+            "language": "en",
+            "personality_traits": "I’m analytical and curious, and I enjoy breaking complex problems down into manageable pieces. I tend to be calm under pressure, but I’m also competitive in a healthy way and push myself and my team to ship high-quality work quickly. I value direct communication, a good sense of humor, and I’m the kind of person who likes to mentor others while still constantly learning myself.",
+            "life_experiences": "I grew up in a middle-class suburb outside of Denver and got into programming in high school by hacking together simple games and websites. After earning my computer science degree from a state university, I moved to San Francisco to work at a couple of mid-sized companies before joining my current early-stage startup, where I’m one of the first engineering hires. I’ve gone through a couple of intense product pivots, worked late nights to meet funding milestones, and learned to balance my love for clean architecture with the realities of startup speed.",
+            "appearance": {
+              "ethnicity": "White Caucasian",
+              "skin_color": "light skin",
+              "hair_color": "brown",
+              "hair_style": "short straight",
+              "eye_color": "blue",
+              "facial_hair": "light stubble",
+              "face_shape": "oval",
+              "build": "lean"
+            }
+          },
+          "Init_State": {
+            "description": "A 31-year-old White Caucasian man with light skin, an oval face and lean build, brown short straight hair, blue eyes, and light stubble, wearing a simple crew-neck T-shirt and casual zip hoodie, looking directly at the camera in a frontal ID photo with a calm, focused expression.",
+            "education": "Colorado State University, Bachelor, Computer Science",
+            "location": "United States, San Francisco",
+            "career": "Early-stage tech startup, Senior Software Engineer",
+            "preferences": {
+              "food": {
+                "like": [
+                  "burritos and tacos from local taquerias",
+                  "ramen and sushi",
+                  "simple home-cooked pasta and stir-fries",
+                  "good burgers",
+                  "healthy grain bowls and salads for lunch",
+                  "occasional late-night takeout pizza during crunch time"
+                ],
+                "dislike": [
+                  "overly greasy fast food",
+                  "very sugary desserts",
+                  "extremely spicy dishes that overpower flavor",
+                  "fussy fine-dining with tiny portions"
+                ]
+              },
+              "beverage": {
+                "like": [
+                  "black coffee",
+                  "cold brew",
+                  "sparkling water",
+                  "IPA craft beer",
+                  "occasional whiskey or bourbon",
+                  "protein shakes after workouts"
+                ],
+                "dislike": [
+                  "overly sweet sodas",
+                  "energy drinks",
+                  "very sweet cocktails",
+                  "milk-heavy drinks that feel too heavy"
+                ]
+              },
+              "reading": {
+                "like": [
+                  "software engineering blogs and tech articles",
+                  "nonfiction books on startups and product management",
+                  "behavioral economics and psychology books",
+                  "sci-fi novels with strong world-building",
+                  "articles about developer productivity and tooling"
+                ],
+                "dislike": [
+                  "overly abstract philosophy texts",
+                  "celebrity gossip magazines",
+                  "formulaic romance novels",
+                  "clickbait articles with little substance"
+                ]
+              },
+              "music": {
+                "like": [
+                  "lofi hip-hop for coding",
+                  "indie rock",
+                  "electronic and chillhouse playlists",
+                  "movie and game soundtracks for focus",
+                  "classic rock on road trips"
+                ],
+                "dislike": [
+                  "very loud heavy metal while working",
+                  "bubblegum pop on repeat",
+                  "songs with intrusive lyrics when deep coding",
+                  "auto-tuned novelty tracks"
+                ]
+              },
+              "movie": {
+                "like": [
+                  "sci-fi and tech-oriented movies",
+                  "thoughtful thrillers",
+                  "well-written TV dramas and limited series",
+                  "documentaries about startups and innovators",
+                  "smart comedies with good dialogue"
+                ],
+                "dislike": [
+                  "overly predictable action movies",
+                  "pure jump-scare horror",
+                  "very slow art films with no payoff",
+                  "reality TV competitions"
+                ]
+              },
+              "game": {
+                "like": [
+                  "strategy and management games",
+                  "co-op games with friends",
+                  "indie puzzle-platformers",
+                  "occasionally competitive online shooters",
+                  "coding and logic puzzle challenges"
+                ],
+                "dislike": [
+                  "pay-to-win mobile games",
+                  "grindy MMOs",
+                  "games with heavy loot box mechanics",
+                  "very time-consuming RPGs with endless side quests"
+                ]
+              },
+              "sports": {
+                "like": [
+                  "pickup basketball",
+                  "running and light jogging",
+                  "indoor rock climbing with friends",
+                  "casual gym workouts",
+                  "hiking on weekends near the Bay Area"
+                ],
+                "dislike": [
+                  "very high-contact sports like tackle football",
+                  "early-morning intensive bootcamps",
+                  "long-distance endurance races",
+                  "overly competitive league play that feels like a second job"
+                ]
+              },
+              "clothing": {
+                "like": [
+                  "casual tech wear like hoodies and T-shirts",
+                  "comfortable jeans and chinos",
+                  "simple sneakers",
+                  "minimalist, practical jackets",
+                  "company swag hoodies and T-shirts"
+                ],
+                "dislike": [
+                  "formal suits and ties for everyday work",
+                  "flashy designer logos",
+                  "very bright neon colors",
+                  "clothes that are tight or restrictive while sitting and coding"
+                ]
+              },
+              "travel": {
+                "like": [
+                  "city trips with good coffee shops and coworking spaces",
+                  "visiting tech hubs like Seattle or New York",
+                  "weekend getaways to nature for hiking",
+                  "international travel to Japan and Europe",
+                  "combining conferences with short vacations"
+                ],
+                "dislike": [
+                  "overly packaged resort vacations",
+                  "rigid group tours with no flexibility",
+                  "crowded tourist traps",
+                  "very long trips without reliable internet"
+                ]
+              },
+              "pet": {
+                "like": [
+                  "friendly medium-sized dogs",
+                  "cats that are independent but affectionate",
+                  "office dogs at startups",
+                  "the idea of adopting a rescue dog in the future"
+                ],
+                "dislike": [
+                  "very high-maintenance exotic pets",
+                  "animals that require constant attention",
+                  "noisy pets in small apartments",
+                  "reptiles or insects as pets"
+                ]
+              }
+            },
+            "social_relationships": {
+              "Daniel Carter": {
+                "relationship_type": "father",
+                "description": "A White middle-aged man with light skin, a slightly stocky build, an oval face, short graying brown hair, and glasses, wearing a casual button-up shirt and looking straight at the camera in a frontal ID photo with a neutral expression."
+              },
+              "Laura Carter": {
+                "relationship_type": "mother",
+                "description": "A White middle-aged woman with light skin, a medium build, an oval face, shoulder-length light brown hair, and soft blue eyes, wearing a simple blouse and looking directly at the camera in a frontal ID photo with a gentle smile."
+              },
+              "Emily Carter": {
+                "relationship_type": "younger_sister",
+                "description": "A White woman in her late 20s with light skin, a slim build, an oval face, long straight dark blonde hair, and brown eyes, wearing a casual top and looking directly at the camera in a frontal ID photo with a friendly expression."
+              },
+              "Jason Miller": {
+                "relationship_type": "best_friend",
+                "description": "A White man in his early 30s with light skin, an athletic build, a slightly angular oval face, short dark brown hair, and trimmed beard, wearing a T-shirt and looking straight into the camera in a frontal ID photo with a relaxed half-smile."
+              },
+              "Ryan Thompson": {
+                "relationship_type": "college_friend",
+                "description": "A White man in his early 30s with light skin, a medium build, a round-oval face, short sandy brown hair, and light stubble, wearing a hoodie and looking directly at the camera in a frontal ID photo with a casual expression."
+              },
+              "Sarah Nguyen": {
+                "relationship_type": "college_friend",
+                "description": "An Asian-American woman in her early 30s with light to medium skin tone, a petite build, an oval face, straight black shoulder-length hair, and dark brown eyes, wearing a simple sweater and looking directly at the camera in a frontal ID photo with a slight smile."
+              },
+              "Alex Rivera": {
+                "relationship_type": "startup_cofounder",
+                "description": "A Hispanic man in his early 30s with medium-light tan skin, a lean build, a defined oval face, short wavy black hair, and a neatly trimmed beard, wearing a casual shirt and looking straight at the camera in a frontal ID photo with an intense but approachable expression."
+              },
+              "Priya Shah": {
+                "relationship_type": "coworker",
+                "description": "A South Asian woman in her early 30s with medium brown skin, a slim build, an oval face, long straight black hair parted in the middle, and dark eyes, wearing a simple blouse and looking directly at the camera in a frontal ID photo with a calm, focused expression."
+              },
+              "Chris Johnson": {
+                "relationship_type": "coworker",
+                "description": "A Black man in his early 30s with dark brown skin, a medium-athletic build, an oval face, short cropped black hair, and a short beard, wearing a crew-neck T-shirt and looking straight at the camera in a frontal ID photo with a neutral expression."
+              },
+              "Liam O'Brien": {
+                "relationship_type": "former_coworker",
+                "description": "A White man in his early 30s with light skin, a tall lean build, a narrow oval face, short red hair, and light stubble, wearing a casual collared shirt and looking directly at the camera in a frontal ID photo with a reserved smile."
+              },
+              "Natalie Brooks": {
+                "relationship_type": "friend",
+                "description": "A White woman in her early 30s with light skin, a medium build, an oval face, shoulder-length wavy brown hair, and green eyes, wearing a casual top and looking straight at the camera in a frontal ID photo with a warm, open expression."
+              },
+              "Tyler Green": {
+                "relationship_type": "basketball_friend",
+                "description": "A White man in his early 30s with light skin, an athletic build, an oval face, short dirty blonde hair, and clean-shaven cheeks, wearing a sports T-shirt and looking directly at the camera in a frontal ID photo with a relaxed smile."
+              },
+              "Olivia Martinez": {
+                "relationship_type": "neighbor",
+                "description": "A Latina woman in her late 20s with medium tan skin, a slim build, an oval face, long straight dark brown hair, and brown eyes, wearing a casual T-shirt and looking straight at the camera in a frontal ID photo with a neutral yet approachable expression."
+              },
+              "Kevin Lee": {
+                "relationship_type": "online_friend",
+                "description": "An East Asian man in his early 30s with light skin, a medium build, an oval face, short black hair, and glasses, wearing a T-shirt and looking directly at the camera in a frontal ID photo with a slight, friendly smile."
+              },
+              "Rachel Stein": {
+                "relationship_type": "mentor",
+                "description": "A White woman in her early 40s with light skin, a medium build, an oval face, shoulder-length straight dark brown hair, and brown eyes, wearing a business-casual blouse and looking directly at the camera in a frontal ID photo with a confident, kind expression."
+              }
+            },
+            "health": "Medium",
+            "emotion": "Medium",
+            "finance": "Medium"
+          },
+          "Important_Dates": {
+            "festivals": [
+              {
+                "day": "New Year's Day",
+                "date": "2025-01-01"
+              },
+              {
+                "day": "Martin Luther King Jr Day",
+                "date": "2025-01-20"
+              },
+              {
+                "day": "Presidents Day",
+                "date": "2025-02-17"
+              },
+              {
+                "day": "Saint Patrick's Day",
+                "date": "2025-03-17"
+              },
+              {
+                "day": "Cesar Chavez Day",
+                "date": "2025-03-31"
+              },
+              {
+                "day": "Easter Sunday",
+                "date": "2025-04-20"
+              },
+              {
+                "day": "Memorial Day",
+                "date": "2025-05-26"
+              },
+              {
+                "day": "Juneteenth National Independence Day",
+                "date": "2025-06-19"
+              },
+              {
+                "day": "Independence Day",
+                "date": "2025-07-04"
+              },
+              {
+                "day": "Labor Day",
+                "date": "2025-09-01"
+              },
+              {
+                "day": "Columbus Day and Indigenous Peoples Day",
+                "date": "2025-10-13"
+              },
+              {
+                "day": "Halloween",
+                "date": "2025-10-31"
+              },
+              {
+                "day": "Veterans Day",
+                "date": "2025-11-11"
+              },
+              {
+                "day": "Thanksgiving Day",
+                "date": "2025-11-27"
+              },
+              {
+                "day": "Christmas Day",
+                "date": "2025-12-25"
+              },
+              {
+                "day": "New Year's Eve",
+                "date": "2025-12-31"
+              }
+            ],
+            "memorial_dates": [
+              {
+                "day": "Michael Carter's Birthday",
+                "date": "2025-07-14"
+              },
+              {
+                "day": "Parents Wedding Anniversary",
+                "date": "2025-06-15"
+              },
+              {
+                "day": "Emily Carter's Birthday",
+                "date": "2025-09-05"
+              },
+              {
+                "day": "Jason Miller's Birthday",
+                "date": "2025-03-22"
+              },
+              {
+                "day": "Startup Joining Anniversary",
+                "date": "2025-04-01"
+              },
+              {
+                "day": "College Graduation Remembrance Day",
+                "date": "2025-05-18"
+              },
+              {
+                "day": "Michael and Jason Friendship Anniversary",
+                "date": "2025-10-10"
+              }
+            ],
+            "event_milestones": [
+              {
+                "day": "Q1 Product Roadmap Planning Week",
+                "date": "2025-01-06"
+              },
+              {
+                "day": "Annual Performance Review with Founder",
+                "date": "2025-01-23"
+              },
+              {
+                "day": "Start Winter Fitness and Running Plan",
+                "date": "2025-01-27"
+              },
+              {
+                "day": "Codebase Refactoring Decision Deadline",
+                "date": "2025-02-11"
+              },
+              {
+                "day": "Tech Conference Call for Papers Submission",
+                "date": "2025-02-20"
+              },
+              {
+                "day": "Quarterly Budget and Personal Finance Review",
+                "date": "2025-02-26"
+              },
+              {
+                "day": "Major Product Beta Launch Target",
+                "date": "2025-03-12"
+              },
+              {
+                "day": "Mentor One on One Career Checkin",
+                "date": "2025-03-19"
+              },
+              {
+                "day": "Bay Area Hiking Day with Friends",
+                "date": "2025-03-29"
+              },
+              {
+                "day": "Startup Board Meeting and Metrics Review",
+                "date": "2025-04-08"
+              },
+              {
+                "day": "Annual Health Checkup Appointment",
+                "date": "2025-04-17"
+              },
+              {
+                "day": "Spring Apartment Deep Cleaning Weekend",
+                "date": "2025-04-26"
+              },
+              {
+                "day": "Feature Freeze for Summer Release",
+                "date": "2025-05-09"
+              },
+              {
+                "day": "Denver Trip Planning Decision Deadline",
+                "date": "2025-05-16"
+              },
+              {
+                "day": "Friends Game Night and LAN Party",
+                "date": "2025-05-24"
+              },
+              {
+                "day": "Midyear Salary and Equity Discussion",
+                "date": "2025-06-06"
+              },
+              {
+                "day": "Summer Running Goal Checkpoint",
+                "date": "2025-06-21"
+              },
+              {
+                "day": "Short Vacation or Staycation Start",
+                "date": "2025-06-28"
+              },
+              {
+                "day": "Birthday Weekend Getaway or Celebration",
+                "date": "2025-07-12"
+              },
+              {
+                "day": "Post Birthday Personal Goals Review",
+                "date": "2025-07-21"
+              },
+              {
+                "day": "Refactor and Tech Debt Cleanup Sprint",
+                "date": "2025-08-05"
+              },
+              {
+                "day": "Climbing Gym Session with Coworkers",
+                "date": "2025-08-16"
+              },
+              {
+                "day": "Quarterly Savings and Investment Adjustment",
+                "date": "2025-08-27"
+              },
+              {
+                "day": "Start Q4 Planning and Roadmap Draft",
+                "date": "2025-09-09"
+              },
+              {
+                "day": "College Friends Reunion Weekend",
+                "date": "2025-09-20"
+              },
+              {
+                "day": "Fall Health and Sleep Routine Reset",
+                "date": "2025-09-30"
+              },
+              {
+                "day": "Startup Fundraising Milestone Checkpoint",
+                "date": "2025-10-15"
+              },
+              {
+                "day": "Tech Meetup or Conference Attendance",
+                "date": "2025-10-23"
+              },
+              {
+                "day": "Year End Promotion and Role Discussion",
+                "date": "2025-11-18"
+              },
+              {
+                "day": "Annual Year Reflection and 2026 Planning Day",
+                "date": "2025-12-29"
+              }
+            ]
+          },
+          "sessions": [
+            {
+              "session_id": "10_0",
+              "event_id": 0,
+              "parent_event_id": null,
+              "event_name": "New Year's Day solo reflection and ordering takeout",
+              "event_start_time": "2025-01-01 10:00:00",
+              "event_end_time": "2025-01-01 13:00:00",
+              "image_refs": {
+                "person_avatar": "image/uid10/pensona_reference_photos/10_person_0.png",
+                "person_avatar_description": null,
+                "event_scene": "image/uid10/camera_photos/10_event_0.png",
+                "event_scene_description": null,
+                "extra_images": [
+                  {
+                    "type": "music",
+                    "file": "image/uid10/music_screenshots/10_music_0.png",
+                    "description": ""
+                  },
+                  {
+                    "type": "shopping",
+                    "file": "image/uid10/shopping_records/10_shopping_0.png",
+                    "description": ""
+                  },
+                  {
+                    "type": "ticket",
+                    "file": "image/uid10/ticket_records/10_ticket_0.png",
+                    "description": ""
+                  },
+                  {
+                    "type": "group_chat",
+                    "file": "image/uid10/chat_records/10_gc_0_cropped1.png",
+                    "description": "The consecutive first page of the same long group chat screenshot, 4 pages total."
+                  },
+                  {
+                    "type": "group_chat",
+                    "file": "image/uid10/chat_records/10_gc_0_cropped2.png",
+                    "description": "The consecutive second page of the same long group chat screenshot, 4 pages total."
+                  },
+                  {
+                    "type": "group_chat",
+                    "file": "image/uid10/chat_records/10_gc_0_cropped3.png",
+                    "description": "The consecutive third page of the same long group chat screenshot, 4 pages total."
+                  },
+                  {
+                    "type": "group_chat",
+                    "file": "image/uid10/chat_records/10_gc_0_cropped4.png",
+                    "description": "The consecutive fourth page of the same long group chat screenshot, 4 pages total."
+                  },
+                  {
+                    "type": "group_chat_member_avatar",
+                    "file": "image/uid10/kg_reference_photos/10_Liam O'Brien_avatar.png",
+                    "description": ""
+                  }
+                ]
+              },
+              "image_candidates": [
+                "image/uid10/pensona_reference_photos/10_person_0.png",
+                "image/uid10/camera_photos/10_event_0.png",
+                "image/uid10/music_screenshots/10_music_0.png",
+                "image/uid10/shopping_records/10_shopping_0.png",
+                "image/uid10/ticket_records/10_ticket_0.png",
+                "image/uid10/chat_records/10_gc_0_cropped1.png",
+                "image/uid10/chat_records/10_gc_0_cropped2.png",
+                "image/uid10/chat_records/10_gc_0_cropped3.png",
+                "image/uid10/chat_records/10_gc_0_cropped4.png",
+                "image/uid10/kg_reference_photos/10_Liam O'Brien_avatar.png"
+              ],
+              "dialogue_goal": "Help Michael organize and reflect on his New Year’s Day morning, including his mood, journaling, food choice, and goals for balancing career growth with health and life outside work.",
+              "dialogue_summary": "Michael reviews a quiet New Year’s Day morning in his San Francisco apartment, starting with mixed hope and anxiety about the year ahead. He talks through journaling about startup pivots, deciding on a burrito instead of cooking, reading tech blogs while waiting, and narrowing an abstract sense of ambition into more balanced goals.",
+              "dialogue": [
+                {
+                  "turn": 1,
+                  "role": "user",
+                  "content": "I will send my profile photo first, so the later experiences can stay tied to me as the main person.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 2,
+                  "role": "user",
+                  "image_inline": "image/uid10/pensona_reference_photos/10_person_0.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 3,
+                  "role": "assistant",
+                  "content": "Got it. I will use this profile photo as the identity reference for you and connect the later events back to you.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 4,
+                  "role": "user",
+                  "content": "I woke up pretty early today and just sat there for a while thinking about the year ahead. It felt hopeful, but also kind of anxious.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 5,
+                  "role": "assistant",
+                  "content": "That sounds like a very New Year’s Day kind of mood. Do you want to unpack what was driving the hope and what was making you anxious?",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 6,
+                  "role": "user",
+                  "content": "Mostly work stuff. Last year at the startup was intense with all the product pivots, and I was thinking about how much of my energy went into just keeping up.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 7,
+                  "role": "assistant",
+                  "content": "So the pivots left you feeling like you were always reacting instead of steering. Did you journal about that, or was it more of a mental pass?",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 8,
+                  "role": "user",
+                  "content": "I journaled about it. I wanted to be honest that I’ve got a competitive drive, but I don’t want to let that turn into just grinding harder without taking care of myself.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 9,
+                  "role": "assistant",
+                  "content": "That’s a good distinction. It sounds like you’re trying to keep the ambition, but not let it swallow everything else. Did you write anything concrete about health or mentoring?",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 10,
+                  "role": "user",
+                  "content": "Yeah. I wrote that I want to be healthier this year and also be a better mentor on the team. I’ve been thinking that being useful at work shouldn’t just mean working longer hours.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 11,
+                  "role": "assistant",
+                  "content": "That’s a solid reset. Maybe this year is less about proving you can go fast and more about building a pace you can actually sustain. Did that journaling leave you feeling clearer, or still mixed?",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 12,
+                  "role": "user",
+                  "content": "A bit clearer, but still mixed. By late morning I got lazy about cooking, so I decided to order from the taqueria I usually like instead.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 13,
+                  "role": "assistant",
+                  "content": "That makes sense. On a day like today, an easy local burrito feels a lot better than forcing a whole cooking project. I assume you went with your usual kind of order?",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 14,
+                  "role": "user",
+                  "content": "Pretty much, yes. I just wanted something familiar and satisfying, not a bunch of effort. I was definitely not in the mood for anything fancy.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 15,
+                  "role": "assistant",
+                  "content": "Got it. While you were waiting, did you end up just zoning out, or did you do something with the time?",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 16,
+                  "role": "user",
+                  "content": "I scrolled through tech blogs. That’s kind of my default when I want something practical and work-related, especially when I’m in that reflective headspace.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 17,
+                  "role": "assistant",
+                  "content": "That fits your style pretty well. It’s funny how on holidays some people want a complete break, and others still reach for something familiar and useful. Were you reading anything specific, like startup stuff or more general engineering articles?",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 18,
+                  "role": "user",
+                  "content": "Mostly engineering and product-related pieces. I wasn’t trying to escape work completely, just trying to think through whether I should make the new year about bigger career goals or about life outside work.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 19,
+                  "role": "assistant",
+                  "content": "That’s the real question, isn’t it. Let me check I’ve got the sequence right: you woke up anxious but hopeful, then spent time journaling, then ordered tacos from the taqueria, and while waiting you read startup newsletters.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 20,
+                  "role": "user",
+                  "content": "Not tacos. I ordered a burrito, and it was tech blogs, not startup newsletters. The rest is right.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 21,
+                  "role": "assistant",
+                  "content": "Thanks for correcting that. So it was a burrito and tech blogs, which actually sounds even more in line with your usual routine. Want to turn that vague career-versus-life-outside-work tension into a couple of concrete goals?",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 22,
+                  "role": "user",
+                  "content": "Yeah, I do. I keep thinking I need something ambitious enough to matter, but not so broad that it turns into another year of just reacting to whatever the startup needs.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 23,
+                  "role": "assistant",
+                  "content": "That’s a useful framing. One path is to define one career goal, one health goal, and one relationship or mentoring goal, so none of them gets completely crowded out. Would that feel too rigid, or actually helpful?",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 24,
+                  "role": "user",
+                  "content": "Helpful, I think. I like goals when they’re specific enough to act on. I just don’t want them to turn into a giant list that makes me feel behind before January even gets going.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 25,
+                  "role": "assistant",
+                  "content": "That makes total sense. You probably want something like a few anchors, not a giant scoreboard. For health, is the main thing consistency, sleep, workouts, or food?",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 26,
+                  "role": "user",
+                  "content": "Consistency. If I’m being honest, I’m better when I keep a steady routine instead of trying to make huge changes all at once. Same thing with mentoring, actually.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 27,
+                  "role": "assistant",
+                  "content": "That’s a good insight. Small repeatable habits will probably fit you better than an extreme reset. It also sounds like this year you’re trying to be more intentional than you were during last year’s chaos.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 28,
+                  "role": "user",
+                  "content": "Exactly. Last year felt like one long sprint. This year I want to keep growing, but I don’t want to look back and realize I ignored everything outside work.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 29,
+                  "role": "assistant",
+                  "content": "That’s a very grounded New Year’s intention. If you want, I can help you turn this into a simple plan with three bullets: work, health, and balance, plus a short weekly check-in.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 30,
+                  "role": "user",
+                  "content": "Yeah, that would help. I don’t need some huge resolution list. I mostly need a way to keep the year from drifting.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 31,
+                  "role": "assistant",
+                  "content": "Then the plan can stay lightweight: one career objective tied to impact at the startup, one health habit you can actually keep, and one mentoring or personal-life habit that protects balance. That way you can revisit it without it feeling like homework.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 32,
+                  "role": "user",
+                  "content": "That sounds right. Honestly, just talking it through makes the morning feel less vague.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 33,
+                  "role": "assistant",
+                  "content": "Good. If you want, I can draft those three goals for you next in a really plain format so you can save them and come back later this month.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 34,
+                  "role": "user",
+                  "content": "Please do. And maybe keep it practical, not inspirational-poster practical.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 35,
+                  "role": "assistant",
+                  "content": "Deal. Practical it is: measurable, short, and not too polished. Also, once your burrito arrives, that probably makes for a much better New Year’s lunch than trying to force something elaborate.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 36,
+                  "role": "user",
+                  "content": "I also sent over the scene photo from that moment.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 37,
+                  "role": "user",
+                  "image_inline": "image/uid10/camera_photos/10_event_0.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 38,
+                  "role": "assistant",
+                  "content": "Got it. This image adds the detail of A person is seated alone at a sm, so I will read it together with the earlier context.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 39,
+                  "role": "user",
+                  "content": "This chat thread has 4 pages. I will send all of them together, and you can respond after seeing the full set.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 40,
+                  "role": "user",
+                  "image_inline": "image/uid10/chat_records/10_gc_0_cropped1.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 41,
+                  "role": "user",
+                  "image_inline": "image/uid10/chat_records/10_gc_0_cropped2.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 42,
+                  "role": "user",
+                  "image_inline": "image/uid10/chat_records/10_gc_0_cropped3.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 43,
+                  "role": "user",
+                  "image_inline": "image/uid10/chat_records/10_gc_0_cropped4.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 44,
+                  "role": "assistant",
+                  "content": "Got it. Across these 4 chat pages, I can see The image is a screenshot of a g；The image is a vertical smartpho, so I will treat them as one continuous conversation.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 45,
+                  "role": "user",
+                  "content": "This is Liam O'Brien's avatar. I am sending it too so we can match this person later.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 46,
+                  "role": "user",
+                  "image_inline": "image/uid10/kg_reference_photos/10_Liam O'Brien_avatar.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 47,
+                  "role": "assistant",
+                  "content": "Got it. When Liam O'Brien comes up later, I will connect this avatar with the related conversation.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 48,
+                  "role": "user",
+                  "content": "I also sent that music page.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 49,
+                  "role": "user",
+                  "image_inline": "image/uid10/music_screenshots/10_music_0.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 50,
+                  "role": "assistant",
+                  "content": "Got it. The image mainly shows The image shows a smartphone scr, so it makes that part of the experience more concrete.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 51,
+                  "role": "user",
+                  "content": "I also sent that shopping page.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 52,
+                  "role": "user",
+                  "image_inline": "image/uid10/shopping_records/10_shopping_0.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 53,
+                  "role": "assistant",
+                  "content": "Understood. The visual detail here is The image is a smartphone screen, which helps anchor this part of the record.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 54,
+                  "role": "user",
+                  "content": "I also sent that ticket or itinerary page.",
+                  "content_type": "text"
+                },
+                {
+                  "turn": 55,
+                  "role": "user",
+                  "image_inline": "image/uid10/ticket_records/10_ticket_0.png",
+                  "content_type": "image"
+                },
+                {
+                  "turn": 56,
+                  "role": "assistant",
+                  "content": "Got it. The image mainly shows The image is a smartphone screen, so it makes that part of the experience more concrete.",
+                  "content_type": "text"
+                }
+              ],
+              "child_event_memories": [],
+              "own_memory_points": [
+                {
+                  "memory_id": "10_0_sys_0",
+                  "memory_source": "system",
+                  "memory_type": "Persona Memory",
+                  "memory_content": "A 31-year-old White Caucasian man with light skin, an oval face and lean build, brown short straight hair, blue eyes, and light stubble, wearing a simple crew-neck T-shirt and casual zip hoodie, looking directly at the camera in a frontal ID photo with a calm, focused expression.",
+                  "timestamp": "2025-01-01 00:00:00",
+                  "importance": 1.0,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "10_0_sys_1",
+                  "memory_source": "system",
+                  "memory_type": "Persona Memory",
+                  "memory_content": "Michael Carter's career: Early-stage tech startup, Senior Software Engineer.",
+                  "timestamp": "2025-01-01 00:00:00",
+                  "importance": 0.9,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "10_0_sys_2",
+                  "memory_source": "system",
+                  "memory_type": "Persona Memory",
+                  "memory_content": "Michael Carter lives and works in United States, San Francisco.",
+                  "timestamp": "2025-01-01 00:00:00",
+                  "importance": 0.85,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "10_0_sys_3",
+                  "memory_source": "system",
+                  "memory_type": "Persona Memory",
+                  "memory_content": "Michael Carter's key relationships: Daniel Carter: {'relationship_type': 'father', 'description': 'A White middle-aged man with light skin, a slightly stocky build, an oval face, short graying brown hair, and glasses, wearing a casual button-up shirt and looking straight at the camera in a frontal ID photo with a neutral expression.'}; Laura Carter: {'relationship_type': 'mother', 'description': 'A White middle-aged woman with light skin, a medium build, an oval face, shoulder-length light brown hair, and soft blue eyes, wearing a simple blouse and looking directly at the camera in a frontal ID photo with a gentle smile.'}; Emily Carter: {'relationship_type': 'younger_sister', 'description': 'A White woman in her late 20s with light skin, a slim build, an oval face, long straight dark blonde hair, and brown eyes, wearing a casual top and looking directly at the camera in a frontal ID photo with a friendly expression.'}.",
+                  "timestamp": "2025-01-01 00:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "10_0_img_0",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This person portrait corresponds to Michael Carter, showing the main people involved in \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/pensona_reference_photos/10_person_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    1,
+                    2,
+                    3
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_1",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This event scene image captures Michael Carter during \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/camera_photos/10_event_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    36,
+                    37,
+                    38
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_2",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This music app screenshot records app activity by Michael Carter related to \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/music_screenshots/10_music_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    48,
+                    49,
+                    50
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_3",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This shopping app screenshot records app activity by Michael Carter related to \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/shopping_records/10_shopping_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    51,
+                    52,
+                    53
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_4",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This image records clues about Michael Carter in \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/ticket_records/10_ticket_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    54,
+                    55,
+                    56
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_5",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This group chat screenshot records discussion among Michael Carter about \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/chat_records/10_gc_0_cropped1.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    39,
+                    40,
+                    44
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_6",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This group chat screenshot records discussion among Michael Carter about \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/chat_records/10_gc_0_cropped2.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    39,
+                    41,
+                    44
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_7",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This group chat screenshot records discussion among Michael Carter about \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/chat_records/10_gc_0_cropped3.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    39,
+                    42,
+                    44
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_8",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This group chat screenshot records discussion among Michael Carter about \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/chat_records/10_gc_0_cropped4.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    39,
+                    43,
+                    44
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_9",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This image records clues about Michael Carter in \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/kg_reference_photos/10_Liam O'Brien_avatar.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    45,
+                    46,
+                    47
+                  ]
+                }
+              ],
+              "memory_points": [
+                {
+                  "memory_id": "10_0_sys_0",
+                  "memory_source": "system",
+                  "memory_type": "Persona Memory",
+                  "memory_content": "A 31-year-old White Caucasian man with light skin, an oval face and lean build, brown short straight hair, blue eyes, and light stubble, wearing a simple crew-neck T-shirt and casual zip hoodie, looking directly at the camera in a frontal ID photo with a calm, focused expression.",
+                  "timestamp": "2025-01-01 00:00:00",
+                  "importance": 1.0,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "10_0_sys_1",
+                  "memory_source": "system",
+                  "memory_type": "Persona Memory",
+                  "memory_content": "Michael Carter's career: Early-stage tech startup, Senior Software Engineer.",
+                  "timestamp": "2025-01-01 00:00:00",
+                  "importance": 0.9,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "10_0_sys_2",
+                  "memory_source": "system",
+                  "memory_type": "Persona Memory",
+                  "memory_content": "Michael Carter lives and works in United States, San Francisco.",
+                  "timestamp": "2025-01-01 00:00:00",
+                  "importance": 0.85,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "10_0_sys_3",
+                  "memory_source": "system",
+                  "memory_type": "Persona Memory",
+                  "memory_content": "Michael Carter's key relationships: Daniel Carter: {'relationship_type': 'father', 'description': 'A White middle-aged man with light skin, a slightly stocky build, an oval face, short graying brown hair, and glasses, wearing a casual button-up shirt and looking straight at the camera in a frontal ID photo with a neutral expression.'}; Laura Carter: {'relationship_type': 'mother', 'description': 'A White middle-aged woman with light skin, a medium build, an oval face, shoulder-length light brown hair, and soft blue eyes, wearing a simple blouse and looking directly at the camera in a frontal ID photo with a gentle smile.'}; Emily Carter: {'relationship_type': 'younger_sister', 'description': 'A White woman in her late 20s with light skin, a slim build, an oval face, long straight dark blonde hair, and brown eyes, wearing a casual top and looking directly at the camera in a frontal ID photo with a friendly expression.'}.",
+                  "timestamp": "2025-01-01 00:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "10_parent_0_pri_0",
+                  "memory_source": "primary",
+                  "memory_type": "Event Memory",
+                  "memory_content": "On New Year's Day morning, Michael Carter woke up alone in his small San Francisco apartment and spent time reflecting on the year ahead, feeling both hopeful and anxious.",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.86,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    4,
+                    5
+                  ]
+                },
+                {
+                  "memory_id": "10_parent_0_pri_1",
+                  "memory_source": "primary",
+                  "memory_type": "Event Memory",
+                  "memory_content": "He journaled about the intensity of last year's product pivots at his startup and about wanting to balance his competitive drive with better health habits and stronger mentoring on the team.",
+                  "timestamp": "2025-01-01 10:45:00",
+                  "importance": 0.82,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    6,
+                    8,
+                    10,
+                    28
+                  ]
+                },
+                {
+                  "memory_id": "10_parent_0_pri_2",
+                  "memory_source": "primary",
+                  "memory_type": "Event Memory",
+                  "memory_content": "Around noon, Michael decided not to cook and ordered a burrito from a local taqueria in San Francisco.",
+                  "timestamp": "2025-01-01 12:00:00",
+                  "importance": 0.75,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    12,
+                    14,
+                    35
+                  ]
+                },
+                {
+                  "memory_id": "10_parent_0_pri_3",
+                  "memory_source": "primary",
+                  "memory_type": "Event Memory",
+                  "memory_content": "While waiting for the takeout, he scrolled through tech blogs and kept thinking about whether to set ambitious career goals or focus more on life outside work.",
+                  "timestamp": "2025-01-01 12:20:00",
+                  "importance": 0.79,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    16,
+                    18,
+                    19,
+                    20
+                  ]
+                },
+                {
+                  "memory_id": "10_parent_0_sec_0",
+                  "memory_source": "secondary",
+                  "memory_type": "Preference Memory",
+                  "memory_content": "The event reinforced that Michael reaches for familiar local takeout like burritos when he wants something easy and satisfying instead of cooking.",
+                  "timestamp": "2025-01-01 12:30:00",
+                  "importance": 0.56,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    12,
+                    14,
+                    35
+                  ]
+                },
+                {
+                  "memory_id": "10_parent_0_sec_1",
+                  "memory_source": "secondary",
+                  "memory_type": "Dialogue Memory",
+                  "memory_content": "He was still mentally weighing a goal for the new year: pushing hard on career growth versus protecting time for health, mentoring, and a better balance outside work.",
+                  "timestamp": "2025-01-01 12:45:00",
+                  "importance": 0.64,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    22,
+                    23,
+                    24,
+                    28,
+                    29,
+                    31
+                  ]
+                },
+                {
+                  "memory_id": "10_parent_0_sec_2",
+                  "memory_source": "secondary",
+                  "memory_type": "Preference Memory",
+                  "memory_content": "Tech blogs felt like his default New Year's Day reading while waiting for food, especially when he wanted something practical and work-related.",
+                  "timestamp": "2025-01-01 12:50:00",
+                  "importance": 0.49,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    16,
+                    18
+                  ]
+                },
+                {
+                  "memory_id": "10_parent_0_int_0",
+                  "memory_source": "interference",
+                  "memory_type": "Event Memory",
+                  "memory_content": "Around noon, Michael ordered tacos from a local taqueria instead of a burrito while he waited for delivery.",
+                  "timestamp": "2025-01-01 12:00:00",
+                  "importance": 0.42,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "10_parent_0_int_1",
+                  "memory_source": "interference",
+                  "memory_type": "Event Memory",
+                  "memory_content": "While waiting for takeout, he browsed startup newsletters and product-management articles rather than general tech blogs.",
+                  "timestamp": "2025-01-01 12:20:00",
+                  "importance": 0.38,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "10_parent_0_img_0",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This person portrait corresponds to Michael Carter, showing the main people involved in \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/pensona_reference_photos/10_person_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_0",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This person portrait corresponds to Michael Carter, showing the main people involved in \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/pensona_reference_photos/10_person_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    1,
+                    2,
+                    3
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_1",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This event scene image captures Michael Carter during \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/camera_photos/10_event_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    36,
+                    37,
+                    38
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_2",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This music app screenshot records app activity by Michael Carter related to \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/music_screenshots/10_music_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    48,
+                    49,
+                    50
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_3",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This shopping app screenshot records app activity by Michael Carter related to \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/shopping_records/10_shopping_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    51,
+                    52,
+                    53
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_4",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This image records clues about Michael Carter in \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/ticket_records/10_ticket_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    54,
+                    55,
+                    56
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_5",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This group chat screenshot records discussion among Michael Carter about \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/chat_records/10_gc_0_cropped1.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    39,
+                    40,
+                    44
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_6",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This group chat screenshot records discussion among Michael Carter about \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/chat_records/10_gc_0_cropped2.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    39,
+                    41,
+                    44
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_7",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This group chat screenshot records discussion among Michael Carter about \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/chat_records/10_gc_0_cropped3.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    39,
+                    42,
+                    44
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_8",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This group chat screenshot records discussion among Michael Carter about \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/chat_records/10_gc_0_cropped4.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    39,
+                    43,
+                    44
+                  ]
+                },
+                {
+                  "memory_id": "10_0_img_9",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This image records clues about Michael Carter in \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/kg_reference_photos/10_Liam O'Brien_avatar.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    45,
+                    46,
+                    47
+                  ]
+                }
+              ],
+              "shared_parent_memory_points": [
+                {
+                  "memory_id": "10_parent_0_pri_0",
+                  "memory_source": "primary",
+                  "memory_type": "Event Memory",
+                  "memory_content": "On New Year's Day morning, Michael Carter woke up alone in his small San Francisco apartment and spent time reflecting on the year ahead, feeling both hopeful and anxious.",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.86,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    4,
+                    5
+                  ]
+                },
+                {
+                  "memory_id": "10_parent_0_pri_1",
+                  "memory_source": "primary",
+                  "memory_type": "Event Memory",
+                  "memory_content": "He journaled about the intensity of last year's product pivots at his startup and about wanting to balance his competitive drive with better health habits and stronger mentoring on the team.",
+                  "timestamp": "2025-01-01 10:45:00",
+                  "importance": 0.82,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    6,
+                    8,
+                    10,
+                    28
+                  ]
+                },
+                {
+                  "memory_id": "10_parent_0_pri_2",
+                  "memory_source": "primary",
+                  "memory_type": "Event Memory",
+                  "memory_content": "Around noon, Michael decided not to cook and ordered a burrito from a local taqueria in San Francisco.",
+                  "timestamp": "2025-01-01 12:00:00",
+                  "importance": 0.75,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    12,
+                    14,
+                    35
+                  ]
+                },
+                {
+                  "memory_id": "10_parent_0_pri_3",
+                  "memory_source": "primary",
+                  "memory_type": "Event Memory",
+                  "memory_content": "While waiting for the takeout, he scrolled through tech blogs and kept thinking about whether to set ambitious career goals or focus more on life outside work.",
+                  "timestamp": "2025-01-01 12:20:00",
+                  "importance": 0.79,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    16,
+                    18,
+                    19,
+                    20
+                  ]
+                },
+                {
+                  "memory_id": "10_parent_0_sec_0",
+                  "memory_source": "secondary",
+                  "memory_type": "Preference Memory",
+                  "memory_content": "The event reinforced that Michael reaches for familiar local takeout like burritos when he wants something easy and satisfying instead of cooking.",
+                  "timestamp": "2025-01-01 12:30:00",
+                  "importance": 0.56,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    12,
+                    14,
+                    35
+                  ]
+                },
+                {
+                  "memory_id": "10_parent_0_sec_1",
+                  "memory_source": "secondary",
+                  "memory_type": "Dialogue Memory",
+                  "memory_content": "He was still mentally weighing a goal for the new year: pushing hard on career growth versus protecting time for health, mentoring, and a better balance outside work.",
+                  "timestamp": "2025-01-01 12:45:00",
+                  "importance": 0.64,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    22,
+                    23,
+                    24,
+                    28,
+                    29,
+                    31
+                  ]
+                },
+                {
+                  "memory_id": "10_parent_0_sec_2",
+                  "memory_source": "secondary",
+                  "memory_type": "Preference Memory",
+                  "memory_content": "Tech blogs felt like his default New Year's Day reading while waiting for food, especially when he wanted something practical and work-related.",
+                  "timestamp": "2025-01-01 12:50:00",
+                  "importance": 0.49,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": [
+                    16,
+                    18
+                  ]
+                },
+                {
+                  "memory_id": "10_parent_0_int_0",
+                  "memory_source": "interference",
+                  "memory_type": "Event Memory",
+                  "memory_content": "Around noon, Michael ordered tacos from a local taqueria instead of a burrito while he waited for delivery.",
+                  "timestamp": "2025-01-01 12:00:00",
+                  "importance": 0.42,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "10_parent_0_int_1",
+                  "memory_source": "interference",
+                  "memory_type": "Event Memory",
+                  "memory_content": "While waiting for takeout, he browsed startup newsletters and product-management articles rather than general tech blogs.",
+                  "timestamp": "2025-01-01 12:20:00",
+                  "importance": 0.38,
+                  "original_memories": [],
+                  "image_refs": [],
+                  "dialogue_turn_ids": []
+                },
+                {
+                  "memory_id": "10_parent_0_img_0",
+                  "memory_source": "primary",
+                  "memory_type": "Image Memory",
+                  "memory_content": "This person portrait corresponds to Michael Carter, showing the main people involved in \"New Year's Day solo reflection and ordering takeout\".",
+                  "timestamp": "2025-01-01 10:00:00",
+                  "importance": 0.8,
+                  "original_memories": [],
+                  "image_refs": [
+                    "image/uid10/pensona_reference_photos/10_person_0.png"
+                  ],
+                  "dialogue_turn_ids": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5
+                  ]
+                }
+              ],
+              "parent_memory_key": "0",
+              "session_stats": {
+                "dialogue_turn_count": 56,
+                "image_candidate_count": 10,
+                "image_inline_count": 10,
+                "memory_image_ref_count": 11,
+                "unique_image_count": 10,
+                "dialogue_output_tokens": 2555
+              }
+            }
+          ],
+          "session_stats_summary": {
+            "session_count": 1,
+            "total_dialogue_turn_count": 56,
+            "total_dialogue_output_tokens": 2555,
+            "total_image_candidate_count": 10,
+            "total_unique_image_count": 10
+          }
+        }
+      ]
+    }
+  ]
+}

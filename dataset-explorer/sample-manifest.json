@@ -1,0 +1,42 @@
+{
+  "sample_only": true,
+  "users": [
+    {
+      "user_id": 0,
+      "session_id": "0_0",
+      "question_id": "0_q_0"
+    },
+    {
+      "user_id": 10,
+      "session_id": "10_0",
+      "question_id": "10_q_826"
+    }
+  ],
+  "asset_count": 24,
+  "assets": [
+    "image/uid0/book_screenshots/0_book_0.png",
+    "image/uid0/camera_photos/0_event_0.png",
+    "image/uid0/camera_photos/edited_20260422_061633.png",
+    "image/uid0/chat_records/0_gc_0_cropped1.png",
+    "image/uid0/chat_records/0_gc_0_cropped2.png",
+    "image/uid0/chat_records/0_gc_0_cropped3.png",
+    "image/uid0/chat_records/0_gc_0_cropped4.png",
+    "image/uid0/kg_reference_photos/0_蒋立新_avatar.png",
+    "image/uid0/kg_reference_photos/0_蔡雪宁_avatar.png",
+    "image/uid0/kg_reference_photos/0_郝志强_avatar.png",
+    "image/uid0/pensona_reference_photos/0_person_0.png",
+    "image/uid0/posts/0_friend_0.png",
+    "image/uid0/transaction_records/0_money_0.png",
+    "image/uid0/video_screenshots/0_video_0.png",
+    "image/uid10/camera_photos/10_event_0.png",
+    "image/uid10/chat_records/10_gc_0_cropped1.png",
+    "image/uid10/chat_records/10_gc_0_cropped2.png",
+    "image/uid10/chat_records/10_gc_0_cropped3.png",
+    "image/uid10/chat_records/10_gc_0_cropped4.png",
+    "image/uid10/kg_reference_photos/10_Liam O'Brien_avatar.png",
+    "image/uid10/music_screenshots/10_music_0.png",
+    "image/uid10/pensona_reference_photos/10_person_0.png",
+    "image/uid10/shopping_records/10_shopping_0.png",
+    "image/uid10/ticket_records/10_ticket_0.png"
+  ]
+}
