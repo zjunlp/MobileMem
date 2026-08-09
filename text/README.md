@@ -112,6 +112,10 @@ person.json
                                   └── qa_synthesis_results_post.json
 ```
 
+**During trajectory synthesis, you can inspect the trajectory structure and content in real time:**
+
+![Real-time trajectory visualization](figures/keme_web.gif)
+
 > [!NOTE]
 > The trajectory launcher reads a persona from `${DATA_DIR}/profiles/${USER_ID}.json`. All three launchers write intermediate artifacts to `${OUTPUT_DIR}/${USER_ID}/`. The model and paths can be overridden through environment variables.
 
@@ -171,10 +175,6 @@ Visualization options:
 - `--traj_server_host` and `--traj_server_port` configure the trajectory server (launcher defaults: `0.0.0.0` and `5001`).
 - `--studio_url` enables AgentScope Studio integration. `--studio_project` sets its project name (launcher default: `keme`).
 - `--ngrok_authtoken` supplies an ngrok token, otherwise `NGROK_AUTHTOKEN` is used. The launcher always passes `--disable_ngrok`. To enable a public URL, invoke `run_synthesis.py` directly without that flag.
-
-During trajectory synthesis, you can inspect the trajectory structure and content in real time:
-
-![Real-time trajectory visualization](figures/keme_web.gif)
 
 ### 2. Question-Answer Pair Synthesis
 
