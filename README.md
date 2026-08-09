@@ -24,6 +24,18 @@
 
 ---
 
+## 📑 Table of Contents
+
+- [🔥 News](#-news)
+- [🚀 Getting Started](#-getting-started)
+  - [📖 Text Track](#-text-track)
+  - [🖼️ Omni Track](#️-omni-track)
+- [🗂️ Project Structure](#️-project-structure)
+- [🔍 Analyzing Failures with MemTrace](#-analyzing-failures-with-memtrace)
+- [🚩 Citation](#-citation)
+
+---
+
 ## 🔔 News
 - **2025-08-01** — We publicly release the MobileMem dataset.
 - **2025-06-01** — We launch the MobileMem project.
@@ -54,6 +66,26 @@ The multimodal benchmark for evaluating on-device memory with realistic mobile i
 
 ---
 
+## 🗂️ Project Structure
+
+The repository is organized into two main tracks, each containing everything you need for data access, evaluation, and construction.
+
+```bash
+MobileMem/
+├── text/                           # 📖 Text Track
+│   ├── README.md                   # Track-specific guide and dataset download
+│   ├── keme/                       # 🛠️ KEME synthesis pipeline code
+│   └── eval/                       # ⚙️ Evaluation scripts for text track
+├── omni/                           # 🖼️ Omni Track
+│   ├── README.md                   # Track-specific guide and dataset download
+│   ├── src/                        # 🛠️ Data construction pipeline code
+│   ├── eval/                       # ⚙️ Evaluation scripts for omni track
+│   └── asset/                      # 🎨 Images used in this README
+└── README.md                       # This file
+```
+
+---
+
 ## 🔍 Analyzing Failures with MemTrace
 We recommend using **[MemTrace](https://github.com/zjunlp/MemTrace)** to perform an in-depth error analysis. MemTrace helps you visualize and diagnose where and why your memory system fails, making it easier to pinpoint areas for improvement.
 
@@ -64,4 +96,5 @@ We recommend using **[MemTrace](https://github.com/zjunlp/MemTrace)** to perform
 If this work or datasets is helpful, please kindly cite as this:
 
 ```bibtex
+
 ```
