@@ -1,12 +1,11 @@
 <div align="center">
 
 <div align="center">
-  <img src="omni/asset/logo_01.png" style="height: 52px; width: auto; box-shadow: 0 4px 18px rgba(0,0,0,0.06); vertical-align: middle; display: inline-block;">
-  <span style="font-size: 52px; font-weight: bold; margin-left: 10px; vertical-align: middle; display: inline-block; line-height: 1.3;">
+  <img src="omni/asset/logo_01.png" style="height: 60px; width: auto; box-shadow: 0 4px 18px rgba(0,0,0,0.06); vertical-align: middle; display: inline-block;">
+  <h1 style="font-size: 60px; font-weight: bold; margin: 0 0 0 12px; border-bottom: none; display: inline-block; vertical-align: middle; line-height: 1.2;">
     MobileMem
-  </span>
+  </h1>
 </div>
-
 
 Learning from a Year of Mobile Experiences
 
