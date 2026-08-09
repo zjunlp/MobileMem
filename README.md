@@ -2,7 +2,7 @@
 <div align="center">
 
 # <img src="https://img.icons8.com/fluency/48/iphone.png" alt="iPhone" width="34" height="34" style="vertical-align: middle;"/> MobileMem <img src="https://img.icons8.com/fluency/48/gallery.png" alt="Gallery" width="34" height="34" style="vertical-align: middle;"/>
-## *Learning from a Year of Mobile Experiences*
+*Learning from a Year of Mobile Experiences*
 
 <img src="omni/asset/logo.jpg" style="width:45%; height: auto; border-radius: 20px; box-shadow: 0 8px 28px rgba(0,0,0,0.12);" align=center>
 
