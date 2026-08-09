@@ -10,6 +10,8 @@
   Learning from a Year of Mobile Experiences
 </p>
 
+<img src="omni/asset/logo.jpg" style="width:45%; height: auto; border-radius: 20px; box-shadow: 0 8px 28px rgba(0,0,0,0.12);" align=center>
+
 [![Paper](https://img.shields.io/badge/📄_Paper-2026.XXXXX-b31b1b?style=flat-square&logo=arxiv&logoColor=white)](https://arxiv.org/abs/XXXX)
 [![Website](https://img.shields.io/badge/🌐_Website-MobileMem-1e7bbf?style=flat-square&logo=googlechrome&logoColor=white)](https://zjunlp.github.io/MobileMem/)
 [![HuggingFace](https://img.shields.io/badge/🤗_Dataset-MobileMem-fcd022?style=flat-square)](https://huggingface.co/datasets/zjunlp/MobileMem)
