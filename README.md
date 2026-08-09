@@ -1,100 +1,115 @@
-<div align="center">
+# MobileMem Dataset Explorer
 
-<img src="omni/asset/logo_01.png" style="width: 50%; height: auto; box-shadow: 0 4px 18px rgba(0,0,0,0.06); display: block; margin: 0 auto;">
+This local Web viewer supports both the checked-in sample data and the complete
+MobileMem-Omni dataset from Hugging Face.
 
-### MobileMem: Learning from a Year of Mobile Experiences
+**MobileMem Dataset Explorer is open-source software released under the MIT
+License.** You may use, modify, and redistribute its source code under the
+terms of the license.
 
-[![Paper](https://img.shields.io/badge/📄_Paper-2026.XXXXX-b31b1b?style=flat-square&logo=arxiv&logoColor=white)](https://arxiv.org/abs/XXXX)
-[![Website](https://img.shields.io/badge/🌐_Website-MobileMem-1e7bbf?style=flat-square&logo=googlechrome&logoColor=white)](https://zjunlp.github.io/MobileMem/)
-[![HuggingFace](https://img.shields.io/badge/🤗_Dataset-MobileMem-fcd022?style=flat-square)](https://huggingface.co/datasets/zjunlp/MobileMem)
-[![License](https://img.shields.io/badge/📜_License-MIT-2ea44f?style=flat-square&logo=opensourceinitiative&logoColor=white)](#license)
+The default sample contains:
 
----
+- `u0`, session `0_0`, question `0_q_0`
+- `u10`, session `10_0`, question `10_q_826`
 
-<img src="omni/asset/fig1.png" style="width:100%; height: auto; border-radius: 14px; box-shadow: 0 4px 18px rgba(0,0,0,0.06);" align=center>
+It contains only the 24 images referenced by those two sessions. The full
+dataset and its source ZIP archives are intentionally excluded from Git, but
+the viewer can read them directly after download.
 
-**MobileMem** is a comprehensive benchmarking framework for evaluating **on-device memory systems** in realistic mobile environments.
+## Requirements
 
----
+- Python 3.10 or newer
+- `pip` and Python's built-in `venv` module
+- A modern browser such as Chrome, Edge, Firefox, or Safari
+- About 50 MB of free disk space for sample mode, plus the Python virtual
+  environment
+- About 6.5 GB of additional disk space for the complete dataset
+- Local port `8766` available, or another port supplied through `MEMWEB_PORT`
 
-<img src="omni/asset/fig2.png" style="width:100%; height: auto; border-radius: 14px; box-shadow: 0 4px 18px rgba(0,0,0,0.06);" align=center>
+Node.js, a database, external services, and API keys are not required.
 
-**MobileMem** is built from **multiple heterogeneous sources** to enable comprehensive on-device memory modeling.
-</div>
-
----
-
-## 📑 Table of Contents
-
-- [🔥 News](#-news)
-- [🚀 Getting Started](#-getting-started)
-  - [📖 Text Track](#-text-track)
-  - [🖼️ Omni Track](#️-omni-track)
-- [🗂️ Project Structure](#️-project-structure)
-- [🔍 Analyzing Failures with MemTrace](#-analyzing-failures-with-memtrace)
-- [🚩 Citation](#-citation)
-
----
-
-## 🔔 News
-- **2025-08-01** — We publicly release the MobileMem dataset.
-- **2025-06-01** — We launch the MobileMem project.
-
----
-
-## 🚀 Getting Started
-
-MobileMem offers two benchmark tracks. Choose the path that fits your needs and navigate to the corresponding resources.
-
-### 📖 Text Track
-The textual benchmark for evaluating memory systems on long-term, knowledge-intensive mobile agent trajectories.
-
-| Section | Description | Quick Link |
-| :--- | :--- | :--- |
-| **📥 Data Access** | Download the synthesized KEME trajectories and QA pairs from HuggingFace. | [Link](https://huggingface.co/datasets/zjunlp/MobileMem) |
-| **⚙️ How to Evaluate** | **Detailed evaluation guide for reproducing leaderboard results is available in the [MemBase](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem) repository.** | [Link](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem) |
-| **🛠️ Data Construction** | Reproduce the KEME synthesis pipeline from scratch. | [Link](https://github.com/zjunlp/MobileMem/tree/main/text) |
-
-### 🖼️ Omni Track
-The multimodal benchmark for evaluating on-device memory with realistic mobile images and dialogues.
-
-| Section | Description | Quick Link |
-| :--- | :--- | :--- |
-| **📥 Data Access** | Download the MobileMem-Omni dataset, including images and dialogues. | [Link](https://huggingface.co/datasets/zjunlp/MobileMem) |
-| **⚙️ How to Evaluate** | Evaluate your models on various memory task types using our provided scripts. | [Link](https://github.com/zjunlp/MobileMem/tree/main/omni/eval) |
-| **🛠️ Data Construction** | Rebuild the entire MobileMem-Omni dataset with the provided pipeline. | [Link](https://github.com/zjunlp/MobileMem/tree/main/omni) |
-
----
-
-## 🗂️ Project Structure
-
-The repository is organized into two main tracks, each containing everything you need for data access, evaluation, and construction.
+## Run on macOS or Linux
 
 ```bash
-MobileMem/
-├── text/                           # 📖 Text Track
-│   ├── README.md                   # Track-specific guide and dataset download
-│   ├── keme/                       # 🛠️ KEME synthesis pipeline code
-│   └── eval/                       # ⚙️ Evaluation scripts for text track
-├── omni/                           # 🖼️ Omni Track
-│   ├── README.md                   # Track-specific guide and dataset download
-│   ├── src/                        # 🛠️ Data construction pipeline code
-│   ├── eval/                       # ⚙️ Evaluation scripts for omni track
-│   └── asset/                      # 🎨 Images used in this README
-└── README.md                       # This file
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+./run_local.sh
 ```
 
----
+Open <http://127.0.0.1:8766>.
 
-## 🔍 Analyzing Failures with MemTrace
-We recommend using **[MemTrace](https://github.com/zjunlp/MemTrace)** to perform an in-depth error analysis. MemTrace helps you visualize and diagnose where and why your memory system fails, making it easier to pinpoint areas for improvement.
+Set `MEMWEB_PORT` to use another port:
 
----
-
-## 🚩 Citation
-
-If this work or datasets is helpful, please kindly cite as this:
-
-```bibtex
-
+```bash
+MEMWEB_PORT=9000 ./run_local.sh
 ```
+
+## Run on Windows PowerShell
+
+```powershell
+py -3.10 -m venv .venv
+.\.venv\Scripts\python -m pip install -r requirements.txt
+.\.venv\Scripts\python app\server.py
+```
+
+Open <http://127.0.0.1:8766>.
+
+To use another port in PowerShell:
+
+```powershell
+$env:MEMWEB_PORT = "9000"
+.\.venv\Scripts\python app\server.py
+```
+
+The server reads the sample JSON and image folders from this directory by
+default. Set `MEMWEB_DATA_DIR` to browse a separate full-dataset directory.
+
+## Download the full dataset
+
+Install the Hugging Face CLI and download the complete dataset into the ignored
+`full-dataset/MobileMem` directory:
+
+```bash
+python -m pip install --upgrade huggingface_hub
+hf download zjunlp/MobileMem \
+  --repo-type dataset \
+  --local-dir full-dataset/MobileMem
+```
+
+The download directory is exactly the layout consumed by this viewer and is
+ignored by Git. A complete download includes files such as:
+
+```text
+full-dataset/MobileMem/
+├── omni/data.jsonl
+├── omni/questions.jsonl
+├── omni/image.zip
+└── text/
+```
+
+Start the viewer against the downloaded directory:
+
+```bash
+MEMWEB_DATA_DIR="$PWD/full-dataset/MobileMem" ./run_local.sh
+```
+
+Open <http://127.0.0.1:8766>. The viewer automatically detects
+`omni/data.jsonl`, `omni/questions.jsonl`, and `omni/image.zip`, and exposes all
+20 users. Images are read directly from `image.zip` on demand, so the archive
+does not need to be extracted.
+
+On Windows PowerShell, use:
+
+```powershell
+$env:MEMWEB_DATA_DIR = "$PWD\full-dataset\MobileMem"
+.\.venv\Scripts\python app\server.py
+```
+
+Dataset page and raw-data notes:
+<https://huggingface.co/datasets/zjunlp/MobileMem>.
+
+## Open source and license
+
+The source code in this repository is open source under the [MIT License](LICENSE).
+The MobileMem dataset is downloaded separately from Hugging Face and remains
+subject to the terms published with the dataset.

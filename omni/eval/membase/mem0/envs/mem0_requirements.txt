@@ -1,4 +1,0 @@
-mem0ai==1.0.5
-kuzu==0.11.3
-rank-bm25==0.2.2
-litellm==1.75.9

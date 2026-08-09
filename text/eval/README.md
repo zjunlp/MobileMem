@@ -1,1 +1,0 @@
-Run baseline memory systems and reproduce leaderboard results via the evaluation scripts provided at [Link](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem).

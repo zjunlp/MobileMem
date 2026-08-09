@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MemWeb · 记忆数据集可视化</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #161922;
+    --panel-2: #1d2230;
+    --border: #262c3a;
+    --text: #e6e8ee;
+    --muted: #8b93a7;
+    --accent: #6aa9ff;
+    --accent-2: #ffaa6a;
+    --ok: #6ad7a7;
+    --warn: #ffb55a;
+    --err: #ff7a7a;
+    --user-msg: #2c3a55;
+    --asst-msg: #2a3a30;
+  }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Microsoft YaHei", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  button {
+    background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+    padding: 4px 10px; border-radius: 6px; cursor: pointer;
+  }
+  button:hover { background: #2a3146; }
+  button.primary { background: var(--accent); color: #0b1019; border-color: var(--accent); }
+  input, select {
+    background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+    padding: 5px 8px; border-radius: 6px;
+  }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .layout { display: grid; grid-template-columns: 260px 1fr; height: 100vh; }
+  .sidebar {
+    background: var(--panel); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+  }
+  .sidebar header {
+    padding: 14px 16px; border-bottom: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .sidebar header h1 {
+    font-size: 14px; margin: 0; color: var(--accent);
+  }
+  .sidebar header .sub { color: var(--muted); font-size: 12px; }
+  .user-list { flex: 1; overflow-y: auto; padding: 8px; }
+  .user-card {
+    padding: 10px 12px; margin-bottom: 6px; border: 1px solid transparent;
+    border-radius: 8px; cursor: pointer; background: transparent;
+  }
+  .user-card:hover { background: var(--panel-2); }
+  .user-card.active {
+    background: var(--panel-2); border-color: var(--accent);
+  }
+  .user-card .name { font-weight: 600; }
+  .user-card .meta { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+  .main {
+    overflow-y: auto; padding: 18px 24px;
+  }
+  .tabs {
+    display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 16px;
+  }
+  .tab {
+    padding: 8px 14px; cursor: pointer; border-bottom: 2px solid transparent;
+    color: var(--muted); user-select: none;
+  }
+  .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+
+  .panel {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 14px;
+  }
+  .panel h2 {
+    margin: 0 0 10px 0; font-size: 14px; color: var(--accent-2);
+  }
+  .kv { display: grid; grid-template-columns: 140px 1fr; gap: 6px 12px; }
+  .kv .k { color: var(--muted); }
+  .kv .v { white-space: pre-wrap; word-break: break-all; }
+  .tag {
+    display: inline-block; padding: 1px 8px; border-radius: 999px;
+    background: var(--panel-2); color: var(--muted); font-size: 12px; margin: 2px 4px 2px 0;
+  }
+  .tag.acc { color: var(--accent); border: 1px solid var(--accent); background: transparent; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; }
+  tbody tr:hover { background: var(--panel-2); cursor: pointer; }
+
+  .pager { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .pager .info { color: var(--muted); font-size: 12px; }
+
+  .dialogue {
+    display: flex; flex-direction: column; gap: 10px;
+    max-height: 60vh; overflow-y: auto;
+    padding-right: 6px;
+  }
+  .msg {
+    padding: 8px 12px; border-radius: 10px; max-width: 78%;
+    line-height: 1.55; white-space: pre-wrap; word-break: break-word;
+  }
+  .msg.user { background: var(--user-msg); align-self: flex-end; }
+  .msg.assistant { background: var(--asst-msg); align-self: flex-start; }
+  .msg .meta { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin-bottom: 10px; }
+
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  .stat-card {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px;
+  }
+  .stat-card .label { color: var(--muted); font-size: 12px; }
+  .stat-card .value { font-size: 18px; font-weight: 600; margin-top: 4px; }
+
+  /* relationships */
+  #rel-canvas {
+    width: 100%; height: 480px; background: var(--panel-2);
+    border-radius: 8px; border: 1px solid var(--border);
+  }
+  .rel-legend { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+  .empty { color: var(--muted); padding: 24px; text-align: center; }
+
+  .img-thumb {
+    width: 120px; height: 80px; object-fit: cover;
+    border-radius: 6px; border: 1px solid var(--border);
+    background: var(--panel-2); cursor: pointer;
+  }
+  .img-thumb.sm { width: 64px; height: 48px; }
+  .img-thumb.lg { width: 100%; height: auto; max-height: 360px; object-fit: contain; }
+  .img-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+  .img-grid .img-thumb { width: 100%; height: 100px; }
+  .img-block { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: var(--muted); }
+  .img-banner {
+    width: 100%; max-height: 280px; object-fit: cover; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--panel-2);
+  }
+
+  /* image lightbox */
+  .lb-mask {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+    display: none; align-items: center; justify-content: center; z-index: 999;
+  }
+  .lb-mask.show { display: flex; }
+  .lb-img { max-width: 92vw; max-height: 92vh; object-fit: contain; }
+  .lb-close {
+    position: absolute; top: 16px; right: 24px; color: #fff; font-size: 28px;
+    cursor: pointer; user-select: none;
+  }
+
+  .gallery-section { margin-bottom: 18px; }
+  .gallery-section h3 { font-size: 13px; color: var(--accent-2); margin: 0 0 8px 0; }
+  .pill {
+    padding: 1px 6px; border-radius: 4px; font-size: 11px;
+    background: var(--panel-2); color: var(--muted); margin-right: 4px;
+  }
+  .pill.role-user { background: #354b73; color: #cfe2ff; }
+  .pill.role-assistant { background: #355a47; color: #d2f1d4; }
+  .pill.diff-easy { background: #2a4d3a; color: #b6e6c4; }
+  .pill.diff-medium { background: #4d452a; color: #f0d9a8; }
+  .pill.diff-hard { background: #4d2a2a; color: #f0a8a8; }
+
+  details > summary { cursor: pointer; color: var(--muted); }
+  details[open] > summary { color: var(--text); }
+
+  .timeline { position: relative; padding-left: 16px; }
+  .timeline::before {
+    content: ""; position: absolute; left: 4px; top: 0; bottom: 0;
+    width: 2px; background: var(--border);
+  }
+  .tl-item { position: relative; padding: 6px 0 8px 12px; }
+  .tl-item::before {
+    content: ""; position: absolute; left: -10px; top: 12px;
+    width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+  }
+  .tl-item .time { color: var(--muted); font-size: 12px; }
+  .tl-item .title { font-weight: 600; }
+  .tl-item .summary { color: var(--muted); margin-top: 2px; }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #2a3146; border-radius: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <header>
+      <h1>MemWeb · 记忆数据集</h1>
+      <div class="sub" id="overall-sub">加载中…</div>
+    </header>
+    <div class="user-list" id="user-list"></div>
+  </aside>
+
+  <main class="main">
+    <div id="lb" class="lb-mask" onclick="closeLightbox(event)">
+      <span class="lb-close" onclick="closeLightbox(event)">×</span>
+      <img id="lb-img" class="lb-img" />
+    </div>
+
+    <div id="user-header" class="panel" style="display:none">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <div style="font-size:18px;font-weight:600;" id="uh-name"></div>
+          <div style="color:var(--muted);margin-top:4px;" id="uh-meta"></div>
+        </div>
+        <div id="uh-stats" class="row" style="gap:18px;"></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="profile">用户总览</div>
+      <div class="tab" data-tab="sessions">会话列表</div>
+      <div class="tab" data-tab="timeline">时间线</div>
+      <div class="tab" data-tab="dialogue">对话详情</div>
+      <div class="tab" data-tab="questions">问题集</div>
+      <div class="tab" data-tab="relationships">人际关系</div>
+      <div class="tab" data-tab="gallery">图片库</div>
+    </div>
+
+    <section id="tab-profile" class="tabpane"></section>
+    <section id="tab-sessions" class="tabpane" style="display:none"></section>
+    <section id="tab-timeline" class="tabpane" style="display:none"></section>
+    <section id="tab-dialogue" class="tabpane" style="display:none"></section>
+    <section id="tab-questions" class="tabpane" style="display:none"></section>
+    <section id="tab-relationships" class="tabpane" style="display:none"></section>
+    <section id="tab-gallery" class="tabpane" style="display:none"></section>
+  </main>
+</div>
+
+<script>
+const state = {
+  users: [],
+  currentUid: null,
+  currentUser: null,
+  sessionsPage: 1,
+  sessionsPageSize: 40,
+  sessionsKeyword: "",
+  questionsPage: 1,
+  questionsPageSize: 50,
+  questionsQtype: "",
+  questionsDifficulty: "",
+  questionsKeyword: "",
+  currentSessionId: null,
+  currentSession: null,
+  galleryInfo: null,
+  galleryPage: 1,
+  galleryPageSize: 80,
+  galleryGroup: "",
+};
+
+// ---- 图片工具 ----
+function imgUrl(path) {
+  if (!path) return "";
+  if (typeof path !== "string") return "";
+  if (/^https?:\/\//i.test(path)) return path;
+  return "/" + path.replace(/^\/+/, "");
+}
+function openLightbox(url) {
+  const lb = document.getElementById("lb");
+  document.getElementById("lb-img").src = url;
+  lb.classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+function closeLightbox(e) {
+  if (!e || e.target.id === "lb" || e.target.classList.contains("lb-close")
+      || e.target.classList.contains("lb-img") === false) {
+    document.getElementById("lb").classList.remove("show");
+    document.body.style.overflow = "";
+  }
+}
+function imgThumb(path, opts={}) {
+  if (!path) return el("span");
+  const url = imgUrl(path);
+  return el("img", {
+    class: "img-thumb " + (opts.size || ""),
+    src: url,
+    alt: opts.alt || "数据集图片",
+    title: path,
+    loading: "lazy",
+    decoding: "async",
+    onclick: () => openLightbox(url),
+    onerror: function() { this.style.display = "none"; },
+  });
+}
+
+async function api(path, params={}) {
+  const url = new URL(path, location.origin);
+  Object.entries(params).forEach(([k,v]) => {
+    if (v !== "" && v !== null && v !== undefined) url.searchParams.set(k, v);
+  });
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`${resp.status} ${resp.statusText}`);
+  return resp.json();
+}
+
+function el(tag, attrs={}, ...children) {
+  const e = document.createElement(tag);
+  Object.entries(attrs).forEach(([k,v]) => {
+    if (k === "class") e.className = v;
+    else if (k === "style" && typeof v === "object") Object.assign(e.style, v);
+    else if (k.startsWith("on") && typeof v === "function") e[k.toLowerCase()] = v;
+    else if (["checked", "disabled", "hidden", "selected"].includes(k)) e[k] = Boolean(v);
+    else if (v !== false && v != null) e.setAttribute(k, v);
+  });
+  children.flat().forEach(c => {
+    if (c == null) return;
+    if (c instanceof Node) e.appendChild(c);
+    else e.appendChild(document.createTextNode(String(c)));
+  });
+  return e;
+}
+
+function fmtDate(s) {
+  if (!s) return "";
+  return s.length > 16 ? s.slice(0, 16) : s;
+}
+
+// ---- 侧栏 / 总览 ----
+async function loadUsers() {
+  const sum = await api("/api/summary");
+  document.getElementById("overall-sub").textContent =
+    `${sum.user_count} 用户 · ${sum.total_sessions} 会话 · ${sum.total_questions} 问题`;
+
+  const users = await api("/api/users");
+  state.users = users;
+  const list = document.getElementById("user-list");
+  list.innerHTML = "";
+  users.forEach(u => {
+    const card = el("div", {
+      class: "user-card",
+      "data-uid": u.user_id,
+      onclick: () => selectUser(u.user_id),
+    },
+      el("div", {class: "name"}, `#${u.user_id} ${u.name || "(未知)"}`),
+      el("div", {class: "meta"},
+        `${u.gender || "-"} · ${u.session_count || 0} 会话 · ${u.question_count || 0} 问题`)
+    );
+    list.appendChild(card);
+  });
+  if (users.length > 0) selectUser(users[0].user_id);
+}
+
+async function selectUser(uid) {
+  state.currentUid = uid;
+  state.currentSessionId = null;
+  state.currentSession = null;
+  state.sessionsPage = 1;
+  state.questionsPage = 1;
+  state.galleryPage = 1;
+  state.galleryGroup = "";
+  document.querySelectorAll(".user-card").forEach(c => {
+    c.classList.toggle("active", Number(c.dataset.uid) === uid);
+  });
+
+  const [u, sessions] = await Promise.all([
+    api(`/api/users/${uid}`),
+    api(`/api/users/${uid}/sessions`, {page: 1, page_size: 1}),
+  ]);
+  state.currentUser = u;
+  state.currentSessionId = sessions.items?.[0]?.session_id || null;
+  renderUserHeader(u);
+  renderTab(currentTab());
+}
+
+function renderUserHeader(u) {
+  const hdr = document.getElementById("user-header");
+  hdr.style.display = "block";
+  const p = u.profile || {};
+  document.getElementById("uh-name").textContent =
+    `#${u.user_id} ${p.name || "(未知)"}`;
+  const meta = [
+    p.gender, p.birth_date, p.nationality, p.language,
+    (u.init_state || {}).career,
+    (u.init_state || {}).location,
+  ].filter(Boolean).join(" · ");
+  document.getElementById("uh-meta").textContent = meta;
+
+  const st = document.getElementById("uh-stats");
+  st.innerHTML = "";
+  const items = [
+    ["会话", u.session_count],
+    ["问题", u.question_count],
+    ["对话轮", (u.session_stats_summary||{}).total_dialogue_turn_count],
+  ];
+  items.forEach(([k,v]) => {
+    if (v == null) return;
+    st.appendChild(el("div", {style: "text-align:right"},
+      el("div", {style: "color:var(--muted);font-size:11px"}, k),
+      el("div", {style: "font-size:16px;font-weight:600"}, String(v))
+    ));
+  });
+}
+
+// ---- tabs ----
+function currentTab() {
+  return document.querySelector(".tab.active").dataset.tab;
+}
+document.querySelectorAll(".tab").forEach(t => {
+  t.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(x => {
+      x.classList.remove("active");
+      x.setAttribute("aria-selected", "false");
+    });
+    t.classList.add("active");
+    t.setAttribute("aria-selected", "true");
+    document.querySelectorAll(".tabpane").forEach(p => p.style.display = "none");
+    document.getElementById(`tab-${t.dataset.tab}`).style.display = "block";
+    renderTab(t.dataset.tab);
+  });
+});
+
+function renderTab(name) {
+  if (!state.currentUser) return;
+  const fn = {
+    profile: renderProfile,
+    sessions: renderSessionsTab,
+    timeline: renderTimelineTab,
+    dialogue: renderDialogueTab,
+    questions: renderQuestionsTab,
+    relationships: renderRelationshipsTab,
+    gallery: renderGalleryTab,
+  }[name];
+  if (fn) {
+    Promise.resolve(fn()).catch(err => {
+      const root = document.getElementById(`tab-${name}`);
+      root.innerHTML = "";
+      root.appendChild(el("div", {class:"panel"},
+        el("h2", {}, "加载失败"),
+        el("div", {class:"empty"}, err.message)));
+    });
+  }
+}
+
+// ---- profile ----
+async function renderProfile() {
+  const u = state.currentUser;
+  const p = u.profile || {};
+  const ini = u.init_state || {};
+  const root = document.getElementById("tab-profile");
+  root.innerHTML = "";
+
+  // 找一张代表性头像：从该用户第一个 session 的 image_refs.person_avatar
+  let avatarPath = null;
+  let avatarDesc = null;
+  try {
+    const ses = await api(`/api/users/${state.currentUid}/sessions`, {page:1, page_size:1});
+    if (ses.items && ses.items[0]) {
+      const s = await api(`/api/users/${state.currentUid}/sessions/${ses.items[0].session_id}`);
+      const ir = s.image_refs || {};
+      avatarPath = ir.person_avatar;
+      avatarDesc = ir.person_avatar_description;
+    }
+  } catch(e) {/* ignore */}
+
+  const profileRow = el("div", {style:"display:flex;gap:16px;align-items:flex-start"},
+    avatarPath ? el("img", {class:"img-thumb", src: imgUrl(avatarPath),
+                            style:"width:120px;height:160px;cursor:pointer",
+                            onclick: () => openLightbox(imgUrl(avatarPath))}) : null,
+    el("div", {style:"flex:1"},
+      el("div", {class: "kv"},
+        ...["name","uuid","gender","birth_date","nationality","language"].flatMap(k =>
+          [el("div", {class:"k"}, k), el("div", {class:"v"}, String(p[k] ?? ""))]
+        ),
+        el("div", {class:"k"}, "personality_traits"),
+        el("div", {class:"v"}, p.personality_traits || ""),
+        el("div", {class:"k"}, "life_experiences"),
+        el("div", {class:"v"}, p.life_experiences || ""),
+        ...(avatarDesc ? [el("div", {class:"k"}, "avatar_description"), el("div", {class:"v"}, avatarDesc)] : []),
+      )
+    )
+  );
+  const meta = el("div", {class: "panel"},
+    el("h2", {}, "Basic Profile"),
+    profileRow,
+  );
+  root.appendChild(meta);
+
+  const init = el("div", {class: "panel"},
+    el("h2", {}, "Init State"),
+    el("div", {class:"kv"},
+      ...["description","education","location","career"].flatMap(k =>
+        [el("div", {class:"k"}, k), el("div", {class:"v"}, String(ini[k] ?? ""))]
+      ),
+    ),
+    el("details", {style:"margin-top:8px"},
+      el("summary", {}, "preferences (JSON)"),
+      el("pre", {style:"white-space:pre-wrap;color:var(--muted);font-size:12px"},
+        JSON.stringify(ini.preferences || {}, null, 2))
+    ),
+    el("details", {style:"margin-top:8px"},
+      el("summary", {}, "social_relationships (JSON)"),
+      el("pre", {style:"white-space:pre-wrap;color:var(--muted);font-size:12px"},
+        JSON.stringify(ini.social_relationships || {}, null, 2))
+    ),
+    el("details", {style:"margin-top:8px"},
+      el("summary", {}, "health / emotion / finance"),
+      el("pre", {style:"white-space:pre-wrap;color:var(--muted);font-size:12px"},
+        JSON.stringify({health: ini.health, emotion: ini.emotion, finance: ini.finance}, null, 2))
+    )
+  );
+  root.appendChild(init);
+
+  const memDist = u.memory_type_distribution || {};
+  if (Object.keys(memDist).length) {
+    const card = el("div", {class:"panel"},
+      el("h2", {}, "Memory Type 分布"),
+      el("div", {},
+        Object.entries(memDist)
+          .sort((a,b)=>b[1]-a[1])
+          .map(([k,v]) => el("span", {class:"tag acc"}, `${k} × ${v}`))
+      )
+    );
+    root.appendChild(card);
+  }
+
+  const idates = u.important_dates || {};
+  if (Object.keys(idates).length) {
+    root.appendChild(el("div", {class:"panel"},
+      el("h2", {}, "Important Dates"),
+      el("pre", {style:"white-space:pre-wrap;color:var(--muted);font-size:12px"},
+        JSON.stringify(idates, null, 2)
+      )
+    ));
+  }
+}
+
+// ---- sessions list ----
+async function renderSessionsTab() {
+  const root = document.getElementById("tab-sessions");
+  root.innerHTML = "";
+  const uid = state.currentUid;
+
+  const toolbar = el("div", {class:"toolbar"},
+    el("input", {id:"ses-kw", placeholder:"关键字（event_name/dialogue_summary/goal）",
+                 value: state.sessionsKeyword, style:"min-width:280px"}),
+    el("button", {class:"primary", onclick: () => {
+      state.sessionsKeyword = document.getElementById("ses-kw").value;
+      state.sessionsPage = 1;
+      renderSessionsTab();
+    }}, "搜索"),
+    el("span", {style:"color:var(--muted);margin-left:auto"}, ` page=${state.sessionsPage}`)
+  );
+  root.appendChild(toolbar);
+
+  const data = await api(`/api/users/${uid}/sessions`, {
+    page: state.sessionsPage, page_size: state.sessionsPageSize, keyword: state.sessionsKeyword,
+  });
+
+  const tbl = el("table", {},
+    el("thead", {}, el("tr", {},
+      el("th", {style:"width:130px"}, "scene"),
+      el("th", {}, "session_id"),
+      el("th", {}, "event_name"),
+      el("th", {}, "开始 / 结束"),
+      el("th", {}, "对话"),
+      el("th", {}, "记忆点"),
+      el("th", {}, "图片"),
+    )),
+    el("tbody", {},
+      data.items.map(s =>
+        el("tr", {onclick: () => openSession(s.session_id)},
+          el("td", {onclick: (e)=>e.stopPropagation()},
+            s.event_scene ? imgThumb(s.event_scene) : ""),
+          el("td", {}, s.session_id || ""),
+          el("td", {}, el("div", {style:"font-weight:600"}, s.event_name || ""),
+            el("div", {style:"color:var(--muted);font-size:12px"}, (s.dialogue_summary || "").slice(0, 90))),
+          el("td", {}, fmtDate(s.event_start_time)+" → "+fmtDate(s.event_end_time)),
+          el("td", {}, String(s.dialogue_turn_count)),
+          el("td", {}, String(s.memory_point_count)),
+          el("td", {}, String(s.image_candidate_count))
+        )
+      )
+    )
+  );
+  root.appendChild(tbl);
+
+  root.appendChild(el("div", {class:"pager"},
+    el("button", {disabled: state.sessionsPage<=1, onclick: () => { state.sessionsPage--; renderSessionsTab(); }}, "上一页"),
+    el("span", {class:"info"}, `第 ${data.page} / ${data.total_pages} 页 · 共 ${data.total} 条`),
+    el("button", {disabled: state.sessionsPage>=data.total_pages, onclick: () => { state.sessionsPage++; renderSessionsTab(); }}, "下一页"),
+  ));
+}
+
+async function openSession(sid) {
+  state.currentSessionId = sid;
+  document.querySelectorAll(".tab").forEach(t => {
+    t.classList.toggle("active", t.dataset.tab === "dialogue");
+  });
+  document.querySelectorAll(".tabpane").forEach(p => p.style.display = "none");
+  document.getElementById("tab-dialogue").style.display = "block";
+  renderDialogueTab();
+}
+
+// ---- dialogue ----
+async function renderDialogueTab() {
+  const root = document.getElementById("tab-dialogue");
+  root.innerHTML = "";
+  const uid = state.currentUid;
+
+  if (!state.currentSessionId) {
+    root.appendChild(el("div", {class:"empty"}, "请在「会话列表」中点击一条 session 查看对话"));
+    return;
+  }
+
+  let s = state.currentSession;
+  if (!s || s.session_id !== state.currentSessionId) {
+    s = await api(`/api/users/${uid}/sessions/${state.currentSessionId}`);
+    state.currentSession = s;
+  }
+
+  const ir = s.image_refs || {};
+  const meta = el("div", {class:"panel"},
+    el("h2", {}, `${s.event_name || ""}  · session ${s.session_id}`),
+    el("div", {style:"display:flex;gap:14px;align-items:flex-start;margin-bottom:10px"},
+      ir.event_scene ? el("img", {class:"img-banner", style:"max-width:360px",
+                                  src: imgUrl(ir.event_scene),
+                                  onclick: () => openLightbox(imgUrl(ir.event_scene))}) : null,
+      el("div", {style:"flex:1"},
+        el("div", {class:"kv"},
+          el("div", {class:"k"}, "起止时间"),
+          el("div", {class:"v"}, `${fmtDate(s.event_start_time)} → ${fmtDate(s.event_end_time)}`),
+          el("div", {class:"k"}, "对话目标"),
+          el("div", {class:"v"}, s.dialogue_goal || ""),
+          el("div", {class:"k"}, "对话摘要"),
+          el("div", {class:"v"}, s.dialogue_summary || ""),
+          el("div", {class:"k"}, "parent_event_id"),
+          el("div", {class:"v"}, String(s.parent_event_id ?? "-")),
+          ...(ir.event_scene_description ? [el("div", {class:"k"}, "scene 描述"),
+                                            el("div", {class:"v"}, ir.event_scene_description)] : []),
+        )
+      )
+    )
+  );
+  root.appendChild(meta);
+
+  // extra images / image_candidates
+  const extras = (ir.extra_images || []).filter(Boolean);
+  const cands = s.image_candidates || [];
+  if (extras.length || cands.length) {
+    const galleries = el("div", {class:"panel"},
+      el("h2", {}, `图片（extra ${extras.length} · candidates ${cands.length}）`));
+    if (extras.length) {
+      galleries.appendChild(el("div", {class:"gallery-section"},
+        el("h3", {}, `extra_images`),
+        el("div", {class:"img-grid"},
+          extras.map(p => imgThumb(typeof p === "string" ? p : (p.file || p.path || p.image)))
+        )
+      ));
+    }
+    if (cands.length) {
+      galleries.appendChild(el("div", {class:"gallery-section"},
+        el("h3", {}, `image_candidates`),
+        el("div", {class:"img-grid"},
+          cands.map(c => {
+            const path = typeof c === "string" ? c : (c.path || c.image || c.image_path);
+            const desc = (typeof c === "object" ? (c.description || c.caption) : "") || "";
+            return el("div", {class:"img-block"}, imgThumb(path),
+              desc ? el("div", {style:"font-size:11px;color:var(--muted)"}, desc.slice(0,80)) : null);
+          })
+        )
+      ));
+    }
+    root.appendChild(galleries);
+  }
+
+  // dialogue
+  const dlg = el("div", {class:"panel"},
+    el("h2", {}, `对话（${(s.dialogue||[]).length} turn）`),
+    el("div", {class:"dialogue"},
+      (s.dialogue || []).map(t => renderDialogueTurn(t))
+    )
+  );
+  root.appendChild(dlg);
+
+  // memory points
+  const ownMp = s.own_memory_points || [];
+  const sharedMp = s.shared_parent_memory_points || [];
+  const fullMp = s.memory_points || [];
+  if (ownMp.length || sharedMp.length || fullMp.length) {
+    const mp = el("div", {class:"panel"},
+      el("h2", {}, "记忆点"),
+      renderMemoryGroup("own_memory_points", ownMp),
+      renderMemoryGroup("shared_parent_memory_points", sharedMp),
+      renderMemoryGroup("memory_points (汇总)", fullMp),
+    );
+    root.appendChild(mp);
+  }
+}
+
+function renderDialogueTurn(t) {
+  const ct = t.content_type || "text";
+  const meta = `turn ${t.turn} · ${t.role} · ${ct}`;
+  const children = [el("div", {class:"meta"}, meta)];
+
+  if (ct === "image" && t.image_inline) {
+    const url = imgUrl(t.image_inline);
+    children.push(el("img", {
+      src: url,
+      style: "max-width:100%;max-height:300px;border-radius:6px;cursor:pointer;display:block",
+      onclick: () => openLightbox(url),
+      onerror: function() { this.style.display = "none"; }
+    }));
+    children.push(el("div", {style:"font-size:11px;color:var(--muted);margin-top:4px;word-break:break-all"},
+      t.image_inline));
+  } else {
+    children.push(el("div", {}, t.content || ""));
+  }
+  return el("div", {class:`msg ${t.role || ""}`}, ...children);
+}
+
+function renderMemoryGroup(title, mps) {
+  if (!mps || !mps.length) return el("div");
+  return el("details", {open: title.startsWith("own"), style:"margin-bottom:6px"},
+    el("summary", {}, `${title}  (${mps.length})`),
+    el("table", {},
+      el("thead", {}, el("tr", {},
+        el("th", {style:"width:90px"}, "image"),
+        el("th", {}, "id"), el("th", {}, "type"), el("th", {}, "importance"),
+        el("th", {}, "timestamp"), el("th", {}, "content"))),
+      el("tbody", {}, mps.map(m => {
+        const refs = (m.image_refs || []).filter(Boolean);
+        const imgs = refs.length
+          ? el("div", {style:"display:flex;flex-wrap:wrap;gap:3px"},
+              refs.slice(0, 4).map(r => {
+                const path = typeof r === "string" ? r : (r.path || r.image || r.image_path);
+                return imgThumb(path, {size:"sm"});
+              }))
+          : "";
+        return el("tr", {},
+          el("td", {}, imgs),
+          el("td", {}, m.memory_id || ""),
+          el("td", {}, el("span", {class:"pill"}, m.memory_type || "")),
+          el("td", {}, String(m.importance ?? "")),
+          el("td", {}, fmtDate(m.timestamp)),
+          el("td", {style:"max-width:480px"}, m.memory_content || "")
+        );
+      }))
+    )
+  );
+}
+
+// ---- timeline ----
+async function renderTimelineTab() {
+  const root = document.getElementById("tab-timeline");
+  root.innerHTML = "";
+  const uid = state.currentUid;
+  const data = await api(`/api/users/${uid}/timeline`);
+
+  const wrap = el("div", {class:"panel"},
+    el("h2", {}, `时间线（${data.count} 条 event）`),
+    el("div", {class:"timeline"},
+      data.items.map(t =>
+        el("div", {class:"tl-item", onclick: () => { state.currentSessionId = t.session_id; openSession(t.session_id); }},
+          el("div", {class:"time"}, `${fmtDate(t.event_start_time)} → ${fmtDate(t.event_end_time)}`),
+          el("div", {class:"title"}, t.event_name || t.session_id),
+          el("div", {class:"summary"}, (t.dialogue_summary || "").slice(0, 200))
+        )
+      )
+    )
+  );
+  root.appendChild(wrap);
+}
+
+// ---- questions ----
+async function renderQuestionsTab() {
+  const root = document.getElementById("tab-questions");
+  root.innerHTML = "";
+  const uid = state.currentUid;
+
+  const stats = await api(`/api/users/${uid}/questions/stats`);
+  const statPanel = el("div", {class:"panel"},
+    el("h2", {}, `问题统计（共 ${stats.total} 题）`),
+    el("div", {class:"stats-grid"},
+      el("div", {class:"stat-card"},
+        el("div", {class:"label"}, "question_type"),
+        el("div", {}, Object.entries(stats.question_type || {}).map(([k,v]) =>
+          el("div", {style:"font-size:13px"}, `${k}: ${v}`)))
+      ),
+      el("div", {class:"stat-card"},
+        el("div", {class:"label"}, "difficulty"),
+        el("div", {}, Object.entries(stats.difficulty || {}).map(([k,v]) =>
+          el("div", {style:"font-size:13px"}, `${k}: ${v}`)))
+      ),
+      el("div", {class:"stat-card"},
+        el("div", {class:"label"}, "question_format"),
+        el("div", {}, Object.entries(stats.question_format || {}).map(([k,v]) =>
+          el("div", {style:"font-size:13px"}, `${k}: ${v}`)))
+      ),
+    )
+  );
+  root.appendChild(statPanel);
+
+  const qtypeOpts = ["", ...Object.keys(stats.question_type || {})];
+  const diffOpts = ["", ...Object.keys(stats.difficulty || {})];
+
+  const toolbar = el("div", {class:"toolbar"},
+    "类型 ",
+    el("select", {id:"q-type", onchange: e => { state.questionsQtype = e.target.value; state.questionsPage = 1; renderQuestionsTab(); }},
+      qtypeOpts.map(v => el("option", {value:v, ...(v===state.questionsQtype?{selected:"selected"}:{})}, v || "(全部)"))),
+    "难度 ",
+    el("select", {id:"q-diff", onchange: e => { state.questionsDifficulty = e.target.value; state.questionsPage = 1; renderQuestionsTab(); }},
+      diffOpts.map(v => el("option", {value:v, ...(v===state.questionsDifficulty?{selected:"selected"}:{})}, v || "(全部)"))),
+    el("input", {id:"q-kw", placeholder:"关键字（question/answer）", value: state.questionsKeyword, style:"min-width:240px"}),
+    el("button", {class:"primary", onclick: () => { state.questionsKeyword = document.getElementById("q-kw").value; state.questionsPage = 1; renderQuestionsTab(); }}, "搜索"),
+  );
+  root.appendChild(toolbar);
+
+  const data = await api(`/api/users/${uid}/questions`, {
+    page: state.questionsPage, page_size: state.questionsPageSize,
+    qtype: state.questionsQtype, difficulty: state.questionsDifficulty, keyword: state.questionsKeyword,
+  });
+
+  const list = el("div", {class:"col"},
+    data.items.map(q => renderQuestionCard(q))
+  );
+  root.appendChild(list);
+
+  root.appendChild(el("div", {class:"pager"},
+    el("button", {disabled: state.questionsPage<=1, onclick: () => { state.questionsPage--; renderQuestionsTab(); }}, "上一页"),
+    el("span", {class:"info"}, `第 ${data.page} / ${data.total_pages} 页 · 共 ${data.total} 条`),
+    el("button", {disabled: state.questionsPage>=data.total_pages, onclick: () => { state.questionsPage++; renderQuestionsTab(); }}, "下一页"),
+  ));
+}
+
+// ---- relationships ----
+async function renderRelationshipsTab() {
+  const root = document.getElementById("tab-relationships");
+  root.innerHTML = "";
+  const uid = state.currentUid;
+  const data = await api(`/api/users/${uid}/relationships`);
+
+  const panel = el("div", {class:"panel"},
+    el("h2", {}, `人际关系（${data.nodes.length} 节点 · ${data.edges.length} 关系）`),
+    el("canvas", {id:"rel-canvas"}),
+    el("div", {class:"rel-legend"}, "中心为当前用户；节点颜色表示关系类型。"),
+    el("details", {style:"margin-top:8px"},
+      el("summary", {}, "原始 social_relationships JSON"),
+      el("pre", {style:"white-space:pre-wrap;color:var(--muted);font-size:12px"},
+        JSON.stringify(data.raw_social_relationships, null, 2))
+    )
+  );
+  root.appendChild(panel);
+
+  // Equal-angle placement keeps long bilingual names from colliding.
+  drawRelGraph(data);
+}
+
+function drawRelGraph(data) {
+  const canvas = document.getElementById("rel-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.clientWidth;
+  const H = canvas.clientHeight;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0,0,W,H);
+
+  const cx = W/2, cy = H/2;
+  const groups = {};
+  data.nodes.forEach(n => {
+    if (n.group === "self") return;
+    (groups[n.group] = groups[n.group] || []).push(n);
+  });
+  const groupKeys = Object.keys(groups);
+  const palette = ["#6aa9ff","#ffaa6a","#6ad7a7","#ff7a7a","#c7a4ff","#ffd95a","#5ad9d9","#ff9ec7"];
+  const positions = new Map();
+  positions.set(data.me_name, {x: cx, y: cy});
+
+  const outerNodes = data.nodes.filter(n => n.group !== "self");
+  const radiusX = W * 0.38;
+  const radiusY = H * 0.36;
+  outerNodes.forEach((n, index) => {
+    const angle = -Math.PI / 2 + (index / outerNodes.length) * Math.PI * 2;
+    positions.set(n.id, {
+      x: cx + Math.cos(angle) * radiusX,
+      y: cy + Math.sin(angle) * radiusY,
+      group: n.group,
+    });
+  });
+
+  ctx.strokeStyle = "#3a4258";
+  ctx.lineWidth = 1;
+  data.edges.forEach(e => {
+    const a = positions.get(e.source), b = positions.get(e.target);
+    if (!a || !b) return;
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  });
+
+  positions.forEach((pos, name) => {
+    const isSelf = (name === data.me_name);
+    const groupIdx = isSelf ? -1 : groupKeys.indexOf(pos.group);
+    const color = isSelf ? "#ffffff" : palette[(groupIdx>=0?groupIdx:0) % palette.length];
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, isSelf ? 10 : 7, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = isSelf ? "#0b1019" : "#0f1115";
+    ctx.font = isSelf ? "bold 12px sans-serif" : "11px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    ctx.fillStyle = "#e6e8ee";
+    ctx.fillText(name, pos.x, pos.y - 12);
+    if (!isSelf) {
+      ctx.fillStyle = "#8b93a7";
+      ctx.font = "10px sans-serif";
+      ctx.fillText(pos.group, pos.x, pos.y + 20);
+    }
+  });
+}
+
+function renderQuestionCard(q) {
+  const refs = (q.image_refs || []).filter(Boolean);
+  const evRefs = (q.evidence || []).map(e => e.image_path).filter(Boolean);
+  const allRefs = [...new Set([...refs, ...evRefs])];
+  const sourceSessions = q.source_session_ids || [];
+
+  const header = el("div", {style:"display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap"},
+    el("span", {style:"font-family:monospace;color:var(--muted);min-width:70px"}, q.question_id || ""),
+    el("span", {class:"pill"}, q.question_type || ""),
+    el("span", {class:`pill diff-${(q.difficulty||"").toLowerCase()}`}, q.difficulty || ""),
+    q.question_format ? el("span", {class:"pill"}, q.question_format) : null,
+    sourceSessions.length ? el("div", {style:"margin-left:auto;display:flex;gap:6px;flex-wrap:wrap"},
+      sourceSessions.map(sid =>
+        el("a", {href:"#", onclick: e => { e.preventDefault(); openSession(sid); },
+                 class:"pill", style:"cursor:pointer;color:var(--accent)"}, "→ " + sid)
+      )
+    ) : null,
+  );
+
+  const qa = el("div", {style:"margin-top:10px"},
+    el("div", {style:"line-height:1.6;font-size:14px"},
+      el("span", {style:"color:var(--accent);font-weight:600;margin-right:6px"}, "Q:"),
+      q.question || ""
+    ),
+    el("div", {style:"line-height:1.6;font-size:14px;margin-top:6px"},
+      el("span", {style:"color:var(--ok);font-weight:600;margin-right:6px"}, "A:"),
+      q.answer || "(无)"
+    ),
+    q.options && q.options.length ? el("div", {style:"margin-top:6px;color:var(--muted);font-size:12px"},
+      "options: " + JSON.stringify(q.options)) : null
+  );
+
+  const evDetails = (q.evidence || []).length
+    ? el("details", {style:"margin-top:10px"},
+        el("summary", {}, `evidence (${q.evidence.length})`),
+        el("div", {class:"col", style:"margin-top:6px"},
+          q.evidence.map((e,i) => {
+            let explainText = e.explanation;
+            if (typeof explainText === "string") {
+              try {
+                const parsed = JSON.parse(explainText);
+                explainText = JSON.stringify(parsed, null, 2);
+              } catch(_) {}
+            } else if (typeof explainText === "object") {
+              explainText = JSON.stringify(explainText, null, 2);
+            }
+            return el("div", {style:"border:1px solid var(--border);border-radius:6px;padding:8px;background:var(--panel-2)"},
+              el("div", {style:"display:flex;gap:10px;align-items:flex-start"},
+                e.image_path ? imgThumb(e.image_path) : null,
+                el("div", {style:"flex:1;font-size:12px;color:var(--muted)"},
+                  el("div", {}, `event_id=${e.event_id ?? "-"} · session_id=${e.session_id || "-"}`),
+                  e.image_path ? el("div", {style:"font-family:monospace;margin-top:2px"}, e.image_path) : null,
+                  explainText ? el("pre", {style:"white-space:pre-wrap;margin:6px 0 0 0;font-size:11px"}, explainText) : null
+                )
+              )
+            );
+          })
+        )
+      )
+    : null;
+
+  const imgBar = allRefs.length
+    ? el("div", {style:"display:flex;flex-wrap:wrap;gap:6px;margin-top:10px"},
+        allRefs.map(p => imgThumb(p)))
+    : null;
+
+  return el("div", {class:"panel", style:"margin-bottom:12px"},
+    header, qa, imgBar, evDetails
+  );
+}
+
+// ---- gallery ----
+async function renderGalleryTab() {
+  const root = document.getElementById("tab-gallery");
+  root.innerHTML = "";
+  const uid = state.currentUid;
+  const data = await api(`/api/users/${uid}/images`, {
+    page: state.galleryPage,
+    page_size: state.galleryPageSize,
+    group: state.galleryGroup,
+  });
+
+  if (!data.available) {
+    root.appendChild(el("div", {class:"panel"},
+      el("h2", {}, "图片库"),
+      el("div", {class:"empty"},
+        `用户 u${uid} 没有可用图片。请确认 image/ 目录或 omni/image.zip 已就绪。`)
+    ));
+    return;
+  }
+
+  const groupSelect = el("select", {
+    onchange: event => {
+      state.galleryGroup = event.target.value;
+      state.galleryPage = 1;
+      renderGalleryTab();
+    },
+  },
+    el("option", {value:"", selected: !state.galleryGroup}, "全部分类"),
+    Object.entries(data.group_counts).map(([group, count]) =>
+      el("option", {value:group, selected: state.galleryGroup === group}, `${group} (${count})`)
+    )
+  );
+
+  root.appendChild(el("div", {class:"panel"},
+    el("h2", {}, `图片库（共 ${data.total} 张 · ${Object.keys(data.groups).length} 个分类）`),
+    el("div", {class:"toolbar"},
+      el("label", {}, "分类 ", groupSelect),
+      el("span", {style:"color:var(--muted);margin-left:auto"},
+        `第 ${data.page} / ${data.total_pages} 页`)
+    )
+  ));
+
+  Object.entries(data.groups).forEach(([sub, files]) => {
+    const sec = el("div", {class:"panel"},
+      el("h2", {}, `${sub}（当前页 ${files.length} / 共 ${data.group_counts[sub]}）`),
+      el("div", {class:"img-grid"},
+        files.map(name => imgThumb(`${data.url_prefix}/${sub}/${name}`))
+      )
+    );
+    root.appendChild(sec);
+  });
+
+  root.appendChild(el("div", {class:"pager"},
+    el("button", {
+      disabled: state.galleryPage <= 1,
+      onclick: () => { state.galleryPage--; renderGalleryTab(); },
+    }, "上一页"),
+    el("span", {class:"info"}, `第 ${data.page} / ${data.total_pages} 页 · 共 ${data.total} 张`),
+    el("button", {
+      disabled: state.galleryPage >= data.total_pages,
+      onclick: () => { state.galleryPage++; renderGalleryTab(); },
+    }, "下一页"),
+  ));
+}
+
+loadUsers().catch(err => {
+  document.getElementById("user-list").innerHTML =
+    `<div style="color:var(--err);padding:12px">加载失败：${err.message}</div>`;
+});
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeLightbox();
+});
+</script>
+</body>
+</html>
