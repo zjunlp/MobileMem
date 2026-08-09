@@ -2,14 +2,14 @@
 <div align="center">
 
 <div align="center">
-  <p style="font-size: 48px; font-weight: bold; margin: 10px 0 0 0; line-height: 1.3;">
-    <img src="https://img.icons8.com/fluency/48/iphone.png" alt="iPhone" width="38" height="38" style="vertical-align: middle;"/> 
+  <h1 style="font-size: 52px; font-weight: bold; margin: 10px 0 0 0; border-bottom: none; display: inline-block; line-height: 1.3;">
+    <img src="https://img.icons8.com/fluency/48/iphone.png" alt="iPhone" width="40" height="40" style="vertical-align: middle;"/> 
     MobileMem 
-    <img src="https://img.icons8.com/fluency/48/gallery.png" alt="Gallery" width="38" height="38" style="vertical-align: middle;"/>
-  </p>
-  <p style="font-size: 22px; font-style: italic; margin: -2px 0 16px 0; color: #555; line-height: 1.4;">
+    <img src="https://img.icons8.com/fluency/48/gallery.png" alt="Gallery" width="40" height="40" style="vertical-align: middle;"/>
+  </h1>
+  <h2 style="font-size: 26px; font-style: italic; font-weight: normal; margin: -4px 0 16px 0; color: #555; border-bottom: none; line-height: 1.4;">
     Learning from a Year of Mobile Experiences
-  </p>
+  </h2>
   <img src="omni/asset/logo.jpg" style="width:40%; max-width: 460px; height: auto; border-radius: 20px; box-shadow: 0 6px 24px rgba(0,0,0,0.10);">
 </div>
 
