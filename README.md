@@ -63,7 +63,7 @@ We recommend using **[MemTrace](https://github.com/zjunlp/MemTrace)** to perform
 
 ## 🚩 Citation
 
-If this paper or datasets is helpful, please kindly cite as this:
+If this work or datasets is helpful, please kindly cite as this:
 
 ```bibtex
 ```
