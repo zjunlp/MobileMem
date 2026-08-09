@@ -2,15 +2,15 @@
 <div align="center">
 
 <div align="center">
-  <h1 style="font-size: 2.5em; margin-bottom: 0; border-bottom: none; display: inline-block;">
+  <p style="font-size: 2.6em; font-weight: bold; margin: 0;">
     <img src="https://img.icons8.com/fluency/48/iphone.png" alt="iPhone" width="34" height="34" style="vertical-align: middle;"/> 
     MobileMem 
     <img src="https://img.icons8.com/fluency/48/gallery.png" alt="Gallery" width="34" height="34" style="vertical-align: middle;"/>
-  </h1>
-  <p style="font-size: 1.2em; font-style: italic; margin-top: 0; color: #555;">
+  </p>
+  <p style="font-size: 1.2em; font-style: italic; margin: -6px 0 16px 0; color: #555;">
     Learning from a Year of Mobile Experiences
   </p>
-  <img src="omni/asset/logo.jpg" style="width:45%; height: auto; border-radius: 20px; box-shadow: 0 8px 28px rgba(0,0,0,0.12);" align="center">
+  <img src="omni/asset/logo.jpg" style="width:40%; max-width: 460px; height: auto; border-radius: 20px; box-shadow: 0 6px 24px rgba(0,0,0,0.10);">
 </div>
 
 [![Paper](https://img.shields.io/badge/📄_Paper-2026.XXXXX-b31b1b?style=flat-square&logo=arxiv&logoColor=white)](https://arxiv.org/abs/XXXX)
