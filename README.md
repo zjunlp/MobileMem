@@ -34,27 +34,30 @@
 
 ## 🚀 Getting Started
 
-MobileMem provides two benchmark tracks. Choose the one that fits your needs and navigate to the corresponding resources for data access, evaluation, and construction.
+MobileMem offers two benchmark tracks. Choose the path that fits your needs and navigate to the corresponding resources.
 
 ### 📖 Text Track
-
 The textual benchmark for evaluating memory systems on long-term, knowledge-intensive mobile agent trajectories.
 
-| Section | Description | Link |
+| Section | Description | Quick Link |
 | :--- | :--- | :--- |
-| **Data** | Access the synthesized KEME trajectories and QA pairs. | [Link](https://huggingface.co/datasets/zjunlp/MobileMem) |
-| **Evaluation** | Run baseline memory systems and reproduce leaderboard results. | [Link](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem) |
-| **Construction** | Reproduce the KEME synthesis pipeline. | [Link](https://github.com/zjunlp/MobileMem/tree/main/text) |
+| **📥 Data Access** | Download the synthesized KEME trajectories and QA pairs from HuggingFace. | [Link](https://huggingface.co/datasets/zjunlp/MobileMem) |
+| **⚙️ How to Evaluate** | **Detailed evaluation guide for reproducing leaderboard results is available in the [MemBase](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem) repository.** | [Link](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem) |
+| **🛠️ Data Construction** | Reproduce the KEME synthesis pipeline from scratch. | [Link](https://github.com/zjunlp/MobileMem/tree/main/text) |
 
 ### 🖼️ Omni Track
-
 The multimodal benchmark for evaluating on-device memory with realistic mobile images and dialogues.
 
-| Section | Description | Link |
+| Section | Description | Quick Link |
 | :--- | :--- | :--- |
-| **Data** | Download the MobileMem-Omni dataset with images and dialogues. | [Link](https://huggingface.co/datasets/zjunlp/MobileMem) |
-| **Evaluation** | Evaluate models on memory task types. | [Link](https://github.com/zjunlp/MobileMem/tree/main/omni/eval) |
-| **Construction** | Rebuild the MobileMem-Omni. | [Link](https://github.com/zjunlp/MobileMem/tree/main/omni) |
+| **📥 Data Access** | Download the MobileMem-Omni dataset, including images and dialogues. | [Link](https://huggingface.co/datasets/zjunlp/MobileMem) |
+| **⚙️ How to Evaluate** | Evaluate your models on various memory task types using our provided scripts. | [Link](https://github.com/zjunlp/MobileMem/tree/main/omni/eval) |
+| **🛠️ Data Construction** | Rebuild the entire MobileMem-Omni dataset with the provided pipeline. | [Link](https://github.com/zjunlp/MobileMem/tree/main/omni) |
+
+---
+
+## 🔍 Analyzing Failures with MemTrace
+We recommend using **[MemTrace](https://github.com/zjunlp/MemTrace)** to perform an in-depth error analysis. MemTrace helps you visualize and diagnose where and why your memory system fails, making it easier to pinpoint areas for improvement.
 
 ---
 
