@@ -1,17 +1,15 @@
-
 <div align="center">
 
 <div align="center">
-  <h1 style="font-size: 52px; font-weight: bold; margin: 10px 0 0 0; border-bottom: none; display: inline-block; line-height: 1.3;">
-    <img src="https://img.icons8.com/fluency/48/iphone.png" alt="iPhone" width="40" height="40" style="vertical-align: middle;"/> 
-    MobileMem 
-    <img src="https://img.icons8.com/fluency/48/gallery.png" alt="Gallery" width="40" height="40" style="vertical-align: middle;"/>
-  </h1>
-  <h2 style="font-size: 26px; font-style: italic; font-weight: normal; margin: -4px 0 16px 0; color: #555; border-bottom: none; line-height: 1.4;">
-    Learning from a Year of Mobile Experiences
-  </h2>
-  <img src="omni/asset/logo.jpg" style="width:40%; max-width: 460px; height: auto; border-radius: 20px; box-shadow: 0 6px 24px rgba(0,0,0,0.10);">
+  <img src="omni/asset/logo_01.png" style="height: 52px; width: auto; box-shadow: 0 4px 18px rgba(0,0,0,0.06); vertical-align: middle; display: inline-block;">
+  <span style="font-size: 52px; font-weight: bold; margin-left: 10px; vertical-align: middle; display: inline-block; line-height: 1.3;">
+    MobileMem
+  </span>
 </div>
+
+
+Learning from a Year of Mobile Experiences
+
 
 [![Paper](https://img.shields.io/badge/📄_Paper-2026.XXXXX-b31b1b?style=flat-square&logo=arxiv&logoColor=white)](https://arxiv.org/abs/XXXX)
 [![Website](https://img.shields.io/badge/🌐_Website-MobileMem-1e7bbf?style=flat-square&logo=googlechrome&logoColor=white)](https://zjunlp.github.io/MobileMem/)
