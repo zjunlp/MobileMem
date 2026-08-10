@@ -206,6 +206,9 @@ playwright install --with-deps chromium
 `libatk`, …). It needs `sudo` on Debian/Ubuntu; drop the flag if those libraries
 are already present or you cannot elevate.
 
+Alternatively, `omni/scripts/run_trajectory_smoke.sh` creates the repository
+`.venv` and installs missing Python packages and Chromium only when needed.
+
 #### Chinese screenshots need a CJK font
 
 Screenshot templates ask for `PingFang SC` / `Microsoft YaHei`, which do not
@@ -224,9 +227,9 @@ Verify with `fc-list :lang=zh | head`.
 cleanly when it is absent; set `INSWAPPER_MODEL` to its path to enable it. The
 `buffalo_l` detector is downloaded by InsightFace on first use.
 
-For the local API-free smoke pipeline, pass `--offline` (or set
-`MOBILEMEM_OFFLINE=true`). For online generation, copy `src/.env.example` to
-`src/.env` and configure the text API plus the selected image provider.
+The 14-node construction DAG has no offline generation mode. Listing the DAG
+and running tests are offline, while producing a new trajectory calls text and
+image APIs.
 
 ---
 
@@ -282,8 +285,8 @@ python -m pipeline.cli run --from social_world
 # Restrict to specific persona uuid(s) and cap the events per persona
 python -m pipeline.cli run --uuid 0 --max-events 15
 
-# Run a deterministic end-to-end smoke flow without API keys or network calls
-python -m pipeline.cli run --offline --uuid 10 --max-events 1 --max-workers 1
+# Set up missing local dependencies and run one small online trajectory
+bash ../scripts/run_trajectory_smoke.sh
 
 # Create corresponding dialogues and memory points.
 python ../data/final_dataset/generate_code/stage5_sessions.py `
