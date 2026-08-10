@@ -10,6 +10,13 @@ OUTPUT_ROOT="${OUTPUT_ROOT:-$REPO_ROOT/.cache/mobilemem-smoke}"
 UUID="${UUID:-10}"
 MAX_EVENTS="${MAX_EVENTS:-1}"
 MAX_WORKERS="${MAX_WORKERS:-1}"
+USER_CONFIG_DIR="${MOBILEMEM_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/mobilemem}"
+PROXY_ENV_FILE="${MOBILEMEM_PROXY_ENV_FILE:-$USER_CONFIG_DIR/proxy.env}"
+
+if [[ -f "$PROXY_ENV_FILE" ]]; then
+  # shellcheck source=/dev/null
+  source "$PROXY_ENV_FILE"
+fi
 
 # Create the local Conda environment only when Python or pip is unavailable.
 if [[ ! -x "$PYTHON_BIN" ]] \
@@ -36,22 +43,29 @@ fi
 
 if ! "$PYTHON_BIN" -c '
 import bs4, cv2, dotenv, html2image, jsonlines, numpy, openai, playwright
-import qrcode, requests, scipy, tenacity, tqdm
+import qrcode, requests, scipy, socksio, tenacity, tqdm
 from PIL import Image
 ' >/dev/null 2>&1; then
   printf 'Installing Python dependencies...\n'
   "$PYTHON_BIN" -m pip install --upgrade pip
   "$PYTHON_BIN" -m pip install \
-    -r "$REPO_ROOT/omni/requirements.txt" "html2image>=2,<3"
+    -r "$REPO_ROOT/omni/requirements.txt" \
+    "html2image>=2,<3" "httpx[socks]>=0.27,<1"
 fi
 
 ENV_FILE="$REPO_ROOT/omni/src/.env"
 if [[ ! -f "$ENV_FILE" ]]; then
-  cp "$REPO_ROOT/omni/src/.env.example" "$ENV_FILE"
+  USER_ENV_FILE="${MOBILEMEM_ENV_FILE:-$USER_CONFIG_DIR/.env}"
+  if [[ -f "$USER_ENV_FILE" ]]; then
+    cp "$USER_ENV_FILE" "$ENV_FILE"
+  else
+    cp "$REPO_ROOT/omni/src/.env.example" "$ENV_FILE"
+    chmod 600 "$ENV_FILE"
+    printf 'Created %s. Fill in the API settings, then run this script again.\n' \
+      "$ENV_FILE" >&2
+    exit 1
+  fi
   chmod 600 "$ENV_FILE"
-  printf 'Created %s. Fill in the API settings, then run this script again.\n' \
-    "$ENV_FILE" >&2
-  exit 1
 fi
 
 # html2image needs the Chromium installed by Playwright on machines without Chrome.

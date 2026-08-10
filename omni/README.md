@@ -208,6 +208,7 @@ are already present or you cannot elevate.
 
 Alternatively, `omni/scripts/run_trajectory_smoke.sh` uses Conda to create the
 repository `.venv` and installs missing packages and Chromium only when needed.
+It also reuses optional `.env` and `proxy.env` files from `~/.config/mobilemem/`.
 
 #### Chinese screenshots need a CJK font
 
