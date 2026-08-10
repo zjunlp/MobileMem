@@ -7,6 +7,7 @@
   justify-content: center;
   min-height: calc(var(--case-phone-h, 500px) + 36px);
   padding: 18px 16px;
+  font-family: var(--font-sans);
   overflow: hidden;
   border: 1px solid rgba(18, 35, 27, 0.14);
   border-radius: 8px;
@@ -30,6 +31,24 @@
   background-size: 34px 34px;
   opacity: 0.55;
 }
+
+.case-stage * {
+  font-family: var(--font-sans);
+}
+
+.case-stage :is(p, span, small, em, button, input) {
+  font-weight: 500 !important;
+}
+
+.case-stage :is(b, strong, .case-phone-top, .room-bubble) {
+  font-weight: 600 !important;
+}
+
+.case-stage :is(.case-current-thought, .case-relation-card, .px-relation-card)::before {
+  font-family: var(--font-sans);
+  font-weight: 600 !important;
+}
+
 .case-flow {
   display: flex;
   flex-direction: column;
@@ -325,7 +344,7 @@
     radial-gradient(circle at 18% -20%, rgba(99, 190, 255, 0.32), transparent 46%),
     linear-gradient(180deg, #f8fffb 0%, #effbf4 100%);
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 600;
   text-transform: uppercase;
 }
 .case-phone-top::before {
@@ -416,7 +435,7 @@
   margin: 0;
   font-size: 11px;
   line-height: 1.35;
-  font-weight: 850;
+  font-weight: 500;
 }
 .case-reasoning {
   width: min(100%, 202px);
@@ -459,7 +478,8 @@
   background: var(--green);
   color: var(--white);
   font-size: 8px;
-  font-weight: 950;
+  font-family: var(--font-sans);
+  font-weight: 600;
   box-shadow: 0 0 0 5px rgba(15, 123, 79, 0.08);
 }
 .case-current-thought.is-changing {
@@ -477,13 +497,13 @@
   color: var(--green-dark);
   font-size: 9px;
   line-height: 1.1;
-  font-weight: 950;
+  font-weight: 600;
 }
 .case-current-thought span {
   max-width: calc(100% - 22px);
   font-size: 9px;
   line-height: 1.25;
-  font-weight: 850;
+  font-weight: 400;
 }
 .case-thought-proof {
   display: grid;
@@ -510,7 +530,7 @@
   font-size: 8px;
   line-height: 1.2;
   font-style: normal;
-  font-weight: 950;
+  font-weight: 600;
 }
 .case-thought-proof small {
   display: block;
@@ -518,7 +538,7 @@
   color: var(--muted);
   font-size: 8px;
   line-height: 1.2;
-  font-weight: 800;
+  font-weight: 400;
 }
 .case-relation-proof {
   position: relative;
@@ -549,7 +569,7 @@
   color: var(--green-dark);
   font-size: 7.2px;
   line-height: 1.1;
-  font-weight: 950;
+  font-weight: 500;
   text-align: center;
 }
 .lang-en .case-relation-card small {
@@ -567,7 +587,8 @@
   color: #fff;
   font-size: 7px;
   line-height: 1;
-  font-weight: 950;
+  font-family: var(--font-sans);
+  font-weight: 600;
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.16);
 }
 .case-relation-proof::before,
@@ -1410,7 +1431,7 @@
   font-weight: 950;
   color: #fff;
   white-space: nowrap;
-  letter-spacing: 0.3px;
+  letter-spacing: 0;
 }
 .memory-room .px-x {
   background: #cc3e57;

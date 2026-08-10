@@ -16,9 +16,9 @@
     />
     <meta property="og:site_name" content="MobileMem" />
     <meta name="twitter:card" content="summary" />
-    <link rel="stylesheet" href="assets/web/css/site.css" />
-    <link rel="stylesheet" href="assets/web/css/case-demo.css" />
-    <link rel="stylesheet" href="assets/web/css/application-browser.css" />
+    <link rel="stylesheet" href="assets/web/css/site.css?v=20260810-4" />
+    <link rel="stylesheet" href="assets/web/css/case-demo.css?v=20260810-4" />
+    <link rel="stylesheet" href="assets/web/css/application-browser.css?v=20260810-7" />
   </head>
   <body class="lang-en">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -52,13 +52,12 @@
       <!-- Project overview and interactive memory case -->
       <section class="section hero" id="mobilemem" aria-labelledby="mobilemem-title">
         <div class="wrap hero-grid">
-          <div>
-            <p class="eyebrow">Why MobileMem</p>
-            <h1 id="mobilemem-title">MobileMem</h1>
-            <p class="quote" data-lang="zh">MobileMem：面向持续演进智能体的端侧记忆</p>
-            <p class="quote" data-lang="en">
-              MobileMem: On-Device Memory for Continually Evolving Agents
-            </p>
+          <div class="hero-copy">
+            <p class="hero-product-name">MobileMem</p>
+            <h1 id="mobilemem-title">
+              <span data-lang="zh">面向持续演进智能体的端侧记忆</span>
+              <span data-lang="en">On-Device Memory for Continually Evolving Agents</span>
+            </h1>
             <p class="quote small" data-lang="zh">
               MobileMem
               作为用户的个人记忆智能体，能够自动理解用户意图，执行跨时间的人脸识别以关联多年间女儿的身份，从海量照片档案中定位
@@ -100,6 +99,10 @@
                 <span data-lang="zh">视频</span>
                 <span data-lang="en">Video</span>
               </button>
+              <a class="btn" href="leaderboard.html">
+                <span data-lang="zh">榜单</span>
+                <span data-lang="en">Leaderboard</span>
+              </a>
             </div>
           </div>
           <div class="media-stack">
@@ -541,212 +544,191 @@
           </div>
           <div class="application-layout" data-application-showcase>
             <div class="application-accordion">
-              <details
-                class="application-item"
-                open
-                data-application-uid="uid0"
-                data-application-type="group_chat"
-              >
+              <details class="application-item" open>
                 <summary>
                   <span class="application-index">01</span>
                   <span class="application-summary-copy">
                     <strong>
-                      <span data-lang="zh">生态系统</span>
-                      <span data-lang="en">Ecosystem</span>
+                      <span data-lang="zh">健康管理与用药提醒</span>
+                      <span data-lang="en">Health Management and Medication Reminder</span>
                     </strong>
-                    <small>
-                      <span data-lang="zh">移动 AI 助手长期记忆评测</span>
-                      <span data-lang="en"
-                        >Long-term memory evaluation for mobile AI assistants</span
-                      >
-                    </small>
                   </span>
                   <span class="application-chevron" aria-hidden="true"></span>
                 </summary>
                 <div class="application-body">
                   <p data-lang="zh">
-                    MobileMem 被设计为一个统一基准，用于评估移动 AI
-                    助手中的长期记忆，而不是一个独立的记忆系统。其模块化架构可无缝集成到现有移动智能体生态中，包括任务理解、记忆检索、问答、网页搜索、回复安全和执行模块。因此，MobileMem
-                    支持不同记忆架构之间的可复现比较，并促进长期记忆评测接入真实开发管线。
+                    一位老年用户日常记录血压和血糖，并保存历次体检报告和医生建议。过去几个月，每次复诊后，用户都会在日历中记下下次复诊时间，在笔记中记录医生调整的用药方案，通过浏览器搜索某种常用药的禁忌，并将化验报告和处方照片保存在相册中。某天清晨，用户略感头晕，打开手机询问助手：“我以前对什么药过敏？请帮我看看现在吃的药里有没有这种成分。”助手将健康记录中的过敏史与当前用药清单进行匹配，立即给出明确的风险提示。
                   </p>
                   <p data-lang="en">
-                    MobileMem is designed as a unified benchmark for evaluating long-term memory in
-                    mobile AI assistants rather than a standalone memory system. Its modular
-                    architecture seamlessly integrates with the existing mobile agent ecosystem,
-                    including task understanding, memory retrieval, question answering, web search,
-                    response safety, and execution modules. Consequently, MobileMem supports
-                    reproducible comparison across different memory architectures and facilitates
-                    the integration of long-term memory evaluation into real-world development
-                    pipelines.
+                    An elderly user routinely records blood pressure and blood glucose measurements
+                    and has kept past medical examination reports and doctor's advice. Over the past
+                    few months, after each follow-up visit, the user has noted the next appointment
+                    time in Calendar, jotted down the doctor's medication adjustments in Notes,
+                    searched for contraindications of a common medication via the browser, and saved
+                    photos of lab reports and prescriptions in Photos. One early morning, feeling
+                    slightly dizzy, the user opens the phone and asks the assistant, "What
+                    medication was I allergic to before? Please check whether any of the medicines
+                    I'm currently taking contain it." By matching the allergy history in the health
+                    records with the current medication list, the assistant immediately provides a
+                    clear risk alert.
                   </p>
                 </div>
               </details>
-              <details
-                class="application-item"
-                data-application-uid="uid0"
-                data-application-type="book"
-              >
+              <details class="application-item">
                 <summary>
                   <span class="application-index">02</span>
                   <span class="application-summary-copy">
                     <strong>
-                      <span data-lang="zh">标准化</span>
-                      <span data-lang="en">Standardization</span>
+                      <span data-lang="zh">旅行行程规划</span>
+                      <span data-lang="en">Travel Itinerary Planning</span>
                     </strong>
-                    <small>
-                      <span data-lang="zh">真实手机记忆与统一评测框架</span>
-                      <span data-lang="en">Authentic smartphone memory and unified protocols</span>
-                    </small>
                   </span>
                   <span class="application-chevron" aria-hidden="true"></span>
                 </summary>
                 <div class="application-body">
                   <p data-lang="zh">
-                    MobileMem
-                    的一个关键特征是，它由真实智能手机记忆构建，而不是合成交互日志或人工整理的用户画像。该基准在单一评测框架中统一了基础记忆、认知记忆、偏好记忆、时间推理和视觉推理，同时将评估建立在约一年真实用户活动之上。MobileMem
-                    建立在原生移动应用生成的异构记忆源之上，包括日历、相册、笔记、文档、待办事项、账单、语音备忘录、屏幕记忆、视频记忆以及其他用户生成记录。
+                    一位计划前往成都的游客提前浏览了大量游记和攻略，随手收藏多篇文章，并逐渐被川西环线的山水吸引。出发前一晚，用户询问助手：“根据我收藏的所有内容，成都周边两天怎么安排比较好？”助手没有泛泛推荐宽窄巷子和锦里，而是将收藏攻略的内容与用户此前搜索过的交通方式和住宿偏好整合，给出具体的两日行程：第一天从成都市区出发，经都江堰前往映秀；第二天翻越巴朗山口远眺四姑娘山，傍晚返回。
                   </p>
                   <p data-lang="en">
-                    A key characteristic of MobileMem is that it is constructed from authentic
-                    smartphone memory rather than synthetic interaction logs or manually curated
-                    user profiles. The benchmark unifies foundational memory, cognitive memory,
-                    preference memory, temporal reasoning, and visual reasoning within a single
-                    evaluation framework, while grounding assessment in approximately one year of
-                    real user activities. MobileMem is built upon heterogeneous memory sources
-                    generated by native mobile applications, including calendars, albums, notes,
-                    documents, to-do lists, bills, voice memos, screen memories, video memories, and
-                    other user-generated records.
+                    A tourist planning a trip to Chengdu has browsed numerous travelogues and guides
+                    in advance, casually bookmarking several articles, and becomes increasingly
+                    drawn to the mountains and waters along the Western Sichuan Ring Route. The
+                    night before departure, the user says to the assistant, "Based on everything
+                    I've bookmarked, what's a good two-day route around Chengdu?" Instead of
+                    generically recommending Kuanzhai Alley and Jinli, the assistant integrates the
+                    content of the bookmarked guides with the user's previously searched
+                    transportation modes and accommodation preferences, and produces a concrete
+                    two-day itinerary: departing from downtown Chengdu on the first day, passing
+                    through Dujiangyan to Yingxiu, and on the second day crossing Balang Mountain
+                    Pass to view Mount Siguniang before returning in the evening.
                   </p>
                 </div>
               </details>
-              <details
-                class="application-item"
-                data-application-uid="uid0"
-                data-application-type="money"
-              >
+              <details class="application-item">
                 <summary>
                   <span class="application-index">03</span>
                   <span class="application-summary-copy">
                     <strong>
-                      <span data-lang="zh">端侧智能</span>
-                      <span data-lang="en">On-Device Intelligence</span>
+                      <span data-lang="zh">个人影视清单与追剧记录</span>
+                      <span data-lang="en">Personal Watchlist and Drama Tracking</span>
                     </strong>
-                    <small>
-                      <span data-lang="zh">可度量、可比较、可持续改进</span>
-                      <span data-lang="en">Measurable, comparable, continuously improvable</span>
-                    </small>
                   </span>
                   <span class="application-chevron" aria-hidden="true"></span>
                 </summary>
                 <div class="application-body">
                   <p data-lang="zh">
-                    MobileMem
-                    将长期记忆评测从定性能力展示转向可度量、可比较且可持续改进的评估。该基准为检索准确性、时间一致性、偏好理解、多模态推理和长程知识整合提供综合指标，从而能够客观比较不同记忆架构和检索策略。随着基础模型日益从云服务迁移到边缘设备，MobileMem
-                    为评估可靠、高效、隐私感知且能通过长期用户交互持续演进的记忆系统提供了有效框架。
+                    一位长期追剧的用户总会在笔记中写详细评论，并附上几张印象深刻的截图，久而久之积累了数百部影视作品的观后记录。今天刚看完一部新剧，用户觉得它与以前记录过的一部作品很像，却记不清细节，于是询问助手：“根据我过去的追剧记录，把和这部剧有关的内容整理出来，并写一篇对比长评。”助手不借助在线搜索，而是梳理多年间散落在笔记中的观后感，识别风格或主题相近的作品，从多个角度逐项比较，生成一篇包含观点、素材来源和个人记忆痕迹的长评。
                   </p>
                   <p data-lang="en">
-                    MobileMem shifts long-term memory evaluation from qualitative capability
-                    demonstrations to measurable, comparable, and continuously improvable
-                    assessment. The benchmark provides comprehensive metrics for retrieval accuracy,
-                    temporal consistency, preference understanding, multimodal reasoning, and
-                    long-horizon knowledge integration, enabling objective comparison among
-                    different memory architectures and retrieval strategies. As foundation models
-                    increasingly migrate from cloud services to edge devices, MobileMem offers an
-                    effective framework for evaluating reliable, efficient, and privacy-aware memory
-                    systems that continuously evolve through long-term user interactions.
+                    A habitual drama watcher always writes detailed reviews in Notes, accompanied by
+                    several memorable screenshots, and has accumulated an archive of impressions
+                    covering hundreds of films and TV shows over a long period. Having just finished
+                    a new drama today, the user feels it resonates with one previously recorded but
+                    cannot recall the specifics. The user asks the assistant, "Based on my past
+                    drama tracking records, organize everything related to this one and write a
+                    comparative long review." Without resorting to online search, the assistant
+                    sifts through the fragmented impressions accumulated over the years in Notes,
+                    identifies works similar in style or theme, compares them from several angles
+                    item by item, and generates a review with opinions, source material, and traces
+                    of personal memory.
                   </p>
                 </div>
               </details>
-              <details
-                class="application-item"
-                data-application-uid="uid1"
-                data-application-type="event"
-              >
+              <details class="application-item">
                 <summary>
                   <span class="application-index">04</span>
                   <span class="application-summary-copy">
                     <strong>
-                      <span data-lang="zh">用户记忆价值</span>
-                      <span data-lang="en">User Memory Value</span>
+                      <span data-lang="zh">工作复盘与年中总结</span>
+                      <span data-lang="en">Work Review and Mid-Year Summary</span>
                     </strong>
-                    <small>
-                      <span data-lang="zh">以长期多模态用户记忆作为个性化基本单元</span>
-                      <span data-lang="en"
-                        >Long-term multimodal user memory as personalization</span
-                      >
-                    </small>
                   </span>
                   <span class="application-chevron" aria-hidden="true"></span>
                 </summary>
                 <div class="application-body">
                   <p data-lang="zh">
-                    从核心上看，MobileMem
-                    将长期多模态用户记忆视为个性化的基本单元。不同于主要评估孤立事实回忆的传统问答基准，MobileMem
-                    评估 AI
-                    助手是否能够在扩展时间跨度内持续积累、检索、整合并推理不断演化的用户记忆。通过建模真实用户轨迹、多语言交互、动态偏好和真实世界事件，该基准鼓励开发能够提供上下文感知、主动且持续自适应辅助能力的
-                    AI 助手。
+                    一位职场人士正在准备年中总结。过去半年中，会议无数、方案反复修改，还阅读了大量技术文章和行业资讯，但总感觉学习内容零散、难以整理。用户询问助手：“帮我复盘过去半年的工作。结合上次技术分享，梳理我主要在补哪些知识，以及工作中卡在哪里。”助手整合日历中的会议时间线和项目里程碑、文档中的报告与方案修改记录、笔记中的零散思考，以及屏幕记忆中浏览过的技术文章主题，提炼出清晰的学习轨迹，对照工作任务与实际产出，定位用户反复受阻的瓶颈，并生成结构清晰的年中复盘总结。
                   </p>
                   <p data-lang="en">
-                    At its core, MobileMem treats long-term multimodal user memory as the
-                    fundamental unit of personalization. Unlike conventional question answering
-                    benchmarks that primarily evaluate isolated factual recall, MobileMem evaluates
-                    whether AI assistants can continuously accumulate, retrieve, integrate, and
-                    reason over evolving user memories across extended temporal horizons. By
-                    modeling authentic user trajectories, multilingual interactions, dynamic
-                    preferences, and real-world events, the benchmark encourages the development of
-                    AI assistants capable of delivering context-aware, proactive, and continuously
-                    adaptive assistance.
+                    A working professional is preparing a mid-year summary. Over the past six months
+                    there have been countless meetings, repeatedly revised proposals, and
+                    substantial reading of technical articles and industry news, yet it feels like
+                    the learning has been diffuse and hard to organize. The user says to the
+                    assistant, "Help me review my work from the past six months. Based on the last
+                    tech sharing session, sort out what I've mainly been catching up on and where
+                    I've been stuck at work." The assistant integrates the timelines of all meetings
+                    and project milestones from Calendar, the revision histories of reports and
+                    proposals from Documents, the fragmented reflections in Notes, and the themes of
+                    technical articles browsed through screen memory, distills a clear learning
+                    trajectory, contrasts work tasks with actual output, pinpoints the bottlenecks
+                    where the user repeatedly got stuck, and generates a well-structured mid-year
+                    review summary.
                   </p>
                 </div>
               </details>
-              <details
-                class="application-item"
-                data-application-uid="uid1"
-                data-application-type="video"
-              >
+              <details class="application-item">
                 <summary>
                   <span class="application-index">05</span>
                   <span class="application-summary-copy">
                     <strong>
-                      <span data-lang="zh">应用场景</span>
-                      <span data-lang="en">Application Scenarios</span>
+                      <span data-lang="zh">家庭预算与订阅复盘</span>
+                      <span data-lang="en">Household Budget and Subscription Review</span>
                     </strong>
-                    <small>
-                      <span data-lang="zh">健康管理、行程规划、影视追踪与工作复盘</span>
-                      <span data-lang="en">Health, travel, entertainment, and work</span>
-                    </small>
                   </span>
                   <span class="application-chevron" aria-hidden="true"></span>
                 </summary>
                 <div class="application-body">
                   <p data-lang="zh">
-                    <strong>健康管理与用药提醒：</strong
-                    >助手结合日历、笔记、浏览记录、体检报告和处方，核对用户的药物过敏史与当前用药，并及时给出风险提醒。<br /><br />
-                    <strong>旅行行程规划：</strong
-                    >助手整合用户收藏的游记、交通方式和住宿偏好，生成符合个人兴趣的具体行程。<br /><br />
-                    <strong>个人影视清单与追剧记录：</strong
-                    >助手从长期积累的观剧笔记和截图中识别相似作品，进行跨时间比较并生成个性化长评。<br /><br />
-                    <strong>工作复盘与年中总结：</strong
-                    >助手整合日历、文档、笔记和屏幕记忆，梳理学习轨迹、工作产出与长期存在的瓶颈。
+                    一位家庭财务管理者长期保存水电账单、应用商店收据和会员续费通知，并在日历中记录重要扣款日期。制定下月预算前，用户询问助手：“最近哪些固定订阅涨价了？下个月有哪些服务会自动续费？”助手关联历次支付记录、续费通知和日历提醒，识别价格变化与重复会员，按日期整理出续费清单，并标记需要确认或取消的项目。
                   </p>
                   <p data-lang="en">
-                    <strong>Health Management and Medication Reminder:</strong> The assistant
-                    matches the user's allergy history with the current medication list and provides
-                    a clear risk alert.<br /><br />
-                    <strong>Itinerary Planning for a Foreign Trip:</strong> The assistant integrates
-                    bookmarked guides with transportation and accommodation preferences to produce a
-                    personalized itinerary.<br /><br />
-                    <strong>Personal Watchlist and Drama Tracking:</strong> The assistant identifies
-                    works with similar styles or themes and generates a comparative review grounded
-                    in long-term personal memory.<br /><br />
-                    <strong>Work Review and Mid-Year Summary:</strong> The assistant integrates
-                    calendars, documents, notes, and screen memories to summarize learning
-                    trajectories, work output, and recurring bottlenecks.
+                    A household budget manager keeps utility bills, app-store receipts, and
+                    membership renewal notices, while recording important charge dates in Calendar.
+                    Before planning next month's expenses, the user asks, "Which recurring
+                    subscriptions increased recently, and what will renew next month?" The assistant
+                    links payment records, renewal notices, and calendar reminders, identifies price
+                    changes and duplicate memberships, and prepares a dated checklist of items to
+                    confirm or cancel.
                   </p>
                 </div>
               </details>
             </div>
-            <figure class="application-phone-visual" data-application-step="detail" tabindex="0">
+            <figure
+              class="scenario-dialogue-visual"
+              data-scenario-dialogue
+              aria-label="Application scenario dialogue"
+            >
+              <div class="application-phone scenario-dialogue-phone">
+                <section
+                  class="application-ai-dialogue"
+                  aria-label="User and AI dialogue trajectory"
+                >
+                  <div
+                    class="application-ai-dialogue-stream"
+                    data-scenario-stream
+                    aria-live="polite"
+                  ></div>
+                  <footer class="application-ai-composer" aria-hidden="true">
+                    <span class="application-ai-composer-field"></span>
+                    <button type="button" tabindex="-1" disabled>
+                      <span data-lang="zh">已发送</span><span data-lang="en">Sent</span>
+                    </button>
+                  </footer>
+                </section>
+              </div>
+              <div
+                class="scenario-dialogue-pagination"
+                data-scenario-pagination
+                role="group"
+                aria-label="Application dialogue scenarios"
+              ></div>
+            </figure>
+            <figure
+              class="application-phone-visual"
+              data-application-step="detail"
+              tabindex="0"
+              hidden
+            >
               <header class="application-browser-head">
                 <span class="application-browser-title">
                   <strong>
@@ -1195,6 +1177,7 @@
             class="application-lightbox"
             id="application-lightbox"
             aria-labelledby="application-lightbox-title"
+            hidden
           >
             <div class="application-lightbox-inner">
               <div class="application-lightbox-media">
@@ -1399,12 +1382,9 @@
         </video>
       </div>
     </dialog>
-    <script src="assets/web/memweb/trajectories.js"></script>
-    <script src="assets/web/memweb/trajectories-extra.js"></script>
-    <script src="assets/web/js/application-data.js?v=20260809-2"></script>
     <script src="assets/web/js/case-demo.js?v=20260809-2"></script>
     <script src="assets/web/js/quick-start.js?v=20260809-1"></script>
-    <script src="assets/web/js/application-browser.js?v=20260809-4"></script>
+    <script src="assets/web/js/application-scenarios.js?v=20260810-13"></script>
     <script src="assets/web/js/main.js?v=20260809-2"></script>
   </body>
 </html>

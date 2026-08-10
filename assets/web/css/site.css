@@ -22,6 +22,10 @@
   --white: #ffffff;
   --shadow: 0 18px 60px rgba(23, 33, 28, 0.12);
   --nav-h: 72px;
+  --font-display: "Suisse Works Book", "Iowan Old Style", "Songti SC", STSong, Georgia, serif;
+  --font-sans: "Suisse Intl Book", "Suisse Intl", "Avenir Next", Avenir, "PingFang SC",
+    "Hiragino Sans GB", Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
 * {
@@ -40,15 +44,17 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family:
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  letter-spacing: 0;
   line-height: 1.5;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
 }
 
 a {
@@ -130,8 +136,8 @@ button:focus-visible {
   border-radius: 8px;
   color: var(--muted);
   text-decoration: none;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .nav-links a:hover {
@@ -158,8 +164,8 @@ button:focus-visible {
   color: var(--muted);
   cursor: pointer;
   font: inherit;
-  font-size: 13px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .language-toggle button[aria-pressed="true"] {
@@ -203,6 +209,7 @@ main {
 
 .hero {
   position: relative;
+  min-height: calc(100vh - var(--nav-h) - 36px);
   background: linear-gradient(
     120deg,
     rgba(238, 246, 241, 0.85),
@@ -218,14 +225,33 @@ main {
   align-items: center;
 }
 
+.hero-copy {
+  max-width: 720px;
+}
+
+.hero-product-name {
+  margin: 0 0 20px;
+  color: var(--green-dark);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
 .eyebrow {
   display: none;
   margin: 0 0 12px;
   color: var(--green);
   font-size: 13px;
-  font-weight: 850;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0;
   text-transform: uppercase;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
 }
 
 h1,
@@ -242,16 +268,28 @@ h1 {
   letter-spacing: 0;
 }
 
+.hero h1 {
+  max-width: 720px;
+  margin-bottom: 26px;
+  color: #1d272a;
+  font-family: var(--font-display);
+  font-size: 58px;
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
 h2 {
   margin-bottom: 24px;
   font-size: clamp(30px, 4.2vw, 54px);
-  line-height: 1.02;
+  line-height: 1.08;
   letter-spacing: 0;
 }
 
 h3 {
   margin-bottom: 10px;
-  font-size: 17px;
+  font-size: 19px;
   line-height: 1.25;
   letter-spacing: 0;
 }
@@ -261,14 +299,39 @@ h3 {
   color: #243129;
   font-size: clamp(18px, 2vw, 23px);
   line-height: 1.42;
-  font-weight: 580;
+  font-weight: 400;
 }
 
 .quote.small {
   color: var(--muted);
   font-size: 15px;
   line-height: 1.55;
-  font-weight: 520;
+  font-weight: 400;
+}
+
+.hero .quote.small {
+  max-width: 690px;
+  margin-bottom: 0;
+  color: #646464;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.hero .actions {
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.hero .btn {
+  min-height: 54px;
+  padding: 0 24px;
+  border-color: rgba(29, 39, 42, 0.72);
+  background: rgba(255, 255, 255, 0.76);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  box-shadow: none;
 }
 
 .actions {
@@ -290,8 +353,8 @@ h3 {
   background: var(--white);
   color: var(--ink);
   text-decoration: none;
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 500;
   box-shadow: 0 1px 0 rgba(23, 33, 28, 0.04);
 }
 
@@ -569,7 +632,7 @@ h3 {
   padding: 13px 16px;
   cursor: pointer;
   list-style: none;
-  font-weight: 900;
+  font-weight: 500;
 }
 
 .feature-accordion summary::-webkit-details-marker {
@@ -587,7 +650,7 @@ h3 {
   background: rgba(15, 123, 79, 0.08);
   color: var(--green);
   font-size: 18px;
-  font-weight: 950;
+  font-weight: 500;
   line-height: 1;
 }
 
@@ -620,14 +683,14 @@ h3 {
   color: #12231b;
   font-size: clamp(16px, 1.15vw, 19px);
   line-height: 1.1;
-  font-weight: 950;
+  font-weight: 600;
 }
 
 .feature-summary-copy small {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.2;
-  font-weight: 820;
+  font-weight: 400;
 }
 
 .accordion-body {
@@ -640,7 +703,7 @@ h3 {
   color: #243129;
   font-size: clamp(14px, 1vw, 16px);
   line-height: 1.58;
-  font-weight: 650;
+  font-weight: 400;
 }
 
 /* Quick start ------------------------------------------------------------- */
@@ -679,7 +742,7 @@ h3 {
 
 .quick h3 {
   margin-bottom: 6px;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .quick .quote.small {
@@ -716,7 +779,7 @@ h3 {
 }
 
 .command-block code {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-mono);
 }
 
 .terminal-demo {
@@ -737,7 +800,7 @@ h3 {
   background: #182b21;
   color: rgba(255, 255, 255, 0.72);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 500;
 }
 
 .terminal-dots {
@@ -764,7 +827,7 @@ h3 {
   min-height: 126px;
   padding: 12px 15px;
   color: #f8fbf4;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
   line-height: 1.5;
 }
@@ -843,7 +906,7 @@ h3 {
   display: block;
   color: var(--white);
   font-size: 22px;
-  font-weight: 900;
+  font-weight: 600;
   line-height: 1.1;
 }
 
@@ -852,7 +915,7 @@ h3 {
   margin-top: 3px;
   color: rgba(255, 255, 255, 0.64);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 400;
 }
 
 .github-button {
@@ -889,7 +952,7 @@ h3 {
   cursor: pointer;
   font: inherit;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 500;
   line-height: 1;
   text-align: left;
   white-space: nowrap;
@@ -955,7 +1018,7 @@ h3 {
   color: rgba(255, 255, 255, 0.78);
   font-size: 15px;
   line-height: 1.45;
-  font-weight: 650;
+  font-weight: 400;
 }
 
 .github-cta .btn {
@@ -1056,7 +1119,7 @@ h3 {
   border-top: 1px solid rgba(217, 225, 220, 0.82);
   color: var(--muted);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 500;
   text-align: center;
 }
 
@@ -1143,8 +1206,8 @@ h3 {
     content: "";
   }
 
-  .media-stack {
-    order: -1;
+  .hero h1 {
+    font-size: 48px;
   }
 }
 
@@ -1208,17 +1271,35 @@ h3 {
     font-size: 38px;
   }
 
+  .hero-product-name {
+    margin-bottom: 14px;
+    font-size: 14px;
+  }
+
+  .hero h1 {
+    margin-bottom: 20px;
+    font-size: 40px;
+    line-height: 1.08;
+  }
+
   .quote {
     font-size: 17px;
   }
 
   .hero .quote.small {
-    font-size: 14px;
-    line-height: 1.45;
+    font-size: 17px;
+    line-height: 1.35;
   }
 
   .hero .actions {
-    margin-top: 16px;
+    gap: 10px;
+    margin-top: 22px;
+  }
+
+  .hero .btn {
+    min-height: 48px;
+    padding: 0 18px;
+    font-size: 15px;
   }
 
   .hero .image-frame img {
