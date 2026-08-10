@@ -11,20 +11,27 @@ UUID="${UUID:-10}"
 MAX_EVENTS="${MAX_EVENTS:-1}"
 MAX_WORKERS="${MAX_WORKERS:-1}"
 
-# Create the local environment only when it does not already exist.
-if [[ ! -x "$PYTHON_BIN" ]]; then
+# Create the local Conda environment only when Python or pip is unavailable.
+if [[ ! -x "$PYTHON_BIN" ]] \
+    || ! "$PYTHON_BIN" -m pip --version >/dev/null 2>&1; then
   if [[ -n "$CUSTOM_PYTHON_BIN" ]]; then
-    printf 'PYTHON_BIN is not executable: %s\n' "$PYTHON_BIN" >&2
+    printf 'PYTHON_BIN must provide an executable Python with pip: %s\n' \
+      "$PYTHON_BIN" >&2
     exit 1
   fi
-  SYSTEM_PYTHON="$(command -v python3.11 || command -v python3 || true)"
-  if [[ -z "$SYSTEM_PYTHON" ]] || ! "$SYSTEM_PYTHON" -c \
-    'import sys; raise SystemExit(sys.version_info < (3, 11))'; then
-    printf 'Python 3.11 or newer is required.\n' >&2
+  CONDA_BIN="${CONDA_EXE:-$(command -v conda || true)}"
+  if [[ -z "$CONDA_BIN" ]]; then
+    printf 'Conda is required to create the local Python environment.\n' >&2
     exit 1
   fi
-  printf 'Creating Python environment: %s\n' "$REPO_ROOT/.venv"
-  "$SYSTEM_PYTHON" -m venv "$REPO_ROOT/.venv"
+  if [[ -e "$REPO_ROOT/.venv" ]]; then
+    mkdir -p "$REPO_ROOT/.cache"
+    BACKUP_ENV="$REPO_ROOT/.cache/incomplete-venv-$(date +%Y%m%d-%H%M%S)-$$"
+    printf 'Moving incomplete environment to: %s\n' "$BACKUP_ENV"
+    mv "$REPO_ROOT/.venv" "$BACKUP_ENV"
+  fi
+  printf 'Creating Conda environment: %s\n' "$REPO_ROOT/.venv"
+  "$CONDA_BIN" create --yes --prefix "$REPO_ROOT/.venv" python=3.11 pip
 fi
 
 if ! "$PYTHON_BIN" -c '

@@ -206,8 +206,8 @@ playwright install --with-deps chromium
 `libatk`, …). It needs `sudo` on Debian/Ubuntu; drop the flag if those libraries
 are already present or you cannot elevate.
 
-Alternatively, `omni/scripts/run_trajectory_smoke.sh` creates the repository
-`.venv` and installs missing Python packages and Chromium only when needed.
+Alternatively, `omni/scripts/run_trajectory_smoke.sh` uses Conda to create the
+repository `.venv` and installs missing packages and Chromium only when needed.
 
 #### Chinese screenshots need a CJK font
 
