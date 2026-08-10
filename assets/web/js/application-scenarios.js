@@ -17,7 +17,7 @@
       },
       messages: [
         textTurn("user", "今天早上起床后有点头晕。我以前对什么药过敏？现在吃的药里有吗？", "I felt dizzy after getting up this morning. What was I allergic to, and is it in my current medication?"),
-        textTurn("ai", "2019 年体检报告和健康档案都记录了青霉素类过敏；上月最后一个周五的复诊笔记更新过药单。我先核对那次复诊。", "Your 2019 examination report and health record both list a penicillin allergy. Your medication list changed at the follow-up visit on the final Friday of last month, so I will start there."),
+        textTurn("ai", "你对青霉素类药物过敏。按上月复诊后的当前药单，四种药里没有直接标注青霉素成分；但新增药物属于需要医生复核交叉过敏风险的相关药类，我已把它标为风险项。", "You are allergic to penicillin-class medicines. Your current four-item list after last month's follow-up does not directly name a penicillin ingredient, but the newly added medicine is from a related class whose cross-allergy risk needs clinician review, so I flagged it as a risk item."),
         textTurn("user", "这是那次复诊的照片，医生当时重新看了我的血压记录。", "This is the follow-up visit. The doctor reviewed my blood-pressure log then."),
         imageTurn(
           "user",
@@ -28,7 +28,7 @@
         ),
         textTurn("ai", "照片与日历中的复诊时间一致；同日相册里还有处方照片，笔记记录为“停用旧药，新增一项，剂量不变”。", "The photo matches the Calendar visit. Photos also contains a same-day prescription, while Notes says: stop the old medicine, add one new item, and keep the other doses unchanged."),
         textTurn("user", "我记不清新加的是哪一盒了。", "I cannot remember which box was newly added."),
-        textTurn("ai", "为避免只凭处方转写判断，请把现在实际在吃的药盒和服药表一起拍给我。", "To avoid relying only on the transcribed prescription, please photograph the boxes you actually take together with your medication schedule."),
+        textTurn("ai", "复诊处方把第四项标为新增，但现有记录没有药盒外观，暂时无法可靠指出是哪一盒。我已标出处方位置；把实际药盒和服药表拍来后，我可以立即对应确认。", "The follow-up prescription marks the fourth item as newly added, but the current record does not show the box, so I cannot reliably identify its appearance yet. I marked its position on the prescription and can match it immediately once you photograph the actual boxes with your schedule."),
         textTurn("user", "我把四种药和服药表都摆出来了，这是我今天早上实际服用的。", "I laid out all four medicines with my schedule. These are what I actually took this morning."),
         imageTurn(
           "user",
@@ -74,7 +74,7 @@
       },
       messages: [
         textTurn("user", "根据我这段时间收藏的内容，成都周边两天怎么安排比较好？", "Based on everything I have saved recently, what is a good two-day route around Chengdu?"),
-        textTurn("ai", "你的收藏主要集中在川西山景；交通搜索偏向自驾或包车，住宿记录偏好可取消、停车方便、少换乘。", "Your saves concentrate on western Sichuan scenery. Transport searches favor driving or a hired car, while lodging history favors free cancellation, easy parking, and fewer transfers."),
+        textTurn("ai", "建议直接走川西两日线：第一天成都—都江堰—映秀并住宿，第二天经卧龙到巴朗山观景后返成都。它符合你偏好的自驾、可取消住宿和少换乘，也比两天往返九寨沟从容。", "Take a two-day western Sichuan route: Chengdu-Dujiangyan-Yingxiu with an overnight stay on day one, then Wolong-Balang Mountain and back to Chengdu on day two. It fits your preference for driving, cancellable lodging, and fewer transfers, and is far less rushed than a two-day Jiuzhaigou return trip."),
         textTurn("user", "这张是我最想去的感觉，不想把两天都花在市区。", "This is closest to what I want. I do not want to spend both days in the city."),
         imageTurn(
           "user",
@@ -131,7 +131,7 @@
       },
       messages: [
         textTurn("user", "根据我过去的追剧记录，把和这部新剧有关的内容整理出来，写一篇对比长评，不要在线搜索。", "Use my past viewing records to organize material related to this new drama and write a comparative long review without searching online."),
-        textTurn("ai", "我已在多年的观剧笔记、相册截图和历史评论中找到三部主题相近的作品，其中一部在你的笔记里被反复引用。", "I found three related works across years of viewing notes, photo screenshots, and past reviews. One of them is cited repeatedly in your archive."),
+        textTurn("ai", "第一版对比长评已按三部主题相近的旧作整理好，全部依据你的观剧笔记、相册截图和历史评论。核心判断是：新剧再次触发了你长期关注的“被空间隔开的亲密关系”，但它用更直接的争执和剪辑替代了旧作的沉默与留白。", "I prepared a first comparative draft around three thematically related older works, using only your viewing notes, saved screenshots, and past reviews. Its central argument is that the new drama reactivates your long-running interest in intimate relationships divided by space, but replaces the older works' silence and restraint with more direct confrontation and editing."),
         textTurn("user", "这是新剧里让我突然觉得似曾相识的一幕。", "This scene from the new drama suddenly felt familiar."),
         imageTurn(
           "user",
@@ -159,7 +159,7 @@
         textTurn("user", "镜头和声音也要单独比较。", "Compare image and sound separately too."),
         textTurn("ai", "旧作多用固定长镜头和室内环境声维持压力；新剧用更快的正反打、门响和脚步声推动冲突。门框构图相似，但节奏功能不同。", "The older work uses static long takes and interior ambience to sustain pressure. The new drama uses faster shot-reverse-shot editing, door sounds, and footsteps to propel conflict. The doorway framing is similar, but its rhythmic function differs."),
         textTurn("user", "不要把我的语气改成那种很空的专业影评。", "Do not turn my voice into an empty professional-review style."),
-        textTurn("ai", "我会保留你笔记里的短句和犹豫，例如“这里太满了，反而没让我难受”，只在后面补充证据和比较，不替你拔高。", "I will keep your short, tentative phrasing, such as ‘This scene is so full that it affects me less,’ and add evidence and comparison without inflating the claim."),
+        textTurn("ai", "已保留你笔记里的短句和犹豫，例如“这里太满了，反而没让我难受”；后面只补证据和比较，没有替你拔高语气。", "I kept your short, tentative phrasing, such as ‘This scene is so full that it affects me less.’ I added only evidence and comparison without inflating the claim."),
         textTurn("user", "我把以前整理截图的桌面也拍了，看看能不能串起来。", "I also photographed the desk where I organized older screenshots. See whether they connect."),
         imageTurn(
           "user",
@@ -170,9 +170,9 @@
         ),
         textTurn("ai", "可以。桌面中的三册笔记分别对应 2019、2021 和 2023 年，截图共同出现“隔着空间说话”的构图，形成了可追溯的跨年份母题。", "Yes. The three notebooks correspond to 2019, 2021, and 2023. Their screenshots repeatedly stage conversation across separated spaces, creating a traceable cross-year motif."),
         textTurn("user", "也要写新剧哪里做得不够，不要因为我刚看完就只夸。", "Include where the new drama falls short. Do not praise it simply because I just finished it."),
-        textTurn("ai", "会写两点：第三幕把原本含蓄的动机解释得过满；配角在关键转折后没有获得足够收束。这两点都来自你昨晚的即时笔记。", "I will include two weaknesses: the third act overexplains motives that were initially subtle, and supporting characters receive too little closure after the main turn. Both points come from your immediate notes last night."),
+        textTurn("ai", "已写入两点不足：第三幕把原本含蓄的动机解释得过满；配角在关键转折后没有获得足够收束。这两点都来自你昨晚的即时笔记。", "I added two weaknesses: the third act overexplains motives that were initially subtle, and supporting characters receive too little closure after the main turn. Both points come from your immediate notes last night."),
         textTurn("user", "每个主要观点都标清楚来自哪篇笔记或哪张图。", "Mark which note or image supports every major point."),
-        textTurn("ai", "正文将使用日期脚注和截图编号：叙事部分对应三篇旧笔记，人物部分对应昨晚笔记，视听部分对应六张新旧截图。", "The draft will use dated footnotes and screenshot numbers: three older notes for narrative, last night's notes for character analysis, and six old and new screenshots for image and sound."),
+        textTurn("ai", "已给正文加上日期脚注和截图编号：叙事部分对应三篇旧笔记，人物部分对应昨晚笔记，视听部分对应六张新旧截图。", "I added dated footnotes and screenshot numbers to the draft: three older notes for narrative, last night's notes for character analysis, and six old and new screenshots for image and sound."),
         textTurn("user", "先告诉我最后会按什么结构写。", "Tell me the final structure before you finish it."),
         textTurn("ai", "五部分：熟悉感从何而来、叙事机制、人物关系、镜头与声音、个人观看史中的重复母题；结尾单列新剧的优点与不足。", "Five sections: where the familiarity begins, narrative mechanism, character relationships, image and sound, and recurring motifs in your viewing history, followed by a separate assessment of the new drama's strengths and weaknesses."),
         textTurn("user", "就按这个写，结尾回答为什么是它让我想起那些旧作品。", "Use that structure, and end by explaining why this particular drama brought those older works back to me."),
@@ -188,7 +188,7 @@
       },
       messages: [
         textTurn("user", "帮我复盘过去半年的工作。结合上次技术分享，梳理我主要补了什么知识、工作卡在哪里。", "Review my work from the past six months. Use my last technical sharing session to identify what I learned and where work kept stalling."),
-        textTurn("ai", "我正在对齐日历会议和里程碑、文档版本、零散笔记，以及屏幕记忆中的技术文章主题。当前记录显示是一条主项目线和三项短期支持任务。", "I am aligning Calendar meetings and milestones, document versions, fragmented notes, and technical-article themes from screen memory. The record shows one main project and three short support tasks."),
+        textTurn("ai", "初版复盘已整理：过去半年是一条主项目线和三项短期支持；主要补了检索流程、评测方法和跨团队需求拆解；反复卡在范围确认偏晚、验证证据不足，以及支持任务打断主项目连续时间。每项结论都已链接到日历、文档版本或笔记。", "I completed a first review: the past six months contain one main project and three short support tasks. Your learning centered on retrieval workflows, evaluation methods, and cross-team requirement breakdown, while recurring blockers were late scope confirmation, insufficient validation evidence, and support work interrupting sustained time on the main project. Each conclusion is linked to Calendar, document versions, or notes."),
         textTurn("user", "这是其中一次连续改方案时拍的，桌上都是那周的版本。", "This was taken during one intensive proposal revision. The desk held that week's versions."),
         imageTurn(
           "user",
@@ -245,7 +245,7 @@
       },
       messages: [
         textTurn("user", "最近哪些固定订阅涨价了？下个月哪些服务会自动续费？", "Which recurring subscriptions increased recently, and which services renew automatically next month?"),
-        textTurn("ai", "我正在核对近六个月的支付记录、应用商店收据、会员续费通知和日历提醒，并把水电等波动账单单独分类。", "I am comparing six months of payments, app-store receipts, renewal notices, and Calendar reminders, while separating variable utilities from subscriptions."),
+        textTurn("ai", "初步清单已完成：云存储从 18 元涨到 24 元，视频会员从 25 元涨到 30 元；下月五项续费分别在 5、12、18、26、28 日扣款；效率工具 A 和 B 功能重复。水电和话费属于波动账单，已单独列出。", "The initial list is ready: cloud storage increased from 18 to 24 yuan and video membership from 25 to 30 yuan. Five subscriptions renew next month on the 5th, 12th, 18th, 26th, and 28th, and productivity tools A and B overlap in function. Utilities and the phone bill are listed separately as variable expenses."),
         textTurn("user", "先看这笔金额很大的记录，别把一次性消费算成订阅。", "Start with this large payment. Do not classify a one-time purchase as a subscription."),
         imageTurn(
           "user",
@@ -265,13 +265,13 @@
           "一次性购买的床品与家居拖鞋",
           "Bedding and household slippers from a one-time purchase",
         ),
-        textTurn("ai", "照片进一步确认这是已经收货的一次性家居消费，不应按月摊成订阅；我会保留在搬家支出类别中。", "The photo further confirms a delivered one-time household purchase. It should not be spread across monthly subscriptions and will remain under moving expenses."),
+        textTurn("ai", "照片进一步确认这是已经收货的一次性家居消费，不应按月摊成订阅；已归入搬家支出类别。", "The photo further confirms a delivered one-time household purchase. It should not be spread across monthly subscriptions and is now categorized under moving expenses."),
         textTurn("user", "音乐会员是家庭套餐，家里几个人都在用，不算重复。", "The music membership is a family plan used by several people, so it is not a duplicate."),
         textTurn("ai", "已保留音乐家庭套餐，并将家庭成员共享记录作为保留依据，不把它与个人音乐服务混为重复项。", "I kept the family music plan and linked the family-sharing record as the reason, rather than treating it as a duplicate personal service."),
         textTurn("user", "真正涨价的是哪些？把前后金额说清楚。", "Which services actually increased? Show the old and new amounts."),
         textTurn("ai", "两项：云存储从每月 18 元调到 24 元，视频会员从每月 25 元调到 30 元；最新收据和续费通知都能相互印证。", "Two services increased: cloud storage from 18 to 24 yuan per month and video membership from 25 to 30 yuan. The latest receipts and renewal notices corroborate both changes."),
         textTurn("user", "你说的重复订阅又是哪两个？", "Which two subscriptions are actually duplicated?"),
-        textTurn("ai", "是两项个人效率工具：都提供云同步、扫描和文档整理，过去三个月均有使用，但主要功能高度重叠；音乐家庭套餐不在其中。", "They are two personal productivity tools. Both provide cloud sync, scanning, and document organization, and both were used in the last three months, but their main functions overlap heavily. The family music plan is not included."),
+        textTurn("ai", "是效率工具 A 和效率工具 B：两者都提供云同步、扫描和文档整理，过去三个月均有使用，但主要功能高度重叠；音乐家庭套餐不在其中。", "They are productivity tools A and B. Both provide cloud sync, scanning, and document organization, and both were used in the last three months, but their main functions overlap heavily. The family music plan is not included."),
         textTurn("user", "下个月每项分别什么时候扣款？", "When will each item charge next month?"),
         textTurn("ai", "5 日云存储、12 日音乐家庭套餐、18 日视频会员、26 日效率工具 A、28 日效率工具 B；每个日期都来自最新续费通知。", "Cloud storage renews on the 5th, family music on the 12th, video on the 18th, productivity tool A on the 26th, and tool B on the 28th. Each date comes from the latest renewal notice."),
         textTurn("user", "我昨晚就是这样对着手机、邮件和日历核账的。", "This is how I compared the phone, emails, and calendar last night."),
