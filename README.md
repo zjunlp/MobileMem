@@ -15,11 +15,7 @@
 
 **MobileMem** is a comprehensive benchmarking framework for evaluating **on-device memory systems** in realistic mobile environments.
 
----
 
-<img src="omni/asset/fig2.png" style="width:100%; height: auto; border-radius: 14px; box-shadow: 0 4px 18px rgba(0,0,0,0.06);" align=center>
-
-**MobileMem** is built from **multiple heterogeneous sources** to enable comprehensive on-device memory modeling.
 </div>
 
 ---
@@ -27,6 +23,8 @@
 ## 📑 Table of Contents
 
 - [🔥 News](#-news)
+- [🎯 Applications](#-applications)
+- [📊 Dataset Structure](#-dataset-structure)
 - [🚀 Getting Started](#-getting-started)
   - [📖 Text Track](#-text-track)
   - [🖼️ Omni Track](#️-omni-track)
@@ -37,8 +35,31 @@
 ---
 
 ## 🔔 News
-- **2025-08-01** — We publicly release the MobileMem dataset.
-- **2025-06-01** — We launch the MobileMem project.
+- **2026-08-01** — We publicly release the MobileMem dataset.
+- **2026-05-16** — We launch the English version of the dataset and benchmark.
+- **2026-05-03** — We launch the Chinese version of the dataset and benchmark.
+
+
+---
+
+## 🎯 Applications
+
+MobileMem is built from **multiple heterogeneous sources** to enable comprehensive on-device memory modeling.
+
+<img src="omni/asset/fig2.png" style="width:100%; height: auto; border-radius: 14px; box-shadow: 0 4px 18px rgba(0,0,0,0.06);" align=center>
+
+---
+
+## 📊 Dataset Structure
+
+MobileMem contains two complementary splits:
+
+| Split | Modality | Description |
+| :--- | :--- | :--- |
+| **text** | Text | Long-horizon user–assistant conversations and structured mobile-app events for evaluating textual memory systems. |
+| **omni** | Text and images | Multimodal mobile interactions with screenshots and photos. |
+
+The dataset is available for download at [HuggingFace](https://huggingface.co/datasets/zjunlp/MobileMem).
 
 ---
 
@@ -82,7 +103,6 @@ MobileMem/
 │   ├── README.md                   # Track-specific guide and dataset download
 │   ├── src/                        # 🛠️ Data construction pipeline code
 │   ├── eval/                       # ⚙️ Evaluation scripts for omni track
-│   └── asset/                      # 🎨 Images used in this README
 └── README.md                       # This file
 ```
 
