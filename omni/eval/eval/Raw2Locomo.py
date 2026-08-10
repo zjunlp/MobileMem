@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# MobileMem-Omni Stage5/Stage6 to LoCoMo conversion helpers.
 """
 读取 stage5.json + stage6.json 的标准合并格式，
 为每个用户生成 data/Locomo/locomo_u{x}.json 文件，

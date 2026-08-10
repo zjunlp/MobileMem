@@ -1,6 +1,0 @@
-langchain==1.2.11
-langgraph==1.1.0
-langchain-huggingface==1.2.1
-langchain-openai==1.1.11
-litellm==1.82.1
-sentence-transformers==5.2.3
