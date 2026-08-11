@@ -741,6 +741,124 @@ h3 {
   margin-bottom: 0;
 }
 
+.dataset-cases {
+  min-height: 0;
+  padding: 20px 0 22px;
+  background: var(--white);
+}
+
+.dataset-cases .wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.dataset-case-trigger {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 40px;
+  align-items: center;
+  gap: 16px;
+  width: min(720px, 100%);
+  min-height: 76px;
+  padding: 10px 12px 10px 14px;
+  border: 0;
+  border-top: 1px solid rgba(15, 83, 53, 0.16);
+  border-bottom: 1px solid rgba(15, 83, 53, 0.16);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.dataset-case-profiles {
+  display: flex;
+  align-items: center;
+  width: 76px;
+  padding-left: 2px;
+}
+
+.dataset-case-profiles img {
+  display: block;
+  width: 46px;
+  height: 46px;
+  border: 3px solid var(--white);
+  border-radius: 50%;
+  background: #e5ede8;
+  object-fit: cover;
+  box-shadow: 0 5px 14px rgba(22, 70, 44, 0.15);
+}
+
+.dataset-case-profiles img + img {
+  margin-left: -16px;
+}
+
+.dataset-case-trigger-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.dataset-case-trigger-copy strong {
+  color: var(--green-dark);
+  font-size: 16px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.dataset-case-trigger-copy small {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.dataset-case-trigger-arrow {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--wash);
+  color: var(--green-dark);
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.dataset-case-trigger-arrow svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.dataset-case-trigger:hover {
+  border-color: var(--green);
+  background: #f6faf7;
+}
+
+.dataset-case-trigger:hover .dataset-case-trigger-arrow {
+  background: var(--green-dark);
+  color: var(--white);
+  transform: translateX(2px);
+}
+
+.dataset-case-trigger:focus-visible {
+  outline: none;
+  background: #f6faf7;
+  box-shadow: inset 3px 0 var(--green);
+}
+
 .command-block {
   margin: 8px 0 0;
   padding: 10px 12px;
@@ -1324,6 +1442,43 @@ h3 {
 
   .quick {
     padding-top: 14px;
+  }
+
+  .dataset-cases {
+    padding: 16px 0 18px;
+  }
+
+  .dataset-case-trigger {
+    grid-template-columns: 64px minmax(0, 1fr) 36px;
+    gap: 10px;
+    min-height: 70px;
+    padding: 8px;
+  }
+
+  .dataset-case-profiles {
+    width: 64px;
+  }
+
+  .dataset-case-profiles img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .dataset-case-profiles img + img {
+    margin-left: -14px;
+  }
+
+  .dataset-case-trigger-copy strong {
+    font-size: 14px;
+  }
+
+  .dataset-case-trigger-copy small {
+    font-size: 9px;
+  }
+
+  .dataset-case-trigger-arrow {
+    width: 36px;
+    height: 36px;
   }
 
   .terminal-content {

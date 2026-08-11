@@ -24,11 +24,12 @@
     previewCount: applicationPreviewCount,
     resolveAssetPath: applicationAssetPath,
   } = applicationData;
+  const applicationCaseLimit = Math.min(applicationPreviewCount, 2);
 
   const applicationRecords = applicationUsers.flatMap((uid) =>
     applicationCategoryOrder.flatMap((type) => {
       const copy = applicationTypeCopy[type];
-      return Array.from({ length: applicationPreviewCount }, (_, sampleIndex) => {
+      return Array.from({ length: applicationCaseLimit }, (_, sampleIndex) => {
         const sampleNumber = sampleIndex + 1;
         return {
           uid,
@@ -49,33 +50,47 @@
   const applicationImage = document.getElementById("application-visual-image");
   const applicationPosition = document.getElementById("application-phone-position");
   const applicationVisual = applicationShowcase?.querySelector(".application-phone-visual");
-  const applicationPhone = document.querySelector(".application-phone");
-  const applicationPhoneDesktop = document.querySelector("[data-application-phone-desktop]");
-  const applicationAiDialogue = document.querySelector("[data-application-ai-dialogue]");
-  const applicationAiEntry = document.querySelector("[data-application-phone-ai]");
-  const applicationPhoneRecents = document.querySelector("[data-application-phone-recents]");
-  const applicationRecentsImage = document.querySelector("[data-application-recents-image]");
-  const applicationRecentsLabel = document.querySelector("[data-application-recents-label]");
-  const applicationRecentsOpen = document.querySelector("[data-application-recents-open]");
-  const applicationSystemButtons = Array.from(
-    document.querySelectorAll("[data-application-system-action]"),
+  const applicationPhone = applicationVisual?.querySelector(".application-phone");
+  const applicationPhoneDesktop = applicationVisual?.querySelector(
+    "[data-application-phone-desktop]",
   );
-  const applicationPhoneCount = document.querySelector("[data-application-phone-count]");
-  const applicationPhoneCaption = document.querySelector("[data-application-phone-caption]");
-  const applicationPhoneCaptionTitle = document.querySelector(
+  const applicationAiDialogue = applicationVisual?.querySelector("[data-application-ai-dialogue]");
+  const applicationAiEntry = applicationVisual?.querySelector("[data-application-phone-ai]");
+  const applicationPhoneRecents = applicationVisual?.querySelector(
+    "[data-application-phone-recents]",
+  );
+  const applicationRecentsImage = applicationVisual?.querySelector(
+    "[data-application-recents-image]",
+  );
+  const applicationRecentsLabel = applicationVisual?.querySelector(
+    "[data-application-recents-label]",
+  );
+  const applicationRecentsOpen = applicationVisual?.querySelector(
+    "[data-application-recents-open]",
+  );
+  const applicationSystemButtons = Array.from(
+    applicationVisual?.querySelectorAll("[data-application-system-action]") || [],
+  );
+  const applicationPhoneCount = applicationVisual?.querySelector("[data-application-phone-count]");
+  const applicationPhoneCaption = applicationVisual?.querySelector(
+    "[data-application-phone-caption]",
+  );
+  const applicationPhoneCaptionTitle = applicationVisual?.querySelector(
     "[data-application-phone-caption-title]",
   );
   const applicationPhoneDirectionButtons = Array.from(
-    document.querySelectorAll("[data-application-phone-direction]"),
+    applicationVisual?.querySelectorAll("[data-application-phone-direction]") || [],
   );
   const applicationPhoneUidButtons = Array.from(
-    document.querySelectorAll("[data-application-phone-uid]"),
+    applicationVisual?.querySelectorAll("[data-application-phone-uid]") || [],
   );
-  const applicationAiUserAvatar = document.querySelector("[data-application-ai-user-avatar]");
+  const applicationAiUserAvatar = applicationVisual?.querySelector(
+    "[data-application-ai-user-avatar]",
+  );
   const applicationPhoneApps = Array.from(
-    document.querySelectorAll("[data-application-phone-type]"),
+    applicationVisual?.querySelectorAll("[data-application-phone-type]") || [],
   );
-  const applicationOpen = document.querySelector("[data-application-open]");
+  const applicationOpen = applicationVisual?.querySelector("[data-application-open]");
   const applicationDirectionButtons = Array.from(
     document.querySelectorAll("[data-application-direction]"),
   );
@@ -87,12 +102,25 @@
   const applicationClose = document.querySelector("[data-application-close]");
   const applicationLightboxMedia = document.querySelector(".application-lightbox-media");
   const applicationMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const applicationAiStream = document.querySelector("[data-application-ai-dialogue-stream]");
-  const applicationAiSessionTitle = document.querySelector("[data-application-ai-session-title]");
-  const applicationAiSessionTabs = document.querySelector("[data-application-ai-session-tabs]");
-  const applicationAiHistory = document.querySelector("[data-application-ai-history]");
-  const applicationAiHistoryOpen = document.querySelector("[data-application-ai-history-open]");
-  const applicationAiHistoryClose = document.querySelector("[data-application-ai-history-close]");
+  const applicationAiStream = applicationVisual?.querySelector(
+    "[data-application-ai-dialogue-stream]",
+  );
+  const applicationAiSessionTitle = applicationVisual?.querySelector(
+    "[data-application-ai-session-title]",
+  );
+  const applicationAiSessionTabs = applicationVisual?.querySelector(
+    "[data-application-ai-session-tabs]",
+  );
+  const applicationAiHistory = applicationVisual?.querySelector("[data-application-ai-history]");
+  const applicationAiHistoryOpen = applicationVisual?.querySelector(
+    "[data-application-ai-history-open]",
+  );
+  const applicationAiHistoryClose = applicationVisual?.querySelector(
+    "[data-application-ai-history-close]",
+  );
+  const datasetCaseDialog = document.getElementById("dataset-case-dialog");
+  const datasetCaseOpen = document.querySelector("[data-dataset-case-open]");
+  const datasetCaseClose = document.querySelector("[data-dataset-case-close]");
 
   // Dialogue data -------------------------------------------------------------
 
@@ -172,7 +200,7 @@
   };
 
   const preloadApplicationGroup = (uid, type) => {
-    for (let sampleNumber = 1; sampleNumber <= applicationPreviewCount; sampleNumber += 1) {
+    for (let sampleNumber = 1; sampleNumber <= applicationCaseLimit; sampleNumber += 1) {
       preloadApplicationImage(applicationAssetPath(uid, type, sampleNumber));
     }
   };
@@ -673,12 +701,33 @@
   bindApplicationSwipe(applicationOpen);
   bindApplicationSwipe(applicationLightboxMedia);
 
+  const openDatasetCases = () => {
+    if (!datasetCaseDialog || datasetCaseDialog.open) return;
+    applicationAssetsReady = true;
+    hydrateApplicationImages();
+    syncApplicationVisual(activeApplicationIndex, false);
+    setApplicationPhoneMode("home");
+    if (typeof datasetCaseDialog.showModal === "function") datasetCaseDialog.showModal();
+    else datasetCaseDialog.setAttribute("open", "");
+  };
+
+  const closeDatasetCases = () => {
+    if (!datasetCaseDialog) return;
+    if (typeof datasetCaseDialog.close === "function") datasetCaseDialog.close();
+    else datasetCaseDialog.removeAttribute("open");
+  };
+
+  datasetCaseOpen?.addEventListener("click", openDatasetCases);
+  datasetCaseClose?.addEventListener("click", closeDatasetCases);
+  datasetCaseDialog?.addEventListener("click", (event) => {
+    if (event.target === datasetCaseDialog) closeDatasetCases();
+  });
+
   // Language and motion -------------------------------------------------------
 
   const setApplicationLanguage = (lang) => {
     applicationLang = lang === "zh" ? "zh" : "en";
-    const languageUids =
-      applicationLang === "zh" ? ["uid0", "uid1", "uid2"] : ["uid10", "uid11", "uid12"];
+    const languageUids = applicationLang === "zh" ? ["uid0"] : ["uid10"];
     let nextIndex = activeApplicationIndex;
     if (!languageUids.includes(activeApplicationUid)) {
       nextIndex = applicationRecords.findIndex(
@@ -689,6 +738,23 @@
     if (applicationPhone?.dataset.applicationPhoneMode === "dialogue") {
       renderApplicationDialogue();
     }
+    datasetCaseClose?.setAttribute(
+      "aria-label",
+      applicationLang === "zh" ? "关闭数据集案例" : "Close dataset cases",
+    );
+    applicationPhoneUidButtons.forEach((button) => {
+      const isChineseCase = button.dataset.applicationPhoneUid === "uid0";
+      const label =
+        applicationLang === "zh"
+          ? isChineseCase
+            ? "中文数据集案例"
+            : "英文数据集案例"
+          : isChineseCase
+            ? "Chinese dataset case"
+            : "English dataset case";
+      button.setAttribute("aria-label", label);
+      button.title = label;
+    });
   };
 
   window.addEventListener("mobilemem:languagechange", (event) => {

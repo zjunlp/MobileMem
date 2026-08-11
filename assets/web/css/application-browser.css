@@ -326,7 +326,7 @@
 }
 .application-uid-group {
   display: inline-grid;
-  grid-template-columns: repeat(3, 34px);
+  grid-template-columns: repeat(2, 34px);
   align-items: center;
   gap: 4px;
 }
@@ -367,6 +367,85 @@
 }
 .application-uid-switch button:hover:not(.is-active) {
   background: rgba(21, 95, 64, 0.07);
+}
+
+.dataset-case-dialog {
+  width: min(420px, calc(100vw - 24px));
+  max-width: none;
+  max-height: calc(100dvh - 24px);
+  padding: 0;
+  overflow: auto;
+  border: 1px solid rgba(15, 83, 53, 0.18);
+  border-radius: 10px;
+  background: #f4f8f5;
+  color: var(--ink);
+  box-shadow: 0 34px 100px rgba(10, 31, 19, 0.34);
+}
+
+.dataset-case-dialog::backdrop {
+  background: rgba(10, 20, 14, 0.64);
+  backdrop-filter: blur(7px);
+}
+
+.dataset-case-dialog-shell {
+  display: grid;
+  justify-items: center;
+  min-height: 100%;
+  padding: 0 24px 24px;
+}
+
+.dataset-case-dialog-head {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: calc(100% + 48px);
+  min-height: 58px;
+  margin: 0 -24px 14px;
+  padding: 0 14px 0 20px;
+  border-bottom: 1px solid rgba(15, 83, 53, 0.11);
+  background: rgba(244, 248, 245, 0.94);
+  backdrop-filter: blur(12px);
+}
+
+.dataset-case-dialog-head h2 {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.dataset-case-dialog-close {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid rgba(15, 83, 53, 0.14);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.82);
+  color: #274b36;
+  cursor: pointer;
+  font: inherit;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.dataset-case-dialog-close:hover {
+  border-color: rgba(15, 123, 79, 0.36);
+  background: #ffffff;
+}
+
+.dataset-case-dialog-close:focus-visible {
+  outline: 3px solid rgba(15, 123, 79, 0.24);
+  outline-offset: 2px;
+}
+
+.dataset-case-dialog .application-phone-visual {
+  margin-bottom: 0;
 }
 .application-browser-view {
   min-height: 0;
@@ -1623,6 +1702,20 @@
   .application-phone-visual {
     min-height: 0;
     border-radius: 18px;
+  }
+  .dataset-case-dialog {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+  }
+  .dataset-case-dialog-shell {
+    padding-right: 12px;
+    padding-bottom: 18px;
+    padding-left: 12px;
+  }
+  .dataset-case-dialog-head {
+    width: calc(100% + 24px);
+    margin-right: -12px;
+    margin-left: -12px;
   }
   .application-browser-head {
     min-height: 55px;
