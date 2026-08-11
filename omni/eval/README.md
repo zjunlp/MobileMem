@@ -257,3 +257,7 @@ result = evaluator.evaluate_file(
 ```
 
 Note: `evaluator.py` depends on helper classes such as `LLMJudge` and `RetrievalCache`. If the final package only includes the three files above, provide those helpers as well or import them from the original project environment.
+
+# 📋 Dataset Logs
+
+The [MobileMem-Omni Logs](https://drive.google.com/file/d/1ZPaUzsu-gyDXZYqiy2b47v6grnfBg7HW/view?usp=drive_link) contain the experimental logs.
