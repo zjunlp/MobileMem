@@ -21,8 +21,26 @@ if (["http:", "https:"].includes(window.location.protocol) && !isLocalPreview) {
 
 const languageToggle = document.querySelector("[data-toggle-lang]");
 const reportLink = document.querySelector("[data-report-link]");
+const languageStorageKey = "mobilemem-language";
 
 // Shared language switch ----------------------------------------------------
+
+const getSavedLanguage = () => {
+  try {
+    const language = window.localStorage.getItem(languageStorageKey);
+    return language === "zh" || language === "en" ? language : null;
+  } catch {
+    return null;
+  }
+};
+
+const saveLanguage = (language) => {
+  try {
+    window.localStorage.setItem(languageStorageKey, language);
+  } catch {
+    // Language switching still works when storage is unavailable.
+  }
+};
 
 const setLanguageToggle = (lang) => {
   if (!languageToggle) return;
@@ -46,21 +64,22 @@ const setReportLink = (lang) => {
     "aria-label",
     isPlaceholder
       ? isChinese
-        ? "白皮书，即将发布"
-        : "Technical Report, coming soon"
+        ? "技术报告，即将发布"
+        : "Tech Report, coming soon"
       : isChinese
-        ? "白皮书"
-        : "Technical Report",
+        ? "技术报告"
+        : "Tech Report",
   );
   if (isPlaceholder) reportLink.title = isChinese ? "即将发布" : "Coming soon";
   else reportLink.removeAttribute("title");
 };
 
-const setPageLanguage = (lang) => {
+const setPageLanguage = (lang, { persist = true } = {}) => {
   const normalizedLang = lang === "zh" ? "zh" : "en";
   document.documentElement.lang = normalizedLang;
   document.body.classList.toggle("lang-zh", normalizedLang === "zh");
   document.body.classList.toggle("lang-en", normalizedLang === "en");
+  if (persist) saveLanguage(normalizedLang);
   setLanguageToggle(normalizedLang);
   setReportLink(normalizedLang);
   window.dispatchEvent(
@@ -78,37 +97,74 @@ reportLink?.addEventListener("click", (event) => {
   if (reportLink.getAttribute("href") === "#") event.preventDefault();
 });
 
-setPageLanguage(document.body.classList.contains("lang-zh") ? "zh" : "en");
+window.addEventListener("storage", (event) => {
+  if (event.key !== languageStorageKey || !event.newValue) return;
+  setPageLanguage(event.newValue, { persist: false });
+});
 
-// OPPO application video ----------------------------------------------------
+setPageLanguage(getSavedLanguage() || (document.body.classList.contains("lang-zh") ? "zh" : "en"));
 
-const videoModal = document.querySelector("#oppo-video-modal");
-const videoPlay = document.querySelector(".video-play");
-const videoClose = document.querySelector(".video-close");
-const oppoVideo = document.querySelector("[data-oppo-video]");
+// Hero statistics ----------------------------------------------------------
 
-if (videoModal && videoPlay && videoClose) {
-  videoPlay.addEventListener("click", () => {
-    videoModal.showModal();
-    if (oppoVideo) {
-      oppoVideo.currentTime = 0;
-      oppoVideo.play().catch(() => {});
+const countUpValues = Array.from(document.querySelectorAll("[data-count-to]"));
+const countUpRegion = document.querySelector(".hero-stats");
+
+const formatCountValue = (element, value) => {
+  const decimals = Number(element.dataset.countDecimals || 0);
+  return `${value.toFixed(decimals)}${element.dataset.countSuffix || ""}`;
+};
+
+const animateCountValue = (element, index) => {
+  const target = Number(element.dataset.countTo);
+  if (!Number.isFinite(target)) return;
+
+  const duration = 1050;
+  const delay = index * 120;
+  let startTime;
+
+  element.textContent = formatCountValue(element, 0);
+
+  const update = (time) => {
+    if (startTime === undefined) startTime = time + delay;
+    if (time < startTime) {
+      window.requestAnimationFrame(update);
+      return;
     }
-  });
 
-  videoClose.addEventListener("click", () => {
-    videoModal.close();
-  });
+    const progress = Math.min((time - startTime) / duration, 1);
+    const easedProgress = 1 - Math.pow(1 - progress, 3);
+    element.textContent = formatCountValue(element, target * easedProgress);
 
-  videoModal.addEventListener("click", (event) => {
-    if (event.target === videoModal) videoModal.close();
-  });
+    if (progress < 1) window.requestAnimationFrame(update);
+    else element.textContent = formatCountValue(element, target);
+  };
 
-  videoModal.addEventListener("close", () => {
-    if (!oppoVideo) return;
-    oppoVideo.pause();
-    oppoVideo.currentTime = 0;
-  });
+  window.requestAnimationFrame(update);
+};
+
+countUpValues.forEach((element) => {
+  const target = Number(element.dataset.countTo);
+  if (Number.isFinite(target)) element.textContent = formatCountValue(element, target);
+});
+
+if (
+  countUpRegion &&
+  countUpValues.length &&
+  !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+) {
+  if ("IntersectionObserver" in window) {
+    const countUpObserver = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        countUpValues.forEach(animateCountValue);
+        countUpObserver.disconnect();
+      },
+      { threshold: 0.35 },
+    );
+    countUpObserver.observe(countUpRegion);
+  } else {
+    countUpValues.forEach(animateCountValue);
+  }
 }
 
 // Highlight accordion -------------------------------------------------------

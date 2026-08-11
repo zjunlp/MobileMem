@@ -8,8 +8,8 @@
       name="description"
       content="MobileMem-Omni benchmark results across textual and multimodal memory methods."
     />
-    <link rel="stylesheet" href="assets/web/css/site.css?v=20260810-4" />
-    <link rel="stylesheet" href="assets/web/css/leaderboard.css?v=20260810-2" />
+    <link rel="stylesheet" href="assets/web/css/site.css?v=20260811-9" />
+    <link rel="stylesheet" href="assets/web/css/leaderboard.css?v=20260811-3" />
   </head>
   <body class="lang-en leaderboard-page">
     <a class="skip-link" href="#leaderboard-main">Skip to results</a>
@@ -76,6 +76,29 @@
             </div>
           </div>
 
+          <div class="control-group resource-control">
+            <span class="control-label">
+              <span data-lang="zh">项目链接</span>
+              <span data-lang="en">Resources</span>
+            </span>
+            <nav class="leaderboard-resource-links" aria-label="Project resources">
+              <a
+                href="https://github.com/zjunlp/MobileMem/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GitHub
+              </a>
+              <a
+                href="https://huggingface.co/datasets/zjunlp/MobileMem"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Hugging Face
+              </a>
+            </nav>
+          </div>
+
           <label class="control-group rank-control" for="rank-metric">
             <span class="control-label">
               <span data-lang="zh">排序指标</span>
@@ -90,7 +113,11 @@
         <div class="wrap">
           <p class="visually-hidden" data-leaderboard-state aria-live="polite"></p>
 
-          <div class="leaderboard-table-shell" tabindex="0" aria-label="Scrollable results table">
+          <div
+            class="leaderboard-table-shell"
+            tabindex="0"
+            aria-label="Results table; scroll horizontally on narrow screens"
+          >
             <table class="leaderboard-table">
               <caption class="visually-hidden">
                 MobileMem-Omni question-answering performance by method and task
@@ -133,7 +160,7 @@
       </section>
     </main>
 
-    <script src="assets/web/js/main.js?v=20260810-1"></script>
+    <script src="assets/web/js/main.js?v=20260811-3"></script>
     <script src="assets/web/js/leaderboard.js?v=20260810-1"></script>
   </body>
 </html>

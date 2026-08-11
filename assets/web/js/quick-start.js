@@ -5,6 +5,7 @@
 
   const terminalOutput = document.querySelector("[data-terminal-output]");
   const terminalButtons = Array.from(document.querySelectorAll("[data-terminal-set]"));
+  const terminalCopyButton = document.querySelector("[data-terminal-copy]");
   const terminalSets = {
     setup: [
       { text: "conda create -n mobilemem python=3.11 -y", prompt: true },
@@ -62,6 +63,45 @@
   const terminalTimers = new Set();
   let terminalCycleIndex = 0;
   let terminalRunId = 0;
+  let activeTerminalSet = terminalSetOrder[0];
+  let copyFeedbackTimer;
+
+  const terminalCopyLabels = {
+    en: { copy: "Copy current commands", copied: "Copied" },
+    zh: { copy: "复制当前命令", copied: "已复制" },
+  };
+
+  const currentLanguage = () => (document.documentElement.lang === "zh" ? "zh" : "en");
+
+  const setTerminalCopyState = (copied = false) => {
+    if (!terminalCopyButton) return;
+    const label = terminalCopyLabels[currentLanguage()][copied ? "copied" : "copy"];
+    terminalCopyButton.classList.toggle("is-copied", copied);
+    terminalCopyButton.setAttribute("aria-label", label);
+    terminalCopyButton.title = label;
+  };
+
+  const writeToClipboard = async (text) => {
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+        // file:// previews may not expose the asynchronous clipboard API.
+      }
+    }
+
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.append(textarea);
+    textarea.select();
+    const copied = document.execCommand("copy");
+    textarea.remove();
+    return copied;
+  };
 
   const clearTerminalTimers = () => {
     terminalTimers.forEach((timer) => window.clearTimeout(timer));
@@ -90,6 +130,7 @@
     clearTerminalTimers();
     terminalRunId += 1;
     const runId = terminalRunId;
+    activeTerminalSet = setName;
     setActiveTerminalButton(setName);
     terminalOutput.innerHTML = "";
     const terminalLines = terminalSets[setName];
@@ -172,5 +213,20 @@
       startTerminalDemo(button.dataset.terminalSet, true);
       button.blur();
     });
+  });
+
+  terminalCopyButton?.addEventListener("click", async () => {
+    const commands = terminalSets[activeTerminalSet].map((line) => line.text).join("\n");
+    const copied = await writeToClipboard(commands);
+    if (!copied) return;
+
+    window.clearTimeout(copyFeedbackTimer);
+    setTerminalCopyState(true);
+    copyFeedbackTimer = window.setTimeout(() => setTerminalCopyState(false), 1500);
+  });
+
+  window.addEventListener("mobilemem:languagechange", () => {
+    window.clearTimeout(copyFeedbackTimer);
+    setTerminalCopyState(false);
   });
 })();

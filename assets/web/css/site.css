@@ -23,8 +23,9 @@
   --shadow: 0 18px 60px rgba(23, 33, 28, 0.12);
   --nav-h: 72px;
   --font-display: "Suisse Works Book", "Iowan Old Style", "Songti SC", STSong, Georgia, serif;
-  --font-sans: "Suisse Intl Book", "Suisse Intl", "Avenir Next", Avenir, "PingFang SC",
-    "Hiragino Sans GB", Arial, sans-serif;
+  --font-sans:
+    "Suisse Intl Book", "Suisse Intl", "Avenir Next", Avenir, "PingFang SC", "Hiragino Sans GB",
+    Arial, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
@@ -229,14 +230,6 @@ main {
   max-width: 720px;
 }
 
-.hero-product-name {
-  margin: 0 0 20px;
-  color: var(--green-dark);
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.2;
-}
-
 .eyebrow {
   display: none;
   margin: 0 0 12px;
@@ -270,10 +263,10 @@ h1 {
 
 .hero h1 {
   max-width: 720px;
-  margin-bottom: 26px;
+  margin-bottom: 20px;
   color: #1d272a;
   font-family: var(--font-display);
-  font-size: 58px;
+  font-size: 50px;
   font-weight: 400;
   line-height: 1.08;
   letter-spacing: 0;
@@ -309,18 +302,65 @@ h3 {
   font-weight: 400;
 }
 
-.hero .quote.small {
+.hero-tagline {
   max-width: 690px;
-  margin-bottom: 0;
-  color: #646464;
-  font-size: 18px;
+  margin: 0;
+  color: #4f5a54;
+  font-size: 20px;
   font-weight: 400;
-  line-height: 1.35;
+  line-height: 1.4;
+}
+
+.hero-stats {
+  width: min(620px, 100%);
+  display: grid;
+  grid-template-columns: 0.8fr 0.8fr 1.4fr;
+  margin-top: 28px;
+  padding: 16px 0;
+  border-top: 1px solid rgba(29, 39, 42, 0.24);
+  border-bottom: 1px solid rgba(29, 39, 42, 0.24);
+}
+
+.hero-stat {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 0 20px;
+  border-right: 1px solid rgba(29, 39, 42, 0.18);
+}
+
+.hero-stat:first-child {
+  padding-left: 0;
+}
+
+.hero-stat:last-child {
+  padding-right: 0;
+  border-right: 0;
+}
+
+.hero-stat strong {
+  flex: 0 0 auto;
+  color: #1d272a;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.hero-stat span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
 }
 
 .hero .actions {
+  max-width: 690px;
+  justify-content: center;
   gap: 12px;
-  margin-top: 30px;
+  margin-top: 22px;
 }
 
 .hero .btn {
@@ -401,70 +441,6 @@ h3 {
   max-height: 390px;
   object-fit: contain;
   object-position: center;
-}
-
-/* OPPO application video modal ------------------------------------------- */
-
-.video-modal {
-  width: min(520px, calc(100% - 32px));
-  padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 8px;
-  background: #0a0f0d;
-  box-shadow: 0 28px 90px rgba(7, 13, 10, 0.46);
-}
-
-.video-modal::backdrop {
-  background: rgba(23, 33, 28, 0.55);
-  backdrop-filter: blur(4px);
-}
-
-.video-modal-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 16px 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-}
-
-.video-modal-head h2 {
-  margin: 0;
-  font-size: 18px;
-  line-height: 1.25;
-}
-
-.video-close {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
-  cursor: pointer;
-  font-size: 24px;
-  line-height: 1;
-}
-
-.oppo-video {
-  display: block;
-  width: min(100%, 430px);
-  max-height: min(78vh, 820px);
-  aspect-ratio: 720 / 1582;
-  margin: 0 auto;
-  background: #050806;
-  object-fit: contain;
-}
-
-.video-player-shell {
-  display: grid;
-  place-items: center;
-  margin: 0;
-  padding: 16px;
-  background: radial-gradient(circle at 50% 0%, rgba(15, 123, 79, 0.2), transparent 42%), #0a0f0d;
 }
 
 .section-head {
@@ -823,6 +799,52 @@ h3 {
   background: #35c46a;
 }
 
+.terminal-copy {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  margin-left: auto;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.76);
+  cursor: pointer;
+}
+
+.terminal-copy:hover {
+  border-color: rgba(124, 227, 160, 0.5);
+  color: #7ce3a0;
+}
+
+.terminal-copy:focus-visible {
+  outline: 2px solid #7ce3a0;
+  outline-offset: 2px;
+}
+
+.terminal-copy svg {
+  width: 15px;
+  height: 15px;
+}
+
+.terminal-copy-check {
+  display: none;
+}
+
+.terminal-copy.is-copied {
+  border-color: rgba(124, 227, 160, 0.5);
+  color: #7ce3a0;
+}
+
+.terminal-copy.is-copied .terminal-copy-icon {
+  display: none;
+}
+
+.terminal-copy.is-copied .terminal-copy-check {
+  display: block;
+}
+
 .terminal-body {
   min-height: 126px;
   padding: 12px 15px;
@@ -1136,6 +1158,53 @@ h3 {
   font-weight: 950;
 }
 
+/* Contact footer ---------------------------------------------------------- */
+
+.site-footer {
+  padding: 0 0 30px;
+  background: var(--white);
+  color: var(--ink);
+}
+
+.footer-contact-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.footer-contact-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.footer-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--green-dark);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.footer-email-arrow {
+  font-size: 17px;
+  line-height: 1;
+  transition: transform 160ms ease;
+}
+
+.footer-email:hover .footer-email-arrow {
+  transform: translate(2px, -2px);
+}
+
 @media (max-width: 980px) {
   :root {
     --nav-h: 66px;
@@ -1207,7 +1276,7 @@ h3 {
   }
 
   .hero h1 {
-    font-size: 48px;
+    font-size: 44px;
   }
 }
 
@@ -1271,24 +1340,34 @@ h3 {
     font-size: 38px;
   }
 
-  .hero-product-name {
-    margin-bottom: 14px;
-    font-size: 14px;
-  }
-
   .hero h1 {
-    margin-bottom: 20px;
-    font-size: 40px;
-    line-height: 1.08;
+    margin-bottom: 16px;
+    font-size: 36px;
+    line-height: 1.1;
   }
 
   .quote {
     font-size: 17px;
   }
 
-  .hero .quote.small {
+  .hero-tagline {
     font-size: 17px;
-    line-height: 1.35;
+    line-height: 1.4;
+  }
+
+  .hero-stats {
+    grid-template-columns: 0.78fr 0.78fr 1.44fr;
+    margin-top: 22px;
+    padding: 14px 0;
+  }
+
+  .hero-stat {
+    gap: 6px;
+    padding: 0 12px;
+  }
+
+  .hero-stat strong {
+    font-size: 25px;
   }
 
   .hero .actions {
@@ -1306,15 +1385,21 @@ h3 {
     max-height: 230px;
   }
 
+  .site-footer {
+    padding-bottom: 26px;
+  }
+
+  .footer-contact-row {
+    gap: 12px 20px;
+    padding-top: 20px;
+  }
+
+  .footer-email {
+    margin-top: 0;
+  }
+
   .feature-grid,
   .pipeline-grid {
     grid-template-columns: 1fr;
-  }
-
-  .image-frame .video-play {
-    right: 12px;
-    bottom: 12px;
-    width: 42px;
-    height: 42px;
   }
 }

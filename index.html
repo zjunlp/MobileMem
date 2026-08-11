@@ -6,17 +6,14 @@
     <title>MobileMem</title>
     <meta
       name="description"
-      content="MobileMem is an on-device memory benchmark for continually evolving mobile AI agents."
+      content="MobileMem: Learning from a Year of Mobile Experiences. A benchmark for on-device long-term memory."
     />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="MobileMem" />
-    <meta
-      property="og:description"
-      content="On-device memory for continually evolving mobile AI agents."
-    />
+    <meta property="og:description" content="A benchmark for on-device long-term memory." />
     <meta property="og:site_name" content="MobileMem" />
     <meta name="twitter:card" content="summary" />
-    <link rel="stylesheet" href="assets/web/css/site.css?v=20260810-4" />
+    <link rel="stylesheet" href="assets/web/css/site.css?v=20260811-9" />
     <link rel="stylesheet" href="assets/web/css/case-demo.css?v=20260810-4" />
     <link rel="stylesheet" href="assets/web/css/application-browser.css?v=20260810-7" />
   </head>
@@ -33,12 +30,26 @@
             height="154"
           />
         </a>
-        <nav class="nav-links" aria-label="Section navigation">
-          <a href="#mobilemem">MobileMem</a>
-          <a href="#features">Highlight</a>
-          <a href="#application">Application</a>
-          <a href="#quick-start">Quick Start</a>
-          <a href="https://github.com/zjunlp/MobileMem/">Github</a>
+        <nav class="nav-links" aria-label="页面导航 / Section navigation">
+          <a href="#mobilemem">
+            <span data-lang="zh">首页</span>
+            <span data-lang="en">MobileMem</span>
+          </a>
+          <a href="#features">
+            <span data-lang="zh">研究亮点</span>
+            <span data-lang="en">Highlight</span>
+          </a>
+          <a href="#application">
+            <span data-lang="zh">应用场景</span>
+            <span data-lang="en">Application</span>
+          </a>
+          <a href="#quick-start">
+            <span data-lang="zh">快速开始</span>
+            <span data-lang="en">Quick Start</span>
+          </a>
+          <a href="https://github.com/zjunlp/MobileMem/" target="_blank" rel="noopener noreferrer">
+            GitHub
+          </a>
         </nav>
         <div class="language-toggle" role="group" aria-label="Language">
           <button type="button" data-toggle-lang="zh" aria-label="Switch language to Chinese">
@@ -53,22 +64,31 @@
       <section class="section hero" id="mobilemem" aria-labelledby="mobilemem-title">
         <div class="wrap hero-grid">
           <div class="hero-copy">
-            <p class="hero-product-name">MobileMem</p>
             <h1 id="mobilemem-title">
-              <span data-lang="zh">面向持续演进智能体的端侧记忆</span>
-              <span data-lang="en">On-Device Memory for Continually Evolving Agents</span>
+              <span data-lang="zh">MobileMem：从一年的移动端经历中学习</span>
+              <span data-lang="en">MobileMem: Learning from a Year of Mobile Experiences</span>
             </h1>
-            <p class="quote small" data-lang="zh">
-              MobileMem
-              作为用户的个人记忆智能体，能够自动理解用户意图，执行跨时间的人脸识别以关联多年间女儿的身份，从海量照片档案中定位
-              2016 年的生日场景，并返回一家三口围坐在生日蛋糕旁的照片。
-            </p>
-            <p class="quote small" data-lang="en">
-              MobileMem acts as the user's personal memory agent, automatically understanding user
-              intent, performing cross-time facial recognition to associate the daughter's identity
-              across years, locating the 2016 birthday scene from a vast photo archive, and
-              returning the photo of the family of three gathered around the birthday cake.
-            </p>
+            <p class="hero-tagline" data-lang="zh">面向端侧长期记忆的评测基准</p>
+            <p class="hero-tagline" data-lang="en">A benchmark for on-device long-term memory</p>
+            <div class="hero-stats" aria-label="MobileMem dataset statistics">
+              <div class="hero-stat">
+                <strong data-count-to="365">365</strong>
+                <span data-lang="zh">天</span>
+                <span data-lang="en">Days</span>
+              </div>
+              <div class="hero-stat">
+                <strong data-count-to="12">12</strong>
+                <span data-lang="zh">个应用</span>
+                <span data-lang="en">Apps</span>
+              </div>
+              <div class="hero-stat">
+                <strong data-count-to="1.72" data-count-decimals="2" data-count-suffix="M">
+                  1.72M
+                </strong>
+                <span data-lang="zh">平均 Token / 用户</span>
+                <span data-lang="en">Avg. tokens / user</span>
+              </div>
+            </div>
             <div class="actions" aria-label="Project links">
               <a
                 class="btn"
@@ -77,28 +97,14 @@
                 data-report-href-en="#"
                 data-report-href-zh="#"
                 aria-disabled="true"
-                aria-label="Technical Report, coming soon"
+                aria-label="Tech Report, coming soon"
                 title="Coming soon"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <span data-lang="zh">白皮书</span>
-                <span data-lang="en">Report</span>
+                <span data-lang="zh">技术报告</span>
+                <span data-lang="en">Tech Report</span>
               </a>
-              <a class="btn" href="https://github.com/zjunlp/MobileMem/">
-                <span data-lang="zh">代码</span>
-                <span data-lang="en">Code</span>
-              </a>
-              <a class="btn" href="mailto:zhangningyu@zju.edu.cn">
-                <span data-lang="zh">邮件</span>
-                <span data-lang="en">Email</span>
-              </a>
-              <button
-                class="btn video-play"
-                type="button"
-                aria-label="OPPO 应用场景视频 / OPPO Application Scenarios video"
-              >
-                <span data-lang="zh">视频</span>
-                <span data-lang="en">Video</span>
-              </button>
               <a class="btn" href="leaderboard.html">
                 <span data-lang="zh">榜单</span>
                 <span data-lang="en">Leaderboard</span>
@@ -1250,6 +1256,39 @@
                   <span></span>
                 </span>
                 <span>mobilemem-quick-start</span>
+                <button
+                  class="terminal-copy"
+                  type="button"
+                  data-terminal-copy
+                  aria-label="Copy current commands"
+                  title="Copy current commands"
+                >
+                  <svg
+                    class="terminal-copy-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+                  </svg>
+                  <svg
+                    class="terminal-copy-check"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M20 6 9 17l-5-5"></path>
+                  </svg>
+                </button>
               </div>
               <div class="terminal-content">
                 <div class="quick-options" aria-label="Quick start command sets">
@@ -1316,7 +1355,12 @@
                 maintained in the project repository.
               </p>
               <div class="github-links">
-                <a class="btn primary github-button" href="https://github.com/zjunlp/MobileMem/">
+                <a
+                  class="btn primary github-button"
+                  href="https://github.com/zjunlp/MobileMem/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <svg class="github-icon" viewBox="0 0 16 16" aria-hidden="true">
                     <path
                       fill="currentColor"
@@ -1339,7 +1383,10 @@
       >
         <div class="wrap institutions-grid">
           <div>
-            <h2 id="institutions-title">Institutions</h2>
+            <h2 id="institutions-title">
+              <span data-lang="zh">合作机构</span>
+              <span data-lang="en">Institutions</span>
+            </h2>
             <p class="quote small" data-lang="zh">本工作由以下机构联合完成。</p>
             <p class="quote small" data-lang="en">
               This work is jointly conducted by the following institutions.
@@ -1367,24 +1414,26 @@
         </div>
       </section>
     </main>
-    <!-- OPPO application scenario video -->
-    <dialog class="video-modal" id="oppo-video-modal" aria-labelledby="oppo-video-title">
-      <div class="video-modal-head">
-        <h2 id="oppo-video-title">OPPO Application Scenarios</h2>
-        <button class="video-close" type="button" aria-label="Close video modal">&times;</button>
+    <footer class="site-footer" id="contact" aria-labelledby="contact-title">
+      <div class="wrap footer-contact-row">
+        <p class="footer-contact-title" id="contact-title">
+          <span data-lang="zh">联系</span>
+          <span data-lang="en">Contact</span>
+        </p>
+        <a
+          class="footer-email"
+          href="mailto:zhangningyu@zju.edu.cn"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span>zhangningyu@zju.edu.cn</span>
+          <span class="footer-email-arrow" aria-hidden="true">&nearr;</span>
+        </a>
       </div>
-      <div class="video-player-shell">
-        <video class="oppo-video" controls preload="none" playsinline data-oppo-video>
-          <source
-            src="assets/web/videos/oppo-application-scenarios.mp4?v=20260809-1"
-            type="video/mp4"
-          />
-        </video>
-      </div>
-    </dialog>
+    </footer>
     <script src="assets/web/js/case-demo.js?v=20260809-2"></script>
-    <script src="assets/web/js/quick-start.js?v=20260809-1"></script>
+    <script src="assets/web/js/quick-start.js?v=20260811-2"></script>
     <script src="assets/web/js/application-scenarios.js?v=20260811-1"></script>
-    <script src="assets/web/js/main.js?v=20260809-2"></script>
+    <script src="assets/web/js/main.js?v=20260811-3"></script>
   </body>
 </html>

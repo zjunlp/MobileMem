@@ -86,12 +86,16 @@
 
 .leaderboard-control-row {
   min-height: 88px;
-  display: flex;
+  display: grid;
+  grid-template-columns:
+    minmax(260px, 1.15fr) minmax(230px, 0.95fr) minmax(164px, auto)
+    minmax(188px, 0.75fr);
   align-items: center;
-  gap: 28px;
+  gap: 18px;
 }
 
 .control-group {
+  min-width: 0;
   display: grid;
   gap: 7px;
 }
@@ -104,7 +108,8 @@
 }
 
 .segmented-control {
-  display: inline-flex;
+  width: 100%;
+  display: flex;
   align-items: center;
   padding: 3px;
   border: 1px solid var(--line);
@@ -113,7 +118,9 @@
 }
 
 .segmented-control button {
+  min-width: 0;
   min-height: 36px;
+  flex: 1 1 0;
   padding: 0 12px;
   border: 0;
   border-radius: 6px;
@@ -131,12 +138,43 @@
   color: var(--white);
 }
 
-.rank-control {
-  margin-left: auto;
+.leaderboard-resource-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.leaderboard-resource-links a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.leaderboard-resource-links a:first-child {
+  flex: 0.8 1 0;
+}
+
+.leaderboard-resource-links a:last-child {
+  flex: 1.2 1 0;
+}
+
+.leaderboard-resource-links a:hover {
+  border-color: rgba(15, 123, 79, 0.38);
+  color: var(--green-dark);
 }
 
 .rank-control select {
-  min-width: 188px;
+  width: 100%;
+  min-width: 0;
   height: 44px;
   padding: 0 36px 0 12px;
   border: 1px solid var(--line);
@@ -153,13 +191,13 @@
 }
 
 .leaderboard-table-shell {
-  overflow: auto;
-  max-height: min(680px, calc(100vh - 250px));
+  overflow-x: auto;
+  overflow-y: visible;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--white);
   box-shadow: 0 10px 32px rgba(23, 33, 28, 0.07);
-  overscroll-behavior: contain;
+  overscroll-behavior-x: contain;
 }
 
 .leaderboard-table-shell:focus-visible {
@@ -191,8 +229,6 @@
 }
 
 .leaderboard-table thead th {
-  position: sticky;
-  top: 0;
   z-index: 3;
   background: #f1f5f2;
   color: #334139;
@@ -209,7 +245,6 @@
 }
 
 .leaderboard-table thead tr:nth-child(2) th {
-  top: 42px;
   min-width: 96px;
   height: 54px;
   white-space: normal;
@@ -239,6 +274,7 @@
 
 .leaderboard-table thead .rank-column,
 .leaderboard-table thead .method-column {
+  position: sticky;
   z-index: 5;
 }
 
@@ -354,17 +390,9 @@ tr[data-family="multimodal"] .method-cell::before {
 
   .leaderboard-control-row {
     min-height: auto;
-    flex-wrap: wrap;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     padding-top: 18px;
     padding-bottom: 18px;
-  }
-
-  .rank-control {
-    margin-left: 0;
-  }
-
-  .leaderboard-table-shell {
-    max-height: 640px;
   }
 }
 
@@ -387,11 +415,13 @@ tr[data-family="multimodal"] .method-cell::before {
     line-height: 1.05;
   }
 
-  .leaderboard-control-row,
-  .control-group,
-  .segmented-control,
-  .rank-control select {
-    width: 100%;
+  .leaderboard-control-row {
+    grid-template-columns: 1fr;
+  }
+
+  .leaderboard-resource-links a {
+    flex: 1 1 0;
+    justify-content: center;
   }
 
   .segmented-control button {
@@ -403,10 +433,6 @@ tr[data-family="multimodal"] .method-cell::before {
 
   .leaderboard-results {
     padding: 32px 0 52px;
-  }
-
-  .leaderboard-table-shell {
-    max-height: 590px;
   }
 
   .leaderboard-table .method-column {
