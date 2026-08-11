@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="omni/asset/logo_01.png" style="width: 50%; height: auto; box-shadow: 0 4px 18px rgba(0,0,0,0.06); display: block; margin: 0 auto;">
+<img src="omni/asset/logo.png" style="width: 50%; height: auto; box-shadow: 0 4px 18px rgba(0,0,0,0.06); display: block; margin: 0 auto;">
 
 ### MobileMem: Learning from a Year of Mobile Experiences
 
