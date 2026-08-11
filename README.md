@@ -84,7 +84,7 @@ The multimodal benchmark for evaluating on-device memory with realistic mobile i
 | Section | Description | Quick Link |
 | :--- | :--- | :--- |
 | **📥 Data Access** | Download the MobileMem-Omni dataset, including images and dialogues. | [Link](https://huggingface.co/datasets/zjunlp/MobileMem) |
-| **⚙️ How to Evaluate** | Evaluate your models on various memory task types using our provided scripts. | [Link](https://github.com/zjunlp/MobileMem/tree/main/omni/eval) |
+| **⚙️ How to Evaluate** | **Detailed evaluation guide for reproducing leaderboard results is available in the [MemBase](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem_omni) repository.** | [Link](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem_omni) |
 | **🛠️ Data Construction** | Rebuild the entire MobileMem-Omni dataset with the provided pipeline. | [Link](https://github.com/zjunlp/MobileMem/tree/main/omni) |
 
 ---

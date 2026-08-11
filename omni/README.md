@@ -19,7 +19,7 @@
 ## 🌟 Overview
 MobileMem-Omni provides multimodal dialogues for mobile scenarios grounded in real user information and year-long event trajectories.
 
-<img src="asset/intro_01.png" style="width:100%; height: auto; border-radius: 14px; box-shadow: 0 4px 18px rgba(0,0,0,0.06);" align=center>
+<img src="asset/intro_01.png" style="width:60%; height: auto; border-radius: 14px; box-shadow: 0 4px 18px rgba(0,0,0,0.06);" align=center>
 
 
 | Feature | Description |
