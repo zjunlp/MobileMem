@@ -58,7 +58,7 @@ The experiments include both textual and multimodal memory methods. Most textual
 | Long Context | [zjunlp/MemBase](https://github.com/zjunlp/MemBase) | Places the complete conversation history in the model context without building an external memory index | [Unified MobileMem-Omni example in MemBase](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem_omni) |
 | NaiveRAG | [zjunlp/MemBase](https://github.com/zjunlp/MemBase) | Embeds conversation chunks and retrieves the top-k chunks for question answering | [Unified MobileMem-Omni example in MemBase](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem_omni) |
 | LangMem | [langchain-ai/langmem](https://github.com/langchain-ai/langmem) | Extracts and updates long-term semantic memories for LangGraph agents | [Unified MobileMem-Omni example in MemBase](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem_omni) |
-| Mem0 | [mem0ai/mem0](https://github.com/mem0ai/mem0) | Maintains extracted user memories with vector or graph-backed retrieval | Use the Mem0 LoCoMo example in MemBase |
+| Mem0 | [mem0ai/mem0](https://github.com/mem0ai/mem0) | Maintains extracted user memories with vector or graph-backed retrieval | [Unified MobileMem-Omni example in MemBase](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem_omni) |
 | LightMem | [zjunlp/LightMem](https://github.com/zjunlp/LightMem) | A lightweight memory framework with compression, topic segmentation, summarization, and configurable retrieval | Follow LightMem's LoCoMo reproduction scripts under `experiments/` |
 | EverMemOS | [EverMind-AI/EverOS](https://github.com/EverMind-AI/EverOS) | A persistent memory system that extracts, organizes, updates, and retrieves long-term user memories | [Unified MobileMem-Omni example in MemBase](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem_omni) |
 | M²A (w/ Caption) | [Little-Fridge/M2A](https://github.com/Little-Fridge/M2A) | Caption-only M²A setting: visual content is represented by captions and evaluated through the textual memory path | Use the M²A evaluation wrapper with image-caption memories enabled and raw-image retrieval disabled |
@@ -73,7 +73,7 @@ The experiments include both textual and multimodal memory methods. Most textual
 
 ### Run Textual Baselines with MemBase
 
-For Long Context, NaiveRAG, LangMem, and EverMemOS, use the complete shared scripts, method-specific entry points, configs, and evaluation instructions in the [unified MobileMem-Omni example in MemBase](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem_omni). MobileMem does not duplicate their execution scripts.
+For Long Context, NaiveRAG, Mem0, LangMem, and EverMemOS, use the complete shared scripts, method-specific entry points, configs, and evaluation instructions in the [unified MobileMem-Omni example in MemBase](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem_omni). MobileMem does not duplicate their execution scripts.
 
 For other MemBase-compatible textual methods, the generic pipeline below remains available.
 
