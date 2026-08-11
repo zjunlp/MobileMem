@@ -19,8 +19,9 @@
 ## 🌟 Overview
 MobileMem-Omni provides multimodal dialogues for mobile scenarios grounded in real user information and year-long event trajectories.
 
-<img src="asset/intro_01.png" style="width:60%; height: auto; border-radius: 14px; box-shadow: 0 4px 18px rgba(0,0,0,0.06);" align=center>
-
+<p align="center">
+  <img src="asset/intro_01.png" alt="MobileMem-Omni Overview" width="50%" style="border-radius: 14px; box-shadow: 0 4px 18px rgba(0,0,0,0.06);">
+</p>
 
 | Feature | Description |
 |:--------|:------------|
@@ -253,7 +254,7 @@ dst = load_dataset("zjunlp/MobileMem-Omni")
 
 ### <a id="evaluation"></a> ⚙️ Evaluation
 
-We provide step-by-step evaluation procedures and scripts in the [`omni/eval`](https://github.com/zjunlp/MobileMem/tree/main/omni/eval) directory to run baseline memory systems.
+We provide step-by-step evaluation procedures and scripts in the [`membase`](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem_omni) to run baseline memory systems. [`omni/eval`](https://github.com/zjunlp/MobileMem/tree/main/omni/eval) contains evaluation scripts for additional baselines beyond those supported by [`membase`](https://github.com/zjunlp/MemBase/tree/main/examples/evaluate_memory_systems_on_mobilemem_omni).
 
 ---
 
