@@ -136,6 +136,7 @@ def fix_names_with_llm(
     problems: Dict[str, str],
     forbidden_names: Set[str],
     prompts_dir: str,
+    nationality: str,
     is_chinese: bool = True,
 ) -> Dict[str, str]:
     """Call the LLM to generate replacement names in bulk.
@@ -155,6 +156,7 @@ def fix_names_with_llm(
     user_prompt = prompt_template.format(
         main_name=main_name,
         main_gender=main_gender,
+        nationality=nationality,
         problem_list=problem_list,
         forbidden_names=forbidden_str,
     )
@@ -272,6 +274,7 @@ def fix_social_names(init_states_path: str, prompts_dir: str) -> int:
                 fixes = fix_names_with_llm(
                     main_name, main_gender, llm_problems,
                     global_names | set(social_rel.keys()), prompts_dir,
+                    nationality=nationality,
                     is_chinese=is_chinese,
                 )
 

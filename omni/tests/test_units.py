@@ -13,6 +13,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -30,7 +31,11 @@ from generation.name_pools import (  # noqa: E402
     SURNAME_POOL,
     make_unique_name,
 )
-from generation.social_name_fix import apply_fixes, classify_name  # noqa: E402
+from generation.social_name_fix import (  # noqa: E402
+    apply_fixes,
+    classify_name,
+    fix_names_with_llm,
+)
 
 
 class MakeUniqueNameTest(unittest.TestCase):
@@ -139,6 +144,38 @@ class ApplyFixesTest(unittest.TestCase):
 
         self.assertEqual(fixed, {"张明远": info})
         self.assertEqual(changes, [])
+
+
+class FixNamesWithLlmTest(unittest.TestCase):
+    @mock.patch("generation.social_name_fix.get_text_llm_model", return_value="test-model")
+    @mock.patch("generation.social_name_fix.llm_request")
+    @mock.patch("generation.social_name_fix._load_prompt")
+    def test_formats_nationality_in_english_prompt(
+        self,
+        load_prompt: mock.Mock,
+        request: mock.Mock,
+        _get_model: mock.Mock,
+    ) -> None:
+        load_prompt.return_value = (
+            "Name: {main_name}\nGender: {main_gender}\n"
+            "Nationality: {nationality}\nProblems: {problem_list}\n"
+            "Forbidden: {forbidden_names}"
+        )
+        request.return_value = ({"Dr. Sullivan": "Katherine Sullivan"}, None)
+
+        fixes = fix_names_with_llm(
+            "Emily Catherine Ward",
+            "female",
+            {"Dr. Sullivan": "doctor"},
+            set(),
+            str(ROOT / "prompts"),
+            nationality="American",
+            is_chinese=False,
+        )
+
+        self.assertEqual(fixes, {"Dr. Sullivan": "Katherine Sullivan"})
+        user_prompt = request.call_args.kwargs["user_prompt"]
+        self.assertIn("Nationality: American", user_prompt)
 
 
 class LoadsTolerantTest(unittest.TestCase):
