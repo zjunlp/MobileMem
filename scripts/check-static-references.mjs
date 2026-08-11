@@ -14,6 +14,7 @@ const sourceFiles = [
   "assets/web/js/case-demo.js",
   "assets/web/js/main.js",
   "assets/web/js/quick-start.js",
+  "assets/web/memweb/qa-cases.js",
 ];
 const assetPattern = /assets\/[A-Za-z0-9_./-]+\.(?:css|gif|jpe?g|js|mp4|pdf|png|webp)/g;
 const references = new Set();

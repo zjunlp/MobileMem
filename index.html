@@ -13,9 +13,9 @@
     <meta property="og:description" content="A benchmark for on-device long-term memory." />
     <meta property="og:site_name" content="MobileMem" />
     <meta name="twitter:card" content="summary" />
-    <link rel="stylesheet" href="assets/web/css/site.css?v=20260811-12" />
+    <link rel="stylesheet" href="assets/web/css/site.css?v=20260811-13" />
     <link rel="stylesheet" href="assets/web/css/case-demo.css?v=20260810-4" />
-    <link rel="stylesheet" href="assets/web/css/application-browser.css?v=20260811-1" />
+    <link rel="stylesheet" href="assets/web/css/application-browser.css?v=20260811-10" />
   </head>
   <body class="lang-en">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -635,39 +635,58 @@
                             <div class="application-phone-status">
                               <strong>9:41</strong><span>MobileMem</span>
                             </div>
-                            <button
-                              class="application-phone-ai-entry"
-                              type="button"
-                              data-application-phone-ai
-                            >
-                              <span class="application-ai-portal-avatar" aria-hidden="true"
-                                ><img
-                                  data-src="assets/web/memweb/uid10-person-01.webp"
-                                  alt=""
-                                  data-application-ai-user-avatar
-                                  loading="lazy"
-                                  decoding="async"
-                              /></span>
-                              <span class="application-ai-portal-copy">
-                                <strong
-                                  ><span data-lang="zh">AI 对话</span
-                                  ><span data-lang="en">AI dialogue</span></strong
-                                >
-                                <svg
-                                  class="application-ai-portal-thread"
-                                  viewBox="0 0 120 17"
-                                  preserveAspectRatio="none"
-                                  aria-hidden="true"
-                                >
-                                  <path d="M2 11 C24 11 28 3 49 3 S78 15 118 7"></path>
-                                  <circle cx="2" cy="11" r="2.5"></circle>
-                                  <circle cx="49" cy="3" r="2.5"></circle>
-                                  <circle cx="82" cy="13" r="2.5"></circle>
-                                  <circle cx="118" cy="7" r="2.5"></circle>
-                                </svg>
-                              </span>
-                              <span class="application-ai-portal-orbit" aria-hidden="true"></span>
-                            </button>
+                            <div class="application-phone-tools">
+                              <button
+                                class="application-phone-ai-entry"
+                                type="button"
+                                data-application-phone-ai
+                              >
+                                <span class="application-ai-portal-avatar" aria-hidden="true"
+                                  ><img
+                                    data-src="assets/web/memweb/uid10-person-01.webp"
+                                    alt=""
+                                    data-application-ai-user-avatar
+                                    loading="lazy"
+                                    decoding="async"
+                                /></span>
+                                <span class="application-ai-portal-copy">
+                                  <strong
+                                    ><span data-lang="zh">AI 对话</span
+                                    ><span data-lang="en">AI dialogue</span></strong
+                                  >
+                                  <svg
+                                    class="application-ai-portal-thread"
+                                    viewBox="0 0 120 17"
+                                    preserveAspectRatio="none"
+                                    aria-hidden="true"
+                                  >
+                                    <path d="M2 11 C24 11 28 3 49 3 S78 15 118 7"></path>
+                                    <circle cx="2" cy="11" r="2.5"></circle>
+                                    <circle cx="49" cy="3" r="2.5"></circle>
+                                    <circle cx="82" cy="13" r="2.5"></circle>
+                                    <circle cx="118" cy="7" r="2.5"></circle>
+                                  </svg>
+                                </span>
+                              </button>
+                              <button
+                                class="application-phone-qa-entry"
+                                type="button"
+                                data-application-phone-qa
+                              >
+                                <span aria-hidden="true">
+                                  <img
+                                    src="assets/web/xiaobu-avatar.webp"
+                                    alt=""
+                                    loading="lazy"
+                                    decoding="async"
+                                  />
+                                </span>
+                                <strong>
+                                  <span data-lang="zh">QA</span>
+                                  <span data-lang="en">QA</span>
+                                </strong>
+                              </button>
+                            </div>
                             <div class="application-phone-apps">
                               <section class="application-memory-cluster">
                                 <strong class="application-memory-cluster-title"
@@ -865,6 +884,59 @@
                               ></div>
                             </section>
                           </section>
+                          <section
+                            class="application-qa-view"
+                            data-application-qa
+                            hidden
+                            aria-label="MobileMem benchmark questions"
+                          >
+                            <header class="application-qa-header">
+                              <span>
+                                <small>MobileMem</small>
+                                <label class="application-qa-type">
+                                  <select
+                                    data-application-qa-type
+                                    aria-label="Question type"
+                                  ></select>
+                                </label>
+                              </span>
+                              <b data-application-qa-position>01 / 02</b>
+                            </header>
+                            <div class="application-qa-scroll" data-application-qa-scroll>
+                              <section class="application-qa-copy">
+                                <small
+                                  ><span data-lang="zh">问题</span
+                                  ><span data-lang="en">Question</span></small
+                                >
+                                <p data-application-qa-question></p>
+                              </section>
+                              <img
+                                class="application-qa-image"
+                                data-application-qa-image
+                                alt=""
+                                loading="lazy"
+                                decoding="async"
+                                hidden
+                              />
+                              <section class="application-qa-answer">
+                                <small
+                                  ><span data-lang="zh">答案</span
+                                  ><span data-lang="en">Answer</span></small
+                                >
+                                <p data-application-qa-answer></p>
+                              </section>
+                              <section class="application-qa-evidence" data-application-qa-evidence>
+                                <small
+                                  ><span data-lang="zh">证据</span
+                                  ><span data-lang="en">Evidence</span></small
+                                >
+                                <div data-application-qa-evidence-text></div>
+                              </section>
+                            </div>
+                            <footer class="application-qa-navigation">
+                              <span data-application-qa-id></span>
+                            </footer>
+                          </section>
                           <div
                             class="application-phone-recents"
                             data-application-phone-recents
@@ -899,13 +971,7 @@
                           >
                             <strong data-application-phone-caption-title></strong>
                           </span>
-                          <button
-                            class="application-phone-screen"
-                            type="button"
-                            data-application-open
-                            aria-label="Open original screenshot"
-                            hidden
-                          >
+                          <div class="application-phone-screen" data-application-screen hidden>
                             <img
                               id="application-visual-image"
                               data-src="assets/web/memweb/curated/uid10-group_chat-01.webp"
@@ -914,7 +980,7 @@
                               fetchpriority="high"
                               decoding="async"
                             />
-                          </button>
+                          </div>
                           <nav
                             class="application-phone-system-nav"
                             aria-label="ColorOS system navigation"
@@ -968,62 +1034,6 @@
               </div>
             </dialog>
           </div>
-
-          <dialog
-            class="application-lightbox"
-            id="application-lightbox"
-            aria-labelledby="application-lightbox-title"
-          >
-            <div class="application-lightbox-inner">
-              <div class="application-lightbox-media">
-                <button
-                  class="application-lightbox-close"
-                  type="button"
-                  data-application-close
-                  aria-label="Close screenshot"
-                >
-                  ×
-                </button>
-                <button
-                  class="application-lightbox-direction"
-                  type="button"
-                  data-application-direction="previous"
-                  aria-label="Previous application"
-                >
-                  <svg viewBox="0 0 20 20" aria-hidden="true">
-                    <path d="m12.5 4.5-5 5.5 5 5.5"></path>
-                  </svg>
-                </button>
-                <img
-                  class="application-lightbox-image"
-                  id="application-lightbox-image"
-                  data-src="assets/web/memweb/curated/uid10-group_chat-01.webp"
-                  alt="MemWeb group chat screenshot from uid10."
-                  loading="lazy"
-                  decoding="async"
-                />
-                <button
-                  class="application-lightbox-direction"
-                  type="button"
-                  data-application-direction="next"
-                  aria-label="Next application"
-                >
-                  <svg viewBox="0 0 20 20" aria-hidden="true">
-                    <path d="m7.5 4.5 5 5.5-5 5.5"></path>
-                  </svg>
-                </button>
-              </div>
-              <div class="application-lightbox-meta">
-                <span class="application-lightbox-copy">
-                  <strong id="application-lightbox-title">Group chat records</strong>
-                  <small id="application-lightbox-record">uid0 / group_chat / 01</small>
-                </span>
-                <span class="application-lightbox-count" id="application-lightbox-count"
-                  >01 / 02</span
-                >
-              </div>
-            </div>
-          </dialog>
         </div>
       </section>
 
@@ -1436,11 +1446,12 @@
     </footer>
     <script src="assets/web/memweb/trajectories.js"></script>
     <script src="assets/web/memweb/trajectories-extra.js"></script>
+    <script src="assets/web/memweb/qa-cases.js?v=20260811-4"></script>
     <script src="assets/web/js/application-data.js?v=20260809-2"></script>
     <script src="assets/web/js/case-demo.js?v=20260809-2"></script>
     <script src="assets/web/js/quick-start.js?v=20260811-2"></script>
     <script src="assets/web/js/application-scenarios.js?v=20260811-1"></script>
-    <script src="assets/web/js/application-browser.js?v=20260811-2"></script>
+    <script src="assets/web/js/application-browser.js?v=20260811-8"></script>
     <script src="assets/web/js/main.js?v=20260811-3"></script>
   </body>
 </html>

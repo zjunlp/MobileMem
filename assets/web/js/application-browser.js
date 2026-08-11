@@ -56,6 +56,19 @@
   );
   const applicationAiDialogue = applicationVisual?.querySelector("[data-application-ai-dialogue]");
   const applicationAiEntry = applicationVisual?.querySelector("[data-application-phone-ai]");
+  const applicationQaEntry = applicationVisual?.querySelector("[data-application-phone-qa]");
+  const applicationQaView = applicationVisual?.querySelector("[data-application-qa]");
+  const applicationQaType = applicationVisual?.querySelector("[data-application-qa-type]");
+  const applicationQaPosition = applicationVisual?.querySelector("[data-application-qa-position]");
+  const applicationQaImage = applicationVisual?.querySelector("[data-application-qa-image]");
+  const applicationQaQuestion = applicationVisual?.querySelector("[data-application-qa-question]");
+  const applicationQaAnswer = applicationVisual?.querySelector("[data-application-qa-answer]");
+  const applicationQaEvidence = applicationVisual?.querySelector("[data-application-qa-evidence]");
+  const applicationQaEvidenceText = applicationVisual?.querySelector(
+    "[data-application-qa-evidence-text]",
+  );
+  const applicationQaScroll = applicationVisual?.querySelector("[data-application-qa-scroll]");
+  const applicationQaId = applicationVisual?.querySelector("[data-application-qa-id]");
   const applicationPhoneRecents = applicationVisual?.querySelector(
     "[data-application-phone-recents]",
   );
@@ -90,17 +103,10 @@
   const applicationPhoneApps = Array.from(
     applicationVisual?.querySelectorAll("[data-application-phone-type]") || [],
   );
-  const applicationOpen = applicationVisual?.querySelector("[data-application-open]");
+  const applicationScreen = applicationVisual?.querySelector("[data-application-screen]");
   const applicationDirectionButtons = Array.from(
     document.querySelectorAll("[data-application-direction]"),
   );
-  const applicationLightbox = document.getElementById("application-lightbox");
-  const applicationLightboxImage = document.getElementById("application-lightbox-image");
-  const applicationLightboxTitle = document.getElementById("application-lightbox-title");
-  const applicationLightboxRecord = document.getElementById("application-lightbox-record");
-  const applicationLightboxCount = document.getElementById("application-lightbox-count");
-  const applicationClose = document.querySelector("[data-application-close]");
-  const applicationLightboxMedia = document.querySelector(".application-lightbox-media");
   const applicationMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const applicationAiStream = applicationVisual?.querySelector(
     "[data-application-ai-dialogue-stream]",
@@ -125,6 +131,9 @@
   // Dialogue data -------------------------------------------------------------
 
   const applicationDialogueSamples = globalThis.applicationTrajectoryData || {};
+  const applicationQaData = globalThis.MobileMemQACases;
+  const applicationQaTypeOrder = applicationQaData?.typeOrder || [];
+  const applicationQaTypeCopy = applicationQaData?.typeCopy || {};
 
   // Runtime state -----------------------------------------------------------
 
@@ -134,17 +143,15 @@
   let activeApplicationType = "group_chat";
   let activeApplicationIndex = 0;
   let activeApplicationSessionIndex = 0;
+  let activeApplicationQaType = applicationQaTypeOrder[0] || "single_hop";
+  let activeApplicationQaIndex = 0;
   let visibleApplicationIndices = [];
   let applicationSwipeStartX = 0;
   let applicationSwipeStartY = 0;
-  let applicationSwipeLockUntil = 0;
   let applicationAssetsReady = false;
   const applicationImagePreloads = new Map();
 
   // Labels and record helpers -------------------------------------------------
-
-  const applicationValue = (record, key) =>
-    record?.[key]?.[applicationLang] || record?.[key]?.en || "";
 
   const applicationAnnotationLabel = (record) => {
     if (!record) return "";
@@ -155,9 +162,6 @@
     }
     return "";
   };
-
-  const applicationRecordLabel = (record) =>
-    `${record.uid} / ${record.type} / ${String(record.sampleNumber).padStart(2, "0")}`;
 
   const setApplicationImageSource = (image, source) => {
     if (!image || !source) return;
@@ -365,6 +369,87 @@
     applicationAiStream.scrollTop = 0;
   };
 
+  // Benchmark QA rendering ---------------------------------------------------
+
+  const renderApplicationQaTypeOptions = () => {
+    if (!applicationQaType) return;
+    const options = document.createDocumentFragment();
+    applicationQaTypeOrder.forEach((type) => {
+      const option = document.createElement("option");
+      option.value = type;
+      option.textContent =
+        applicationQaTypeCopy[type]?.[applicationLang] || applicationQaTypeCopy[type]?.en || type;
+      options.append(option);
+    });
+    applicationQaType.replaceChildren(options);
+    applicationQaType.value = activeApplicationQaType;
+    applicationQaType.setAttribute(
+      "aria-label",
+      applicationLang === "zh" ? "问题类型" : "Question type",
+    );
+  };
+
+  const renderApplicationQa = () => {
+    const userCases = applicationQaData?.users?.[activeApplicationUid]?.cases;
+    const cases = userCases?.[activeApplicationQaType] || [];
+    if (!cases.length) return;
+
+    activeApplicationQaIndex = (activeApplicationQaIndex + cases.length) % cases.length;
+    const sample = cases[activeApplicationQaIndex];
+    const count = `${String(activeApplicationQaIndex + 1).padStart(2, "0")} / ${String(cases.length).padStart(2, "0")}`;
+
+    renderApplicationQaTypeOptions();
+    if (applicationQaPosition) applicationQaPosition.textContent = count;
+    if (applicationQaId) applicationQaId.textContent = sample.id;
+    if (applicationQaQuestion) applicationQaQuestion.textContent = sample.question;
+    if (applicationQaAnswer) applicationQaAnswer.textContent = sample.answer;
+
+    if (applicationQaImage) {
+      if (sample.image) {
+        applicationQaImage.src = sample.image;
+        applicationQaImage.classList.toggle("is-screenshot", sample.imageLayout === "screenshot");
+        applicationQaImage.alt =
+          applicationLang === "zh"
+            ? "当前问题的多模态证据"
+            : "Multimodal evidence for this question";
+        applicationQaImage.hidden = false;
+      } else {
+        applicationQaImage.hidden = true;
+        applicationQaImage.removeAttribute("src");
+        applicationQaImage.classList.remove("is-screenshot");
+        applicationQaImage.alt = "";
+      }
+    }
+
+    const evidenceItems = (
+      Array.isArray(sample.evidence) ? sample.evidence : sample.evidence ? [sample.evidence] : []
+    ).filter((item) => item?.text);
+    if (applicationQaEvidence) applicationQaEvidence.hidden = !evidenceItems.length;
+    if (applicationQaEvidenceText) {
+      const evidence = document.createDocumentFragment();
+      evidenceItems.forEach((item, index) => {
+        const row = document.createElement("p");
+        const source = document.createElement("strong");
+        const text = document.createElement("span");
+        source.textContent = item.sessionId
+          ? `${String(index + 1).padStart(2, "0")} · ${item.sessionId}`
+          : applicationLang === "zh"
+            ? "记忆缺口"
+            : "Memory gap";
+        text.textContent = item.text;
+        row.append(source, text);
+        evidence.append(row);
+      });
+      applicationQaEvidenceText.replaceChildren(evidence);
+    }
+    if (applicationQaScroll) applicationQaScroll.scrollTop = 0;
+  };
+
+  const moveApplicationQa = (direction) => {
+    activeApplicationQaIndex += direction;
+    renderApplicationQa();
+  };
+
   // Phone synchronization -----------------------------------------------------
 
   const setApplicationPhoneMode = (mode) => {
@@ -372,6 +457,7 @@
     const atRecord = mode === "record";
     const atRecents = mode === "recents";
     const atDialogue = mode === "dialogue";
+    const atQa = mode === "qa";
     if (!atDialogue) setApplicationAiHistory(false);
     if (applicationPhone) {
       applicationPhone.dataset.applicationPhoneMode = atHome
@@ -380,10 +466,13 @@
           ? "recents"
           : atDialogue
             ? "dialogue"
-            : "record";
+            : atQa
+              ? "qa"
+              : "record";
     }
     if (applicationPhoneDesktop) applicationPhoneDesktop.hidden = !atHome;
     if (applicationAiDialogue) applicationAiDialogue.hidden = !atDialogue;
+    if (applicationQaView) applicationQaView.hidden = !atQa;
     if (applicationPhoneRecents) applicationPhoneRecents.hidden = !atRecents;
     if (applicationPhoneCount) applicationPhoneCount.hidden = !atRecord;
     const annotationLabel = atRecord
@@ -392,9 +481,27 @@
     if (applicationPhoneCaptionTitle) applicationPhoneCaptionTitle.textContent = annotationLabel;
     if (applicationPhoneCaption) applicationPhoneCaption.hidden = !annotationLabel;
     applicationPhoneDirectionButtons.forEach((button) => {
-      button.hidden = !atRecord;
+      const next = button.dataset.applicationDirection === "next";
+      const label = atQa
+        ? applicationLang === "zh"
+          ? next
+            ? "下一题"
+            : "上一题"
+          : next
+            ? "Next question"
+            : "Previous question"
+        : applicationLang === "zh"
+          ? next
+            ? "下一张图片"
+            : "上一张图片"
+          : next
+            ? "Next image"
+            : "Previous image";
+      button.hidden = !(atRecord || atQa);
+      button.setAttribute("aria-label", label);
+      button.title = label;
     });
-    if (applicationOpen) applicationOpen.hidden = !atRecord;
+    if (applicationScreen) applicationScreen.hidden = !atRecord;
   };
 
   const syncApplicationDirectory = () => {
@@ -444,8 +551,6 @@
       applicationTypeCopy[record.type]?.[applicationLang] ||
       applicationTypeCopy[record.type]?.en ||
       record.type;
-    const title = applicationValue(record, "title");
-    const recordLabel = applicationRecordLabel(record);
     const nextAlt = `MemWeb ${applicationTypeCopy[record.type]?.en || record.type} screenshot from ${record.uid}.`;
 
     syncApplicationDirectory();
@@ -456,27 +561,13 @@
       const atRecord = applicationPhone?.dataset.applicationPhoneMode === "record";
       applicationPhoneCaption.hidden = !atRecord || !annotationLabel;
     }
-    if (applicationLightboxTitle) applicationLightboxTitle.textContent = title;
-    if (applicationLightboxRecord) applicationLightboxRecord.textContent = recordLabel;
-    if (applicationLightboxCount) applicationLightboxCount.textContent = count;
     if (applicationRecentsImage) {
       setApplicationImageSource(applicationRecentsImage, record.src);
       applicationRecentsImage.alt = nextAlt;
     }
     if (applicationRecentsLabel)
       applicationRecentsLabel.textContent = `${typeLabel} · ${record.uid.toUpperCase()}`;
-    if (applicationOpen) {
-      applicationOpen.dataset.recordType = record.type;
-      applicationOpen.setAttribute(
-        "aria-label",
-        applicationLang === "zh" ? `查看原始截图：${title}` : `Open original screenshot: ${title}`,
-      );
-    }
-
-    if (applicationLightboxImage) {
-      setApplicationImageSource(applicationLightboxImage, record.src);
-      applicationLightboxImage.alt = nextAlt;
-    }
+    if (applicationScreen) applicationScreen.dataset.recordType = record.type;
 
     applicationImageRequestId += 1;
     const imageRequestId = applicationImageRequestId;
@@ -578,6 +669,18 @@
     setApplicationPhoneMode("dialogue");
   });
 
+  applicationQaEntry?.addEventListener("click", () => {
+    activeApplicationQaIndex = 0;
+    renderApplicationQa();
+    setApplicationPhoneMode("qa");
+  });
+
+  applicationQaType?.addEventListener("change", () => {
+    activeApplicationQaType = applicationQaType.value;
+    activeApplicationQaIndex = 0;
+    renderApplicationQa();
+  });
+
   applicationAiHistoryOpen?.addEventListener("click", () => {
     setApplicationAiHistory(true);
   });
@@ -609,6 +712,7 @@
       if (applicationPhone?.dataset.applicationPhoneMode === "dialogue") {
         renderApplicationDialogue();
       }
+      if (applicationPhone?.dataset.applicationPhoneMode === "qa") renderApplicationQa();
     });
   });
 
@@ -633,7 +737,7 @@
         setApplicationAiHistory(false, { focusTrigger: true });
         return;
       }
-      if (action === "back" && ["record", "dialogue"].includes(currentMode))
+      if (action === "back" && ["record", "dialogue", "qa"].includes(currentMode))
         setApplicationPhoneMode("home");
     });
   });
@@ -644,38 +748,27 @@
 
   applicationDirectionButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      moveApplication(button.dataset.applicationDirection === "previous" ? -1 : 1);
+      const direction = button.dataset.applicationDirection === "previous" ? -1 : 1;
+      if (
+        button.hasAttribute("data-application-phone-direction") &&
+        applicationPhone?.dataset.applicationPhoneMode === "qa"
+      ) {
+        moveApplicationQa(direction);
+        return;
+      }
+      moveApplication(direction);
     });
   });
 
   applicationVisual?.addEventListener("keydown", (event) => {
     if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
-    event.preventDefault();
-    moveApplication(event.key === "ArrowLeft" ? -1 : 1);
-  });
-
-  const openApplicationLightbox = () => {
-    if (!applicationLightbox) return;
-    if (typeof applicationLightbox.showModal === "function") applicationLightbox.showModal();
-    else applicationLightbox.setAttribute("open", "");
-  };
-
-  const closeApplicationLightbox = () => {
-    if (!applicationLightbox) return;
-    if (typeof applicationLightbox.close === "function") applicationLightbox.close();
-    else applicationLightbox.removeAttribute("open");
-  };
-
-  applicationOpen?.addEventListener("click", () => {
-    if (Date.now() < applicationSwipeLockUntil) return;
-    openApplicationLightbox();
-  });
-  applicationClose?.addEventListener("click", closeApplicationLightbox);
-  applicationLightbox?.addEventListener("click", (event) => {
-    if (event.target === applicationLightbox) closeApplicationLightbox();
-  });
-  applicationLightbox?.addEventListener("keydown", (event) => {
-    if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+    const currentMode = applicationPhone?.dataset.applicationPhoneMode;
+    if (currentMode === "qa") {
+      event.preventDefault();
+      moveApplicationQa(event.key === "ArrowLeft" ? -1 : 1);
+      return;
+    }
+    if (currentMode !== "record") return;
     event.preventDefault();
     moveApplication(event.key === "ArrowLeft" ? -1 : 1);
   });
@@ -693,13 +786,11 @@
       const deltaY = event.clientY - applicationSwipeStartY;
       if (Math.abs(deltaX) < 46 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) return;
       event.preventDefault();
-      applicationSwipeLockUntil = Date.now() + 360;
       moveApplication(deltaX > 0 ? -1 : 1);
     });
   };
 
-  bindApplicationSwipe(applicationOpen);
-  bindApplicationSwipe(applicationLightboxMedia);
+  bindApplicationSwipe(applicationScreen);
 
   const openDatasetCases = () => {
     if (!datasetCaseDialog || datasetCaseDialog.open) return;
@@ -738,6 +829,8 @@
     if (applicationPhone?.dataset.applicationPhoneMode === "dialogue") {
       renderApplicationDialogue();
     }
+    if (applicationPhone?.dataset.applicationPhoneMode === "qa") renderApplicationQa();
+    setApplicationPhoneMode(applicationPhone?.dataset.applicationPhoneMode || "home");
     datasetCaseClose?.setAttribute(
       "aria-label",
       applicationLang === "zh" ? "关闭数据集案例" : "Close dataset cases",
@@ -819,6 +912,7 @@
   // Initialization ------------------------------------------------------------
 
   activateApplication(activeApplicationIndex, { animate: false });
+  if (applicationQaEntry) applicationQaEntry.hidden = !applicationQaData;
   setApplicationLanguage(applicationLang);
   setApplicationPhoneMode("home");
   initApplicationPreloading();
