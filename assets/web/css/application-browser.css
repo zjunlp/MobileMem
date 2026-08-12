@@ -579,6 +579,8 @@
   padding: 34px 12px 58px;
   overflow: hidden;
   border-radius: 28px;
+  font-family: var(--font-sans);
+  font-weight: 400;
   background:
     radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.92), transparent 28%),
     radial-gradient(circle at 92% 84%, rgba(112, 103, 193, 0.1), transparent 34%),
@@ -589,11 +591,12 @@
   align-items: center;
   justify-content: space-between;
   color: #214431;
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: var(--font-sans);
   font-size: 8px;
 }
+.application-phone-status strong,
 .application-phone-status span {
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: 0;
 }
 .application-phone-apps {
@@ -693,7 +696,7 @@
   overflow: hidden;
   max-width: 100%;
   font-size: 9px;
-  font-weight: 850;
+  font-weight: 600;
   line-height: 1.1;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -733,7 +736,7 @@
 }
 .application-ai-portal-copy strong {
   font-size: 14px;
-  font-weight: 850;
+  font-weight: 600;
   letter-spacing: 0;
 }
 .application-ai-portal-thread {
@@ -804,7 +807,7 @@
   padding: 0 2px;
   color: #244333;
   font-size: 9px;
-  font-weight: 820;
+  font-weight: 600;
   line-height: 1.2;
 }
 .application-memory-mosaic {
@@ -886,7 +889,7 @@
   background: rgba(249, 252, 250, 0.94);
   color: #173d2a;
   font-size: 9px;
-  font-weight: 850;
+  font-weight: 600;
   letter-spacing: 0;
   line-height: 1.1;
   text-align: left;

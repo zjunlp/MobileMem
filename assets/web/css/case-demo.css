@@ -6,30 +6,13 @@
   gap: 12px;
   justify-content: center;
   min-height: calc(var(--case-phone-h, 500px) + 36px);
-  padding: 18px 16px;
+  padding: 18px 0;
   font-family: var(--font-sans);
-  overflow: hidden;
-  border: 1px solid rgba(18, 35, 27, 0.14);
-  border-radius: 8px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.98),
-    rgba(239, 248, 242, 0.96) 62%,
-    rgba(246, 238, 226, 0.9)
-  );
-  box-shadow: 0 18px 46px rgba(23, 33, 28, 0.14);
+  overflow: visible;
   isolation: isolate;
 }
 .case-stage::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    linear-gradient(90deg, rgba(15, 123, 79, 0.045) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(15, 123, 79, 0.04) 1px, transparent 1px);
-  background-size: 34px 34px;
-  opacity: 0.55;
+  content: none;
 }
 
 .case-stage * {

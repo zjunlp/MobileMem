@@ -188,7 +188,20 @@
     const request = new Promise((resolve) => {
       const image = new Image();
       image.decoding = "async";
-      image.addEventListener("load", () => resolve(true), { once: true });
+      image.addEventListener(
+        "load",
+        () => {
+          if (typeof image.decode !== "function") {
+            resolve(true);
+            return;
+          }
+          image
+            .decode()
+            .catch(() => {})
+            .finally(() => resolve(true));
+        },
+        { once: true },
+      );
       image.addEventListener(
         "error",
         () => {
@@ -207,6 +220,18 @@
     for (let sampleNumber = 1; sampleNumber <= applicationCaseLimit; sampleNumber += 1) {
       preloadApplicationImage(applicationAssetPath(uid, type, sampleNumber));
     }
+  };
+
+  const preloadApplicationQaImages = (uid) => {
+    const users = applicationQaData?.users || {};
+    const userIds = uid ? [uid] : Object.keys(users);
+    userIds.forEach((userId) => {
+      const cases = users[userId]?.cases;
+      if (!cases) return;
+      Object.values(cases).forEach((samples) => {
+        samples.forEach((sample) => preloadApplicationImage(sample.image));
+      });
+    });
   };
 
   const getVisibleApplicationIndices = () =>
@@ -670,9 +695,16 @@
   });
 
   applicationQaEntry?.addEventListener("click", () => {
+    preloadApplicationQaImages();
     activeApplicationQaIndex = 0;
     renderApplicationQa();
     setApplicationPhoneMode("qa");
+  });
+  applicationQaEntry?.addEventListener("pointerenter", () => {
+    preloadApplicationQaImages();
+  });
+  applicationQaEntry?.addEventListener("focus", () => {
+    preloadApplicationQaImages(activeApplicationUid);
   });
 
   applicationQaType?.addEventListener("change", () => {
@@ -696,8 +728,10 @@
   });
 
   applicationPhoneUidButtons.forEach((button) => {
-    const preloadGroup = () =>
+    const preloadGroup = () => {
       preloadApplicationGroup(button.dataset.applicationPhoneUid, activeApplicationType);
+      preloadApplicationQaImages(button.dataset.applicationPhoneUid);
+    };
     button.addEventListener("pointerenter", preloadGroup);
     button.addEventListener("focus", preloadGroup);
     button.addEventListener("click", () => {
@@ -796,6 +830,7 @@
     if (!datasetCaseDialog || datasetCaseDialog.open) return;
     applicationAssetsReady = true;
     hydrateApplicationImages();
+    preloadApplicationQaImages();
     syncApplicationVisual(activeApplicationIndex, false);
     setApplicationPhoneMode("home");
     if (typeof datasetCaseDialog.showModal === "function") datasetCaseDialog.showModal();
@@ -809,6 +844,12 @@
   };
 
   datasetCaseOpen?.addEventListener("click", openDatasetCases);
+  datasetCaseOpen?.addEventListener("pointerenter", () => {
+    preloadApplicationQaImages();
+  });
+  datasetCaseOpen?.addEventListener("focus", () => {
+    preloadApplicationQaImages();
+  });
   datasetCaseClose?.addEventListener("click", closeDatasetCases);
   datasetCaseDialog?.addEventListener("click", (event) => {
     if (event.target === datasetCaseDialog) closeDatasetCases();
@@ -888,10 +929,12 @@
   };
 
   const initApplicationPreloading = () => {
-    if (!applicationShowcase) return;
+    const preloadingTarget = datasetCaseOpen || applicationShowcase;
+    if (!preloadingTarget) return;
     if (typeof IntersectionObserver !== "function") {
       applicationAssetsReady = true;
       hydrateApplicationImages();
+      preloadApplicationQaImages();
       syncApplicationVisual(activeApplicationIndex, false);
       return;
     }
@@ -901,12 +944,13 @@
         if (!entries.some((entry) => entry.isIntersecting)) return;
         applicationAssetsReady = true;
         hydrateApplicationImages();
+        preloadApplicationQaImages();
         syncApplicationVisual(activeApplicationIndex, false);
         observer.disconnect();
       },
       { rootMargin: "600px 0px" },
     );
-    observer.observe(applicationShowcase);
+    observer.observe(preloadingTarget);
   };
 
   // Initialization ------------------------------------------------------------
