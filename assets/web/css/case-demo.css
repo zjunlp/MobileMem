@@ -1917,4 +1917,53 @@
   }
 }
 
-@media;
+@media (min-width: 981px) {
+  .case-stage {
+    --case-demo-size: calc((100cqi - 12px) * 0.6849315);
+    grid-template-columns: minmax(0, 23fr) minmax(0, 50fr);
+    grid-template-rows: minmax(0, var(--case-demo-size));
+    align-items: center;
+    height: calc(var(--case-demo-size) + 36px);
+    min-height: 0;
+  }
+
+  .case-flow,
+  .case-phone {
+    height: 100%;
+    min-height: 0;
+    max-height: 100%;
+    overflow: hidden;
+  }
+
+  .case-story-panel,
+  .memory-room {
+    min-height: 0;
+    aspect-ratio: 1;
+  }
+
+  .memory-room {
+    height: 100% !important;
+    max-height: none;
+  }
+
+  .memory-room .room-bg {
+    object-fit: contain;
+  }
+}
+
+@media (max-width: 980px) {
+  .case-story-panel,
+  .memory-room {
+    min-height: 0;
+    aspect-ratio: 1;
+  }
+
+  .memory-room {
+    height: auto !important;
+    max-height: none;
+  }
+
+  .memory-room .room-bg {
+    object-fit: contain;
+  }
+}

@@ -205,7 +205,7 @@ main {
 /* Hero -------------------------------------------------------------------- */
 
 .hero .wrap {
-  width: min(1450px, calc(100% - 40px));
+  width: min(1280px, calc(100% - 96px));
 }
 
 .hero {
@@ -221,13 +221,13 @@ main {
 
 .hero-grid {
   display: grid;
-  grid-template-columns: minmax(580px, 0.92fr) minmax(760px, 1.08fr);
-  gap: 26px;
+  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+  gap: 40px;
   align-items: center;
 }
 
 .hero-copy {
-  max-width: 720px;
+  max-width: 640px;
 }
 
 .eyebrow {
@@ -262,11 +262,11 @@ h1 {
 }
 
 .hero h1 {
-  max-width: 720px;
-  margin-bottom: 20px;
+  max-width: 640px;
+  margin-bottom: 18px;
   color: #1d272a;
   font-family: var(--font-display);
-  font-size: 50px;
+  font-size: 44px;
   font-weight: 400;
   line-height: 1.08;
   letter-spacing: 0;
@@ -303,20 +303,20 @@ h3 {
 }
 
 .hero-tagline {
-  max-width: 690px;
+  max-width: 620px;
   margin: 0;
   color: #4f5a54;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 400;
   line-height: 1.4;
 }
 
 .hero-stats {
-  width: min(620px, 100%);
+  width: min(580px, 100%);
   display: grid;
   grid-template-columns: 0.8fr 0.8fr 1.4fr;
-  margin-top: 28px;
-  padding: 16px 0;
+  margin-top: 24px;
+  padding: 14px 0;
   border-top: 1px solid rgba(29, 39, 42, 0.24);
   border-bottom: 1px solid rgba(29, 39, 42, 0.24);
 }
@@ -343,7 +343,7 @@ h3 {
   flex: 0 0 auto;
   color: #1d272a;
   font-family: var(--font-display);
-  font-size: 28px;
+  font-size: 25px;
   font-weight: 400;
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -357,19 +357,19 @@ h3 {
 }
 
 .hero .actions {
-  max-width: 690px;
+  max-width: 580px;
   justify-content: center;
   gap: 12px;
-  margin-top: 22px;
+  margin-top: 20px;
 }
 
 .hero .btn {
-  min-height: 54px;
-  padding: 0 24px;
+  min-height: 50px;
+  padding: 0 22px;
   border-color: rgba(29, 39, 42, 0.72);
   background: rgba(255, 255, 255, 0.76);
   font-family: inherit;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
   box-shadow: none;
 }
@@ -415,8 +415,11 @@ h3 {
 }
 
 .media-stack {
+  width: min(660px, 100%);
   display: grid;
+  justify-self: center;
   gap: 14px;
+  container-type: inline-size;
 }
 
 .image-frame {
@@ -1353,6 +1356,10 @@ h3 {
   }
 
   .wrap {
+    width: min(100% - 28px, 760px);
+  }
+
+  .hero .wrap {
     width: min(100% - 28px, 760px);
   }
 
