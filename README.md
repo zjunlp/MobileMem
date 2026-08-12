@@ -34,7 +34,7 @@
 
 ---
 
-## 🔔 News
+## 🔥 News
 - **2026-08-01** — We publicly release the MobileMem dataset.
 - **2026-05-16** — We launch the English version of the dataset and benchmark.
 - **2026-05-03** — We launch the Chinese version of the dataset and benchmark.
