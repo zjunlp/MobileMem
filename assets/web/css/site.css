@@ -409,6 +409,95 @@ h3 {
   box-shadow: 0 8px 18px rgba(23, 33, 28, 0.1);
 }
 
+.video-play {
+  cursor: pointer;
+}
+
+/* Project video ---------------------------------------------------------- */
+
+.video-modal {
+  width: min(1040px, calc(100% - 40px), calc((100vh - 110px) * 16 / 9));
+  width: min(1040px, calc(100% - 40px), calc((100dvh - 110px) * 16 / 9));
+  max-width: none;
+  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(29, 39, 42, 0.18);
+  border-radius: 8px;
+  background: var(--white);
+  box-shadow: 0 28px 80px rgba(7, 13, 10, 0.32);
+}
+
+.video-modal[open] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.video-modal::backdrop {
+  background: rgba(23, 33, 28, 0.58);
+  backdrop-filter: blur(4px);
+}
+
+.video-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 58px;
+  padding: 9px 10px 9px 18px;
+  border-bottom: 1px solid var(--line);
+  background: var(--white);
+}
+
+.video-modal-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.video-close {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 27px;
+  line-height: 1;
+}
+
+.video-close:hover {
+  background: var(--soft);
+}
+
+.video-close:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 1px;
+}
+
+.video-player-shell {
+  display: grid;
+  place-items: center;
+  background: #080d0b;
+}
+
+.mobilemem-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #080d0b;
+  object-fit: contain;
+}
+
 .arrow {
   font-size: 18px;
   line-height: 0;

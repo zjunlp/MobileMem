@@ -21,7 +21,12 @@ if (["http:", "https:"].includes(window.location.protocol) && !isLocalPreview) {
 
 const languageToggle = document.querySelector("[data-toggle-lang]");
 const reportLink = document.querySelector("[data-report-link]");
+const videoModal = document.querySelector("#mobilemem-video-modal");
+const videoPlay = document.querySelector(".video-play");
+const videoClose = document.querySelector(".video-close");
+const mobilememVideo = document.querySelector("[data-mobilemem-video]");
 const languageStorageKey = "mobilemem-language";
+let activeVideoLanguage = "en";
 
 // Shared language switch ----------------------------------------------------
 
@@ -74,6 +79,26 @@ const setReportLink = (lang) => {
   else reportLink.removeAttribute("title");
 };
 
+const prepareVideoSource = () => {
+  if (!mobilememVideo) return;
+  const sourceKey = activeVideoLanguage === "zh" ? "videoSrcZh" : "videoSrcEn";
+  const source = mobilememVideo.dataset[sourceKey];
+  if (!source || mobilememVideo.getAttribute("src") === source) return;
+  mobilememVideo.pause();
+  mobilememVideo.src = source;
+  mobilememVideo.load();
+};
+
+const setVideoLanguage = (lang) => {
+  activeVideoLanguage = lang === "zh" ? "zh" : "en";
+  if (mobilememVideo) {
+    const posterKey = activeVideoLanguage === "zh" ? "videoPosterZh" : "videoPosterEn";
+    mobilememVideo.poster = mobilememVideo.dataset[posterKey] || "";
+  }
+  videoClose?.setAttribute("aria-label", activeVideoLanguage === "zh" ? "关闭视频" : "Close video");
+  if (videoModal?.open) prepareVideoSource();
+};
+
 const setPageLanguage = (lang, { persist = true } = {}) => {
   const normalizedLang = lang === "zh" ? "zh" : "en";
   document.documentElement.lang = normalizedLang;
@@ -82,6 +107,7 @@ const setPageLanguage = (lang, { persist = true } = {}) => {
   if (persist) saveLanguage(normalizedLang);
   setLanguageToggle(normalizedLang);
   setReportLink(normalizedLang);
+  setVideoLanguage(normalizedLang);
   window.dispatchEvent(
     new CustomEvent("mobilemem:languagechange", {
       detail: { lang: normalizedLang },
@@ -103,6 +129,29 @@ window.addEventListener("storage", (event) => {
 });
 
 setPageLanguage(getSavedLanguage() || (document.body.classList.contains("lang-zh") ? "zh" : "en"));
+
+// Project video ------------------------------------------------------------
+
+if (videoModal && videoPlay && videoClose && mobilememVideo) {
+  videoPlay.addEventListener("click", () => {
+    prepareVideoSource();
+    videoModal.showModal();
+    mobilememVideo.play().catch(() => {});
+  });
+
+  videoClose.addEventListener("click", () => {
+    videoModal.close();
+  });
+
+  videoModal.addEventListener("click", (event) => {
+    if (event.target === videoModal) videoModal.close();
+  });
+
+  videoModal.addEventListener("close", () => {
+    mobilememVideo.pause();
+    mobilememVideo.currentTime = 0;
+  });
+}
 
 // Hero statistics ----------------------------------------------------------
 

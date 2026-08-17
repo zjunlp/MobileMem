@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>MobileMem-Omni Leaderboard</title>
+    <title>MobileMem-Omni</title>
     <meta
       name="description"
-      content="MobileMem-Omni benchmark results across textual and multimodal memory methods."
+      content="MobileMem and MobileMem-Omni benchmark results across memory methods."
     />
     <link rel="stylesheet" href="assets/web/css/site.css?v=20260811-9" />
-    <link rel="stylesheet" href="assets/web/css/leaderboard.css?v=20260815-1" />
+    <link rel="stylesheet" href="assets/web/css/leaderboard.css?v=20260817-2" />
   </head>
   <body class="lang-en leaderboard-page">
     <a class="skip-link" href="#leaderboard-main">Skip to results</a>
@@ -24,7 +24,7 @@
           <span data-lang="zh">返回</span>
           <span data-lang="en">Back</span>
         </a>
-        <strong class="leaderboard-context">MobileMem-Omni</strong>
+        <strong class="leaderboard-context" data-leaderboard-context>MobileMem-Omni</strong>
         <div class="language-toggle" role="group" aria-label="Language">
           <button type="button" data-toggle-lang="zh" aria-label="Switch language to Chinese">
             Chinese
@@ -36,7 +36,22 @@
     <main id="leaderboard-main" class="leaderboard-main">
       <section class="leaderboard-hero" aria-labelledby="leaderboard-title">
         <div class="wrap leaderboard-hero-row">
-          <h1 id="leaderboard-title">MobileMem-Omni Leaderboard</h1>
+          <div class="leaderboard-title-row">
+            <h1 id="leaderboard-title" data-leaderboard-title>MobileMem-Omni</h1>
+            <details class="benchmark-title-switcher" data-benchmark-switcher>
+              <summary aria-label="Switch benchmark" title="Switch benchmark">
+                <span class="benchmark-title-chevron" aria-hidden="true"></span>
+              </summary>
+              <div class="benchmark-title-menu" aria-label="Benchmark">
+                <button type="button" data-benchmark="omni" aria-current="true">
+                  MobileMem-Omni
+                </button>
+                <button type="button" data-benchmark="textual" aria-current="false">
+                  MobileMem-Text
+                </button>
+              </div>
+            </details>
+          </div>
           <p class="leaderboard-submit-note">
             <span data-lang="zh">欢迎提交结果上榜，请联系</span>
             <span data-lang="en">To submit results to the leaderboard, contact</span>
@@ -60,7 +75,7 @@
             </div>
           </div>
 
-          <div class="control-group">
+          <div class="control-group" data-family-control-group>
             <span class="control-label">
               <span data-lang="zh">方法类型</span>
               <span data-lang="en">Method family</span>
@@ -124,40 +139,8 @@
             aria-label="Results table; scroll horizontally on narrow screens"
           >
             <table class="leaderboard-table">
-              <caption class="visually-hidden">
-                MobileMem-Omni question-answering performance by method and task
-              </caption>
-              <thead>
-                <tr>
-                  <th class="rank-column" rowspan="2" scope="col">
-                    <span data-lang="zh">排名</span>
-                    <span data-lang="en">Rank</span>
-                  </th>
-                  <th class="method-column" rowspan="2" scope="col">
-                    <span data-lang="zh">方法</span>
-                    <span data-lang="en">Method</span>
-                  </th>
-                  <th colspan="7" scope="colgroup">
-                    <span data-lang="zh">任务</span>
-                    <span data-lang="en">Task</span>
-                  </th>
-                  <th colspan="2" scope="colgroup">
-                    <span data-lang="zh">总体</span>
-                    <span data-lang="en">Overall</span>
-                  </th>
-                </tr>
-                <tr>
-                  <th data-score-key="singleHop" scope="col">Single-Hop</th>
-                  <th data-score-key="multiHop" scope="col">Multi-Hop</th>
-                  <th data-score-key="knowledgeUpdate" scope="col">Knowledge Update</th>
-                  <th data-score-key="temporalReasoning" scope="col">Temporal Reasoning</th>
-                  <th data-score-key="abstention" scope="col">Abstention</th>
-                  <th data-score-key="implicitPreference" scope="col">Implicit Preference</th>
-                  <th data-score-key="visualReasoning" scope="col">Visual Reasoning</th>
-                  <th data-score-key="llmJudge" scope="col">LLM-Judge</th>
-                  <th data-score-key="f1" scope="col">F1</th>
-                </tr>
-              </thead>
+              <caption class="visually-hidden" data-leaderboard-caption></caption>
+              <thead data-leaderboard-head></thead>
               <tbody data-leaderboard-body></tbody>
             </table>
           </div>
@@ -165,7 +148,7 @@
       </section>
     </main>
 
-    <script src="assets/web/js/main.js?v=20260811-3"></script>
-    <script src="assets/web/js/leaderboard.js?v=20260810-1"></script>
+    <script src="assets/web/js/main.js?v=20260817-1"></script>
+    <script src="assets/web/js/leaderboard.js?v=20260817-1"></script>
   </body>
 </html>
