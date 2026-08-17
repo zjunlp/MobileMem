@@ -13,7 +13,7 @@
     <meta property="og:description" content="A benchmark for on-device long-term memory." />
     <meta property="og:site_name" content="MobileMem" />
     <meta name="twitter:card" content="summary" />
-    <link rel="stylesheet" href="assets/web/css/site.css?v=20260817-1" />
+    <link rel="stylesheet" href="assets/web/css/site.css?v=20260817-5" />
     <link rel="stylesheet" href="assets/web/css/case-demo.css?v=20260812-5" />
     <link rel="stylesheet" href="assets/web/css/application-browser.css?v=20260811-11" />
   </head>
@@ -42,6 +42,10 @@
           <a href="#features">
             <span data-lang="zh">研究亮点</span>
             <span data-lang="en">Highlight</span>
+          </a>
+          <a href="#video">
+            <span data-lang="zh">视频</span>
+            <span data-lang="en">Video</span>
           </a>
           <a href="#quick-start">
             <span data-lang="zh">快速开始</span>
@@ -107,10 +111,6 @@
                 <span data-lang="zh">榜单</span>
                 <span data-lang="en">Leaderboard</span>
               </a>
-              <button class="btn video-play" type="button">
-                <span data-lang="zh">视频</span>
-                <span data-lang="en">Video</span>
-              </button>
             </div>
           </div>
           <div class="media-stack">
@@ -1227,6 +1227,48 @@
         </div>
       </section>
 
+      <!-- Project video -->
+      <section class="section video-section" id="video" aria-labelledby="video-title">
+        <div class="wrap">
+          <div class="center-head video-section-head">
+            <h2 id="video-title">
+              <span data-lang="zh">视频</span>
+              <span data-lang="en">Video</span>
+            </h2>
+          </div>
+          <div class="video-frame">
+            <video
+              class="mobilemem-video video-inline"
+              controls
+              preload="metadata"
+              playsinline
+              src="assets/web/videos/mobilemem-overview-en.mp4?v=20260817-8178-crf23"
+              poster="assets/web/videos/mobilemem-overview-en.jpg?v=20260817-8178-crf23"
+              data-mobilemem-video
+              data-video-src-zh="assets/web/videos/mobilemem-overview-zh.mp4?v=20260817-8178-crf23"
+              data-video-src-en="assets/web/videos/mobilemem-overview-en.mp4?v=20260817-8178-crf23"
+              data-video-poster-zh="assets/web/videos/mobilemem-overview-zh.jpg?v=20260817-8178-crf23"
+              data-video-poster-en="assets/web/videos/mobilemem-overview-en.jpg?v=20260817-8178-crf23"
+            ></video>
+            <button
+              class="video-cover"
+              type="button"
+              data-video-cover
+              aria-label="Play MobileMem video"
+            >
+              <img
+                src="assets/web/videos/mobilemem-overview-en.jpg?v=20260817-8178-crf23"
+                alt=""
+                width="2560"
+                height="1440"
+                data-video-cover-image
+              />
+              <span class="video-cover-play" aria-hidden="true">&#9654;</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
       <!-- Quick start -->
       <section class="section quick" id="quick-start" aria-labelledby="quick-title">
         <div class="wrap">
@@ -1423,37 +1465,13 @@
               <span class="counter-item">
                 <span data-lang="zh">访问量</span>
                 <span data-lang="en">Page views</span>
-                <strong id="busuanzi_value_page_pv">--</strong>
+                <strong id="busuanzi_page_pv">--</strong>
               </span>
             </div>
           </div>
         </div>
       </section>
     </main>
-    <dialog class="video-modal" id="mobilemem-video-modal" aria-labelledby="video-modal-title">
-      <div class="video-modal-head">
-        <h2 id="video-modal-title">
-          <span data-lang="zh">MobileMem 视频</span>
-          <span data-lang="en">MobileMem Video</span>
-        </h2>
-        <button class="video-close" type="button" aria-label="Close video">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="video-player-shell">
-        <video
-          class="mobilemem-video"
-          controls
-          preload="none"
-          playsinline
-          data-mobilemem-video
-          data-video-src-zh="assets/web/videos/mobilemem-overview-zh.mp4"
-          data-video-src-en="assets/web/videos/mobilemem-overview-en.mp4"
-          data-video-poster-zh="assets/web/videos/mobilemem-overview-zh.jpg"
-          data-video-poster-en="assets/web/videos/mobilemem-overview-en.jpg"
-        ></video>
-      </div>
-    </dialog>
     <footer class="site-footer" id="contact" aria-labelledby="contact-title">
       <div class="wrap footer-contact-row">
         <p class="footer-contact-title" id="contact-title">
@@ -1479,6 +1497,6 @@
     <script src="assets/web/js/quick-start.js?v=20260811-2"></script>
     <script src="assets/web/js/application-scenarios.js?v=20260811-1"></script>
     <script src="assets/web/js/application-browser.js?v=20260811-10"></script>
-    <script src="assets/web/js/main.js?v=20260817-1"></script>
+    <script src="assets/web/js/main.js?v=20260817-7"></script>
   </body>
 </html>

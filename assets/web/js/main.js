@@ -7,13 +7,13 @@
 
 // Optional page analytics ---------------------------------------------------
 
-const pageViewCounter = document.querySelector("#busuanzi_value_page_pv");
+const pageViewCounter = document.querySelector("#busuanzi_page_pv");
 const isLocalPreview = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
 
 if (["http:", "https:"].includes(window.location.protocol) && !isLocalPreview) {
   const busuanziScript = document.createElement("script");
   busuanziScript.defer = true;
-  busuanziScript.src = "https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js";
+  busuanziScript.src = "https://busuanzi.9420.ltd/js";
   document.head.appendChild(busuanziScript);
 } else if (pageViewCounter) {
   pageViewCounter.textContent = "—";
@@ -21,10 +21,9 @@ if (["http:", "https:"].includes(window.location.protocol) && !isLocalPreview) {
 
 const languageToggle = document.querySelector("[data-toggle-lang]");
 const reportLink = document.querySelector("[data-report-link]");
-const videoModal = document.querySelector("#mobilemem-video-modal");
-const videoPlay = document.querySelector(".video-play");
-const videoClose = document.querySelector(".video-close");
 const mobilememVideo = document.querySelector("[data-mobilemem-video]");
+const videoCover = document.querySelector("[data-video-cover]");
+const videoCoverImage = document.querySelector("[data-video-cover-image]");
 const languageStorageKey = "mobilemem-language";
 let activeVideoLanguage = "en";
 
@@ -79,12 +78,21 @@ const setReportLink = (lang) => {
   else reportLink.removeAttribute("title");
 };
 
-const prepareVideoSource = () => {
+const prepareVideoSource = ({ poster = "" } = {}) => {
   if (!mobilememVideo) return;
   const sourceKey = activeVideoLanguage === "zh" ? "videoSrcZh" : "videoSrcEn";
   const source = mobilememVideo.dataset[sourceKey];
-  if (!source || mobilememVideo.getAttribute("src") === source) return;
+
+  if (videoCoverImage) videoCoverImage.src = poster;
+  if (videoCover) videoCover.hidden = false;
+
   mobilememVideo.pause();
+  mobilememVideo.poster = poster;
+  if (!source || mobilememVideo.getAttribute("src") === source) {
+    mobilememVideo.currentTime = 0;
+    return;
+  }
+
   mobilememVideo.src = source;
   mobilememVideo.load();
 };
@@ -93,10 +101,13 @@ const setVideoLanguage = (lang) => {
   activeVideoLanguage = lang === "zh" ? "zh" : "en";
   if (mobilememVideo) {
     const posterKey = activeVideoLanguage === "zh" ? "videoPosterZh" : "videoPosterEn";
-    mobilememVideo.poster = mobilememVideo.dataset[posterKey] || "";
+    const poster = mobilememVideo.dataset[posterKey] || "";
+    prepareVideoSource({ poster });
   }
-  videoClose?.setAttribute("aria-label", activeVideoLanguage === "zh" ? "关闭视频" : "Close video");
-  if (videoModal?.open) prepareVideoSource();
+  videoCover?.setAttribute(
+    "aria-label",
+    activeVideoLanguage === "zh" ? "播放 MobileMem 视频" : "Play MobileMem video",
+  );
 };
 
 const setPageLanguage = (lang, { persist = true } = {}) => {
@@ -130,26 +141,16 @@ window.addEventListener("storage", (event) => {
 
 setPageLanguage(getSavedLanguage() || (document.body.classList.contains("lang-zh") ? "zh" : "en"));
 
-// Project video ------------------------------------------------------------
-
-if (videoModal && videoPlay && videoClose && mobilememVideo) {
-  videoPlay.addEventListener("click", () => {
-    prepareVideoSource();
-    videoModal.showModal();
-    mobilememVideo.play().catch(() => {});
+if (mobilememVideo && videoCover) {
+  videoCover.addEventListener("click", () => {
+    videoCover.hidden = true;
+    mobilememVideo.play().catch(() => {
+      videoCover.hidden = false;
+    });
   });
 
-  videoClose.addEventListener("click", () => {
-    videoModal.close();
-  });
-
-  videoModal.addEventListener("click", (event) => {
-    if (event.target === videoModal) videoModal.close();
-  });
-
-  videoModal.addEventListener("close", () => {
-    mobilememVideo.pause();
-    mobilememVideo.currentTime = 0;
+  mobilememVideo.addEventListener("play", () => {
+    videoCover.hidden = true;
   });
 }
 
