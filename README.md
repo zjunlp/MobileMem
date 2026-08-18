@@ -4,7 +4,7 @@
 
 ### MobileMem: Learning from a Year of Mobile Experiences
 
-[![Paper](https://img.shields.io/badge/📄_Paper-2608.13606-b31b1b?style=flat-square&logo=arxiv&logoColor=white)](https://arxiv.org/abs/2608.13606)
+[![Paper](https://img.shields.io/badge/📄_Paper-2608.13606v2-b31b1b?style=flat-square&logo=arxiv&logoColor=white)](https://arxiv.org/abs/2608.13606v2)
 [![Website](https://img.shields.io/badge/🌐_Website-MobileMem-1e7bbf?style=flat-square&logo=googlechrome&logoColor=white)](https://zjunlp.github.io/MobileMem/)
 [![HuggingFace](https://img.shields.io/badge/🤗_Dataset-MobileMem-fcd022?style=flat-square)](https://huggingface.co/datasets/zjunlp/MobileMem)
 [![License](https://img.shields.io/badge/📜_License-MIT-2ea44f?style=flat-square&logo=opensourceinitiative&logoColor=white)](#license)
@@ -35,6 +35,7 @@
 ---
 
 ## 🔥 News
+- **2026-08-18** — We have officially released our [technical report](https://arxiv.org/abs/2608.13606v2).
 - **2026-08-01** — We publicly release the MobileMem dataset.
 - **2026-05-16** — We launch the English version of the dataset and benchmark.
 - **2026-05-03** — We launch the Chinese version of the dataset and benchmark.
@@ -118,9 +119,9 @@ We recommend using **[MemTrace](https://github.com/zjunlp/MemTrace)** to perform
 If this work or datasets is helpful, please kindly cite as this:
 
 ```bibtex
-@misc{deng2026mobilememlearningyearmobile,
+@misc{mobilemem,
       title={MobileMem: Learning from a Year of Mobile Experiences}, 
-      author={Xinle Deng and Yida Xue and Xiangyuan Ru and Haoming Xu and Shuofei Qiao and Mengru Wang and Yijun Chen and Buqiang Xu and Chen Jiang and Yuchen Eleanor Jiang and Lizhong Wang and Jianfeng Wang and Li Zeng and Haofen Wang and Guilin Qi and Huajun Chen and Ningyu Zhang},
+      author={Xinle Deng and Yida Xue and Xiangyuan Ru and Yijun Chen and Buqiang Xu and Mingjun Mao and Xinjie Liu and Haoming Xu and Shuofei Qiao and Mengru Wang and Chen Jiang and Yuchen Eleanor Jiang and Lizhong Wang and Jason Wang and Li Zeng and Haofen Wang and Guilin Qi and Huajun Chen and Ningyu Zhang},
       year={2026},
       eprint={2608.13606},
       archivePrefix={arXiv},
