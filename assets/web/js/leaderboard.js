@@ -1,4 +1,4 @@
-/** MobileMem and MobileMem-Omni paper-result leaderboard. */
+/** MobileMem benchmark leaderboards. */
 
 (() => {
   const familyLabels = {
@@ -21,6 +21,20 @@
     { key: "visualReasoning", group: "task", en: "Visual Reasoning", zh: "视觉推理" },
     { key: "llmJudge", group: "overall", en: "LLM-Judge", zh: "LLM-Judge" },
     { key: "f1", group: "overall", en: "F1", zh: "F1" },
+  ];
+
+  // Scores for the bilingual light-questions subset. The source reports
+  // correct rates (%) for each backbone and task; the total score is exposed
+  // as the overall metric so it can be used for ranking like the other tables.
+  const lightQuestionsMetrics = [
+    { key: "singleHop", group: "task", en: "Single-Hop", zh: "单跳推理" },
+    { key: "multiHop", group: "task", en: "Multi-Hop", zh: "多跳推理" },
+    { key: "knowledgeUpdate", group: "task", en: "Knowledge Update", zh: "知识更新" },
+    { key: "temporalReasoning", group: "task", en: "Temporal Reasoning", zh: "时序推理" },
+    { key: "implicitPreference", group: "task", en: "Implicit Preference", zh: "隐式偏好" },
+    { key: "abstention", group: "task", en: "Abstention", zh: "拒答" },
+    { key: "visualReasoning", group: "task", en: "Visual Reasoning", zh: "视觉推理" },
+    { key: "overall", group: "overall", en: "Overall", zh: "总体" },
   ];
 
   const textualMetrics = [
@@ -179,6 +193,144 @@
       ],
     ],
     omniMetrics,
+  );
+
+  const lightQuestionsRows = createRows(
+    [
+      [
+        "textual",
+        "gpt54",
+        "EverMemOS",
+        ["46.96", "41.18", "46.30", "62.89", "58.20", "13.33", "34.27", "42.59"],
+      ],
+      [
+        "textual",
+        "gpt54",
+        "LightMem",
+        ["40.19", "37.34", "45.75", "47.48", "48.36", "26.67", "28.44", "38.34"],
+      ],
+      [
+        "multimodal",
+        "gpt54",
+        "Multimodal Long Context",
+        ["38.32", "24.04", "34.52", "45.91", "18.85", "27.06", "12.35", "29.25"],
+      ],
+      [
+        "textual",
+        "gpt54",
+        "NaiveRAG",
+        ["28.50", "23.53", "21.92", "29.87", "8.20", "10.98", "15.62", "21.40"],
+      ],
+      [
+        "textual",
+        "gpt54",
+        "Mem0",
+        ["27.10", "24.30", "26.85", "33.02", "51.64", "7.45", "14.92", "24.26"],
+      ],
+      [
+        "textual",
+        "gpt54",
+        "LangMem",
+        ["22.66", "18.67", "27.95", "35.85", "46.72", "20.78", "13.75", "24.05"],
+      ],
+      [
+        "textual",
+        "gpt54",
+        "M²A (w/ Caption)",
+        ["27.57", "29.92", "26.03", "23.58", "36.89", "5.10", "23.54", "24.44"],
+      ],
+      [
+        "multimodal",
+        "gpt54",
+        "SigLIP + NaiveRAG",
+        ["28.04", "16.62", "25.48", "28.30", "44.26", "5.10", "9.79", "20.67"],
+      ],
+      [
+        "multimodal",
+        "gpt54",
+        "UniversalRAG",
+        ["23.60", "17.65", "25.48", "32.08", "46.72", "5.88", "7.69", "20.36"],
+      ],
+      [
+        "textual",
+        "gpt54",
+        "Textual Long Context",
+        ["16.82", "8.70", "22.47", "22.64", "44.26", "27.06", "7.93", "18.07"],
+      ],
+      [
+        "multimodal",
+        "gpt54",
+        "M²A",
+        ["1.40", "1.79", "2.74", "7.23", "27.05", "29.41", "3.96", "7.41"],
+      ],
+      [
+        "textual",
+        "qwen",
+        "EverMemOS",
+        ["30.84", "30.43", "27.67", "42.45", "23.77", "22.35", "21.45", "28.81"],
+      ],
+      [
+        "textual",
+        "qwen",
+        "LightMem",
+        ["32.94", "31.20", "35.34", "25.16", "36.07", "24.31", "23.78", "29.46"],
+      ],
+      [
+        "multimodal",
+        "qwen",
+        "Multimodal Long Context",
+        ["23.60", "11.76", "19.73", "21.07", "9.02", "0.78", "7.69", "14.38"],
+      ],
+      [
+        "textual",
+        "qwen",
+        "NaiveRAG",
+        ["7.01", "6.14", "5.21", "5.66", "0.82", "10.98", "3.50", "5.85"],
+      ],
+      [
+        "textual",
+        "qwen",
+        "Mem0",
+        ["26.64", "24.04", "32.33", "28.30", "62.30", "9.02", "17.02", "25.48"],
+      ],
+      [
+        "textual",
+        "qwen",
+        "LangMem",
+        ["19.86", "14.07", "17.53", "20.75", "18.85", "21.18", "5.13", "15.99"],
+      ],
+      [
+        "textual",
+        "qwen",
+        "M²A (w/ Caption)",
+        ["25.70", "26.09", "23.84", "23.27", "26.23", "6.27", "21.91", "22.31"],
+      ],
+      [
+        "multimodal",
+        "qwen",
+        "SigLIP + NaiveRAG",
+        ["13.55", "12.28", "13.15", "16.67", "14.75", "21.18", "3.73", "12.78"],
+      ],
+      [
+        "multimodal",
+        "qwen",
+        "UniversalRAG",
+        ["16.82", "13.30", "19.18", "16.67", "25.41", "21.57", "2.56", "14.90"],
+      ],
+      [
+        "textual",
+        "qwen",
+        "Textual Long Context",
+        ["4.91", "4.60", "5.48", "12.58", "5.74", "4.71", "3.03", "5.68"],
+      ],
+      [
+        "multimodal",
+        "qwen",
+        "M²A",
+        ["0.47", "0.77", "1.37", "12.89", "6.56", "10.20", "4.20", "4.46"],
+      ],
+    ],
+    lightQuestionsMetrics,
   );
 
   const textualRows = createRows(
@@ -530,6 +682,24 @@
       hasFamilies: true,
       rows: omniRows,
     },
+    lightQuestions: {
+      label: "Light-questions",
+      title: { en: "Light-questions", zh: "Light-questions" },
+      caption: {
+        en: "Light-questions bilingual subset correct-rate performance by method and task",
+        zh: "Light-questions 中英文合并子集各方法在不同任务上的正确率",
+      },
+      metrics: lightQuestionsMetrics,
+      groups: ["task", "overall"],
+      backbones: [
+        { id: "gpt54", label: "GPT-5.4-mini" },
+        { id: "qwen", label: "Qwen3-VL-8B-Instruct" },
+      ],
+      defaultBackbone: "gpt54",
+      defaultMetric: "overall",
+      hasFamilies: true,
+      rows: lightQuestionsRows,
+    },
     textual: {
       label: "MobileMem-Text",
       title: { en: "MobileMem-Text", zh: "MobileMem-Text" },
@@ -700,12 +870,13 @@
     const metric = currentMetric();
     const filtered = benchmark.rows
       .filter((row) => row.backbone === state.backbone)
-      .filter((row) => !benchmark.hasFamilies || state.family === "all" || row.family === state.family)
+      .filter(
+        (row) => !benchmark.hasFamilies || state.family === "all" || row.family === state.family,
+      )
       .sort((left, right) => {
         const leftValue = metricNumber(left.values[state.metric]);
         const rightValue = metricNumber(right.values[state.metric]);
-        const scoreOrder =
-          metric.rank === "asc" ? leftValue - rightValue : rightValue - leftValue;
+        const scoreOrder = metric.rank === "asc" ? leftValue - rightValue : rightValue - leftValue;
         return scoreOrder || left.sourceOrder - right.sourceOrder;
       });
 
