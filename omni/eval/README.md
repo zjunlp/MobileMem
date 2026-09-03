@@ -260,4 +260,4 @@ Note: `evaluator.py` depends on helper classes such as `LLMJudge` and `Retrieval
 
 # 📋 Dataset Logs
 
-The [MobileMem-Omni Logs]([https://drive.google.com/file/d/1ZPaUzsu-gyDXZYqiy2b47v6grnfBg7HW/view?usp=drive_link](https://drive.google.com/file/d/1v8brPpJDaMqePJRteaILltbBXPgp7jHi/view?usp=sharing)) contain the experimental logs.
+The [MobileMem-Omni Logs](https://drive.google.com/file/d/1v8brPpJDaMqePJRteaILltbBXPgp7jHi/view?usp=sharing) contain the experimental logs.
