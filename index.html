@@ -13,7 +13,7 @@
     <meta property="og:description" content="A benchmark for on-device long-term memory." />
     <meta property="og:site_name" content="MobileMem" />
     <meta name="twitter:card" content="summary" />
-    <link rel="stylesheet" href="assets/web/css/site.css?v=20260817-5" />
+    <link rel="stylesheet" href="assets/web/css/site.css?v=20261009-1" />
     <link rel="stylesheet" href="assets/web/css/case-demo.css?v=20260812-5" />
     <link rel="stylesheet" href="assets/web/css/application-browser.css?v=20260811-11" />
   </head>
@@ -1040,6 +1040,89 @@
         </div>
       </section>
 
+      <!-- Dataset tracks -->
+      <section
+        class="section compact dataset-tracks"
+        id="datasets"
+        aria-labelledby="datasets-title"
+      >
+        <div class="wrap">
+          <div class="center-head">
+            <p class="eyebrow">Data Categories</p>
+            <h2 id="datasets-title">
+              <span data-lang="zh">MobileMem 的数据分类</span>
+              <span data-lang="en">MobileMem Data Categories</span>
+            </h2>
+          </div>
+          <div class="dataset-tracks-scroll" tabindex="0">
+            <table class="dataset-tracks-table">
+              <caption class="sr-only">
+                <span data-lang="zh">MobileMem 包含的数据分类</span>
+                <span data-lang="en">The data categories included in MobileMem</span>
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">
+                    <span data-lang="zh">数据集</span>
+                    <span data-lang="en">Track</span>
+                  </th>
+                  <th scope="col">
+                    <span data-lang="zh">模态</span>
+                    <span data-lang="en">Modality</span>
+                  </th>
+                  <th scope="col">
+                    <span data-lang="zh">描述</span>
+                    <span data-lang="en">Description</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row"><code>text</code></th>
+                  <td>
+                    <span data-lang="zh">文本</span>
+                    <span data-lang="en">Text</span>
+                  </td>
+                  <td>
+                    <span data-lang="zh">长时程用户–助手对话与结构化移动应用事件。</span>
+                    <span data-lang="en"
+                      >Long-horizon user–assistant conversations and structured mobile-app
+                      events.</span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row"><code>omni</code></th>
+                  <td>
+                    <span data-lang="zh">文本与图像</span>
+                    <span data-lang="en">Text and images</span>
+                  </td>
+                  <td>
+                    <span data-lang="zh">包含截图与照片的多模态移动交互。</span>
+                    <span data-lang="en"
+                      >Multimodal mobile interactions with screenshots and photos.</span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row"><code>struct</code></th>
+                  <td>
+                    <span data-lang="zh">结构化数据</span>
+                    <span data-lang="en">Structured data</span>
+                  </td>
+                  <td>
+                    <span data-lang="zh">来自端侧应用的模拟结构化数据。</span>
+                    <span data-lang="en"
+                      >Simulated structured data from on-device applications.</span
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       <!-- Research highlights -->
       <section class="section" id="features" aria-labelledby="features-title">
         <div class="wrap">
@@ -1507,7 +1590,7 @@
               <span class="counter-item">
                 <span data-lang="zh">访问量</span>
                 <span data-lang="en">Page views</span>
-                <strong id="busuanzi_page_pv">--</strong>
+                <strong id="busuanzi_value_page_pv">--</strong>
               </span>
             </div>
           </div>
@@ -1539,6 +1622,6 @@
     <script src="assets/web/js/quick-start.js?v=20260811-2"></script>
     <script src="assets/web/js/application-scenarios.js?v=20260811-1"></script>
     <script src="assets/web/js/application-browser.js?v=20260811-10"></script>
-    <script src="assets/web/js/main.js?v=20260817-7"></script>
+    <script src="assets/web/js/main.js?v=20261009-1"></script>
   </body>
 </html>

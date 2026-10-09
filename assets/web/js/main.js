@@ -7,14 +7,44 @@
 
 // Optional page analytics ---------------------------------------------------
 
-const pageViewCounter = document.querySelector("#busuanzi_page_pv");
+const pageViewCounter = document.querySelector("#busuanzi_value_page_pv");
 const isLocalPreview = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
 
-if (["http:", "https:"].includes(window.location.protocol) && !isLocalPreview) {
+const counterProviders = [
+  {
+    src: "https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js",
+  },
+  {
+    src: "https://busuanzi.9420.ltd/js",
+    prefix: "busuanzi_value",
+  },
+];
+let counterProviderIndex = -1;
+
+const loadCounterProvider = (index) => {
+  if (counterProviderIndex >= index || !pageViewCounter) return;
+  counterProviderIndex = index;
+  if (index >= counterProviders.length) {
+    pageViewCounter.textContent = "—";
+    return;
+  }
+
+  const provider = counterProviders[index];
   const busuanziScript = document.createElement("script");
   busuanziScript.defer = true;
-  busuanziScript.src = "https://busuanzi.9420.ltd/js";
+  busuanziScript.src = provider.src;
+  if (provider.prefix) busuanziScript.dataset.prefix = provider.prefix;
+  busuanziScript.addEventListener("error", () => loadCounterProvider(index + 1));
   document.head.appendChild(busuanziScript);
+
+  window.setTimeout(() => {
+    const value = (pageViewCounter.textContent ?? "").trim();
+    if (!value || value === "--") loadCounterProvider(index + 1);
+  }, 6000);
+};
+
+if (["http:", "https:"].includes(window.location.protocol) && !isLocalPreview) {
+  loadCounterProvider(0);
 } else if (pageViewCounter) {
   pageViewCounter.textContent = "—";
 }
