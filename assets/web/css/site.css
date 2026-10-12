@@ -627,6 +627,22 @@ h3 {
   font-size: 13px;
 }
 
+.dataset-track-link {
+  display: inline-block;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.dataset-track-link:hover code,
+.dataset-track-link:focus-visible code {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.dataset-track-link:hover code {
+  background: rgba(15, 123, 79, 0.14);
+}
+
 .dataset-tracks-table td:nth-child(2) {
   width: 148px;
   color: var(--muted);
